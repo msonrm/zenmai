@@ -54,13 +54,15 @@
   /* ★未訳の行は英語のまま出す。開発中は罫を付けて目で見えるようにする */
   #screen p.raw { color: var(--dim); border-left: 2px solid var(--warn); padding-left: .6em }
 
-  /* ── フッタ: 入力欄。右端に控えめな成績 ── */
+  /* ── フッタ: ★コマンド行は本文と同じ段に揃える。成績は右下に置く ── */
   #foot {
-    flex: 0 0 auto; display: flex; align-items: baseline; gap: .5em;
-    padding-top: .7em; padding-bottom: .8em;
+    flex: 0 0 auto; position: relative;
+    padding-top: .7em; padding-bottom: .9em;
     background: var(--panel); border-top: 1px solid var(--rule);
   }
-  #foot > span.caret { color: var(--accent); flex: 0 0 auto }
+  /* `>` の左端が本文の左端、入力欄の右端が本文の右端に来る */
+  #prompt { display: flex; align-items: baseline; gap: .5em }
+  #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
   #input {
     flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
     color: var(--ink); font: inherit; padding: .15em 0;
@@ -68,10 +70,15 @@
   }
   #input:focus { border-bottom-color: var(--accent) }
   #input::placeholder { color: var(--dim) }
-  #stat { flex: 0 0 auto; font-size: .72rem; color: var(--dim); font-variant-numeric: tabular-nums }
+  /* 右下。段の外なので本文の右端より外側に出る */
+  #stat {
+    position: absolute; right: 1.2em; bottom: .15em;
+    font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums;
+  }
   /* 狭いときは説明を畳む（題だけ残す）→ さらに狭ければ成績も畳む */
   @media (max-width: 46em) { #title .tag { display: none } }
-  @media (max-width: 30em) { #stat { display: none } }
+  /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
+  @media (max-width: 40em) { #stat { display: none } }
 </style>
 </head>
 <body>
@@ -81,10 +88,12 @@
     <span id="score"></span>
   </div>
   <div id="screen" class="gutter" aria-live="polite"></div>
-  <div id="foot" class="edge">
-    <span class="caret">&gt;</span>
-    <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
-           spellcheck="false" placeholder="英語のコマンドを打つ（例: open mailbox）">
+  <div id="foot">
+    <div id="prompt" class="gutter">
+      <span class="caret">&gt;</span>
+      <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
+             spellcheck="false" placeholder="英語のコマンドを打つ（例: open mailbox）">
+    </div>
     <span id="stat"></span>
   </div>
 
