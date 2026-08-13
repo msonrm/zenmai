@@ -60,7 +60,7 @@ const pump = () => {
     const rest = tr.flush()
     if (rest) process.stdout.write(rest + '\n')
     const m = tr.stats
-    process.stderr.write(`\n--- 引けた ${m.hit} 行 / 引けなかった ${m.miss} 行 ---\n`)
+    process.stderr.write(`\n--- 引けた ${m.hit} 行（うち貪欲 ${m.greedy}）/ 訳さない ${m.notrans} 行 / ★引けなかった ${m.miss} 行 ---\n`)
     for (const s of [...m.missed].slice(0, 30)) process.stderr.write('  未訳: ' + s + '\n')
     process.exit(0)
   }

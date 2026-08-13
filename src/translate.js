@@ -18,7 +18,9 @@ function compile(en) {
   for (const m of en.matchAll(/\{([A-Z0-9,?!-]+)\}/g)) {
     re += escapeRe(en.slice(i, m.index))
     names.push(m[1].replace(/,$/, ''))
-    re += '([\\s\\S]+?)'
+    // ★スロットは文をまたげない。`[\\s\\S]` だと `A {OBJ}` のような緩い骨格が行全体を食う
+    //   （`A path leads into the forest to the east.` が丸ごとスロットに入って `A ` が消えた）
+    re += '([^.!?]+?)'
     i = m.index + m[0].length
   }
   re += escapeRe(en.slice(i))
@@ -43,12 +45,28 @@ class Translator {
     for (const t of [...asset.assembled, ...asset.templates]) {
       const en = norm(t.en)
       if (!/\{[A-Z]/.test(en)) { if (!this.exact.has(en)) this.exact.set(en, t.ja); continue }
-      this.patterns.push({ ...compile(en), ja: t.ja, len: en.length })
+      // 具体性（スロットを除いた字数）が高いものから当てる
+      this.patterns.push({ ...compile(en), ja: t.ja, len: en.replace(/\{[^}]*\}/g, '').length })
     }
     // 長い骨格から当てる（短いものが先に食うのを防ぐ）
     this.patterns.sort((a, b) => b.len - a.len)
+    // ★ZIL は文字列の中の改行を `|` で表す。実行時は本物の改行として届くので、
+    //   `|` を境に英日を対で割って登録する（読み物が行単位で引けるようになる）
+    for (const [en, ja] of [...this.exact, ...this.props]) {
+      if (!en.includes('|')) continue
+      const e = en.split('|').map((x) => x.trim())
+      const j = ja.split('|').map((x) => x.trim())
+      if (e.length !== j.length) continue
+      for (let i = 0; i < e.length; i++) if (e[i] && j[i] && !this.exact.has(e[i])) this.exact.set(e[i], j[i])
+    }
+    // 版権表示など「訳さない行」は miss と分けて数える。★こちらも `|` で割る
+    this.notrans = new Set()
+    for (const en of asset.notrans || []) {
+      this.notrans.add(norm(en))
+      for (const part of en.split('|')) if (norm(part)) this.notrans.add(norm(part))
+    }
     this.buf = ''
-    this.stats = { hit: 0, miss: 0, missed: new Set() }
+    this.stats = { hit: 0, greedy: 0, miss: 0, notrans: 0, missed: new Set() }
   }
 
   /** 1 語（または名詞句）を日本語へ。無ければそのまま返す */
@@ -58,6 +76,49 @@ class Translator {
     //   日本語に冠詞は無いので、剥がすだけで済む
     const bare = k.replace(/^(a|an|the)\s+/i, '')
     return this.props.get(k) || this.exact.get(k) || this.props.get(bare) || this.exact.get(bare) || en
+  }
+
+  /** 1 単位（1 文 or 数文のまとまり）を引く。引けなければ null。統計は数えない */
+  lookup(key) {
+    if (!key) return null
+    const hit = this.exact.get(key) ?? this.props.get(key)
+    if (hit !== undefined) return hit
+    for (const p of this.patterns) {
+      const m = key.match(p.re)
+      if (!m) continue
+      let out = p.ja
+      p.names.forEach((name, idx) => {
+        out = out.replace('{' + name + '}', this.word(m[idx + 1]))
+      })
+      return out
+    }
+    return null
+  }
+
+  /**
+   * ★行の中を前方から貪欲に食う。
+   *
+   * 1 行に複数の完成文が並ぶことがある（`It is pitch black. You are likely to be eaten by a grue.`）。
+   * こちらは 2 文を別々に持っているので、行単位の完全一致では引けない。
+   * 逆に、複数文が 1 件として登録されているもの（グルーの説明 3 文）もあるため、
+   * **長いまとまりから順に試して、当たったら次へ進む**（逐次入力の配列エンジンと同じ最長一致）。
+   */
+  greedy(key) {
+    const parts = key.match(/[^.!?]*[.!?]+["')\]]*\s*|[^.!?]+$/g)
+    if (!parts || parts.length < 2) return null
+    const out = []
+    let i = 0, hit = false
+    while (i < parts.length) {
+      let ja = null, span = 0
+      for (let j = parts.length; j > i; j--) {
+        const cand = norm(parts.slice(i, j).join(''))
+        const t = this.lookup(cand)
+        if (t !== null) { ja = t; span = j - i; break }
+      }
+      if (ja === null) { out.push(parts[i].trim()); i++ }
+      else { out.push(ja); hit = true; i += span }
+    }
+    return hit ? out.join('') : null
   }
 
   /** 完成した 1 行を日本語にする。引けなければ null */
@@ -70,18 +131,16 @@ class Translator {
       return inner === null ? null : p[1] + inner
     }
     const key = norm(raw)
-    if (!key) return raw
-    const hit = this.exact.get(key) ?? this.props.get(key)
-    if (hit !== undefined) { this.stats.hit++; return hit }
-    for (const p of this.patterns) {
-      const m = key.match(p.re)
-      if (!m) continue
-      let out = p.ja
-      p.names.forEach((name, idx) => {
-        out = out.replace('{' + name + '}', this.word(m[idx + 1]))
-      })
-      this.stats.hit++
-      return out
+    if (!key || /^>+$/.test(key)) return raw   // プロンプトだけの行は素通し
+    const whole = this.lookup(key)
+    if (whole !== null) { this.stats.hit++; return whole }
+    const g = this.greedy(key)
+    if (g !== null) { this.stats.hit++; this.stats.greedy++; return g }
+    // ★版権バナーは実行時に連結されて出る（`Copyright (c) 1981, … Infocom, Inc. All rights reserved.`）
+    //   ので、完全一致では拾えない。包含関係で判定する（相手は定型の版権表示だけなので安全）
+    if (this.notrans.has(key) || [...this.notrans].some((n) => n.includes(key) || key.includes(n))) {
+      this.stats.notrans++
+      return null
     }
     this.stats.miss++
     this.stats.missed.add(key)
