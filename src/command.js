@@ -111,7 +111,9 @@ function createCommander(asset) {
         kind: 'obj',
         key,
         word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
-        vehicle: !!o.vehicle,
+        // ★共有された言い方（舟 = ビニールの塊 / 魔法の舟 / 穴の空いた舟）は、
+        //   **どれかが乗り物なら乗り物として扱う**。どれを指すかは場が決める
+        vehicle: shared ? own.some((x) => objOf[x].vehicle) : !!o.vehicle,
       })
     }
   }
@@ -161,11 +163,17 @@ function createCommander(asset) {
       //   見えてしまう（「どあをあける」が `open` だけになり、原作が (door) を補った）。
       //   助詞は語彙に無いので未知語の側に飲まれる。だから末尾で判定する。
       //   を/は/が に限る —— に・で は副詞の末尾（しずかに・いそいで）と紛れる
-      //   ★助詞だけが余ることがある（「絨毯の下を見る」の「を」= 役はもう決まっている）。
-      //   そのときは未知語ではないので、止めない
-      const mk = word.match(/(を|は|が)$/)
-      if (mk) word = word.slice(0, -1)
-      if (word) { unknown.push(word); if (mk) hardStop = true }
+      //   ★助詞は語彙に無いので**未知語の側に飲まれる**。末尾だけでなく途中も見る
+      //   （「こおりをとーちでとかす」は「こおりをとーちで」がひと塊になる）。
+      //   助詞だけが余ることもある（「絨毯の下を見る」の「を」= 役はもう決まっている）ので、
+      //   前が空なら止めない
+      const cut = word.search(/[をはが]/)
+      if (cut < 0) { if (word) unknown.push(word) } else {
+        const head = word.slice(0, cut)
+        const rest = word.slice(cut + 1)
+        if (head) { unknown.push(head); hardStop = true }
+        if (rest) unknown.push(rest)
+      }
       echo.push(s.slice(i, j))
       i = j
     }
@@ -205,7 +213,10 @@ function createCommander(asset) {
 
     // ★役の割り当て: を/は/が → 直接目的語、で/を使って → 道具、に/へ/の中に… → 第 2 目的語
     //   ★助詞で明示されたほうを優先する（裸の名詞より「を」が強い）
-    let prso = objs.find((o) => o.role === 'O') || objs.find((o) => o.role === null) || null
+    //   ★「カナリアのぜんまいを巻く」—— 頭の名詞が動詞の側に入っている言い方がある
+    //   （`ぜんまいを巻く` で 1 語）。残った修飾語が実は目的語なので拾う
+    let prso = objs.find((o) => o.role === 'O') || objs.find((o) => o.role === null)
+      || objs.find((o) => o.role === 'MOD') || null
     const tool = objs.find((o) => o.role === 'WITH')
     const dest = objs.find((o) => ['TO', 'IN', 'ON', 'UNDER', 'BEHIND', 'FROM'].includes(o.role))
     if (!prso && dest && objs.length === 1) { prso = dest }

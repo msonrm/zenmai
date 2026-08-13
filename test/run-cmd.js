@@ -41,7 +41,7 @@ const CASES = [
   ['うえへのぼる', 'up'],
   ['はしごをおりる', 'climb down ladder'],  // 乗り物でなければ climb down
   ['きをおりる', 'climb down tree'],        // 実プレイ: disembark tree は「乗っていない」
-  ['ふねをおりる', 'disembark inflat boat'], // 乗り物（VEHBIT）なら disembark
+  ['ふねをおりる', 'disembark boat'],       // 乗り物（VEHBIT）なら disembark
   ['なかにはいる', 'enter'],
   // --- 実プレイで出た取りこぼし（2026-08-13）---
   ['いたをはずす', 'take boards'],          // BOARD が動詞と物で衝突していた
