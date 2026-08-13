@@ -1,0 +1,71 @@
+'use strict'
+/**
+ * ブラウザ用ホスト（web/main.js）を node で走らせる検証。
+ *
+ * 最小の DOM と fetch を用意して、**本番と同じコード**を通す。
+ * ブラウザを開けない環境でも、配線の壊れ（要素 id の取り違え・イベントの繋ぎ忘れ・
+ * 段落の組み立て）はここで落ちる。描画の見た目だけは目で見るしかない。
+ *
+ * 使い方: node test/run-web-dom.js "north" "east" ...
+ */
+const fs = require('fs')
+const path = require('path')
+const vm2 = require('vm')
+
+const ROOT = path.join(__dirname, '..')
+const cmds = process.argv.slice(2)
+
+// --- 最小の DOM ---
+class El {
+  constructor(tag) {
+    this.tag = tag; this.children = []; this._text = ''
+    this.className = ''; this.value = ''; this.disabled = false; this.placeholder = ''
+    this.scrollTop = 0; this.scrollHeight = 0; this.handlers = {}
+  }
+  get textContent() { return this._text }
+  set textContent(v) { this._text = String(v) }
+  appendChild(c) { this.children.push(c); return c }
+  get lastElementChild() { return this.children[this.children.length - 1] }
+  addEventListener(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn) }
+  dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
+  focus() {}
+}
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat']
+const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
+const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
+const window = {}
+global.window = window
+global.document = document
+global.fetch = async (url) => {
+  const p = path.join(ROOT, 'web', url)
+  if (!fs.existsSync(p)) return { ok: false }
+  const buf = fs.readFileSync(p)
+  return { ok: true, json: async () => JSON.parse(buf.toString('utf8')), arrayBuffer: async () => buf }
+}
+
+// --- 本番のスクリプトを順に読み込む（index.html の script 順と同じ）---
+for (const f of ['vendor/zvm.min.js', 'src/translate.js', 'src/glk-shim.js']) {
+  vm2.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f })
+}
+if (!window.ZVM) window.ZVM = module.exports && module.exports.prototype ? module.exports : global.ZVM
+vm2.runInThisContext(fs.readFileSync(path.join(ROOT, 'web', 'main.js'), 'utf8'), { filename: 'web/main.js' })
+
+// --- コマンドを順に流す ---
+let n = 0
+const tick = () => {
+  if (els.input.disabled) return setTimeout(tick, 30)          // まだ入力待ちではない
+  if (n >= cmds.length) return finish()
+  els.input.value = cmds[n++]
+  els.input.dispatch('keydown', { key: 'Enter' })
+  setTimeout(tick, 30)
+}
+const finish = () => {
+  const text = els.screen.children.map((p) => (p.className === 'cmd' ? '> ' : '') + p.textContent).join('\n')
+  console.log(text)
+  console.log('\n--- 状態行: [' + els.place.textContent + '] ' + els.score.textContent)
+  console.log('--- ' + els.stat.textContent.trim())
+  const raw = els.screen.children.filter((p) => p.className === 'raw')
+  console.log('--- 未訳として描かれた段落: ' + raw.length)
+  process.exit(0)
+}
+setTimeout(tick, 200)

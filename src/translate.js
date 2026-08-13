@@ -174,4 +174,8 @@ class Translator {
   }
 }
 
-module.exports = { Translator, compile, norm }
+{
+  const api = { Translator, compile, norm }
+  if (typeof module !== 'undefined' && module.exports) module.exports = api
+  if (typeof window !== 'undefined') window.ZenmaiTranslate = api
+}
