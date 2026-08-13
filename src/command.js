@@ -85,6 +85,7 @@ function createCommander(asset) {
     const s = kana(raw)
     const found = []          // { kind, key, word, role }
     const unknown = []
+    let hardStop = false      // ★未知語が目的語の位置に立っていたら送らない
     const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
     while (i < s.length) {
@@ -103,16 +104,31 @@ function createCommander(asset) {
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
       while (j < s.length && !lex.some((e) => s.startsWith(e.kana, j))) j++
-      unknown.push(s.slice(i, j))
+      let word = s.slice(i, j)
+      // ★未知語が格助詞を背負っていたら、それは「物のつもり」だ。捨ててはいけない。
+      //   動詞だけ送るとゲームが**別の物を勝手に補う**ことがあり、たまたま正しく
+      //   見えてしまう（「どあをあける」が `open` だけになり、原作が (door) を補った）。
+      //   助詞は語彙に無いので未知語の側に飲まれる。だから末尾で判定する。
+      //   を/は/が に限る —— に・で は副詞の末尾（しずかに・いそいで）と紛れる
+      //   ★助詞だけが余ることがある（「絨毯の下を見る」の「を」= 役はもう決まっている）。
+      //   そのときは未知語ではないので、止めない
+      const mk = word.match(/(を|は|が)$/)
+      if (mk) word = word.slice(0, -1)
+      if (word) { unknown.push(word); if (mk) hardStop = true }
       echo.push(s.slice(i, j))
       i = j
     }
+    if (hardStop) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
     const verb = found.find((f) => f.kind === 'verb')
     const dirs = found.filter((f) => f.kind === 'dir')
     const objs = found.filter((f) => f.kind === 'obj')
 
     // 方角だけ（「北」「北へ行く」）→ 方角の語をそのまま渡す
-    if (dirs.length && (!verb || verb.key === 'WALK')) {
+    // ★「下へ降りる」「上へ登る」も方角の言い方。原作の CLIMB / DISEMBARK は
+    //   **物に対する動詞**（梯子を降りる = `disembark ladder`）なので、
+    //   物を伴わずに方角だけが立っているときに限って方角へ寄せる
+    const MOVE_DIR = ['CLIMB', 'DISEMBARK']
+    if (dirs.length && (!verb || verb.key === 'WALK' || (MOVE_DIR.includes(verb.key) && !objs.length))) {
       return { command: dirs[0].word, trace: '方角', unknown, echo: echo.join('') }
     }
     // 「中に入る」「外に出る」の中／外は方角ではなく動詞のほうに含まれている
@@ -136,7 +152,9 @@ function createCommander(asset) {
     const out = [verb.key.toLowerCase()]
     const shapes = verb.shapes || []
     const has = (p) => shapes.some((sh) => sh.split(' ').includes(p))
-    if (prso && prso !== dest) {
+    // ★前置詞つきの目的語が 1 つだけでも、その前置詞を動詞が取らないなら**裸で渡す**。
+    //   「木に登る」の「に」は原作の CLIMB には無い形（`climb tree` が正しい）
+    if (prso && !(dest === prso && has(dest.role))) {
       // ★裸の目的語を取らない動詞（`look` など）には、構文表から前置詞を補う。
       //   `look case` は原作の構文に無く「その文は知らない形だ」で弾かれる
       // ★（動詞単独）は「裸の目的語が使える」ことを意味しない。混同していた

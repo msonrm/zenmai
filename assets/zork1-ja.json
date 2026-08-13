@@ -584,6 +584,11 @@
    "en": "A long, theatrical slash. You catch it on your {F-WEP}, but the thief twists his knife, and the {F-WEP} goes flying.",
    "id": "F-35",
    "ja": "長く芝居がかった斬撃。{F-WEP}で受けたが、盗賊が刃をひねり、{F-WEP}は飛んでいった。"
+  },
+  {
+   "en": "({OBJ})",
+   "id": "P-8",
+   "ja": "（{OBJ}）"
   }
  ],
  "exact": {
