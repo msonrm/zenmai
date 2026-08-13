@@ -31,6 +31,9 @@ const PARTICLES = [
   // ★「には」は入れない —— 「なかにはいる」の「はいる」の頭を食う
   ['から', 'FROM'], ['へ', 'TO'], ['に', 'TO'], ['で', 'WITH'],
   ['を', 'O'], ['は', 'O'], ['が', 'O'], ['と', 'AND'],
+  // ★連体修飾の「の」（家の扉 / 家のドア）。**上の の〜 より必ず後ろに置く**
+  //   —— 先に来ると「絨毯の下」の「のした」を食う
+  ['の', 'MOD'],
 ]
 
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
@@ -143,8 +146,18 @@ function createCommander(asset) {
       return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
     }
 
+    // ★「家の扉」の「家」は目的語ではなく**修飾語**。日本語は修飾語が前に来るので、
+    //   これを外さないと先に見つかったほう（家）が目的語になる。
+    //   ただし後ろに名詞が続かないなら（「家の」で終わる）ただの言い落としとして残す。
+    //   ★「木のドア」のように**語彙に丸ごと載っている複合語は最長一致が先に取る**ので、
+    //   ここへは来ない = 落ちるのは登録されていない組み合わせだけ
+    const heads = objs.filter((o, k) => !(o.role === 'MOD' && objs[k + 1]))
+    objs.length = 0
+    objs.push(...heads)
+
     // ★役の割り当て: を/は/が → 直接目的語、で/を使って → 道具、に/へ/の中に… → 第 2 目的語
-    let prso = objs.find((o) => o.role === 'O' || o.role === null) || null
+    //   ★助詞で明示されたほうを優先する（裸の名詞より「を」が強い）
+    let prso = objs.find((o) => o.role === 'O') || objs.find((o) => o.role === null) || null
     const tool = objs.find((o) => o.role === 'WITH')
     const dest = objs.find((o) => ['TO', 'IN', 'ON', 'UNDER', 'BEHIND', 'FROM'].includes(o.role))
     if (!prso && dest && objs.length === 1) { prso = dest }

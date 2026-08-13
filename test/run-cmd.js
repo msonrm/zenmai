@@ -21,6 +21,10 @@ const CASES = [
   ['けんをとる', 'take sword'],
   ['けんをつかむ', 'take sword'],          // 同じ英単語に寄せる（動詞の言い方は複数）
   ['じゅうたんをめくる', 'move rug'],
+  // --- 連体修飾（AのB）は B が目的語（2026-08-14 実プレイ）---
+  ['いえのとびらをあける', 'open front door'],
+  ['いえのどあをあける', 'open front door'],
+  ['きのどあをあける', 'open wooden door'],   // 語彙に載っている複合語は最長一致が先に取る
   // --- 助詞が役を決める ---
   ['ランタンでとびらをあける', 'open front door with brass lamp'],
   ['じゅうたんのしたをみる', 'look under rug'],
