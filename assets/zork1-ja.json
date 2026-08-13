@@ -374,6 +374,216 @@
    "en": "You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is slightly ajar.",
    "id": "W-4",
    "ja": "白い家の台所にいる。食卓は、つい先ほど食事の支度に使われたように見える。通路が西へ延び、暗い階段が上へ続いているのが見える。暗い煙突が下へ通じており、東には小さな窓があって、わずかに開いている。"
+  },
+  {
+   "en": "A good slash, but it misses the {VILLAIN} by a mile.",
+   "id": "C-1",
+   "ja": "見事な斬撃だが、{VILLAIN}には遠く及ばず外れた。"
+  },
+  {
+   "en": "A good stroke, but it's too slow; the {VILLAIN} dodges.",
+   "id": "C-2",
+   "ja": "よい一撃だが遅すぎた。{VILLAIN}はかわした。"
+  },
+  {
+   "en": "Clang! Crash! The {VILLAIN} parries.",
+   "id": "C-3",
+   "ja": "ガシャン、ガチャン。{VILLAIN}が受け止めた。"
+  },
+  {
+   "en": "Your sword misses the {VILLAIN} by an inch.",
+   "id": "C-4",
+   "ja": "剣は{VILLAIN}をわずかに外した。"
+  },
+  {
+   "en": "A furious exchange, and the {VILLAIN} is knocked out!",
+   "id": "C-5",
+   "ja": "激しい打ち合いの末、{VILLAIN}は倒れて気を失った。"
+  },
+  {
+   "en": "{OBJ}: Taken.",
+   "id": "M-1",
+   "ja": "{OBJ}：取った。"
+  },
+  {
+   "en": "The objects that you mentioned aren't here.",
+   "id": "M-2",
+   "ja": "きみが言ったものは、ここにない。"
+  },
+  {
+   "en": "A furious exchange, and the {F-DEF} is knocked out!",
+   "id": "F-1",
+   "ja": "激しい打ち合いの末、{F-DEF}は倒れて気を失った。"
+  },
+  {
+   "en": "A good slash, but it misses the {F-DEF} by a mile.",
+   "id": "F-2",
+   "ja": "見事な斬撃だが、{F-DEF}には遠く及ばず外れた。"
+  },
+  {
+   "en": "A good stroke, but it's too slow; the {F-DEF} dodges.",
+   "id": "F-3",
+   "ja": "よい一撃だが遅すぎた。{F-DEF}はかわした。"
+  },
+  {
+   "en": "A quick stroke, but the {F-DEF} is on guard.",
+   "id": "F-4",
+   "ja": "素早い一撃だが、{F-DEF}は構えている。"
+  },
+  {
+   "en": "A savage blow on the thigh! The {F-DEF} is stunned but can still fight!",
+   "id": "F-5",
+   "ja": "太腿への痛烈な一撃。{F-DEF}はふらついたが、まだ戦える。"
+  },
+  {
+   "en": "Clang! Crash! The {F-DEF} parries.",
+   "id": "F-6",
+   "ja": "ガシャン、ガチャン。{F-DEF}が受け止めた。"
+  },
+  {
+   "en": "It's curtains for the {F-DEF} as your {F-WEP} removes his head.",
+   "id": "F-7",
+   "ja": "{F-WEP}が首を落とし、{F-DEF}はそれで終わった。"
+  },
+  {
+   "en": "The blow lands, making a shallow gash in the {F-DEF}'s arm!",
+   "id": "F-8",
+   "ja": "一撃が入り、{F-DEF}の腕に浅い切り傷を作った。"
+  },
+  {
+   "en": "The fatal blow strikes the {F-DEF} square in the heart: He dies.",
+   "id": "F-9",
+   "ja": "致命の一撃が{F-DEF}の心臓をまともに貫いた。息絶えた。"
+  },
+  {
+   "en": "The force of your blow knocks the {F-DEF} back, stunned.",
+   "id": "F-10",
+   "ja": "一撃の勢いで{F-DEF}は後ろへ吹き飛び、ふらついている。"
+  },
+  {
+   "en": "The haft of your {F-WEP} knocks out the {F-DEF}.",
+   "id": "F-11",
+   "ja": "{F-WEP}の柄が{F-DEF}を打ち倒し、気を失わせた。"
+  },
+  {
+   "en": "The quickness of your thrust knocks the {F-DEF} back, stunned.",
+   "id": "F-12",
+   "ja": "突きの速さに{F-DEF}は後ろへ退き、ふらついている。"
+  },
+  {
+   "en": "The {F-DEF} is battered into unconsciousness.",
+   "id": "F-13",
+   "ja": "{F-DEF}は打ちのめされて気を失った。"
+  },
+  {
+   "en": "The {F-DEF} is confused and can't fight back.",
+   "id": "F-14",
+   "ja": "{F-DEF}は混乱して反撃できない。"
+  },
+  {
+   "en": "The {F-DEF} is disarmed by a subtle feint past his guard.",
+   "id": "F-15",
+   "ja": "守りをすり抜ける巧みな誘いで、{F-DEF}は武器を失った。"
+  },
+  {
+   "en": "The {F-DEF} is knocked out!",
+   "id": "F-16",
+   "ja": "{F-DEF}は倒れて気を失った。"
+  },
+  {
+   "en": "The {F-DEF} is momentarily disoriented and can't fight back.",
+   "id": "F-17",
+   "ja": "{F-DEF}は一瞬方向を失い、反撃できない。"
+  },
+  {
+   "en": "The {F-DEF} is staggered, and drops to his knees.",
+   "id": "F-18",
+   "ja": "{F-DEF}はふらつき、膝をついた。"
+  },
+  {
+   "en": "The {F-DEF} is struck on the arm; blood begins to trickle down.",
+   "id": "F-19",
+   "ja": "{F-DEF}の腕に一撃が入り、血が滴りはじめる。"
+  },
+  {
+   "en": "The {F-DEF} receives a deep gash in his side.",
+   "id": "F-20",
+   "ja": "{F-DEF}の脇に深い切り傷ができた。"
+  },
+  {
+   "en": "The {F-DEF} takes a fatal blow and slumps to the floor dead.",
+   "id": "F-21",
+   "ja": "{F-DEF}は致命の一撃を受け、床に崩れて息絶えた。"
+  },
+  {
+   "en": "The {F-DEF}'s weapon is knocked to the floor, leaving him unarmed.",
+   "id": "F-22",
+   "ja": "{F-DEF}の武器は床に叩き落とされ、素手になった。"
+  },
+  {
+   "en": "You charge, but the {F-DEF} jumps nimbly aside.",
+   "id": "F-23",
+   "ja": "突進したが、{F-DEF}は身軽に横へ跳んだ。"
+  },
+  {
+   "en": "Your {F-WEP} crashes down, knocking the {F-DEF} into dreamland.",
+   "id": "F-24",
+   "ja": "{F-WEP}が振り下ろされ、{F-DEF}を夢の中へ送り込んだ。"
+  },
+  {
+   "en": "Your {F-WEP} misses the {F-DEF} by an inch.",
+   "id": "F-25",
+   "ja": "{F-WEP}は{F-DEF}をわずかに外した。"
+  },
+  {
+   "en": "Your {F-WEP} pinks the {F-DEF} on the wrist, but it's not serious.",
+   "id": "F-26",
+   "ja": "{F-WEP}が{F-DEF}の手首をかすめたが、深くはない。"
+  },
+  {
+   "en": "The axe hits your {F-WEP} and knocks it spinning.",
+   "id": "F-27",
+   "ja": "斧が{F-WEP}に当たり、回転させて弾き飛ばした。"
+  },
+  {
+   "en": "The axe knocks your {F-WEP} out of your hand. It falls to the floor.",
+   "id": "F-28",
+   "ja": "斧が{F-WEP}を手から叩き落とした。床に落ちる。"
+  },
+  {
+   "en": "The thief neatly flips your {F-WEP} out of your hands, and it drops to the floor.",
+   "id": "F-29",
+   "ja": "盗賊は手際よく{F-WEP}を手から跳ね上げ、床に落とした。"
+  },
+  {
+   "en": "You parry a low thrust, and your {F-WEP} slips out of your hand.",
+   "id": "F-30",
+   "ja": "低い突きを受け止めたが、{F-WEP}が手から滑り落ちた。"
+  },
+  {
+   "en": "The troll swings, you parry, but the force of his blow knocks your {F-WEP} away.",
+   "id": "F-31",
+   "ja": "トロルが振り、受け止めたものの、その勢いで{F-WEP}を弾き飛ばされた。"
+  },
+  {
+   "en": "The troll charges, and his axe slashes you on your {F-WEP} arm.",
+   "id": "F-32",
+   "ja": "トロルが突進し、斧が{F-WEP}を持つ腕を斬った。"
+  },
+  {
+   "en": "The monster grabs you on the wrist, squeezes, and you drop your {F-WEP} in pain.",
+   "id": "F-33",
+   "ja": "怪物が手首をつかんで締め上げ、痛みで{F-WEP}を落としてしまった。"
+  },
+  {
+   "en": "The Cyclops grabs your {F-WEP}, tastes it, and throws it to the ground in disgust.",
+   "id": "F-34",
+   "ja": "サイクロプスは{F-WEP}をつかみ、味わってから、うんざりして地面に投げ捨てた。"
+  },
+  {
+   "en": "A long, theatrical slash. You catch it on your {F-WEP}, but the thief twists his knife, and the {F-WEP} goes flying.",
+   "id": "F-35",
+   "ja": "長く芝居がかった斬撃。{F-WEP}で受けたが、盗賊が刃をひねり、{F-WEP}は飛んでいった。"
   }
  ],
  "exact": {
@@ -1430,33 +1640,72 @@
   "hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.",
   "and, being for the moment sated, throws it back. Fortunately, the troll has poor control, and the {PRSO} falls to the floor. He does not look pleased.",
   ", but in trying to take it you have noticed an irregularity beneath it.",
+  "The troll swings, you parry, but the force of his blow knocks your",
+  "The monster grabs you on the wrist, squeezes, and you drop your",
   "The troll, who is remarkably coordinated, catches the {PRSO}",
+  "'s weapon is knocked to the floor, leaving him unarmed.",
+  ", tastes it, and throws it to the ground in disgust.",
+  "is struck on the arm; blood begins to trickle down.",
+  "The troll charges, and his axe slashes you on your",
+  "takes a fatal blow and slumps to the floor dead.",
+  "is momentarily disoriented and can't fight back.",
+  "A long, theatrical slash. You catch it on your",
+  "is disarmed by a subtle feint past his guard.",
+  "out of your hands, and it drops to the floor.",
   "The {WINNER} seems confused. \"I don't see any",
   "Here begins a transcript of interaction with",
+  "The blow lands, making a shallow gash in the",
   "Here ends a transcript of interaction with",
   "Oh, no! A lurking grue slithered into the",
+  ", but the thief twists his knife, and the",
   ", especially in light of your condition.",
+  "out of your hand. It falls to the floor.",
+  "The quickness of your thrust knocks the",
   "a clear area leading towards a forest.",
   "catches fire. Unfortunately, you were",
   "Swimming isn't usually allowed in the",
+  "A good stroke, but it's too slow; the",
+  "is staggered, and drops to his knees.",
   "\" in a way that I don't understand.",
+  "on the wrist, but it's not serious.",
+  "is battered into unconsciousness.",
+  "receives a deep gash in his side.",
+  "The force of your blow knocks the",
+  "is confused and can't fight back.",
   "Trying to destroy the {PRSO} with",
+  "You parry a low thrust, and your",
   "The contents of the {PRSO} spill",
+  "A good slash, but it misses the",
+  "A savage blow on the thigh! The",
+  "is stunned but can still fight!",
   "what appears to be a kitchen.",
+  "square in the heart: He dies.",
   "Playing in this way with the",
   "The rug is too heavy to lift",
   "A terrific throw! The {PRSO}",
+  "A furious exchange, and the",
+  "The thief neatly flips your",
   "ward, and looks climbable.",
+  "crashes down, knocking the",
+  "The fatal blow strikes the",
   "Opening the {PRSO} reveals",
   "I don't know the word \"",
+  "A quick stroke, but the",
+  "and knocks it spinning.",
+  "slips out of your hand.",
   "You can't use multiple",
   "Your load is too heavy",
   "isn't notably helpful.",
+  "The Cyclops grabs your",
   "direct objects with \"",
   "doesn't seem to work.",
+  "It's curtains for the",
   "There is a {OBJ} here",
   "You used the word \"",
   "What do you want to",
+  "You charge, but the",
+  "jumps nimbly aside.",
+  "The axe knocks your",
   "You don't have the",
   "that you mentioned",
   "out and disappears",
@@ -1465,34 +1714,55 @@
   "and devoured you!",
   "Fiddling with the",
   "The chimney leads",
+  "Clang! Crash! The",
+  "removes his head.",
+  "The axe hits your",
+  "The haft of your",
   "it at the time.",
   "your bare hands",
   "has burned out.",
+  "into dreamland.",
+  "is knocked out!",
   "(How about the",
   "has no effect.",
   "slightly ajar.",
   "is turned off.",
+  "knocks out the",
+  "back, stunned.",
   "to the ground",
   ", in the {AV}",
   "do you mean,",
   "(being worn)",
+  "is on guard.",
+  "goes flying.",
   "The {OBJ} do",
   "Kicking the",
   "Pushing the",
   "You can see",
+  "unconscious",
+  "by an inch.",
   "is futile.",
   "Waving the",
   "There is a",
+  "misses the",
+  "by a mile.",
   "The {PRSO}",
   "n't here.",
+  "pinks the",
   "the {OBJ}",
   "n't lead",
   "dungeon.",
   "the room",
   "The lamp",
+  "parries.",
+  "in pain.",
   "a {PRSI}",
   "holding",
+  "unarmed",
   "You can",
+  "dodges.",
+  "as your",
+  "'s arm!",
   "A {OBJ}",
   "object",
   "here!\"",
@@ -1503,11 +1773,14 @@
   "ward.",
   "here.",
   "open.",
+  "away.",
   "a {F}",
   "tell",
   "down",
   "room",
-  "out."
+  "out.",
+  "arm.",
+  "es."
  ],
  "notrans": [
   "through",

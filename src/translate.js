@@ -20,7 +20,10 @@ function compile(en) {
     names.push(m[1].replace(/,$/, ''))
     // ★スロットは文をまたげない。`[\\s\\S]` だと `A {OBJ}` のような緩い骨格が行全体を食う
     //   （`A path leads into the forest to the east.` が丸ごとスロットに入って `A ` が消えた）
-    re += '([^.!?]+?)'
+    // ただし**引用符で囲まれたスロット**は別 —— 未知語がそのまま入るので記号もありうる
+    //   （`I don't know the word "!)".` が外れていた）
+    const quoted = en[m.index - 1] === '"' && en[m.index + m[0].length] === '"'
+    re += quoted ? '([^"]*)' : '([^.!?]+?)'
     i = m.index + m[0].length
   }
   re += escapeRe(en.slice(i))

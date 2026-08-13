@@ -140,7 +140,10 @@ function createGlk(host) {
     submitLine(text) {
       if (!lineReq || !pending) return false
       const { win, buf } = lineReq
-      const s = String(text)
+      // ★バッファの上限を守る。溢れると Uint8Array.set が「offset is out of bounds」で落ちる
+      //   （長いコマンド `put coffin, sceptre, and gold into case` で実際に落ちた）
+      const max = (buf && buf.length) || 120
+      const s = String(text).slice(0, max)
       for (let i = 0; i < s.length; i++) buf[i] = s.charCodeAt(i)
       pending.push_field(evtype_LineInput)
       pending.push_field(win)
