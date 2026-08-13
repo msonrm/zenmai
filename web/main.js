@@ -25,19 +25,25 @@
     return
   }
 
+  // 行頭・行末に単独で立つ `>` を落とす（ゲームのプロンプト）
+  const strip = (t) => t.replace(/^[ \t]*>+[ \t]*$/gm, '').replace(/(^|\n)[ \t]*>+[ \t]*$/g, '$1')
+
   let para = null
   function show(text, cls) {
-    // 空行で段落を切る。改行はそのまま活かす（pre-wrap）
+    // 空行で段落を切る。段落の中の改行は活かす（pre-wrap）
     for (const chunk of text.split(/\n{2,}/)) {
-      if (!chunk) { para = null; continue }
+      const t = chunk.replace(/^\n+|\n+$/g, '')
+      if (!t) { para = null; continue }
       if (!para || cls) {
         para = document.createElement('p')
         if (cls) para.className = cls
         screen.appendChild(para)
-        if (cls) para = null
       }
-      const p = para || screen.lastElementChild
-      p.textContent += chunk
+      const p = para
+      // 追記のときは行の境目を落とさない。★末尾の改行は残さない（余った空行になる）
+      if (p.textContent && !p.textContent.endsWith('\n')) p.textContent += '\n'
+      p.textContent += t
+      if (cls) para = null
     }
     screen.scrollTop = screen.scrollHeight
   }
@@ -46,9 +52,8 @@
     cols: 64,
     rows: 24,
     write(text) {
-      // ★訳せた行と訳せなかった行を分けて描く（未訳が目で見える）
       const out = tr.feed(text)
-      if (out) show(out)
+      if (out) show(strip(out))
     },
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
@@ -57,8 +62,10 @@
       $('score').textContent = m ? m[2] : ''
     },
     update() {
-      const rest = tr.flush()
-      if (rest) show(rest)
+      // ★ゲーム自身が入力待ちの前に `>` を印字する。こちらは入力欄に自前の
+      //   プロンプトを持っているので、二重に出さないよう落とす
+      const rest = strip(tr.flush())
+      if (rest.trim()) show(rest)
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
       if (Glk.waitingFor() === 'char') $('input').placeholder = '何かキーを（Enter で進む）'
