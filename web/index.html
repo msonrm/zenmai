@@ -51,6 +51,9 @@
   #screen p { margin: 0 0 .9em; white-space: pre-wrap }
   #screen p.cmd { color: var(--accent) }
   #screen p.cmd::before { content: "> " }
+  /* 実際に渡した英語コマンド（種明かし。薄く小さく） */
+  #screen p.sent { margin: -.6em 0 .9em; font-size: .75rem; color: var(--dim); font-family: ui-monospace, monospace }
+  #screen p.sent::before { content: "→ " }
   /* ★未訳の行は英語のまま出す。開発中は罫を付けて目で見えるようにする */
   #screen p.raw { color: var(--dim); border-left: 2px solid var(--warn); padding-left: .6em }
 
@@ -92,13 +95,14 @@
     <div id="prompt" class="gutter">
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
-             spellcheck="false" placeholder="英語のコマンドを打つ（例: open mailbox）">
+             spellcheck="false" placeholder="日本語で打つ（例: 郵便箱を開ける）">
     </div>
     <span id="stat"></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
   <script src="../src/translate.js"></script>
+  <script src="../src/command.js"></script>
   <script src="../src/glk-shim.js"></script>
   <script src="main.js"></script>
 </body>

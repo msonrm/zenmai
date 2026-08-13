@@ -1,0 +1,1142 @@
+{
+ "objects": {
+  "ADVERTISEMENT": {
+   "adjs": [
+    "SMALL"
+   ],
+   "desc": "leaflet",
+   "ja": [
+    "ちらし",
+    "紙",
+    "チラシ"
+   ],
+   "nouns": [
+    "ADVERTISEMENT",
+    "LEAFLET",
+    "BOOKLET",
+    "MAIL"
+   ]
+  },
+  "BOARD": {
+   "adjs": [],
+   "desc": "board",
+   "ja": [
+    "板"
+   ],
+   "nouns": [
+    "BOARDS",
+    "BOARD"
+   ]
+  },
+  "BOTTLE": {
+   "adjs": [
+    "CLEAR",
+    "GLASS"
+   ],
+   "desc": "glass bottle",
+   "ja": [
+    "ガラス瓶",
+    "瓶"
+   ],
+   "nouns": [
+    "BOTTLE",
+    "CONTAINER"
+   ]
+  },
+  "CHIMNEY": {
+   "adjs": [
+    "DARK",
+    "NARROW"
+   ],
+   "desc": "chimney",
+   "ja": [
+    "煙突"
+   ],
+   "nouns": [
+    "CHIMNEY"
+   ]
+  },
+  "FOREST": {
+   "adjs": [],
+   "desc": "forest",
+   "ja": [
+    "森"
+   ],
+   "nouns": [
+    "FOREST",
+    "TREES",
+    "PINES",
+    "HEMLOCKS"
+   ]
+  },
+  "FRONT-DOOR": {
+   "adjs": [
+    "FRONT",
+    "BOARDED"
+   ],
+   "desc": "door",
+   "ja": [
+    "扉",
+    "正面の扉"
+   ],
+   "nouns": [
+    "DOOR"
+   ]
+  },
+  "GARLIC": {
+   "adjs": [],
+   "desc": "clove of garlic",
+   "ja": [
+    "にんにくの一片",
+    "にんにく"
+   ],
+   "nouns": [
+    "GARLIC",
+    "CLOVE"
+   ]
+  },
+  "KITCHEN-WINDOW": {
+   "adjs": [
+    "KITCHEN",
+    "SMALL"
+   ],
+   "desc": "kitchen window",
+   "ja": [
+    "台所の窓",
+    "窓"
+   ],
+   "nouns": [
+    "WINDOW"
+   ]
+  },
+  "LAMP": {
+   "adjs": [
+    "BRASS"
+   ],
+   "desc": "brass lantern",
+   "ja": [
+    "真鍮のランタン",
+    "ランタン",
+    "ランプ"
+   ],
+   "nouns": [
+    "LAMP",
+    "LANTERN",
+    "LIGHT"
+   ]
+  },
+  "LUNCH": {
+   "adjs": [
+    "HOT",
+    "PEPPER"
+   ],
+   "desc": "lunch",
+   "ja": [
+    "昼食",
+    "サンドイッチ"
+   ],
+   "nouns": [
+    "FOOD",
+    "SANDWICH",
+    "LUNCH",
+    "DINNER"
+   ]
+  },
+  "MAILBOX": {
+   "adjs": [
+    "SMALL"
+   ],
+   "desc": "small mailbox",
+   "ja": [
+    "小さな郵便箱",
+    "郵便箱"
+   ],
+   "nouns": [
+    "MAILBOX",
+    "BOX"
+   ]
+  },
+  "MOUNTAIN-RANGE": {
+   "adjs": [
+    "IMPASSABLE",
+    "FLATHEAD"
+   ],
+   "desc": "mountain range",
+   "ja": [
+    "山並み",
+    "山"
+   ],
+   "nouns": [
+    "MOUNTAIN",
+    "RANGE"
+   ]
+  },
+  "RUG": {
+   "adjs": [
+    "LARGE",
+    "ORIENTAL"
+   ],
+   "desc": "carpet",
+   "ja": [
+    "絨毯",
+    "カーペット"
+   ],
+   "nouns": [
+    "RUG",
+    "CARPET"
+   ]
+  },
+  "SANDWICH-BAG": {
+   "adjs": [
+    "BROWN",
+    "ELONGATED",
+    "SMELLY"
+   ],
+   "desc": "brown sack",
+   "ja": [
+    "茶色の袋",
+    "袋"
+   ],
+   "nouns": [
+    "BAG",
+    "SACK"
+   ]
+  },
+  "SONGBIRD": {
+   "adjs": [
+    "SONG"
+   ],
+   "desc": "songbird",
+   "ja": [
+    "小鳥",
+    "鳥"
+   ],
+   "nouns": [
+    "BIRD",
+    "SONGBIRD"
+   ]
+  },
+  "SWORD": {
+   "adjs": [
+    "ELVISH",
+    "OLD",
+    "ANTIQUE"
+   ],
+   "desc": "sword",
+   "ja": [
+    "剣",
+    "エルフの剣"
+   ],
+   "nouns": [
+    "SWORD",
+    "ORCRIST",
+    "GLAMDRING",
+    "BLADE"
+   ]
+  },
+  "TRAP-DOOR": {
+   "adjs": [
+    "TRAP",
+    "DUSTY"
+   ],
+   "desc": "trap door",
+   "ja": [
+    "揚げ戸",
+    "床の扉"
+   ],
+   "nouns": [
+    "DOOR",
+    "TRAPDOOR",
+    "TRAP-DOOR",
+    "COVER"
+   ]
+  },
+  "TREE": {
+   "adjs": [
+    "LARGE",
+    "STORM",
+    ";\"-TOSSED\""
+   ],
+   "desc": "tree",
+   "ja": [
+    "木"
+   ],
+   "nouns": [
+    "TREE",
+    "BRANCH"
+   ]
+  },
+  "TROPHY-CASE": {
+   "adjs": [
+    "TROPHY"
+   ],
+   "desc": "trophy case",
+   "ja": [
+    "トロフィー箱",
+    "箱"
+   ],
+   "nouns": [
+    "CASE"
+   ]
+  },
+  "WATER": {
+   "adjs": [],
+   "desc": "quantity of water",
+   "ja": [
+    "いくらかの水",
+    "水"
+   ],
+   "nouns": [
+    "WATER",
+    "QUANTITY",
+    "LIQUID",
+    "H2O"
+   ]
+  },
+  "WHITE-HOUSE": {
+   "adjs": [
+    "WHITE",
+    "BEAUTI",
+    "COLONI"
+   ],
+   "desc": "white house",
+   "ja": [
+    "白い家",
+    "家"
+   ],
+   "nouns": [
+    "HOUSE"
+   ]
+  },
+  "WOODEN-DOOR": {
+   "adjs": [
+    "WOODEN",
+    "GOTHIC",
+    "STRANGE",
+    "WEST"
+   ],
+   "desc": "wooden door",
+   "ja": [
+    "木の扉",
+    "ゴシックの扉"
+   ],
+   "nouns": [
+    "DOOR",
+    "LETTERING",
+    "WRITING"
+   ]
+  }
+ },
+ "preps": {
+  "ABOUT": [
+   "について"
+  ],
+  "ACROSS": [
+   "を渡って"
+  ],
+  "AROUND": [
+   "のまわりを"
+  ],
+  "AT": [
+   "に",
+   "を"
+  ],
+  "AWAY": [
+   "遠くへ"
+  ],
+  "BEHIND": [
+   "の後ろ",
+   "の裏"
+  ],
+  "DOWN": [
+   "下へ",
+   "下に"
+  ],
+  "FOR": [
+   "を求めて"
+  ],
+  "FROM": [
+   "から"
+  ],
+  "IN": [
+   "の中に",
+   "に入れて"
+  ],
+  "OFF": [
+   "を外して",
+   "オフ"
+  ],
+  "ON": [
+   "の上に",
+   "オン"
+  ],
+  "OUT": [
+   "外へ",
+   "外に"
+  ],
+  "OVER": [
+   "を越えて"
+  ],
+  "TO": [
+   "に",
+   "へ"
+  ],
+  "UNDER": [
+   "の下"
+  ],
+  "UP": [
+   "上へ",
+   "上に"
+  ],
+  "WITH": [
+   "で",
+   "を使って"
+  ]
+ },
+ "verbs": {
+  "ANSWER": {
+   "ja": [
+    "答える"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ]
+  },
+  "ATTACK": {
+   "ja": [
+    "攻撃する",
+    "襲う"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "BLOW": {
+   "ja": [
+    "吹く"
+   ],
+   "shapes": [
+    "OUT OBJ",
+    "UP OBJ WITH OBJ",
+    "UP OBJ",
+    "IN OBJ"
+   ]
+  },
+  "BOARD": {
+   "ja": [
+    "板"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "BRIEF": {
+   "ja": [
+    "簡潔に"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "BURN": {
+   "ja": [
+    "燃やす"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "DOWN OBJ WITH OBJ"
+   ]
+  },
+  "CLIMB": {
+   "ja": [
+    "登る",
+    "上る"
+   ],
+   "shapes": [
+    "UP OBJ",
+    "DOWN OBJ",
+    "OBJ",
+    "IN OBJ",
+    "ON OBJ",
+    "WITH OBJ"
+   ]
+  },
+  "CLOSE": {
+   "ja": [
+    "閉める",
+    "しめる",
+    "閉じる"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "COUNT": {
+   "ja": [
+    "数える"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "CUT": {
+   "ja": [
+    "切る"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ]
+  },
+  "DIG": {
+   "ja": [
+    "掘る"
+   ],
+   "shapes": [
+    "IN OBJ",
+    "IN OBJ WITH OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "DISEMBARK": {
+   "ja": [
+    "降りる"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "DRINK": {
+   "ja": [
+    "飲む"
+   ],
+   "shapes": [
+    "OBJ",
+    "FROM OBJ"
+   ]
+  },
+  "DROP": {
+   "ja": [
+    "置く",
+    "落とす",
+    "捨てる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ DOWN OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ"
+   ]
+  },
+  "EAT": {
+   "ja": [
+    "食べる"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "ENTER": {
+   "ja": [
+    "入る"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ]
+  },
+  "EXAMINE": {
+   "ja": [
+    "調べる",
+    "よく見る",
+    "観察する"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "ON OBJ"
+   ]
+  },
+  "EXIT": {
+   "ja": [
+    "出る"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ]
+  },
+  "EXTINGUISH": {
+   "ja": [
+    "消す"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "FILL": {
+   "ja": [
+    "満たす",
+    "汲む"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "OBJ"
+   ]
+  },
+  "FIND": {
+   "ja": [
+    "見つける",
+    "どこ"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "FOLLOW": {
+   "ja": [
+    "追う"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ]
+  },
+  "GIVE": {
+   "ja": [
+    "渡す",
+    "与える"
+   ],
+   "shapes": [
+    "OBJ TO OBJ",
+    "OBJ OBJ"
+   ]
+  },
+  "INVENTORY": {
+   "ja": [
+    "持ち物",
+    "持ち物を見る",
+    "所持品"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "JUMP": {
+   "ja": [
+    "跳ぶ",
+    "飛ぶ"
+   ],
+   "shapes": [
+    "",
+    "OVER OBJ",
+    "ACROSS OBJ",
+    "IN OBJ",
+    "FROM OBJ",
+    "OFF OBJ"
+   ]
+  },
+  "KICK": {
+   "ja": [
+    "蹴る"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "KILL": {
+   "ja": [
+    "殺す"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "KNOCK": {
+   "ja": [
+    "叩く",
+    "ノックする"
+   ],
+   "shapes": [
+    "AT OBJ",
+    "ON OBJ",
+    "DOWN OBJ"
+   ]
+  },
+  "LEAVE": {
+   "ja": [
+    "去る"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ]
+  },
+  "LIGHT": {
+   "ja": [
+    "点ける",
+    "つける",
+    "灯す"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "LISTEN": {
+   "ja": [
+    "聞く",
+    "耳を澄ます"
+   ],
+   "shapes": [
+    "TO OBJ",
+    "FOR OBJ"
+   ]
+  },
+  "LOCK": {
+   "ja": [
+    "鍵をかける"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ]
+  },
+  "LOOK": {
+   "ja": [
+    "見る",
+    "見回す",
+    "あたりを見る"
+   ],
+   "shapes": [
+    "",
+    "AROUND OBJ",
+    "UP OBJ",
+    "DOWN OBJ",
+    "AT OBJ",
+    "ON OBJ",
+    "WITH OBJ",
+    "UNDER OBJ",
+    "BEHIND OBJ",
+    "IN OBJ",
+    "AT OBJ WITH OBJ",
+    "FOR OBJ"
+   ]
+  },
+  "LOWER": {
+   "ja": [
+    "下げる"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "MOVE": {
+   "ja": [
+    "動かす",
+    "どかす",
+    "ずらす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ OBJ",
+    "OBJ TO OBJ",
+    "OBJ IN OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "OPEN": {
+   "ja": [
+    "開ける",
+    "あける",
+    "開く"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "POKE": {
+   "ja": [
+    "突く"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ]
+  },
+  "POUR": {
+   "ja": [
+    "注ぐ"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "OBJ FROM OBJ"
+   ]
+  },
+  "PRAY": {
+   "ja": [
+    "祈る"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "PULL": {
+   "ja": [
+    "引く",
+    "引っ張る"
+   ],
+   "shapes": [
+    "OBJ",
+    "ON OBJ",
+    "UP OBJ"
+   ]
+  },
+  "PUSH": {
+   "ja": [
+    "押す"
+   ],
+   "shapes": [
+    "OBJ OBJ",
+    "OBJ TO OBJ",
+    "OBJ",
+    "ON OBJ",
+    "OBJ WITH OBJ",
+    "OBJ UNDER OBJ"
+   ]
+  },
+  "PUT": {
+   "ja": [
+    "入れる",
+    "置く"
+   ],
+   "shapes": [
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "DOWN OBJ",
+    "OBJ UNDER OBJ",
+    "OUT OBJ",
+    "ON OBJ",
+    "OBJ BEHIND OBJ"
+   ]
+  },
+  "QUIT": {
+   "ja": [
+    "やめる",
+    "終わる"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "RAISE": {
+   "ja": [
+    "持ち上げる"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ"
+   ]
+  },
+  "READ": {
+   "ja": [
+    "読む"
+   ],
+   "shapes": [
+    "OBJ",
+    "FROM OBJ",
+    "OBJ WITH OBJ",
+    "OBJ OBJ"
+   ]
+  },
+  "RESTART": {
+   "ja": [
+    "やり直す"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "RESTORE": {
+   "ja": [
+    "再開する"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "RING": {
+   "ja": [
+    "鳴らす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "RUB": {
+   "ja": [
+    "こする",
+    "なでる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ]
+  },
+  "SAVE": {
+   "ja": [
+    "保存する"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "SAY": {
+   "ja": [
+    "言う"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "SCORE": {
+   "ja": [
+    "得点"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "SEARCH": {
+   "ja": [
+    "探す",
+    "中を探る"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "FOR OBJ"
+   ]
+  },
+  "SHAKE": {
+   "ja": [
+    "揺する"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "SMELL": {
+   "ja": [
+    "嗅ぐ",
+    "匂いを嗅ぐ"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "SPIN": {
+   "ja": [
+    "回転させる"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  },
+  "SQUEEZE": {
+   "ja": [
+    "握る"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ ON OBJ"
+   ]
+  },
+  "STAND": {
+   "ja": [
+    "立つ"
+   ],
+   "shapes": [
+    "",
+    "UP OBJ"
+   ]
+  },
+  "STRIKE": {
+   "ja": [
+    "打つ"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "OBJ"
+   ]
+  },
+  "SWIM": {
+   "ja": [
+    "泳ぐ"
+   ],
+   "shapes": [
+    "",
+    "IN OBJ",
+    "ACROSS OBJ"
+   ]
+  },
+  "TAKE": {
+   "ja": [
+    "取る",
+    "拾う",
+    "持つ",
+    "手に取る"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "OUT OBJ",
+    "ON OBJ",
+    "UP OBJ",
+    "OBJ OUT OBJ",
+    "OBJ OFF OBJ",
+    "OBJ FROM OBJ"
+   ]
+  },
+  "TELL": {
+   "ja": [
+    "伝える"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ ABOUT OBJ"
+   ]
+  },
+  "THROW": {
+   "ja": [
+    "投げる"
+   ],
+   "shapes": [
+    "OBJ AT OBJ",
+    "OBJ WITH OBJ",
+    "OBJ OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "OBJ OFF OBJ",
+    "OBJ OVER OBJ"
+   ]
+  },
+  "TIE": {
+   "ja": [
+    "結ぶ",
+    "縛る"
+   ],
+   "shapes": [
+    "OBJ TO OBJ",
+    "UP OBJ WITH OBJ"
+   ]
+  },
+  "TURN": {
+   "ja": [
+    "回す"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "ON OBJ",
+    "ON OBJ WITH OBJ",
+    "OFF OBJ",
+    "OBJ TO OBJ",
+    "OBJ FOR OBJ"
+   ]
+  },
+  "UNLOCK": {
+   "ja": [
+    "鍵を開ける"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ]
+  },
+  "UNTIE": {
+   "ja": [
+    "解く"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ FROM OBJ"
+   ]
+  },
+  "VERBOSE": {
+   "ja": [
+    "詳しく"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "VERSION": {
+   "ja": [
+    "版"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "WAIT": {
+   "ja": [
+    "待つ"
+   ],
+   "shapes": [
+    ""
+   ]
+  },
+  "WAKE": {
+   "ja": [
+    "起こす"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ"
+   ]
+  },
+  "WALK": {
+   "ja": [
+    "行く",
+    "歩く",
+    "進む"
+   ],
+   "shapes": [
+    "",
+    "OBJ",
+    "AWAY OBJ",
+    "IN OBJ",
+    "WITH OBJ",
+    "ON OBJ",
+    "OVER OBJ",
+    "TO OBJ",
+    "AROUND OBJ",
+    "UP OBJ",
+    "DOWN OBJ"
+   ]
+  },
+  "WAVE": {
+   "ja": [
+    "振る"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ AT OBJ",
+    "AT OBJ"
+   ]
+  },
+  "WEAR": {
+   "ja": [
+    "身に着ける",
+    "着る"
+   ],
+   "shapes": [
+    "OBJ"
+   ]
+  }
+ }
+}

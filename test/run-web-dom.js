@@ -43,8 +43,14 @@ global.fetch = async (url) => {
   return { ok: true, json: async () => JSON.parse(buf.toString('utf8')), arrayBuffer: async () => buf }
 }
 
-// --- 本番のスクリプトを順に読み込む（index.html の script 順と同じ）---
-for (const f of ['vendor/zvm.min.js', 'src/translate.js', 'src/glk-shim.js']) {
+// --- 本番のスクリプトを順に読み込む ---
+// ★一覧は index.html から読み取る。ここに書き写すと、ページに script を足したとき
+//   テストだけ古くなる（実際に command.js を足した回で落ちた）
+const html = fs.readFileSync(path.join(ROOT, 'web', 'index.html'), 'utf8')
+const srcs = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1])
+for (const rel of srcs) {
+  if (rel === 'main.js') continue                    // main.js は DOM を用意してから
+  const f = path.normalize(path.join('web', rel))
   vm2.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f })
 }
 if (!window.ZVM) window.ZVM = module.exports && module.exports.prototype ? module.exports : global.ZVM

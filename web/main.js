@@ -8,9 +8,11 @@
   const screen = $('screen')
   const { Translator } = window.ZenmaiTranslate
   const { createGlk } = window.GlkShim
+  const { createCommander } = window.ZenmaiCommand
 
   const asset = await (await fetch('../assets/zork1-ja.json')).json()
   const tr = new Translator(asset)
+  const cm = createCommander(await (await fetch('../assets/zork1-cmd.json')).json())
 
   // story file は同梱しない（MIT のソースから各自でビルドするか取得する）
   let story = null
@@ -69,7 +71,7 @@
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
       if (Glk.waitingFor() === 'char') $('input').placeholder = '何かキーを（Enter で進む）'
-      else $('input').placeholder = '英語のコマンドを打つ（例: open mailbox）'
+      else $('input').placeholder = '日本語で打つ（例: 郵便箱を開ける）'
       $('input').focus()
     },
   })
@@ -79,8 +81,16 @@
     const text = $('input').value
     $('input').value = ''
     if (Glk.waitingFor() === 'char') { Glk.submitChar(32); return }
+    // ★日本語で打たれたら英語コマンドへ翻訳する。英語ならそのまま通す
+    const r = cm.toCommand(text)
     show(text || ' ', 'cmd')
-    Glk.submitLine(text)
+    if (!r.command) { show('（読み取れなかった —— 語彙にない言葉が混ざっている）', 'raw'); return }
+    if (r.trace !== '英語のまま') {
+      const p = document.createElement('p')
+      p.className = 'sent'; p.textContent = r.command + (r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')
+      screen.appendChild(p)
+    }
+    Glk.submitLine(r.command)
   })
 
   const vm = new window.ZVM()
