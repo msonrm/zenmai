@@ -23,17 +23,28 @@ class El {
     this.scrollTop = 0; this.scrollHeight = 0; this.handlers = {}
   }
   get textContent() { return this._text }
-  set textContent(v) { this._text = String(v) }
+  set textContent(v) { this._text = String(v); this._html = null }
+  // ★ふりがなは innerHTML で入る。テストは字面を見たいのでタグを剥がして持つ
+  get innerHTML() { return this._html == null ? this._text : this._html }
+  set innerHTML(v) {
+    this._html = String(v)
+    this._text = this._html.replace(/<rt>.*?<\/rt>/g, '').replace(/<[^>]*>/g, '')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+  }
   appendChild(c) { this.children.push(c); return c }
   get lastElementChild() { return this.children[this.children.length - 1] }
   addEventListener(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn) }
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
+// ふりがなの入切は body の class と localStorage を使う
+const store = {}
+global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }
+document.body = { classList: { _s: new Set(), add(c) { this._s.add(c) }, toggle(c) { this._s.has(c) ? this._s.delete(c) : this._s.add(c); return this._s.has(c) } } }
 global.window = window
 global.document = document
 global.fetch = async (url) => {
@@ -72,6 +83,12 @@ const finish = () => {
   console.log('--- ' + els.stat.textContent.trim())
   const raw = els.screen.children.filter((p) => p.className === 'raw')
   console.log('--- 未訳として描かれた段落: ' + raw.length)
+  // ★ふりがなが実際に振られているか（入力はかなだけなので、これは操作系）
+  const html = els.screen.children.map((p) => p.innerHTML).join('')
+  const rt = [...html.matchAll(/<ruby>([^<]*)<rt>([^<]*)<\/rt><\/ruby>/g)]
+  console.log('--- ふりがな: ' + rt.length + ' 箇所　例: '
+    + rt.slice(0, 6).map((m) => m[1] + '(' + m[2] + ')').join(' '))
+  if (!rt.length) { console.error('★ふりがなが 1 つも振られていない'); process.exit(1) }
   process.exit(0)
 }
 setTimeout(tick, 200)

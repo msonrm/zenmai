@@ -46,6 +46,18 @@
   #place { flex: 1 1 auto; min-width: 0; text-align: right; color: var(--ink); font-size: .95rem }
   #score { flex: 0 0 auto; font-variant-numeric: tabular-nums }
 
+  /* ── ふりがな ── */
+  /* ★読めない漢字は打てない（入力はかなだけ）ので、既定で出す。切れるようにもする */
+  ruby { ruby-position: over }
+  ruby rt { font-size: .5em; color: var(--dim); letter-spacing: 0; font-weight: normal }
+  body.no-ruby rt { display: none }
+  #ruby-btn {
+    flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
+  }
+  #ruby-btn:hover { color: var(--ink); border-color: var(--accent) }
+  body.no-ruby #ruby-btn { opacity: .55 }
+
   /* ── 本文 ── */
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
   #screen p { margin: 0 0 .9em; white-space: pre-wrap }
@@ -89,6 +101,7 @@
     <span id="title"><b>ぜんまい</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
     <span id="place">　</span>
     <span id="score"></span>
+    <button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button>
   </div>
   <div id="screen" class="gutter" aria-live="polite"></div>
   <div id="foot">
@@ -101,6 +114,7 @@
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
+  <script src="../src/ruby.js"></script>
   <script src="../src/translate.js"></script>
   <script src="../src/command.js"></script>
   <script src="../src/glk-shim.js"></script>

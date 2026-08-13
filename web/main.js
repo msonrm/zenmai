@@ -9,9 +9,19 @@
   const { Translator } = window.ZenmaiTranslate
   const { createGlk } = window.GlkShim
   const { createCommander } = window.ZenmaiCommand
+  const { createRubifier } = window.ZenmaiRuby
 
   const asset = await (await fetch('../assets/zork1-ja.json')).json()
   const tr = new Translator(asset)
+  const rb = createRubifier(asset.ruby)
+
+  // ★ふりがなの入切。切っても組み直さないよう、CSS で隠すだけにする
+  if (localStorage.getItem('zenmai-ruby') === 'off') document.body.classList.add('no-ruby')
+  $('ruby-btn').addEventListener('click', () => {
+    const off = document.body.classList.toggle('no-ruby')
+    localStorage.setItem('zenmai-ruby', off ? 'off' : 'on')
+    $('input').focus()
+  })
   const cm = createCommander(await (await fetch('../assets/zork1-cmd.json')).json())
 
   // story file は同梱しない（MIT のソースから各自でビルドするか取得する）
@@ -43,8 +53,9 @@
       }
       const p = para
       // 追記のときは行の境目を落とさない。★末尾の改行は残さない（余った空行になる）
-      if (p.textContent && !p.textContent.endsWith('\n')) p.textContent += '\n'
-      p.textContent += t
+      if (p.textContent && !p.textContent.endsWith('\n')) p.innerHTML += '\n'
+      // ★英語のまま出す行（未訳・種明かし）にふりがなは要らない
+      p.innerHTML += cls === 'raw' || cls === 'sent' ? rb.esc(t) : rb.rubify(t)
       if (cls) para = null
     }
     screen.scrollTop = screen.scrollHeight
@@ -60,7 +71,7 @@
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
       const m = line.match(/^(.*?)\s{2,}(.*)$/)
-      $('place').textContent = m ? tr.word(m[1]) : tr.word(line)
+      $('place').innerHTML = rb.rubify(m ? tr.word(m[1]) : tr.word(line))
       $('score').textContent = m ? m[2] : ''
     },
     update() {
