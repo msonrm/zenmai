@@ -68,6 +68,9 @@ class Translator {
       this.notrans.add(norm(en))
       for (const part of en.split('|')) if (norm(part)) this.notrans.add(norm(part))
     }
+    // ★パーサが**プレイヤーの打った語をそのまま復唱する**ときの語訳
+    //   （`You can't see any window here!` の window は DESC ではなく辞書の裸の名詞）
+    this.words = new Map(Object.entries(asset.words || {}))
     this.buf = ''
     this.stats = { hit: 0, greedy: 0, miss: 0, notrans: 0, missed: new Set() }
   }
@@ -78,7 +81,8 @@ class Translator {
     // ★冠詞を剥がしてから引く（`a leaflet` は `leaflet` で登録されている）。
     //   日本語に冠詞は無いので、剥がすだけで済む
     const bare = k.replace(/^(a|an|the)\s+/i, '')
-    return this.props.get(k) || this.exact.get(k) || this.props.get(bare) || this.exact.get(bare) || en
+    return this.props.get(k) || this.exact.get(k) || this.words.get(k)
+      || this.props.get(bare) || this.exact.get(bare) || this.words.get(bare) || en
   }
 
   /** 1 単位（1 文 or 数文のまとまり）を引く。引けなければ null。統計は数えない */

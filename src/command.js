@@ -58,18 +58,57 @@ function createCommander(asset) {
   for (const [key, v] of Object.entries(asset.verbs || {})) {
     for (const ja of v.ja) lex.push({ ja, disp: v.ja[0], kana: kana(ja), kind: 'verb', key, shapes: v.shapes })
   }
-  // ★同じ名詞を複数の物が共有していると原作が聞き返してくる（`door` = 木の扉 / 揚げ戸）。
-  //   形容詞を持っているならそれを添えて、こちらで曖昧さを解いておく
+  // ★同じ英単語を複数の物が共有するとき、どちらを指すかは**部屋によって決まる**。
+  //   原作はそれを持っている（`open door` → 「木の扉と揚げ戸の、どちらのことか。」）ので、
+  //   こちらが先回りして形容詞を足すと、その場に無い物を名指しして外れる
+  //   （実プレイ: 家の西で「窓を覗く」→ `look in kitchen window` → 「台所の窓など、ここには…」）。
+  //
+  //   ★判定は**日本語の側**でする —— その言い方が日本語でも曖昧なら曖昧なまま渡し、
+  //   日本語で一意なら（「揚げ戸」）形容詞を添えて聞き返しを省く。
+  const owners = {}
+  for (const [key, o] of Object.entries(asset.objects || {})) {
+    for (const ja of o.ja) (owners[kana(ja)] = owners[kana(ja)] || []).push(key)
+  }
+  const objOf = asset.objects || {}
+  // ★英語の名詞を複数の物が共有するときだけ形容詞を添える。
+  //   共有していないなら裸で渡す（`move large rug` ではなく `move rug`）
   const nounUse = {}
-  for (const o of Object.values(asset.objects || {})) {
+  for (const o of Object.values(objOf)) {
     const n = (o.nouns[0] || '').toLowerCase()
     nounUse[n] = (nounUse[n] || 0) + 1
   }
-  for (const [key, o] of Object.entries(asset.objects || {})) {
+  const seen = new Set()
+  // ★曖昧な言い方でも画面には漢字を出したい（打鍵はかなだから）。
+  //   同じ英単語に寄る言い方のうち、**漢字を含む最短の形**を代表にする（まど → 窓 / とびら → 扉）
+  const sharedDisp = {}
+  for (const [key, o] of Object.entries(objOf)) {
+    const noun = (o.nouns[0] || '').toLowerCase()
+    for (const ja of o.ja) {
+      const own = owners[kana(ja)] || []
+      if (own.length < 2 || !own.every((x) => (objOf[x].nouns[0] || '').toLowerCase() === noun)) continue
+      if (!/[一-龥]/.test(ja)) continue
+      if (!sharedDisp[noun] || ja.length < sharedDisp[noun].length) sharedDisp[noun] = ja
+    }
+  }
+  for (const [key, o] of Object.entries(objOf)) {
     const noun = (o.nouns[0] || '').toLowerCase()
     const adj = (o.adjs[0] || '').toLowerCase()
-    const word = nounUse[noun] > 1 && adj ? adj + ' ' + noun : noun
-    for (const ja of o.ja) lex.push({ ja, disp: o.ja[0], kana: kana(ja), kind: 'obj', key, word })
+    for (const ja of o.ja) {
+      const k = kana(ja)
+      const own = owners[k] || [key]
+      // 複数の物が同じ言い方を名乗り、しかも英語の名詞が同じ → 原作に判断を返す
+      const shared = own.length > 1 && own.every((x) => (objOf[x].nouns[0] || '').toLowerCase() === noun)
+      if (shared && seen.has(k)) continue          // 同じ語を二重に積まない
+      if (shared) seen.add(k)
+      lex.push({
+        ja,
+        disp: shared ? (sharedDisp[noun] || ja) : o.ja[0],
+        kana: k,
+        kind: 'obj',
+        key,
+        word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
+      })
+    }
   }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length)
