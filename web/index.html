@@ -27,19 +27,23 @@
     font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
     display: flex; flex-direction: column; line-height: 1.85;
   }
-  /* 段組みの内寄せを 1 か所で決める */
+  /* ★本文だけを 36em の段に収める。ヘッダとフッタは全幅
+     （同じ段組みを掛けると、項目が多い側が押し込められて改行が入る） */
   .gutter { padding-left: max(1em, calc((100% - 36em) / 2)); padding-right: max(1em, calc((100% - 36em) / 2)) }
+  .edge { padding-left: 1.2em; padding-right: 1.2em }
+  /* 押し込められても折り返さず、必要なら詰める */
+  #title, #place, #score, #stat { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 
   /* ── ヘッダ: 左に題、右に場所と得点 ── */
   #head {
     flex: 0 0 auto; display: flex; align-items: baseline; gap: 1em;
-    padding-top: .45em; padding-bottom: .45em;
+    padding-top: .5em; padding-bottom: .5em;
     background: var(--panel); border-bottom: 1px solid var(--rule);
     font-size: .82rem; letter-spacing: .04em; color: var(--dim);
   }
-  #title { flex: 0 0 auto }
+  #title { flex: 0 1 auto; min-width: 4em }
   #title b { color: var(--ink); font-weight: 600 }
-  #place { flex: 1 1 auto; text-align: right; color: var(--ink); font-size: .95rem }
+  #place { flex: 1 1 auto; min-width: 0; text-align: right; color: var(--ink); font-size: .95rem }
   #score { flex: 0 0 auto; font-variant-numeric: tabular-nums }
 
   /* ── 本文 ── */
@@ -65,17 +69,19 @@
   #input:focus { border-bottom-color: var(--accent) }
   #input::placeholder { color: var(--dim) }
   #stat { flex: 0 0 auto; font-size: .72rem; color: var(--dim); font-variant-numeric: tabular-nums }
+  /* 狭いときは説明を畳む（題だけ残す）→ さらに狭ければ成績も畳む */
+  @media (max-width: 46em) { #title .tag { display: none } }
   @media (max-width: 30em) { #stat { display: none } }
 </style>
 </head>
 <body>
-  <div id="head" class="gutter">
-    <span id="title"><b>ぜんまい</b> —— 日本語で読むテキストアドベンチャー</span>
+  <div id="head" class="edge">
+    <span id="title"><b>ぜんまい</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
     <span id="place">　</span>
     <span id="score"></span>
   </div>
   <div id="screen" class="gutter" aria-live="polite"></div>
-  <div id="foot" class="gutter">
+  <div id="foot" class="edge">
     <span class="caret">&gt;</span>
     <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
            spellcheck="false" placeholder="英語のコマンドを打つ（例: open mailbox）">
