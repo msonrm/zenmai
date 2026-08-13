@@ -398,10 +398,13 @@
   "Above the trophy case hangs an elvish sword of great antiquity.": "トロフィー箱の上に、たいへん古いエルフの剣が掛かっている。",
   "An almost inaudible voice whispers in your ear, \"Look to your treasures for the final secret.\"": "ほとんど聞き取れない声が耳元でささやく。「最後の秘密は、集めた宝に問え」",
   "An interesting idea...": "興味深い考えだ……",
+  "Aragain Falls": "アラゲインの滝",
   "Are you enjoying yourself?": "楽しんでいるか。",
   "As you sit, you notice an irregularity underneath it. Rather than be uncomfortable, you stand up again.": "腰を下ろすと、下に妙な起伏があるのに気づいた。落ち着かないので、また立ち上がった。",
   "At your service!": "お望みのままに。",
+  "Atlantis Room": "アトランティスの間",
   "Auto-cannibalism is not the answer.": "自分を食べても答えは出ない。",
+  "Bat Room": "蝙蝠の部屋",
   "Beats me.": "見当もつかない。",
   "Beg pardon?": "もう一度？",
   "Behind House": "家の裏",
@@ -409,23 +412,45 @@
   "Bizarre!": "奇妙だ。",
   "Brief descriptions.": "説明を簡略にする。",
   "Bug? Not in a flawless program like this! (Cough, cough).": "不具合？ この完璧な作りにそんなものはない。（こほん、こほん）",
+  "Canyon Bottom": "峡谷の底",
+  "Canyon View": "峡谷の眺め",
   "Climbing the walls is to no avail.": "壁を登っても無駄だ。",
   "Closed.": "閉めた。",
+  "Coal Mine": "炭坑",
+  "Cold Passage": "冷たい通路",
   "Come on, now!": "おいおい。",
+  "Cyclops Room": "サイクロプスの部屋",
+  "Dam Base": "ダムの下",
+  "Dam Lobby": "ダムのロビー",
+  "Damp Cave": "湿った洞窟",
+  "Dead End": "行き止まり",
+  "Deep Canyon": "深い峡谷",
   "Do you expect me to applaud?": "拍手でも期待しているのか。",
   "Do you wish to leave the game? (Y is affirmative):": "ゲームを終えるか。（Y なら承諾）:",
   "Do you wish to restart? (Y is affirmative):": "最初から始めるか。（Y なら承諾）:",
+  "Dome Room": "円蓋の間",
   "Done.": "済んだ。",
+  "Drafty Room": "隙間風の部屋",
   "Dropped.": "置いた。",
+  "East of Chasm": "裂け目の東",
+  "East-West Passage": "東西の通路",
+  "Egyptian Room": "エジプトの間",
+  "End of Rainbow": "虹の端",
+  "Engravings Cave": "彫刻の洞窟",
+  "Entrance to Hades": "冥府の入口",
   "Failed.": "失敗した。",
   "Filched!": "掠め取った。",
   "Foo!": "ふん。",
+  "Forest Path": "森の小道",
+  "Frigid River": "冷たい川",
+  "Gas Room": "ガスの部屋",
   "Geronimo...": "ジェロニモ……",
   "Getting tired?": "疲れてきたか。",
   "Go jump in a lake!": "湖にでも飛び込んでこい。",
   "Going up empty-handed is a bad idea.": "手ぶらで上がるのは良くない考えだ。",
   "Good day.": "こんにちは。",
   "Goodbye.": "さようなら。",
+  "Grating Room": "格子の部屋",
   "Have your eyes checked.": "目を診てもらったほうがいい。",
   "Having moved the carpet previously, you find it impossible to move it again.": "一度動かした絨毯を、もう一度動かすことはできない。",
   "He looks like a sailor.": "船乗りのようだ。",
@@ -480,15 +505,25 @@
   "It's right here.": "すぐここにある。",
   "It's too dark to see!": "暗すぎて何も見えない。",
   "It's too dark to see.": "暗すぎて何も見えない。",
+  "Ladder Bottom": "梯子の下",
+  "Ladder Top": "梯子の上",
+  "Land of the Dead": "死者の国",
   "Living Room": "居間",
   "Look around.": "まわりを見てみろ。",
+  "Loud Room": "轟音の部屋",
+  "Machine Room": "機械室",
+  "Maintenance Room": "整備室",
   "Maximum verbosity.": "説明を詳しくする。",
+  "Mine Entrance": "坑道の入口",
+  "Mirror Room": "鏡の間",
+  "Narrow Passage": "狭い通路",
   "Naturally!": "当然だ。",
   "Nice try.": "いい度胸だ。",
   "Nice weather we've been having lately.": "近ごろはいい天気が続くね。",
   "Nobody seems to be awaiting your answer.": "返事を待っている者はいないようだ。",
   "Nobody's home.": "誰もいない。",
   "North of House": "家の北",
+  "North-South Passage": "南北の通路",
   "Not a bright idea, especially since you're in it.": "よい考えではない。まして自分がその中にいる。",
   "Not a chance.": "望みはない。",
   "Nothing happens anymore.": "もう何も起こらない。",
@@ -499,6 +534,7 @@
   "Oh, no! You have walked into a den of hungry grues and it's dinner time!": "なんと、腹を空かせたグルーの巣に踏み込んでしまった。しかも食事の時間だ。",
   "Oh, no! You have walked into the slavering fangs of a lurking grue!": "なんと、潜んでいたグルーの、涎の垂れる牙の中へ歩み入ってしまった。",
   "Ok.": "よし。",
+  "On the Rainbow": "虹の上",
   "On the ground below you can see:": "下の地面に見えるもの:",
   "On the table is an elongated brown sack, smelling of hot peppers.": "食卓の上に、細長い茶色の袋がある。唐辛子の匂いがする。",
   "Only Santa Claus climbs down chimneys.": "煙突を降りてくるのはサンタクロースだけだ。",
@@ -507,12 +543,25 @@
   "Opened.": "開けた。",
   "Please consult your manual for the correct way to talk to other people or creatures.": "人や生き物への正しい話しかけ方は、説明書を見てくれ。",
   "Preposterous!": "ばかばかしい。",
+  "Reservoir North": "貯水池の北",
+  "Reservoir South": "貯水池の南",
   "Restarting.": "最初から始める。",
+  "Rocky Ledge": "岩棚",
+  "Round Room": "円形の間",
+  "Sandy Beach": "砂浜",
+  "Sandy Cave": "砂の洞窟",
   "Say what?": "なんと？",
+  "Shaft Room": "縦坑の間",
   "Shaken.": "振ってみた。",
+  "Slide Room": "滑り台の間",
+  "Smelly Room": "臭う部屋",
   "Sorry, my memory is poor. Please give a direction.": "あいにく覚えが悪い。方角を言ってくれ。",
   "Sorry, you can't correct mistakes in quoted text.": "残念だが、引用の中の誤りは直せない。",
   "South of House": "家の南",
+  "Squeaky Room": "きしむ部屋",
+  "Stone Barrow": "石塚",
+  "Strange Passage": "奇妙な通路",
+  "Stream View": "小川の眺め",
   "Such language in a high-class establishment like this!": "こんな上品な場所で、その言葉遣いはないだろう。",
   "Suicide is not the answer.": "自害は答えにならない。",
   "Superbrief descriptions.": "説明を最小にする。",
@@ -533,6 +582,7 @@
   "That's pretty weird.": "かなり妙だ。",
   "That's silly!": "ばかげている。",
   "The FROBOZZ Corporation created, owns, and operates this dungeon.": "この地下迷宮を造り、所有し、運営しているのはフロボッズ社である。",
+  "The Troll Room": "トロルの部屋",
   "The balloon lands.": "気球が着地した。",
   "The best way to find zorkmids is to go out and look for them.": "ゾークミッドを見つける一番の方法は、出かけて探すことだ。",
   "The boards are securely fastened.": "板はしっかりと打ちつけられている。",
@@ -600,14 +650,20 @@
   "This was not a very safe place to try jumping.": "跳ぶには、あまり安全な場所ではなかった。",
   "Those things aren't here!": "それらはここにない。",
   "Thrown.": "投げた。",
+  "Timber Room": "坑木の間",
   "Time passes...": "時が過ぎる……",
   "Too late for that.": "もう手遅れだ。",
+  "Torch Room": "松明の間",
+  "Treasure Room": "宝物庫",
+  "Twisting Passage": "折れ曲がった通路",
   "Underneath the rug is a closed trap door. As you drop the corner of the rug, the trap door is once again concealed from view.": "絨毯の下には閉じた揚げ戸がある。絨毯の端を落とすと、揚げ戸はまた見えなくなった。",
+  "Up a Tree": "木の上",
   "Use compass directions for movement.": "移動は方角で指示してくれ。",
   "Very good. Now you can go to the second grade.": "よくできた。これで二年生に上がれる。",
   "Warning: only the first word after OOPS is used.": "注意 —— OOPS の後は、最初の一語だけが使われる。",
   "Wasn't he a sailor?": "船乗りではなかったか。",
   "Well, for one, you are playing Zork...": "まず一つ、きみは Zork を遊んでいる……",
+  "Well, you really did it that time. Is suicide painless?": "今度は本当にやってしまった。自害は痛みを伴わないのだろうか。",
   "West of House": "家の西",
   "What a (ahem!) strange idea.": "なんとも（こほん）変わった考えだ。",
   "What a bizarre concept!": "奇妙な思いつきだ。",
@@ -617,9 +673,11 @@
   "What the heck! You won't make friends this way, but nobody around here is too friendly anyhow. Gulp!": "まあいい。これで友ができるわけではないが、ここには愛想のよい者などいない。ごくり。",
   "What you can see looks pretty much as usual, sorry to say.": "見えるかぎりでは、いつもと変わりない。残念ながら。",
   "Wheeeeeeeeee!!!!!": "ひゃっほおおおお。",
+  "White Cliffs Beach": "白い崖の浜",
   "Whoosh!": "びゅっ。",
   "Why don't you just walk like normal people?": "普通に歩いてはどうか。",
   "Why not find your brains?": "自分の頭を探してはどうか。",
+  "Winding Passage": "曲がりくねった通路",
   "With a great effort, the rug is moved to one side of the room, revealing the dusty cover of a closed trap door.": "力を尽くして絨毯を部屋の片側へ寄せると、埃をかぶった閉じた揚げ戸の蓋が現れた。",
   "With great effort, you open the window far enough to allow entry.": "力を込めて、通り抜けられるだけ窓を押し開けた。",
   "With luck, your wish will come true.": "運がよければ、願いは叶うだろう。",
@@ -675,6 +733,7 @@
   "You cannot close that.": "それは閉められない。",
   "You cannot see the forest for the trees.": "木を見て森を見ず、というわけだ。",
   "You cannot talk to that!": "それとは話せない。",
+  "You clearly are a suicidal maniac. We don't allow psychotics in the cave, since they may harm other adventurers. Your remains will be installed in the Land of the Living Dead, where your fellow adventurers may gloat over them.": "どうやら、きみは死に急ぐたちらしい。この洞窟に、他の冒険者を危険にさらしかねない者を置くわけにはいかない。きみの遺骸は〈生ける死者の国〉に安置され、仲間の冒険者たちの嘲笑にさらされることになる。",
   "You could certainly never tie it with that!": "それでは、とても結べない。",
   "You didn't say with what!": "何を使うのか言っていない。",
   "You don't have that!": "それは持っていない。",
@@ -716,29 +775,95 @@
   "Your sword is glowing very brightly.": "剣がまぶしく光っている。",
   "Your sword is glowing with a faint blue glow.": "剣がかすかな青い光を放っている。",
   "Your sword is no longer glowing.": "剣の光は消えた。",
+  "ZORK owner's manual": "ZORK 取扱説明書",
   "a trophy case,": "トロフィー箱があり、",
+  "ancient map": "古い地図",
   "and a closed trap door at your feet.": "足元には閉じた揚げ戸がある。",
   "and a large oriental rug in the center of the room.": "部屋の中央に大きな東洋風の絨毯が敷かれている。",
   "and a rug lying beside an open trap door.": "開いた揚げ戸の傍らに絨毯が敷かれている。",
   "and an open trap door at your feet.": "足元には開いた揚げ戸がある。",
+  "beautiful brass bauble": "美しい真鍮の飾り玉",
+  "beautiful jeweled scarab": "美しい宝石の甲虫",
+  "bird's nest": "鳥の巣",
+  "black book": "黒い書物",
+  "bloody axe": "血のついた斧",
+  "blue button": "青いボタン",
+  "boarded window": "板で塞がれた窓",
+  "brass bell": "真鍮の鈴",
   "brass lantern": "真鍮のランタン",
+  "broken clockwork canary": "壊れたからくりカナリア",
+  "broken jewel-encrusted egg": "壊れた宝石の卵",
+  "broken lantern": "壊れたランタン",
+  "broken timber": "折れた坑木",
+  "brown button": "茶色のボタン",
   "brown sack": "茶色の袋",
+  "burned-out lantern": "燃え尽きたランタン",
   "clove of garlic": "にんにくの一片",
+  "control panel": "制御盤",
+  "crystal skull": "水晶の髑髏",
+  "crystal trident": "水晶の三叉槍",
   "echo echo ...": "こだま こだま ……",
   "glass bottle": "ガラス瓶",
+  "gold coffin": "金の棺",
+  "golden clockwork canary": "金のからくりカナリア",
+  "granite wall": "花崗岩の壁",
+  "green bubble": "緑の球",
+  "group of tool chests": "道具箱の山",
+  "hand-held air pump": "手押しの空気入れ",
+  "huge diamond": "巨大なダイヤモンド",
+  "jade figurine": "翡翠の像",
+  "jewel-encrusted egg": "宝石をちりばめた卵",
+  "kitchen table": "台所の食卓",
   "kitchen window": "台所の窓",
+  "large bag": "大きな袋",
+  "large emerald": "大きなエメラルド",
+  "leather bag of coins": "革の金貨袋",
+  "magic boat": "魔法の舟",
   "mountain range": "山並み",
+  "nasty knife": "嫌な感じのナイフ",
+  "number of ghosts": "亡霊の群れ",
+  "pair of candles": "一対の蝋燭",
+  "pile of bodies": "死体の山",
+  "pile of leaves": "落ち葉の山",
+  "pile of plastic": "ビニールの塊",
+  "platinum bar": "白金の延べ棒",
+  "pot of gold": "金の壺",
+  "punctured boat": "穴の空いた舟",
   "quantity of water": "いくらかの水",
+  "red buoy": "赤い浮標",
+  "red button": "赤いボタン",
+  "red hot brass bell": "赤熱した真鍮の鈴",
+  "river": "川",
+  "rusty knife": "錆びたナイフ",
+  "sapphire-encrusted bracelet": "サファイアをちりばめた腕輪",
+  "set of teeth": "入れ歯",
+  "skeleton key": "合鍵",
   "small mailbox": "小さな郵便箱",
+  "small piece of vitreous slag": "ガラス質の鉱滓のかけら",
+  "small pile of coal": "小さな石炭の山",
+  "stone barrow": "石塚",
+  "stone door": "石の扉",
+  "surrounding wall": "周囲の壁",
+  "tan label": "黄褐色の札",
+  "tour guidebook": "案内書",
   "trap door": "揚げ戸",
   "trophy case": "トロフィー箱",
+  "trunk of jewels": "宝石の詰まった箱",
+  "viscous material": "粘りのある物質",
+  "wall with engravings": "彫刻のある壁",
+  "white cliffs": "白い崖",
   "white house": "白い家",
   "wooden door": "木の扉",
+  "wooden ladder": "木の梯子",
+  "wooden railing": "木の手すり",
+  "yellow button": "黄色のボタン",
   "your hands": "きみの手"
  },
  "fragments": [
   "hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.",
+  "and, being for the moment sated, throws it back. Fortunately, the troll has poor control, and the {PRSO} falls to the floor. He does not look pleased.",
   ", but in trying to take it you have noticed an irregularity beneath it.",
+  "The troll, who is remarkably coordinated, catches the {PRSO}",
   "The {WINNER} seems confused. \"I don't see any",
   "Here begins a transcript of interaction with",
   "Here ends a transcript of interaction with",
@@ -796,9 +921,11 @@
   "the {OBJ}",
   "n't lead",
   "dungeon.",
+  "the room",
   "The lamp",
   "a {PRSI}",
   "holding",
+  "You can",
   "A {OBJ}",
   "object",
   "here!\"",
@@ -812,7 +939,8 @@
   "a {F}",
   "tell",
   "down",
-  "room"
+  "room",
+  "out."
  ],
  "notrans": [
   "through",
@@ -865,9 +993,29 @@
    "owner": "SWORD",
    "prop": "FDESC"
   },
+  "Altar": {
+   "ja": "祭壇",
+   "owner": "SOUTH-TEMPLE",
+   "prop": "DESC"
+  },
+  "Aragain Falls": {
+   "ja": "アラゲインの滝",
+   "owner": "ARAGAIN-FALLS",
+   "prop": "DESC"
+  },
+  "Atlantis Room": {
+   "ja": "アトランティスの間",
+   "owner": "ATLANTIS-ROOM",
+   "prop": "DESC"
+  },
   "Attic": {
    "ja": "屋根裏",
    "owner": "ATTIC",
+   "prop": "DESC"
+  },
+  "Bat Room": {
+   "ja": "蝙蝠の部屋",
+   "owner": "BAT-ROOM",
    "prop": "DESC"
   },
   "Behind House": {
@@ -875,9 +1023,149 @@
    "owner": "EAST-OF-HOUSE",
    "prop": "DESC"
   },
+  "Canyon Bottom": {
+   "ja": "峡谷の底",
+   "owner": "CANYON-BOTTOM",
+   "prop": "DESC"
+  },
+  "Canyon View": {
+   "ja": "峡谷の眺め",
+   "owner": "CANYON-VIEW",
+   "prop": "DESC"
+  },
+  "Cave": {
+   "ja": "洞窟",
+   "owner": "TINY-CAVE",
+   "prop": "DESC"
+  },
   "Cellar": {
    "ja": "地下室",
    "owner": "CELLAR",
+   "prop": "DESC"
+  },
+  "Chasm": {
+   "ja": "裂け目",
+   "owner": "CHASM-ROOM",
+   "prop": "DESC"
+  },
+  "Clearing": {
+   "ja": "空き地",
+   "owner": "CLEARING",
+   "prop": "DESC"
+  },
+  "Coal Mine": {
+   "ja": "炭坑",
+   "owner": "MINE-4",
+   "prop": "DESC"
+  },
+  "Cold Passage": {
+   "ja": "冷たい通路",
+   "owner": "COLD-PASSAGE",
+   "prop": "DESC"
+  },
+  "Cyclops Room": {
+   "ja": "サイクロプスの部屋",
+   "owner": "CYCLOPS-ROOM",
+   "prop": "DESC"
+  },
+  "Dam": {
+   "ja": "ダム",
+   "owner": "DAM-ROOM",
+   "prop": "DESC"
+  },
+  "Dam Base": {
+   "ja": "ダムの下",
+   "owner": "DAM-BASE",
+   "prop": "DESC"
+  },
+  "Dam Lobby": {
+   "ja": "ダムのロビー",
+   "owner": "DAM-LOBBY",
+   "prop": "DESC"
+  },
+  "Damp Cave": {
+   "ja": "湿った洞窟",
+   "owner": "DAMP-CAVE",
+   "prop": "DESC"
+  },
+  "Dead End": {
+   "ja": "行き止まり",
+   "owner": "DEAD-END-5",
+   "prop": "DESC"
+  },
+  "Deep Canyon": {
+   "ja": "深い峡谷",
+   "owner": "DEEP-CANYON",
+   "prop": "DESC"
+  },
+  "Dome Room": {
+   "ja": "円蓋の間",
+   "owner": "DOME-ROOM",
+   "prop": "DESC"
+  },
+  "Drafty Room": {
+   "ja": "隙間風の部屋",
+   "owner": "LOWER-SHAFT",
+   "prop": "DESC"
+  },
+  "East of Chasm": {
+   "ja": "裂け目の東",
+   "owner": "EAST-OF-CHASM",
+   "prop": "DESC"
+  },
+  "East-West Passage": {
+   "ja": "東西の通路",
+   "owner": "EW-PASSAGE",
+   "prop": "DESC"
+  },
+  "Egyptian Room": {
+   "ja": "エジプトの間",
+   "owner": "EGYPT-ROOM",
+   "prop": "DESC"
+  },
+  "End of Rainbow": {
+   "ja": "虹の端",
+   "owner": "END-OF-RAINBOW",
+   "prop": "DESC"
+  },
+  "Engravings Cave": {
+   "ja": "彫刻の洞窟",
+   "owner": "ENGRAVINGS-CAVE",
+   "prop": "DESC"
+  },
+  "Entrance to Hades": {
+   "ja": "冥府の入口",
+   "owner": "ENTRANCE-TO-HADES",
+   "prop": "DESC"
+  },
+  "Forest": {
+   "ja": "森",
+   "owner": "FOREST-3",
+   "prop": "DESC"
+  },
+  "Forest Path": {
+   "ja": "森の小道",
+   "owner": "PATH",
+   "prop": "DESC"
+  },
+  "Frigid River": {
+   "ja": "冷たい川",
+   "owner": "RIVER-5",
+   "prop": "DESC"
+  },
+  "Gallery": {
+   "ja": "画廊",
+   "owner": "GALLERY",
+   "prop": "DESC"
+  },
+  "Gas Room": {
+   "ja": "ガスの部屋",
+   "owner": "GAS-ROOM",
+   "prop": "DESC"
+  },
+  "Grating Room": {
+   "ja": "格子の部屋",
+   "owner": "GRATING-ROOM",
    "prop": "DESC"
   },
   "Kitchen": {
@@ -885,9 +1173,59 @@
    "owner": "KITCHEN",
    "prop": "DESC"
   },
+  "Ladder Bottom": {
+   "ja": "梯子の下",
+   "owner": "LADDER-BOTTOM",
+   "prop": "DESC"
+  },
+  "Ladder Top": {
+   "ja": "梯子の上",
+   "owner": "LADDER-TOP",
+   "prop": "DESC"
+  },
+  "Land of the Dead": {
+   "ja": "死者の国",
+   "owner": "LAND-OF-LIVING-DEAD",
+   "prop": "DESC"
+  },
   "Living Room": {
    "ja": "居間",
    "owner": "LIVING-ROOM",
+   "prop": "DESC"
+  },
+  "Loud Room": {
+   "ja": "轟音の部屋",
+   "owner": "LOUD-ROOM",
+   "prop": "DESC"
+  },
+  "Machine Room": {
+   "ja": "機械室",
+   "owner": "MACHINE-ROOM",
+   "prop": "DESC"
+  },
+  "Maintenance Room": {
+   "ja": "整備室",
+   "owner": "MAINTENANCE-ROOM",
+   "prop": "DESC"
+  },
+  "Maze": {
+   "ja": "迷路",
+   "owner": "MAZE-15",
+   "prop": "DESC"
+  },
+  "Mine Entrance": {
+   "ja": "坑道の入口",
+   "owner": "MINE-ENTRANCE",
+   "prop": "DESC"
+  },
+  "Mirror Room": {
+   "ja": "鏡の間",
+   "owner": "MIRROR-ROOM-2",
+   "prop": "DESC"
+  },
+  "Narrow Passage": {
+   "ja": "狭い通路",
+   "owner": "NARROW-PASSAGE",
    "prop": "DESC"
   },
   "North of House": {
@@ -895,14 +1233,119 @@
    "owner": "NORTH-OF-HOUSE",
    "prop": "DESC"
   },
+  "North-South Passage": {
+   "ja": "南北の通路",
+   "owner": "NS-PASSAGE",
+   "prop": "DESC"
+  },
+  "On the Rainbow": {
+   "ja": "虹の上",
+   "owner": "ON-RAINBOW",
+   "prop": "DESC"
+  },
   "On the table is an elongated brown sack, smelling of hot peppers.": {
    "ja": "食卓の上に、細長い茶色の袋がある。唐辛子の匂いがする。",
    "owner": "SANDWICH-BAG",
    "prop": "FDESC"
   },
+  "Reservoir": {
+   "ja": "貯水池",
+   "owner": "RESERVOIR",
+   "prop": "DESC"
+  },
+  "Reservoir North": {
+   "ja": "貯水池の北",
+   "owner": "RESERVOIR-NORTH",
+   "prop": "DESC"
+  },
+  "Reservoir South": {
+   "ja": "貯水池の南",
+   "owner": "RESERVOIR-SOUTH",
+   "prop": "DESC"
+  },
+  "Rocky Ledge": {
+   "ja": "岩棚",
+   "owner": "CLIFF-MIDDLE",
+   "prop": "DESC"
+  },
+  "Round Room": {
+   "ja": "円形の間",
+   "owner": "ROUND-ROOM",
+   "prop": "DESC"
+  },
+  "Sandy Beach": {
+   "ja": "砂浜",
+   "owner": "SANDY-BEACH",
+   "prop": "DESC"
+  },
+  "Sandy Cave": {
+   "ja": "砂の洞窟",
+   "owner": "SANDY-CAVE",
+   "prop": "DESC"
+  },
+  "Shaft Room": {
+   "ja": "縦坑の間",
+   "owner": "SHAFT-ROOM",
+   "prop": "DESC"
+  },
+  "Shore": {
+   "ja": "岸",
+   "owner": "SHORE",
+   "prop": "DESC"
+  },
+  "Slide Room": {
+   "ja": "滑り台の間",
+   "owner": "SLIDE-ROOM",
+   "prop": "DESC"
+  },
+  "Smelly Room": {
+   "ja": "臭う部屋",
+   "owner": "SMELLY-ROOM",
+   "prop": "DESC"
+  },
   "South of House": {
    "ja": "家の南",
    "owner": "SOUTH-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "Squeaky Room": {
+   "ja": "きしむ部屋",
+   "owner": "SQUEEKY-ROOM",
+   "prop": "DESC"
+  },
+  "Stone Barrow": {
+   "ja": "石塚",
+   "owner": "STONE-BARROW",
+   "prop": "DESC"
+  },
+  "Strange Passage": {
+   "ja": "奇妙な通路",
+   "owner": "STRANGE-PASSAGE",
+   "prop": "DESC"
+  },
+  "Stream": {
+   "ja": "小川",
+   "owner": "IN-STREAM",
+   "prop": "DESC"
+  },
+  "Stream View": {
+   "ja": "小川の眺め",
+   "owner": "STREAM-VIEW",
+   "prop": "DESC"
+  },
+  "Studio": {
+   "ja": "画室",
+   "owner": "STUDIO",
+   "prop": "DESC"
+  },
+  "Temple": {
+   "ja": "神殿",
+   "owner": "NORTH-TEMPLE",
+   "prop": "DESC"
+  },
+  "The Troll Room": {
+   "ja": "トロルの部屋",
+   "owner": "TROLL-ROOM",
    "prop": "DESC"
   },
   "The engravings translate to \"This space intentionally left blank.\"": {
@@ -920,9 +1363,44 @@
    "owner": "ATTIC",
    "prop": "LDESC"
   },
+  "Timber Room": {
+   "ja": "坑木の間",
+   "owner": "TIMBER-ROOM",
+   "prop": "DESC"
+  },
+  "Torch Room": {
+   "ja": "松明の間",
+   "owner": "TORCH-ROOM",
+   "prop": "DESC"
+  },
+  "Treasure Room": {
+   "ja": "宝物庫",
+   "owner": "TREASURE-ROOM",
+   "prop": "DESC"
+  },
+  "Twisting Passage": {
+   "ja": "折れ曲がった通路",
+   "owner": "TWISTING-PASSAGE",
+   "prop": "DESC"
+  },
+  "Up a Tree": {
+   "ja": "木の上",
+   "owner": "UP-A-TREE",
+   "prop": "DESC"
+  },
   "West of House": {
    "ja": "家の西",
    "owner": "WEST-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "White Cliffs Beach": {
+   "ja": "白い崖の浜",
+   "owner": "WHITE-CLIFFS-SOUTH",
+   "prop": "DESC"
+  },
+  "Winding Passage": {
+   "ja": "曲がりくねった通路",
+   "owner": "WINDING-PASSAGE",
    "prop": "DESC"
   },
   "You are facing the north side of a white house. There is no door here, and all the windows are boarded up. To the north a narrow path winds through the trees.": {
@@ -935,9 +1413,79 @@
    "owner": "SOUTH-OF-HOUSE",
    "prop": "LDESC"
   },
+  "ZORK owner's manual": {
+   "ja": "ZORK 取扱説明書",
+   "owner": "OWNERS-MANUAL",
+   "prop": "DESC"
+  },
+  "altar": {
+   "ja": "祭壇",
+   "owner": "ALTAR",
+   "prop": "DESC"
+  },
+  "ancient map": {
+   "ja": "古い地図",
+   "owner": "MAP",
+   "prop": "DESC"
+  },
+  "basket": {
+   "ja": "籠",
+   "owner": "RAISED-BASKET",
+   "prop": "DESC"
+  },
+  "bat": {
+   "ja": "蝙蝠",
+   "owner": "BAT",
+   "prop": "DESC"
+  },
+  "beautiful brass bauble": {
+   "ja": "美しい真鍮の飾り玉",
+   "owner": "BAUBLE",
+   "prop": "DESC"
+  },
+  "beautiful jeweled scarab": {
+   "ja": "美しい宝石の甲虫",
+   "owner": "SCARAB",
+   "prop": "DESC"
+  },
+  "bird's nest": {
+   "ja": "鳥の巣",
+   "owner": "NEST",
+   "prop": "DESC"
+  },
+  "black book": {
+   "ja": "黒い書物",
+   "owner": "BOOK",
+   "prop": "DESC"
+  },
+  "bloody axe": {
+   "ja": "血のついた斧",
+   "owner": "AXE",
+   "prop": "DESC"
+  },
+  "blue button": {
+   "ja": "青いボタン",
+   "owner": "BLUE-BUTTON",
+   "prop": "DESC"
+  },
   "board": {
    "ja": "板",
    "owner": "BOARD",
+   "prop": "DESC"
+  },
+  "boarded window": {
+   "ja": "板で塞がれた窓",
+   "owner": "BOARDED-WINDOW",
+   "prop": "DESC"
+  },
+  "bolt": {
+   "ja": "ボルト",
+   "owner": "BOLT",
+   "prop": "DESC"
+  },
+  "brass bell": {
+   "ja": "真鍮の鈴",
+   "owner": "BELL",
    "prop": "DESC"
   },
   "brass lantern": {
@@ -945,9 +1493,39 @@
    "owner": "LAMP",
    "prop": "DESC"
   },
+  "broken clockwork canary": {
+   "ja": "壊れたからくりカナリア",
+   "owner": "BROKEN-CANARY",
+   "prop": "DESC"
+  },
+  "broken jewel-encrusted egg": {
+   "ja": "壊れた宝石の卵",
+   "owner": "BROKEN-EGG",
+   "prop": "DESC"
+  },
+  "broken lantern": {
+   "ja": "壊れたランタン",
+   "owner": "BROKEN-LAMP",
+   "prop": "DESC"
+  },
+  "broken timber": {
+   "ja": "折れた坑木",
+   "owner": "TIMBERS",
+   "prop": "DESC"
+  },
+  "brown button": {
+   "ja": "茶色のボタン",
+   "owner": "BROWN-BUTTON",
+   "prop": "DESC"
+  },
   "brown sack": {
    "ja": "茶色の袋",
    "owner": "SANDWICH-BAG",
+   "prop": "DESC"
+  },
+  "burned-out lantern": {
+   "ja": "燃え尽きたランタン",
+   "owner": "BURNED-OUT-LANTERN",
    "prop": "DESC"
   },
   "carpet": {
@@ -955,14 +1533,59 @@
    "owner": "RUG",
    "prop": "DESC"
   },
+  "chalice": {
+   "ja": "聖杯",
+   "owner": "CHALICE",
+   "prop": "DESC"
+  },
   "chimney": {
    "ja": "煙突",
    "owner": "CHIMNEY",
    "prop": "DESC"
   },
+  "chute": {
+   "ja": "滑り台",
+   "owner": "SLIDE",
+   "prop": "DESC"
+  },
+  "cliff": {
+   "ja": "崖",
+   "owner": "CLIMBABLE-CLIFF",
+   "prop": "DESC"
+  },
   "clove of garlic": {
    "ja": "にんにくの一片",
    "owner": "GARLIC",
+   "prop": "DESC"
+  },
+  "control panel": {
+   "ja": "制御盤",
+   "owner": "CONTROL-PANEL",
+   "prop": "DESC"
+  },
+  "crack": {
+   "ja": "割れ目",
+   "owner": "CRACK",
+   "prop": "DESC"
+  },
+  "crystal skull": {
+   "ja": "水晶の髑髏",
+   "owner": "SKULL",
+   "prop": "DESC"
+  },
+  "crystal trident": {
+   "ja": "水晶の三叉槍",
+   "owner": "TRIDENT",
+   "prop": "DESC"
+  },
+  "cyclops": {
+   "ja": "サイクロプス",
+   "owner": "CYCLOPS",
+   "prop": "DESC"
+  },
+  "dam": {
+   "ja": "ダム",
+   "owner": "DAM",
    "prop": "DESC"
   },
   "door": {
@@ -980,9 +1603,74 @@
    "owner": "BOTTLE",
    "prop": "DESC"
   },
+  "gold coffin": {
+   "ja": "金の棺",
+   "owner": "COFFIN",
+   "prop": "DESC"
+  },
+  "golden clockwork canary": {
+   "ja": "金のからくりカナリア",
+   "owner": "CANARY",
+   "prop": "DESC"
+  },
+  "granite wall": {
+   "ja": "花崗岩の壁",
+   "owner": "GRANITE-WALL",
+   "prop": "DESC"
+  },
+  "grating": {
+   "ja": "格子",
+   "owner": "GRATE",
+   "prop": "DESC"
+  },
+  "green bubble": {
+   "ja": "緑の球",
+   "owner": "BUBBLE",
+   "prop": "DESC"
+  },
+  "group of tool chests": {
+   "ja": "道具箱の山",
+   "owner": "TOOL-CHEST",
+   "prop": "DESC"
+  },
+  "hand-held air pump": {
+   "ja": "手押しの空気入れ",
+   "owner": "PUMP",
+   "prop": "DESC"
+  },
+  "huge diamond": {
+   "ja": "巨大なダイヤモンド",
+   "owner": "DIAMOND",
+   "prop": "DESC"
+  },
+  "jade figurine": {
+   "ja": "翡翠の像",
+   "owner": "JADE",
+   "prop": "DESC"
+  },
+  "jewel-encrusted egg": {
+   "ja": "宝石をちりばめた卵",
+   "owner": "EGG",
+   "prop": "DESC"
+  },
+  "kitchen table": {
+   "ja": "台所の食卓",
+   "owner": "KITCHEN-TABLE",
+   "prop": "DESC"
+  },
   "kitchen window": {
    "ja": "台所の窓",
    "owner": "KITCHEN-WINDOW",
+   "prop": "DESC"
+  },
+  "large bag": {
+   "ja": "大きな袋",
+   "owner": "LARGE-BAG",
+   "prop": "DESC"
+  },
+  "large emerald": {
+   "ja": "大きなエメラルド",
+   "owner": "EMERALD",
    "prop": "DESC"
   },
   "leaflet": {
@@ -990,9 +1678,39 @@
    "owner": "ADVERTISEMENT",
    "prop": "DESC"
   },
+  "leak": {
+   "ja": "漏れ",
+   "owner": "LEAK",
+   "prop": "DESC"
+  },
+  "leather bag of coins": {
+   "ja": "革の金貨袋",
+   "owner": "BAG-OF-COINS",
+   "prop": "DESC"
+  },
   "lunch": {
    "ja": "昼食",
    "owner": "LUNCH",
+   "prop": "DESC"
+  },
+  "machine": {
+   "ja": "機械",
+   "owner": "MACHINE",
+   "prop": "DESC"
+  },
+  "magic boat": {
+   "ja": "魔法の舟",
+   "owner": "INFLATED-BOAT",
+   "prop": "DESC"
+  },
+  "matchbook": {
+   "ja": "マッチ帳",
+   "owner": "MATCH",
+   "prop": "DESC"
+  },
+  "mirror": {
+   "ja": "鏡",
+   "owner": "MIRROR-1",
    "prop": "DESC"
   },
   "mountain range": {
@@ -1000,9 +1718,144 @@
    "owner": "MOUNTAIN-RANGE",
    "prop": "DESC"
   },
+  "nasty knife": {
+   "ja": "嫌な感じのナイフ",
+   "owner": "KNIFE",
+   "prop": "DESC"
+  },
+  "number of ghosts": {
+   "ja": "亡霊の群れ",
+   "owner": "GHOSTS",
+   "prop": "DESC"
+  },
+  "painting": {
+   "ja": "絵画",
+   "owner": "PAINTING",
+   "prop": "DESC"
+  },
+  "pair of candles": {
+   "ja": "一対の蝋燭",
+   "owner": "CANDLES",
+   "prop": "DESC"
+  },
+  "pedestal": {
+   "ja": "台座",
+   "owner": "PEDESTAL",
+   "prop": "DESC"
+  },
+  "pile of bodies": {
+   "ja": "死体の山",
+   "owner": "BODIES",
+   "prop": "DESC"
+  },
+  "pile of leaves": {
+   "ja": "落ち葉の山",
+   "owner": "LEAVES",
+   "prop": "DESC"
+  },
+  "pile of plastic": {
+   "ja": "ビニールの塊",
+   "owner": "INFLATABLE-BOAT",
+   "prop": "DESC"
+  },
+  "platinum bar": {
+   "ja": "白金の延べ棒",
+   "owner": "BAR",
+   "prop": "DESC"
+  },
+  "pot of gold": {
+   "ja": "金の壺",
+   "owner": "POT-OF-GOLD",
+   "prop": "DESC"
+  },
+  "prayer": {
+   "ja": "祈りの言葉",
+   "owner": "PRAYER",
+   "prop": "DESC"
+  },
+  "punctured boat": {
+   "ja": "穴の空いた舟",
+   "owner": "PUNCTURED-BOAT",
+   "prop": "DESC"
+  },
   "quantity of water": {
    "ja": "いくらかの水",
    "owner": "WATER",
+   "prop": "DESC"
+  },
+  "rainbow": {
+   "ja": "虹",
+   "owner": "RAINBOW",
+   "prop": "DESC"
+  },
+  "red buoy": {
+   "ja": "赤い浮標",
+   "owner": "BUOY",
+   "prop": "DESC"
+  },
+  "red button": {
+   "ja": "赤いボタン",
+   "owner": "RED-BUTTON",
+   "prop": "DESC"
+  },
+  "red hot brass bell": {
+   "ja": "赤熱した真鍮の鈴",
+   "owner": "HOT-BELL",
+   "prop": "DESC"
+  },
+  "river": {
+   "ja": "川",
+   "owner": "RIVER",
+   "prop": "DESC"
+  },
+  "rope": {
+   "ja": "縄",
+   "owner": "ROPE",
+   "prop": "DESC"
+  },
+  "rusty knife": {
+   "ja": "錆びたナイフ",
+   "owner": "RUSTY-KNIFE",
+   "prop": "DESC"
+  },
+  "sand": {
+   "ja": "砂",
+   "owner": "SAND",
+   "prop": "DESC"
+  },
+  "sapphire-encrusted bracelet": {
+   "ja": "サファイアをちりばめた腕輪",
+   "owner": "BRACELET",
+   "prop": "DESC"
+  },
+  "sceptre": {
+   "ja": "王笏",
+   "owner": "SCEPTRE",
+   "prop": "DESC"
+  },
+  "screwdriver": {
+   "ja": "ねじ回し",
+   "owner": "SCREWDRIVER",
+   "prop": "DESC"
+  },
+  "set of teeth": {
+   "ja": "入れ歯",
+   "owner": "TEETH",
+   "prop": "DESC"
+  },
+  "shovel": {
+   "ja": "シャベル",
+   "owner": "SHOVEL",
+   "prop": "DESC"
+  },
+  "skeleton": {
+   "ja": "骸骨",
+   "owner": "BONES",
+   "prop": "DESC"
+  },
+  "skeleton key": {
+   "ja": "合鍵",
+   "owner": "KEYS",
    "prop": "DESC"
   },
   "small mailbox": {
@@ -1010,14 +1863,74 @@
    "owner": "MAILBOX",
    "prop": "DESC"
   },
+  "small piece of vitreous slag": {
+   "ja": "ガラス質の鉱滓のかけら",
+   "owner": "GUNK",
+   "prop": "DESC"
+  },
+  "small pile of coal": {
+   "ja": "小さな石炭の山",
+   "owner": "COAL",
+   "prop": "DESC"
+  },
   "songbird": {
    "ja": "小鳥",
    "owner": "SONGBIRD",
    "prop": "DESC"
   },
+  "stiletto": {
+   "ja": "短剣",
+   "owner": "STILETTO",
+   "prop": "DESC"
+  },
+  "stone barrow": {
+   "ja": "石塚",
+   "owner": "BARROW",
+   "prop": "DESC"
+  },
+  "stone door": {
+   "ja": "石の扉",
+   "owner": "BARROW-DOOR",
+   "prop": "DESC"
+  },
+  "surrounding wall": {
+   "ja": "周囲の壁",
+   "owner": "WALL",
+   "prop": "DESC"
+  },
+  "switch": {
+   "ja": "スイッチ",
+   "owner": "MACHINE-SWITCH",
+   "prop": "DESC"
+  },
   "sword": {
    "ja": "剣",
    "owner": "SWORD",
+   "prop": "DESC"
+  },
+  "table": {
+   "ja": "食卓",
+   "owner": "ATTIC-TABLE",
+   "prop": "DESC"
+  },
+  "tan label": {
+   "ja": "黄褐色の札",
+   "owner": "BOAT-LABEL",
+   "prop": "DESC"
+  },
+  "thief": {
+   "ja": "盗賊",
+   "owner": "THIEF",
+   "prop": "DESC"
+  },
+  "torch": {
+   "ja": "松明",
+   "owner": "TORCH",
+   "prop": "DESC"
+  },
+  "tour guidebook": {
+   "ja": "案内書",
+   "owner": "GUIDE",
    "prop": "DESC"
   },
   "trap door": {
@@ -1030,9 +1943,44 @@
    "owner": "TREE",
    "prop": "DESC"
   },
+  "troll": {
+   "ja": "トロル",
+   "owner": "TROLL",
+   "prop": "DESC"
+  },
   "trophy case": {
    "ja": "トロフィー箱",
    "owner": "TROPHY-CASE",
+   "prop": "DESC"
+  },
+  "trunk of jewels": {
+   "ja": "宝石の詰まった箱",
+   "owner": "TRUNK",
+   "prop": "DESC"
+  },
+  "tube": {
+   "ja": "筒",
+   "owner": "TUBE",
+   "prop": "DESC"
+  },
+  "viscous material": {
+   "ja": "粘りのある物質",
+   "owner": "PUTTY",
+   "prop": "DESC"
+  },
+  "wall with engravings": {
+   "ja": "彫刻のある壁",
+   "owner": "ENGRAVINGS",
+   "prop": "DESC"
+  },
+  "water": {
+   "ja": "水",
+   "owner": "GLOBAL-WATER",
+   "prop": "DESC"
+  },
+  "white cliffs": {
+   "ja": "白い崖",
+   "owner": "WHITE-CLIFF",
    "prop": "DESC"
   },
   "white house": {
@@ -1043,6 +1991,26 @@
   "wooden door": {
    "ja": "木の扉",
    "owner": "WOODEN-DOOR",
+   "prop": "DESC"
+  },
+  "wooden ladder": {
+   "ja": "木の梯子",
+   "owner": "LADDER",
+   "prop": "DESC"
+  },
+  "wooden railing": {
+   "ja": "木の手すり",
+   "owner": "RAILING",
+   "prop": "DESC"
+  },
+  "wrench": {
+   "ja": "スパナ",
+   "owner": "WRENCH",
+   "prop": "DESC"
+  },
+  "yellow button": {
+   "ja": "黄色のボタン",
+   "owner": "YELLOW-BUTTON",
    "prop": "DESC"
   }
  },
@@ -1796,8 +2764,288 @@
    ]
   },
   {
+   "en": "A nice idea, but with a {PRSI}?",
+   "ja": "悪くない考えだ。だが{PRSI}で？",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "There is now a puddle in the bottom of the {AV}.",
+   "ja": "{AV}の底に水たまりができた。",
+   "slots": [
+    "AV"
+   ]
+  },
+  {
+   "en": "The water leaks out of the {PRSI} and evaporates immediately.",
+   "ja": "水は{PRSI}から漏れ出し、たちまち蒸発した。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSI} burns and is consumed.",
+   "ja": "{PRSI}は燃え尽きた。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {V} swings it out of your reach.",
+   "ja": "{V}はそれを振り払い、手の届かないところへ遠ざけた。",
+   "slots": [
+    "V"
+   ]
+  },
+  {
+   "en": "The {W} seems white-hot. You can't hold on to it.",
+   "ja": "{W}は白熱しているようだ。とても握っていられない。",
+   "slots": [
+    "W"
+   ]
+  },
+  {
+   "en": "You would have to get the {PRSO} first, and that seems unlikely.",
+   "ja": "まず{PRSO}を手に入れなければならないが、それは望み薄だ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Can you unlock a grating with a {PRSI}?",
+   "ja": "{PRSI}で格子の鍵を開けるつもりか。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} goes through the grating into the darkness below.",
+   "ja": "{PRSO}は格子を抜け、下の暗闇へ落ちていった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You feel a faint tingling transmitted through the {PRSI}.",
+   "ja": "{PRSI}を通して、かすかな震えが伝わってくる。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The bolt won't turn using the {PRSI}.",
+   "ja": "{PRSI}ではボルトは回らない。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "With a {PRSI}? Do you know how big this dam is? You could only stop a tiny leak with that.",
+   "ja": "{PRSI}で？ このダムの大きさを分かっているのか。それで止められるのは、ごく小さな漏れだけだ。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "With a {OBJ}?",
+   "ja": "{OBJ}で？",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "You hear, off in the distance, someone saying \"My, I wonder what this fine {X} is doing here.\"",
+   "ja": "遠くで誰かがこう言うのが聞こえる。「おや、こんな上等な{X}がなぜここに」",
+   "slots": [
+    "X"
+   ]
+  },
+  {
+   "en": "The thief is taken aback by your unexpected generosity, but accepts the {PRSO} and stops to admire its beauty.",
+   "ja": "盗賊は思わぬ気前のよさに面食らいながらも{PRSO}を受け取り、その美しさに見入っている。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The thief places the {PRSO} in his bag and thanks you politely.",
+   "ja": "盗賊は{PRSO}を袋に入れ、丁重に礼を言った。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You'd better have more light than from the {OBJ}.",
+   "ja": "{OBJ}の明かりだけでは足りない。",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "How sad for an aspiring adventurer to light a {PRSO} in a room which reeks of gas. Fortunately, there is justice in the world.",
+   "ja": "ガスの臭いが立ちこめる部屋で{PRSO}に火を点けるとは、志ある冒険者にはあまりに惜しい末路だ。幸い、この世に正義はある。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It seems that a {PRSI} won't do.",
+   "ja": "{PRSI}では用を成さないようだ。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} floats for a moment, then sinks.",
+   "ja": "{PRSO}はしばらく浮かんでいたが、やがて沈んだ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} splashes into the water and is gone forever.",
+   "ja": "{PRSO}は水音を立てて沈み、二度と戻らない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "With a {PRSI}? Surely you jest!",
+   "ja": "{PRSI}で？ 冗談だろう。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
    "en": "The {PRSO} falls to the ground.",
    "ja": "{PRSO}は地面に落ちた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Not to say that using the {PRSI} isn't original too...",
+   "ja": "{PRSI}を使うのも独創的でないとは言わないが……",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The concept of using a {PRSI} is certainly original.",
+   "ja": "{PRSI}を使うという着想は、たしかに独創的だ。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} tumbles into the river and is seen no more.",
+   "ja": "{PRSO}は川に転がり落ち、見えなくなった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Your attempt to tie up the {PRSO} awakens him.",
+   "ja": "{PRSO}を縛ろうとして、目を覚まさせてしまった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} struggles and you cannot tie him up.",
+   "ja": "{PRSO}が暴れるので、縛ることができない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Why would you tie up a {PRSO}?",
+   "ja": "{PRSO}を縛って何になる。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {OBJ} falls into the slide and is gone.",
+   "ja": "{OBJ}は滑り台に落ち、消えていった。",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "The {PRSO} drops out of sight into the chasm.",
+   "ja": "{PRSO}は裂け目に落ち、見えなくなった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {VILLAIN} slowly regains his feet.",
+   "ja": "{VILLAIN}はゆっくりと立ち上がった。",
+   "slots": [
+    "VILLAIN"
+   ]
+  },
+  {
+   "en": "Fortunately, you still have a {NWEAPON}.",
+   "ja": "幸い、まだ{NWEAPON}がある。",
+   "slots": [
+    "NWEAPON"
+   ]
+  },
+  {
+   "en": "Attacking the {VILLAIN} is pointless.",
+   "ja": "{VILLAIN}を攻撃しても意味がない。",
+   "slots": [
+    "VILLAIN"
+   ]
+  },
+  {
+   "en": "{VILLAIN} cannot defend himself: He dies.",
+   "ja": "{VILLAIN}はもう身を守れない。息絶えた。",
+   "slots": [
+    "VILLAIN"
+   ]
+  },
+  {
+   "en": "Almost as soon as the {VILLAIN} breathes his last breath, a cloud of sinister black fog envelops him, and when the fog lifts, the carcass has disappeared.",
+   "ja": "{VILLAIN}が息を引き取るや、不気味な黒い霧が立ちこめて姿を包み、霧が晴れたとき、死体は消えていた。",
+   "slots": [
+    "VILLAIN"
+   ]
+  },
+  {
+   "en": "You suddenly notice that the {X} vanished.",
+   "ja": "{X}が消えていることに、ふと気づいた。",
+   "slots": [
+    "X"
+   ]
+  },
+  {
+   "en": "The {STR} are safely inside; there's no need to do that.",
+   "ja": "{STR}は中に納まっている。その必要はない。",
+   "slots": [
+    "STR"
+   ]
+  },
+  {
+   "en": "There are lots of {STR} in there.",
+   "ja": "そこには{STR}がたくさんある。",
+   "slots": [
+    "STR"
+   ]
+  },
+  {
+   "en": "Don't be silly. It wouldn't be a {OBJ} anymore.",
+   "ja": "馬鹿を言うな。それでは{OBJ}ではなくなってしまう。",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "It looks pretty much like a {PRSO}.",
+   "ja": "どう見ても{PRSO}だ。",
    "slots": [
     "PRSO"
    ]

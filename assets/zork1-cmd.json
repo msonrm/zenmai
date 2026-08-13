@@ -18,6 +18,156 @@
     "MAIL"
    ]
   },
+  "ALTAR": {
+   "adjs": [],
+   "desc": "altar",
+   "ja": [
+    "祭壇"
+   ],
+   "nouns": [
+    "ALTAR"
+   ]
+  },
+  "ATTIC-TABLE": {
+   "adjs": [],
+   "desc": "table",
+   "ja": [
+    "食卓"
+   ],
+   "nouns": [
+    "TABLE"
+   ]
+  },
+  "AXE": {
+   "adjs": [
+    "BLOODY"
+   ],
+   "desc": "bloody axe",
+   "ja": [
+    "血のついた斧",
+    "ついた斧",
+    "斧"
+   ],
+   "nouns": [
+    "AXE",
+    "AX"
+   ]
+  },
+  "BAG-OF-COINS": {
+   "adjs": [
+    "OLD",
+    "LEATHER"
+   ],
+   "desc": "leather bag of coins",
+   "ja": [
+    "革の金貨袋",
+    "金貨袋"
+   ],
+   "nouns": [
+    "BAG",
+    "COINS",
+    "TREASURE"
+   ]
+  },
+  "BAR": {
+   "adjs": [
+    "PLATINUM",
+    "LARGE"
+   ],
+   "desc": "platinum bar",
+   "ja": [
+    "白金の延べ棒",
+    "延べ棒"
+   ],
+   "nouns": [
+    "BAR",
+    "PLATINUM",
+    "TREASURE"
+   ]
+  },
+  "BARROW": {
+   "adjs": [
+    "MASSIVE",
+    "STONE"
+   ],
+   "desc": "stone barrow",
+   "ja": [
+    "石塚"
+   ],
+   "nouns": [
+    "BARROW",
+    "TOMB"
+   ]
+  },
+  "BARROW-DOOR": {
+   "adjs": [
+    "HUGE",
+    "STONE"
+   ],
+   "desc": "stone door",
+   "ja": [
+    "石の扉"
+   ],
+   "nouns": [
+    "DOOR"
+   ]
+  },
+  "BAT": {
+   "adjs": [
+    "VAMPIRE",
+    "DERANGED"
+   ],
+   "desc": "bat",
+   "ja": [
+    "蝙蝠"
+   ],
+   "nouns": [
+    "BAT",
+    "VAMPIRE"
+   ]
+  },
+  "BAUBLE": {
+   "adjs": [
+    "BRASS",
+    "BEAUTI"
+   ],
+   "desc": "beautiful brass bauble",
+   "ja": [
+    "美しい真鍮の飾り玉",
+    "飾り玉"
+   ],
+   "nouns": [
+    "BAUBLE",
+    "TREASURE"
+   ]
+  },
+  "BELL": {
+   "adjs": [
+    "SMALL",
+    "BRASS"
+   ],
+   "desc": "brass bell",
+   "ja": [
+    "真鍮の鈴",
+    "鈴"
+   ],
+   "nouns": [
+    "BELL"
+   ]
+  },
+  "BLUE-BUTTON": {
+   "adjs": [
+    "BLUE"
+   ],
+   "desc": "blue button",
+   "ja": [
+    "青いボタン"
+   ],
+   "nouns": [
+    "BUTTON",
+    "SWITCH"
+   ]
+  },
   "BOARD": {
    "adjs": [],
    "desc": "board",
@@ -28,6 +178,91 @@
    "nouns": [
     "BOARDS",
     "BOARD"
+   ]
+  },
+  "BOARDED-WINDOW": {
+   "adjs": [
+    "BOARDED"
+   ],
+   "desc": "boarded window",
+   "ja": [
+    "板で塞がれた窓"
+   ],
+   "nouns": [
+    "WINDOW"
+   ]
+  },
+  "BOAT-LABEL": {
+   "adjs": [
+    "TAN",
+    "FINE"
+   ],
+   "desc": "tan label",
+   "ja": [
+    "黄褐色の札",
+    "札"
+   ],
+   "nouns": [
+    "LABEL",
+    "FINEPRINT",
+    "PRINT"
+   ]
+  },
+  "BODIES": {
+   "adjs": [
+    "MANGLED"
+   ],
+   "desc": "pile of bodies",
+   "ja": [
+    "死体の山"
+   ],
+   "nouns": [
+    "BODIES",
+    "BODY",
+    "REMAINS",
+    "PILE"
+   ]
+  },
+  "BOLT": {
+   "adjs": [
+    "METAL",
+    "LARGE"
+   ],
+   "desc": "bolt",
+   "ja": [
+    "ボルト"
+   ],
+   "nouns": [
+    "BOLT",
+    "NUT"
+   ]
+  },
+  "BONES": {
+   "adjs": [],
+   "desc": "skeleton",
+   "ja": [
+    "骸骨"
+   ],
+   "nouns": [
+    "BONES",
+    "SKELETON",
+    "BODY"
+   ]
+  },
+  "BOOK": {
+   "adjs": [
+    "LARGE",
+    "BLACK"
+   ],
+   "desc": "black book",
+   "ja": [
+    "黒い書物"
+   ],
+   "nouns": [
+    "BOOK",
+    "PRAYER",
+    "PAGE",
+    "BOOKS"
    ]
   },
   "BOTTLE": {
@@ -47,6 +282,172 @@
     "CONTAINER"
    ]
   },
+  "BRACELET": {
+   "adjs": [
+    "SAPPHIRE"
+   ],
+   "desc": "sapphire-encrusted bracelet",
+   "ja": [
+    "サファイアをちりばめた腕輪",
+    "腕輪"
+   ],
+   "nouns": [
+    "BRACELET",
+    "JEWEL",
+    "SAPPHIRE",
+    "TREASURE"
+   ]
+  },
+  "BROKEN-CANARY": {
+   "adjs": [
+    "BROKEN",
+    "CLOCKWORK",
+    "GOLD",
+    "GOLDEN"
+   ],
+   "desc": "broken clockwork canary",
+   "ja": [
+    "壊れたからくりカナリア",
+    "からくりカナリア"
+   ],
+   "nouns": [
+    "CANARY",
+    "TREASURE"
+   ]
+  },
+  "BROKEN-EGG": {
+   "adjs": [
+    "BROKEN",
+    "BIRDS",
+    "ENCRUSTED",
+    "JEWEL"
+   ],
+   "desc": "broken jewel-encrusted egg",
+   "ja": [
+    "壊れた宝石の卵",
+    "卵",
+    "宝石の卵"
+   ],
+   "nouns": [
+    "EGG",
+    "TREASURE"
+   ]
+  },
+  "BROKEN-LAMP": {
+   "adjs": [
+    "BROKEN"
+   ],
+   "desc": "broken lantern",
+   "ja": [
+    "壊れたランタン"
+   ],
+   "nouns": [
+    "LAMP",
+    "LANTERN"
+   ]
+  },
+  "BROWN-BUTTON": {
+   "adjs": [
+    "BROWN"
+   ],
+   "desc": "brown button",
+   "ja": [
+    "茶色のボタン",
+    "ボタン"
+   ],
+   "nouns": [
+    "BUTTON",
+    "SWITCH"
+   ]
+  },
+  "BUBBLE": {
+   "adjs": [
+    "SMALL",
+    "GREEN",
+    "PLASTIC"
+   ],
+   "desc": "green bubble",
+   "ja": [
+    "緑の球",
+    "球"
+   ],
+   "nouns": [
+    "BUBBLE"
+   ]
+  },
+  "BUOY": {
+   "adjs": [
+    "RED"
+   ],
+   "desc": "red buoy",
+   "ja": [
+    "赤い浮標"
+   ],
+   "nouns": [
+    "BUOY"
+   ]
+  },
+  "BURNED-OUT-LANTERN": {
+   "adjs": [
+    "RUSTY",
+    "BURNED",
+    "DEAD",
+    "USELESS"
+   ],
+   "desc": "burned-out lantern",
+   "ja": [
+    "燃え尽きたランタン"
+   ],
+   "nouns": [
+    "LANTERN",
+    "LAMP"
+   ]
+  },
+  "CANARY": {
+   "adjs": [
+    "CLOCKWORK",
+    "GOLD",
+    "GOLDEN"
+   ],
+   "desc": "golden clockwork canary",
+   "ja": [
+    "金のからくりカナリア"
+   ],
+   "nouns": [
+    "CANARY",
+    "TREASURE"
+   ]
+  },
+  "CANDLES": {
+   "adjs": [
+    "BURNING"
+   ],
+   "desc": "pair of candles",
+   "ja": [
+    "一対の蝋燭",
+    "蝋燭"
+   ],
+   "nouns": [
+    "CANDLES",
+    "PAIR"
+   ]
+  },
+  "CHALICE": {
+   "adjs": [
+    "SILVER",
+    "ENGRAVINGS"
+   ],
+   "desc": "chalice",
+   "ja": [
+    "聖杯"
+   ],
+   "nouns": [
+    "CHALICE",
+    "CUP",
+    "SILVER",
+    "TREASURE"
+   ]
+  },
   "CHIMNEY": {
    "adjs": [
     "DARK",
@@ -59,6 +460,165 @@
    ],
    "nouns": [
     "CHIMNEY"
+   ]
+  },
+  "CLIMBABLE-CLIFF": {
+   "adjs": [
+    "ROCKY",
+    "SHEER"
+   ],
+   "desc": "cliff",
+   "ja": [
+    "崖"
+   ],
+   "nouns": [
+    "WALL",
+    "CLIFF",
+    "WALLS",
+    "LEDGE"
+   ]
+  },
+  "COAL": {
+   "adjs": [
+    "SMALL"
+   ],
+   "desc": "small pile of coal",
+   "ja": [
+    "小さな石炭の山",
+    "石炭の山"
+   ],
+   "nouns": [
+    "COAL",
+    "PILE",
+    "HEAP"
+   ]
+  },
+  "COFFIN": {
+   "adjs": [
+    "SOLID",
+    "GOLD"
+   ],
+   "desc": "gold coffin",
+   "ja": [
+    "金の棺",
+    "棺"
+   ],
+   "nouns": [
+    "COFFIN",
+    "CASKET",
+    "TREASURE"
+   ]
+  },
+  "CONTROL-PANEL": {
+   "adjs": [
+    "CONTROL"
+   ],
+   "desc": "control panel",
+   "ja": [
+    "制御盤"
+   ],
+   "nouns": [
+    "PANEL"
+   ]
+  },
+  "CRACK": {
+   "adjs": [
+    "NARROW"
+   ],
+   "desc": "crack",
+   "ja": [
+    "割れ目"
+   ],
+   "nouns": [
+    "CRACK"
+   ]
+  },
+  "CYCLOPS": {
+   "adjs": [
+    "HUNGRY",
+    "GIANT"
+   ],
+   "desc": "cyclops",
+   "ja": [
+    "サイクロプス"
+   ],
+   "nouns": [
+    "CYCLOPS",
+    "MONSTER",
+    "EYE"
+   ]
+  },
+  "DAM": {
+   "adjs": [],
+   "desc": "dam",
+   "ja": [
+    "ダム"
+   ],
+   "nouns": [
+    "DAM",
+    "GATE",
+    "GATES",
+    "FCD\\#3"
+   ]
+  },
+  "DIAMOND": {
+   "adjs": [
+    "HUGE",
+    "ENORMOUS"
+   ],
+   "desc": "huge diamond",
+   "ja": [
+    "巨大なダイヤモンド",
+    "ダイヤモンド"
+   ],
+   "nouns": [
+    "DIAMOND",
+    "TREASURE"
+   ]
+  },
+  "EGG": {
+   "adjs": [
+    "BIRDS",
+    "ENCRUSTED",
+    "JEWELED"
+   ],
+   "desc": "jewel-encrusted egg",
+   "ja": [
+    "宝石をちりばめた卵"
+   ],
+   "nouns": [
+    "EGG",
+    "TREASURE"
+   ]
+  },
+  "EMERALD": {
+   "adjs": [
+    "LARGE"
+   ],
+   "desc": "large emerald",
+   "ja": [
+    "大きなエメラルド",
+    "エメラルド"
+   ],
+   "nouns": [
+    "EMERALD",
+    "TREASURE"
+   ]
+  },
+  "ENGRAVINGS": {
+   "adjs": [
+    "OLD",
+    "ANCIENT"
+   ],
+   "desc": "wall with engravings",
+   "ja": [
+    "彫刻のある壁",
+    "ある壁"
+   ],
+   "nouns": [
+    "WALL",
+    "ENGRAVINGS",
+    "INSCRIPTION"
    ]
   },
   "FOREST": {
@@ -97,11 +657,185 @@
    "ja": [
     "にんにくの一片",
     "にんにく",
-    "にんにくのいっぺん"
+    "にんにくのいっぺん",
+    "一片",
+    "いっぺん"
    ],
    "nouns": [
     "GARLIC",
     "CLOVE"
+   ]
+  },
+  "GHOSTS": {
+   "adjs": [
+    "INVISIBLE",
+    "EVIL"
+   ],
+   "desc": "number of ghosts",
+   "ja": [
+    "亡霊の群れ",
+    "群れ"
+   ],
+   "nouns": [
+    "GHOSTS",
+    "SPIRITS",
+    "FIENDS",
+    "FORCE"
+   ]
+  },
+  "GLOBAL-WATER": {
+   "adjs": [],
+   "desc": "water",
+   "ja": [
+    "水"
+   ],
+   "nouns": [
+    "WATER",
+    "QUANTITY"
+   ]
+  },
+  "GRANITE-WALL": {
+   "adjs": [
+    "GRANITE"
+   ],
+   "desc": "granite wall",
+   "ja": [
+    "花崗岩の壁",
+    "壁"
+   ],
+   "nouns": [
+    "WALL"
+   ]
+  },
+  "GRATE": {
+   "adjs": [],
+   "desc": "grating",
+   "ja": [
+    "格子"
+   ],
+   "nouns": [
+    "GRATE",
+    "GRATING"
+   ]
+  },
+  "GUIDE": {
+   "adjs": [
+    "TOUR",
+    "GUIDE"
+   ],
+   "desc": "tour guidebook",
+   "ja": [
+    "案内書"
+   ],
+   "nouns": [
+    "GUIDE",
+    "BOOK",
+    "BOOKS",
+    "GUIDEBOOKS"
+   ]
+  },
+  "GUNK": {
+   "adjs": [
+    "SMALL",
+    "VITREOUS"
+   ],
+   "desc": "small piece of vitreous slag",
+   "ja": [
+    "ガラス質の鉱滓のかけら",
+    "かけら"
+   ],
+   "nouns": [
+    "GUNK",
+    "PIECE",
+    "SLAG"
+   ]
+  },
+  "HOT-BELL": {
+   "adjs": [
+    "BRASS",
+    "HOT",
+    "RED",
+    "SMALL"
+   ],
+   "desc": "red hot brass bell",
+   "ja": [
+    "赤熱した真鍮の鈴"
+   ],
+   "nouns": [
+    "BELL"
+   ]
+  },
+  "INFLATABLE-BOAT": {
+   "adjs": [
+    "PLASTIC",
+    "INFLAT"
+   ],
+   "desc": "pile of plastic",
+   "ja": [
+    "ビニールの塊",
+    "塊"
+   ],
+   "nouns": [
+    "BOAT",
+    "PILE",
+    "PLASTIC",
+    "VALVE"
+   ]
+  },
+  "INFLATED-BOAT": {
+   "adjs": [
+    "INFLAT",
+    "MAGIC",
+    "PLASTIC",
+    "SEAWORTHY"
+   ],
+   "desc": "magic boat",
+   "ja": [
+    "魔法の舟",
+    "舟"
+   ],
+   "nouns": [
+    "BOAT",
+    "RAFT"
+   ]
+  },
+  "JADE": {
+   "adjs": [
+    "EXQUISITE",
+    "JADE"
+   ],
+   "desc": "jade figurine",
+   "ja": [
+    "翡翠の像",
+    "像"
+   ],
+   "nouns": [
+    "FIGURINE",
+    "TREASURE"
+   ]
+  },
+  "KEYS": {
+   "adjs": [
+    "SKELETON"
+   ],
+   "desc": "skeleton key",
+   "ja": [
+    "合鍵"
+   ],
+   "nouns": [
+    "KEY"
+   ]
+  },
+  "KITCHEN-TABLE": {
+   "adjs": [
+    "KITCHEN"
+   ],
+   "desc": "kitchen table",
+   "ja": [
+    "台所の食卓"
+   ],
+   "nouns": [
+    "TABLE"
    ]
   },
   "KITCHEN-WINDOW": {
@@ -120,6 +854,38 @@
     "WINDOW"
    ]
   },
+  "KNIFE": {
+   "adjs": [
+    "NASTY",
+    "UNRUSTY"
+   ],
+   "desc": "nasty knife",
+   "ja": [
+    "嫌な感じのナイフ",
+    "ナイフ",
+    "感じのナイフ"
+   ],
+   "nouns": [
+    "KNIVES",
+    "KNIFE",
+    "BLADE"
+   ]
+  },
+  "LADDER": {
+   "adjs": [
+    "WOODEN",
+    "RICKETY",
+    "NARROW"
+   ],
+   "desc": "wooden ladder",
+   "ja": [
+    "木の梯子",
+    "梯子"
+   ],
+   "nouns": [
+    "LADDER"
+   ]
+  },
   "LAMP": {
    "adjs": [
     "BRASS"
@@ -129,12 +895,65 @@
     "真鍮のランタン",
     "ランタン",
     "ランプ",
-    "しんちゅうのらんたん"
+    "しんちゅうのらんたん",
+    "らんたん",
+    "ん"
    ],
    "nouns": [
     "LAMP",
     "LANTERN",
     "LIGHT"
+   ]
+  },
+  "LARGE-BAG": {
+   "adjs": [
+    "LARGE",
+    "THIEFS"
+   ],
+   "desc": "large bag",
+   "ja": [
+    "大きな袋"
+   ],
+   "nouns": [
+    "BAG"
+   ]
+  },
+  "LEAK": {
+   "adjs": [],
+   "desc": "leak",
+   "ja": [
+    "漏れ"
+   ],
+   "nouns": [
+    "LEAK",
+    "DRIP",
+    "PIPE"
+   ]
+  },
+  "LEAVES": {
+   "adjs": [],
+   "desc": "pile of leaves",
+   "ja": [
+    "落ち葉の山"
+   ],
+   "nouns": [
+    "LEAVES",
+    "LEAF",
+    "PILE"
+   ]
+  },
+  "LOWERED-BASKET": {
+   "adjs": [
+    "LOWERED"
+   ],
+   "desc": "basket",
+   "ja": [
+    "籠"
+   ],
+   "nouns": [
+    "CAGE",
+    "DUMBWAITER",
+    "BASKET"
    ]
   },
   "LUNCH": {
@@ -155,6 +974,29 @@
     "DINNER"
    ]
   },
+  "MACHINE": {
+   "adjs": [],
+   "desc": "machine",
+   "ja": [
+    "機械"
+   ],
+   "nouns": [
+    "MACHINE",
+    "PDP10",
+    "DRYER",
+    "LID"
+   ]
+  },
+  "MACHINE-SWITCH": {
+   "adjs": [],
+   "desc": "switch",
+   "ja": [
+    "スイッチ"
+   ],
+   "nouns": [
+    "SWITCH"
+   ]
+  },
   "MAILBOX": {
    "adjs": [
     "SMALL"
@@ -171,6 +1013,59 @@
     "BOX"
    ]
   },
+  "MAP": {
+   "adjs": [
+    "ANTIQUE",
+    "OLD",
+    "ANCIENT"
+   ],
+   "desc": "ancient map",
+   "ja": [
+    "古い地図"
+   ],
+   "nouns": [
+    "PARCHMENT",
+    "MAP"
+   ]
+  },
+  "MATCH": {
+   "adjs": [
+    "MATCH"
+   ],
+   "desc": "matchbook",
+   "ja": [
+    "マッチ帳"
+   ],
+   "nouns": [
+    "MATCH",
+    "MATCHES",
+    "MATCHBOOK"
+   ]
+  },
+  "MIRROR-1": {
+   "adjs": [],
+   "desc": "mirror",
+   "ja": [
+    "鏡"
+   ],
+   "nouns": [
+    "REFLECTION",
+    "MIRROR",
+    "ENORMOUS"
+   ]
+  },
+  "MIRROR-2": {
+   "adjs": [],
+   "desc": "mirror",
+   "ja": [
+    "鏡"
+   ],
+   "nouns": [
+    "REFLECTION",
+    "MIRROR",
+    "ENORMOUS"
+   ]
+  },
   "MOUNTAIN-RANGE": {
    "adjs": [
     "IMPASSABLE",
@@ -181,11 +1076,222 @@
     "山並み",
     "山",
     "やまなみ",
-    "やま"
+    "やま",
+    "み"
    ],
    "nouns": [
     "MOUNTAIN",
     "RANGE"
+   ]
+  },
+  "NEST": {
+   "adjs": [
+    "BIRDS"
+   ],
+   "desc": "bird's nest",
+   "ja": [
+    "鳥の巣",
+    "巣"
+   ],
+   "nouns": [
+    "NEST"
+   ]
+  },
+  "OWNERS-MANUAL": {
+   "adjs": [
+    "ZORK",
+    "OWNERS",
+    "SMALL"
+   ],
+   "desc": "ZORK owner's manual",
+   "ja": [
+    "ZORK 取扱説明書"
+   ],
+   "nouns": [
+    "MANUAL",
+    "PIECE",
+    "PAPER"
+   ]
+  },
+  "PAINTING": {
+   "adjs": [
+    "BEAUTI"
+   ],
+   "desc": "painting",
+   "ja": [
+    "絵画"
+   ],
+   "nouns": [
+    "PAINTING",
+    "ART",
+    "CANVAS",
+    "TREASURE"
+   ]
+  },
+  "PEDESTAL": {
+   "adjs": [
+    "WHITE",
+    "MARBLE"
+   ],
+   "desc": "pedestal",
+   "ja": [
+    "台座"
+   ],
+   "nouns": [
+    "PEDESTAL"
+   ]
+  },
+  "POT-OF-GOLD": {
+   "adjs": [
+    "GOLD"
+   ],
+   "desc": "pot of gold",
+   "ja": [
+    "金の壺",
+    "壺"
+   ],
+   "nouns": [
+    "POT",
+    "GOLD",
+    "TREASURE"
+   ]
+  },
+  "PRAYER": {
+   "adjs": [
+    "ANCIENT",
+    "OLD"
+   ],
+   "desc": "prayer",
+   "ja": [
+    "祈りの言葉",
+    "言葉"
+   ],
+   "nouns": [
+    "PRAYER",
+    "INSCRIPTION"
+   ]
+  },
+  "PUMP": {
+   "adjs": [
+    "SMALL",
+    "HAND-HELD"
+   ],
+   "desc": "hand-held air pump",
+   "ja": [
+    "手押しの空気入れ",
+    "空気入れ"
+   ],
+   "nouns": [
+    "PUMP",
+    "AIR-PUMP",
+    "TOOL",
+    "TOOLS"
+   ]
+  },
+  "PUNCTURED-BOAT": {
+   "adjs": [
+    "PLASTIC",
+    "PUNCTURE",
+    "LARGE"
+   ],
+   "desc": "punctured boat",
+   "ja": [
+    "穴の空いた舟",
+    "空いた舟"
+   ],
+   "nouns": [
+    "BOAT",
+    "PILE",
+    "PLASTIC"
+   ]
+  },
+  "PUTTY": {
+   "adjs": [
+    "VISCOUS"
+   ],
+   "desc": "viscous material",
+   "ja": [
+    "粘りのある物質",
+    "ある物質"
+   ],
+   "nouns": [
+    "MATERIAL",
+    "GUNK"
+   ]
+  },
+  "RAILING": {
+   "adjs": [
+    "WOODEN"
+   ],
+   "desc": "wooden railing",
+   "ja": [
+    "木の手すり",
+    "手すり"
+   ],
+   "nouns": [
+    "RAILING",
+    "RAIL"
+   ]
+  },
+  "RAINBOW": {
+   "adjs": [],
+   "desc": "rainbow",
+   "ja": [
+    "虹"
+   ],
+   "nouns": [
+    "RAINBOW"
+   ]
+  },
+  "RAISED-BASKET": {
+   "adjs": [],
+   "desc": "basket",
+   "ja": [
+    "籠"
+   ],
+   "nouns": [
+    "CAGE",
+    "DUMBWAITER",
+    "BASKET"
+   ]
+  },
+  "RED-BUTTON": {
+   "adjs": [
+    "RED"
+   ],
+   "desc": "red button",
+   "ja": [
+    "赤いボタン"
+   ],
+   "nouns": [
+    "BUTTON",
+    "SWITCH"
+   ]
+  },
+  "RIVER": {
+   "adjs": [
+    "FRIGID"
+   ],
+   "desc": "river",
+   "ja": [
+    "川"
+   ],
+   "nouns": [
+    "RIVER"
+   ]
+  },
+  "ROPE": {
+   "adjs": [
+    "LARGE"
+   ],
+   "desc": "rope",
+   "ja": [
+    "縄"
+   ],
+   "nouns": [
+    "ROPE",
+    "HEMP",
+    "COIL"
    ]
   },
   "RUG": {
@@ -202,6 +1308,29 @@
    "nouns": [
     "RUG",
     "CARPET"
+   ]
+  },
+  "RUSTY-KNIFE": {
+   "adjs": [
+    "RUSTY"
+   ],
+   "desc": "rusty knife",
+   "ja": [
+    "錆びたナイフ"
+   ],
+   "nouns": [
+    "KNIVES",
+    "KNIFE"
+   ]
+  },
+  "SAND": {
+   "adjs": [],
+   "desc": "sand",
+   "ja": [
+    "砂"
+   ],
+   "nouns": [
+    "SAND"
    ]
   },
   "SANDWICH-BAG": {
@@ -222,6 +1351,99 @@
     "SACK"
    ]
   },
+  "SCARAB": {
+   "adjs": [
+    "BEAUTI",
+    "CARVED",
+    "JEWELED"
+   ],
+   "desc": "beautiful jeweled scarab",
+   "ja": [
+    "美しい宝石の甲虫",
+    "甲虫"
+   ],
+   "nouns": [
+    "SCARAB",
+    "BUG",
+    "BEETLE",
+    "TREASURE"
+   ]
+  },
+  "SCEPTRE": {
+   "adjs": [
+    "SHARP",
+    "EGYPTIAN",
+    "ANCIENT",
+    "ENAMELED"
+   ],
+   "desc": "sceptre",
+   "ja": [
+    "王笏"
+   ],
+   "nouns": [
+    "SCEPTRE",
+    "SCEPTER",
+    "TREASURE"
+   ]
+  },
+  "SCREWDRIVER": {
+   "adjs": [
+    "SCREW"
+   ],
+   "desc": "screwdriver",
+   "ja": [
+    "ねじ回し"
+   ],
+   "nouns": [
+    "SCREWDRIVER",
+    "TOOL",
+    "TOOLS",
+    "DRIVER"
+   ]
+  },
+  "SHOVEL": {
+   "adjs": [],
+   "desc": "shovel",
+   "ja": [
+    "シャベル"
+   ],
+   "nouns": [
+    "SHOVEL",
+    "TOOL",
+    "TOOLS"
+   ]
+  },
+  "SKULL": {
+   "adjs": [
+    "CRYSTAL"
+   ],
+   "desc": "crystal skull",
+   "ja": [
+    "水晶の髑髏",
+    "髑髏"
+   ],
+   "nouns": [
+    "SKULL",
+    "HEAD",
+    "TREASURE"
+   ]
+  },
+  "SLIDE": {
+   "adjs": [
+    "STEEP",
+    "METAL",
+    "TWISTING"
+   ],
+   "desc": "chute",
+   "ja": [
+    "滑り台"
+   ],
+   "nouns": [
+    "CHUTE",
+    "RAMP",
+    "SLIDE"
+   ]
+  },
   "SONGBIRD": {
    "adjs": [
     "SONG"
@@ -236,6 +1458,18 @@
    "nouns": [
     "BIRD",
     "SONGBIRD"
+   ]
+  },
+  "STILETTO": {
+   "adjs": [
+    "VICIOUS"
+   ],
+   "desc": "stiletto",
+   "ja": [
+    "短剣"
+   ],
+   "nouns": [
+    "STILETTO"
    ]
   },
   "SWORD": {
@@ -256,6 +1490,79 @@
     "ORCRIST",
     "GLAMDRING",
     "BLADE"
+   ]
+  },
+  "TEETH": {
+   "adjs": [],
+   "desc": "set of teeth",
+   "ja": [
+    "入れ歯"
+   ],
+   "nouns": [
+    "OVERBOARD",
+    "TEETH"
+   ]
+  },
+  "THIEF": {
+   "adjs": [
+    "SHADY",
+    "SUSPICIOUS",
+    "SEEDY"
+   ],
+   "desc": "thief",
+   "ja": [
+    "盗賊"
+   ],
+   "nouns": [
+    "THIEF",
+    "ROBBER",
+    "MAN",
+    "PERSON"
+   ]
+  },
+  "TIMBERS": {
+   "adjs": [
+    "WOODEN",
+    "BROKEN"
+   ],
+   "desc": "broken timber",
+   "ja": [
+    "折れた坑木",
+    "坑木"
+   ],
+   "nouns": [
+    "TIMBERS",
+    "PILE"
+   ]
+  },
+  "TOOL-CHEST": {
+   "adjs": [
+    "TOOL"
+   ],
+   "desc": "group of tool chests",
+   "ja": [
+    "道具箱の山"
+   ],
+   "nouns": [
+    "CHEST",
+    "CHESTS",
+    "GROUP",
+    "TOOLCHESTS"
+   ]
+  },
+  "TORCH": {
+   "adjs": [
+    "FLAMING",
+    "IVORY"
+   ],
+   "desc": "torch",
+   "ja": [
+    "松明"
+   ],
+   "nouns": [
+    "TORCH",
+    "IVORY",
+    "TREASURE"
    ]
   },
   "TRAP-DOOR": {
@@ -293,6 +1600,35 @@
     "BRANCH"
    ]
   },
+  "TRIDENT": {
+   "adjs": [
+    "POSEIDON",
+    "OWN",
+    "CRYSTAL"
+   ],
+   "desc": "crystal trident",
+   "ja": [
+    "水晶の三叉槍",
+    "三叉槍"
+   ],
+   "nouns": [
+    "TRIDENT",
+    "FORK",
+    "TREASURE"
+   ]
+  },
+  "TROLL": {
+   "adjs": [
+    "NASTY"
+   ],
+   "desc": "troll",
+   "ja": [
+    "トロル"
+   ],
+   "nouns": [
+    "TROLL"
+   ]
+  },
   "TROPHY-CASE": {
    "adjs": [
     "TROPHY"
@@ -305,6 +1641,47 @@
    ],
    "nouns": [
     "CASE"
+   ]
+  },
+  "TRUNK": {
+   "adjs": [
+    "OLD"
+   ],
+   "desc": "trunk of jewels",
+   "ja": [
+    "宝石の詰まった箱",
+    "詰まった箱"
+   ],
+   "nouns": [
+    "TRUNK",
+    "CHEST",
+    "JEWELS",
+    "TREASURE"
+   ]
+  },
+  "TUBE": {
+   "adjs": [],
+   "desc": "tube",
+   "ja": [
+    "筒"
+   ],
+   "nouns": [
+    "TUBE",
+    "TOOTH",
+    "PASTE"
+   ]
+  },
+  "WALL": {
+   "adjs": [
+    "SURROUNDING"
+   ],
+   "desc": "surrounding wall",
+   "ja": [
+    "周囲の壁"
+   ],
+   "nouns": [
+    "WALL",
+    "WALLS"
    ]
   },
   "WATER": {
@@ -321,6 +1698,19 @@
     "QUANTITY",
     "LIQUID",
     "H2O"
+   ]
+  },
+  "WHITE-CLIFF": {
+   "adjs": [
+    "WHITE"
+   ],
+   "desc": "white cliffs",
+   "ja": [
+    "白い崖"
+   ],
+   "nouns": [
+    "CLIFF",
+    "CLIFFS"
    ]
   },
   "WHITE-HOUSE": {
@@ -358,6 +1748,31 @@
     "DOOR",
     "LETTERING",
     "WRITING"
+   ]
+  },
+  "WRENCH": {
+   "adjs": [],
+   "desc": "wrench",
+   "ja": [
+    "スパナ"
+   ],
+   "nouns": [
+    "WRENCH",
+    "TOOL",
+    "TOOLS"
+   ]
+  },
+  "YELLOW-BUTTON": {
+   "adjs": [
+    "YELLOW"
+   ],
+   "desc": "yellow button",
+   "ja": [
+    "黄色のボタン"
+   ],
+   "nouns": [
+    "BUTTON",
+    "SWITCH"
    ]
   }
  },
@@ -882,6 +2297,16 @@
     "UP OBJ"
    ]
   },
+  "PUMP": {
+   "ja": [
+    "手押しの空気入れ",
+    "空気入れ"
+   ],
+   "shapes": [
+    "UP OBJ",
+    "UP OBJ WITH OBJ"
+   ]
+  },
   "PUSH": {
    "ja": [
     "押す",
@@ -1030,6 +2455,16 @@
    ],
    "shapes": [
     "OBJ"
+   ]
+  },
+  "SLIDE": {
+   "ja": [
+    "滑り台"
+   ],
+   "shapes": [
+    "OBJ UNDER OBJ",
+    "OBJ OBJ",
+    "OBJ TO OBJ"
    ]
   },
   "SMELL": {
