@@ -13,13 +13,19 @@ function createRubifier(ruby) {
   const keys = Object.keys(ruby || {}).sort((a, b) => b.length - a.length)
   const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
 
+  const KANJI = /[一-龥々]/
+
   /** 文字列 → ふりがな入りの HTML（**この関数だけが HTML を作る**） */
   function rubify(text) {
     const s = String(text == null ? '' : text)
     let out = ''
     let i = 0
     while (i < s.length) {
-      const k = keys.find((x) => s.startsWith(x, i))
+      // ★漢字の連なりを**丸ごと覆うときだけ**振る。一部だけに当たると誤った読みになる
+      //   （`水晶` に「水(みず)」、`小川` に「川(かわ)」が付いていた）
+      const k = keys.find((x) => s.startsWith(x, i)
+        && !(KANJI.test(s[i]) && KANJI.test(s[i - 1] || ''))
+        && !(KANJI.test(x[x.length - 1]) && KANJI.test(s[i + x.length] || '')))
       if (!k) { out += esc(s[i]); i++; continue }
       for (const [seg, yomi] of ruby[k]) {
         out += yomi ? `<ruby>${esc(seg)}<rt>${esc(yomi)}</rt></ruby>` : esc(seg)
