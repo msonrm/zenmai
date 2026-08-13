@@ -84,7 +84,13 @@
     // ★日本語で打たれたら英語コマンドへ翻訳する。英語ならそのまま通す
     const r = cm.toCommand(text)
     show(text || ' ', 'cmd')
-    if (!r.command) { show('（読み取れなかった —— 語彙にない言葉が混ざっている）', 'raw'); return }
+    if (!r.command) {
+      const w = r.unknown.filter((x) => x.length > 1).map((x) => '「' + x + '」').join('・')
+      show(r.trace === '否定は扱えない' ? '（打ち消しの言い方はまだ扱えない）'
+        : w ? `（${w} は知らない言葉。別の言い方を試してほしい）`
+        : '（読み取れなかった）', 'raw')
+      return
+    }
     if (r.trace !== '英語のまま') {
       const p = document.createElement('p')
       p.className = 'sent'; p.textContent = r.command + (r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')

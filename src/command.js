@@ -118,7 +118,11 @@ function createCommander(asset) {
     // 「中に入る」「外に出る」の中／外は方角ではなく動詞のほうに含まれている
     const bareDirs = dirs.filter((d) => !(verb && ['ENTER', 'EXIT', 'LEAVE'].includes(verb.key) && ['in', 'out'].includes(d.word)))
     if (!verb) {
-      // 動詞が無い → 名詞だけ（「絨毯」）。原作が「何を？」と聞き返す形に寄せる
+      // ★知らない言葉が混じっているなら、それを言う。
+      //   黙って名詞だけ送ると原作が「その文には動詞がない」と返し、
+      //   **打った本人は動詞を打っているので誤解を招く**（今日の方針: 黙って外すより言う）
+      if (unknown.length) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
+      // 名詞だけ（「絨毯」）→ 原作の「何を？」に任せる
       if (objs.length) return { command: objs[0].word, trace: '名詞のみ', unknown, echo: echo.join('') }
       return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
     }
@@ -132,7 +136,18 @@ function createCommander(asset) {
     const out = [verb.key.toLowerCase()]
     const shapes = verb.shapes || []
     const has = (p) => shapes.some((sh) => sh.split(' ').includes(p))
-    if (prso && prso !== dest) out.push(prso.word)
+    if (prso && prso !== dest) {
+      // ★裸の目的語を取らない動詞（`look` など）には、構文表から前置詞を補う。
+      //   `look case` は原作の構文に無く「その文は知らない形だ」で弾かれる
+      // ★（動詞単独）は「裸の目的語が使える」ことを意味しない。混同していた
+      const bareOk = shapes.some((sh) => sh === 'OBJ' || sh.startsWith('OBJ '))
+      if (!bareOk) {
+        const wants = /中|なか|のぞ/.test(verb.ja) ? ['IN', 'AT'] : ['AT', 'IN', 'ON', 'UNDER', 'TO']
+        const p = wants.find((x) => has(x))
+        if (p) out.push(p.toLowerCase())
+      }
+      out.push(prso.word)
+    }
     if (tool && has('WITH')) out.push('with', tool.word)
     if (dest && dest !== prso) {
       const p = has(dest.role) ? dest.role.toLowerCase() : (has('IN') ? 'in' : 'to')
