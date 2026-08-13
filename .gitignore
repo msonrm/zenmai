@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# 作品の story file とソースは同梱しない（各自で取得・ビルドする）
+/vendor/zork1/
+*.z3
+*.z5
+*.z8
+*.zblorb
