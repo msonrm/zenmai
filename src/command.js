@@ -12,26 +12,48 @@
  */
 
 // 方角は原作が単語で受ける（`north` だけで動く）
+// ★読みも要る。無いと「きたへいく」の「き」が木に食いつく（最長一致は
+//   両方に読みがあって初めて守れる）
 const DIRS = {
-  北東: 'northeast', 北西: 'northwest', 南東: 'southeast', 南西: 'southwest',
-  北: 'north', 南: 'south', 東: 'east', 西: 'west',
-  上: 'up', 下: 'down', 中: 'in', 外: 'out',
+  北東: 'northeast', ほくとう: 'northeast', 北西: 'northwest', ほくせい: 'northwest',
+  南東: 'southeast', なんとう: 'southeast', 南西: 'southwest', なんせい: 'southwest',
+  北: 'north', きた: 'north', 南: 'south', みなみ: 'south',
+  東: 'east', ひがし: 'east', 西: 'west', にし: 'west',
+  上: 'up', うえ: 'up', 下: 'down', した: 'down', 中: 'in', なか: 'in', 外: 'out', そと: 'out',
 }
 // 助詞 → 役。長いものから当てる
 const PARTICLES = [
-  ['の中に', 'IN'], ['の中へ', 'IN'], ['の下', 'UNDER'], ['の後ろ', 'BEHIND'], ['の裏', 'BEHIND'],
-  ['の上に', 'ON'], ['の上', 'ON'], ['を使って', 'WITH'], ['によって', 'WITH'],
-  ['から', 'FROM'], ['には', 'TO'], ['へ', 'TO'], ['に', 'TO'], ['で', 'WITH'],
+  ['の中に', 'IN'], ['のなかに', 'IN'], ['の中へ', 'IN'], ['のなかへ', 'IN'],
+  ['の下', 'UNDER'], ['のした', 'UNDER'], ['の後ろ', 'BEHIND'], ['のうしろ', 'BEHIND'],
+  ['の裏', 'BEHIND'], ['のうら', 'BEHIND'],
+  ['の上に', 'ON'], ['のうえに', 'ON'], ['の上', 'ON'], ['のうえ', 'ON'],
+  ['を使って', 'WITH'], ['をつかって', 'WITH'], ['によって', 'WITH'],
+  // ★「には」は入れない —— 「なかにはいる」の「はいる」の頭を食う
+  ['から', 'FROM'], ['へ', 'TO'], ['に', 'TO'], ['で', 'WITH'],
   ['を', 'O'], ['は', 'O'], ['が', 'O'], ['と', 'AND'],
 ]
 
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
 
+/**
+ * ★照合はすべて「かな」に正規化してから行う。
+ * コントローラ入力はかなしか出さないので、`じゅうたん` でも `絨毯` でも当たる必要がある。
+ * 表示は語彙項目の代表形（漢字）を使うので、打鍵がかなでも画面は漢字になる。
+ */
+const kana = (s) => String(s)
+  .replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))  // カタカナ→ひらがな
+  .replace(/[\uff01-\uff5e]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)) // 全角英数→半角
+  .replace(/[ー－—]/g, 'ー')
+  .toLowerCase()
+
+// 否定を捨てると逆の命令になる。★黙って間違うより止める
+const NEGATIVE = /(ない|ないで|ぬ|ません|なかった)$/
+
 function createCommander(asset) {
   // 語彙をひとつの表に畳んで、長いものから当てる（逐次入力の配列エンジンと同じ最長一致）
   const lex = []
   for (const [key, v] of Object.entries(asset.verbs || {})) {
-    for (const ja of v.ja) lex.push({ ja, kind: 'verb', key, shapes: v.shapes })
+    for (const ja of v.ja) lex.push({ ja, disp: v.ja[0], kana: kana(ja), kind: 'verb', key, shapes: v.shapes })
   }
   // ★同じ名詞を複数の物が共有していると原作が聞き返してくる（`door` = 木の扉 / 揚げ戸）。
   //   形容詞を持っているならそれを添えて、こちらで曖昧さを解いておく
@@ -44,37 +66,45 @@ function createCommander(asset) {
     const noun = (o.nouns[0] || '').toLowerCase()
     const adj = (o.adjs[0] || '').toLowerCase()
     const word = nounUse[noun] > 1 && adj ? adj + ' ' + noun : noun
-    for (const ja of o.ja) lex.push({ ja, kind: 'obj', key, word })
+    for (const ja of o.ja) lex.push({ ja, disp: o.ja[0], kana: kana(ja), kind: 'obj', key, word })
   }
-  for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, kind: 'dir', word: en })
-  lex.sort((a, b) => b.ja.length - a.ja.length)
+  for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
+  lex.sort((a, b) => b.kana.length - a.kana.length)
 
   /** @returns {{command:string|null, trace:string, unknown:string[]}} */
   function toCommand(input) {
-    const s = strip(String(input || ''))
-    if (!s) return { command: null, trace: '空', unknown: [] }
+    const raw = strip(String(input || ''))
+    if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
     if (/^[\x20-\x7e]+$/.test(input.trim())) {
-      return { command: input.trim(), trace: '英語のまま', unknown: [] }   // 英語で打たれたら素通し
+      return { command: input.trim(), trace: '英語のまま', unknown: [], echo: input.trim() }
     }
+    if (NEGATIVE.test(raw)) {
+      // ★「扉を開けない」の「ない」を捨てると逆の命令になる。止める
+      return { command: null, trace: '否定は扱えない', unknown: [], echo: raw }
+    }
+    const s = kana(raw)
     const found = []          // { kind, key, word, role }
     const unknown = []
+    const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
     while (i < s.length) {
-      const hit = lex.find((e) => s.startsWith(e.ja, i))
+      const hit = lex.find((e) => s.startsWith(e.kana, i))
       if (hit) {
-        i += hit.ja.length
+        i += hit.kana.length
+        echo.push(hit.disp)
         // 直後の助詞を読む（役を決める）
         let role = null
         for (const [p, r] of PARTICLES) {
-          if (s.startsWith(p, i)) { role = r; i += p.length; break }
+          if (s.startsWith(kana(p), i)) { role = r; i += p.length; echo.push(p); break }
         }
         found.push({ ...hit, role })
         continue
       }
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
-      while (j < s.length && !lex.some((e) => s.startsWith(e.ja, j))) j++
+      while (j < s.length && !lex.some((e) => s.startsWith(e.kana, j))) j++
       unknown.push(s.slice(i, j))
+      echo.push(s.slice(i, j))
       i = j
     }
     const verb = found.find((f) => f.kind === 'verb')
@@ -83,14 +113,14 @@ function createCommander(asset) {
 
     // 方角だけ（「北」「北へ行く」）→ 方角の語をそのまま渡す
     if (dirs.length && (!verb || verb.key === 'WALK')) {
-      return { command: dirs[0].word, trace: '方角', unknown }
+      return { command: dirs[0].word, trace: '方角', unknown, echo: echo.join('') }
     }
     // 「中に入る」「外に出る」の中／外は方角ではなく動詞のほうに含まれている
     const bareDirs = dirs.filter((d) => !(verb && ['ENTER', 'EXIT', 'LEAVE'].includes(verb.key) && ['in', 'out'].includes(d.word)))
     if (!verb) {
       // 動詞が無い → 名詞だけ（「絨毯」）。原作が「何を？」と聞き返す形に寄せる
-      if (objs.length) return { command: objs[0].word, trace: '名詞のみ', unknown }
-      return { command: null, trace: '動詞が見つからない', unknown }
+      if (objs.length) return { command: objs[0].word, trace: '名詞のみ', unknown, echo: echo.join('') }
+      return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
     }
 
     // ★役の割り当て: を/は/が → 直接目的語、で/を使って → 道具、に/へ/の中に… → 第 2 目的語
@@ -113,7 +143,7 @@ function createCommander(asset) {
       out.push(dest.role.toLowerCase(), dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
-    return { command: out.join(' '), trace: '動詞+役', unknown }
+    return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join('') }
   }
 
   return { toCommand, lex }
