@@ -40,7 +40,7 @@ const Glk = createGlk({
     const ja = inputs[n++]
     const r = cm.toCommand(ja)
     process.stdout.write(`\n[${place}]\n> ${ja}`)
-    if (!r.command) { process.stdout.write(`  ……（読み取れない: ${r.trace}）\n`); return setImmediate(() => Glk.submitLine('look')) }
+    if (!r.command) { process.stdout.write(`  ……（${r.note || r.trace}）\n`); return setImmediate(() => Glk.submitLine('look')) }
     process.stdout.write(`   → ${r.command}${r.unknown.length ? '  ※残: ' + r.unknown.join('|') : ''}\n`)
     setImmediate(() => Glk.submitLine(r.command))
   },

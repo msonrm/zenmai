@@ -36,6 +36,10 @@ const PARTICLES = [
   ['の', 'MOD'],
 ]
 
+// 空間の関係を表す役（捨てると意味が変わる）
+const SPATIAL = new Set(['IN', 'ON', 'UNDER', 'BEHIND', 'FROM'])
+const ROLE_JA = { IN: 'の中', ON: 'の上', UNDER: 'の下', BEHIND: 'の後ろ', FROM: 'から', WITH: 'で' }
+
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
 
 /**
@@ -138,7 +142,11 @@ function createCommander(asset) {
         // 直後の助詞を読む（役を決める）
         let role = null
         for (const [p, r] of PARTICLES) {
-          if (s.startsWith(kana(p), i)) { role = r; i += p.length; echo.push(p); break }
+          if (!s.startsWith(kana(p), i)) continue
+          role = r; i += p.length; echo.push(p)
+          // ★「の後ろに」「の中へ」—— 空間の助詞は方向の「に・へ」を伴うことがある
+          if (SPATIAL.has(r) && (s[i] === 'に' || s[i] === 'へ')) { echo.push(s[i]); i++ }
+          break
         }
         found.push({ ...hit, role })
         continue
@@ -206,6 +214,30 @@ function createCommander(asset) {
     const has = (p) => shapes.some((sh) => sh.split(' ').includes(p))
     // ★前置詞つきの目的語が 1 つだけでも、その前置詞を動詞が取らないなら**裸で渡す**。
     //   「木に登る」の「に」は原作の CLIMB には無い形（`climb tree` が正しい）
+    // ★動詞がその関係を取れないなら、**黙って落とさず断る**。
+    //   落とすと「家の後ろに行く」が `walk house` になり、別の意味の命令が飛ぶ。
+    //   「に・へ」だけは例外 —— 日本語では目的語をただ指すことがある（木に登る = climb tree）
+    for (const o of objs) {
+      if (!SPATIAL.has(o.role) || has(o.role)) continue
+      const hint = ['WALK', 'ENTER', 'EXIT'].includes(verb.key) ? ' —— 移動は方角で言う: 北・東・上・下' : ''
+      return {
+        command: null,
+        trace: '原作にない言い方',
+        note: `「${o.disp}${ROLE_JA[o.role]}」を「${verb.disp}」では受けられない${hint}`,
+        unknown,
+        echo: echo.join(''),
+      }
+    }
+    if (tool && !has('WITH')) {
+      return {
+        command: null,
+        trace: '原作にない言い方',
+        note: `「${verb.disp}」に道具（${tool.disp}で）は付けられない`,
+        unknown,
+        echo: echo.join(''),
+      }
+    }
+
     if (prso && !(dest === prso && has(dest.role))) {
       // ★裸の目的語を取らない動詞（`look` など）には、構文表から前置詞を補う。
       //   `look case` は原作の構文に無く「その文は知らない形だ」で弾かれる
@@ -218,7 +250,7 @@ function createCommander(asset) {
       }
       out.push(prso.word)
     }
-    if (tool && has('WITH')) out.push('with', tool.word)
+    if (tool) out.push('with', tool.word)
     if (dest && dest !== prso) {
       const p = has(dest.role) ? dest.role.toLowerCase() : (has('IN') ? 'in' : 'to')
       out.push(p, dest.word)

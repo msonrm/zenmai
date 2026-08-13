@@ -86,7 +86,8 @@
     show(text || ' ', 'cmd')
     if (!r.command) {
       const w = r.unknown.filter((x) => x.length > 1).map((x) => '「' + x + '」').join('・')
-      show(r.trace === '否定は扱えない' ? '（打ち消しの言い方はまだ扱えない）'
+      show(r.note ? `（${r.note}）`
+        : r.trace === '否定は扱えない' ? '（打ち消しの言い方はまだ扱えない）'
         : w ? `（${w} は知らない言葉。別の言い方を試してほしい）`
         : '（読み取れなかった）', 'raw')
       return
