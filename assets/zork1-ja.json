@@ -1,0 +1,1585 @@
+{
+ "assembled": [
+  {
+   "en": "Trying to destroy the {PRSO} with your bare hands is futile.",
+   "id": "A-1",
+   "ja": "素手で{PRSO}を壊そうとしても無駄だ。"
+  },
+  {
+   "en": "Trying to destroy the {PRSO} with a {PRSI} is futile.",
+   "id": "A-2",
+   "ja": "{PRSI}で{PRSO}を壊そうとしても無駄だ。"
+  },
+  {
+   "en": "Opening the {PRSO} reveals {CONTENTS}.",
+   "id": "A-3",
+   "ja": "{PRSO}を開けると、{CONTENTS}が出てきた。"
+  },
+  {
+   "en": "The troll, who is remarkably coordinated, catches the {PRSO} and, being for the moment sated, throws it back. Fortunately, the troll has poor control, and the {PRSO} falls to the floor. He does not look pleased.",
+   "id": "A-4",
+   "ja": "トロルは驚くほど器用に{PRSO}を受け止めたが、今は腹が満ちているのか、それを投げ返してきた。幸い狙いは正確でなく、{PRSO}は床に落ちた。トロルは不満そうだ。"
+  },
+  {
+   "en": "A terrific throw! The {PRSO} hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.",
+   "id": "A-5",
+   "ja": "見事な投げだ。{PRSO}はきみの頭にまともに命中した。ふだんなら大した傷にもならないが、あいにく、身をかがめようとして後ろへ倒れ、首の骨を折ってしまった。大地下帝国の裁きは迅速かつ慈悲深い。"
+  },
+  {
+   "en": "The {PRSO} catches fire. Unfortunately, you were in it at the time.",
+   "id": "A-6",
+   "ja": "{PRSO}は燃え上がった。あいにく、きみはそのとき、その中にいた。"
+  },
+  {
+   "en": "The {PRSO} catches fire. Unfortunately, you were holding it at the time.",
+   "id": "A-7",
+   "ja": "{PRSO}は燃え上がった。あいにく、きみはそのとき、それを手にしていた。"
+  },
+  {
+   "en": "The contents of the {PRSO} spill out and disappears.",
+   "id": "A-8",
+   "ja": "{PRSO}の中身がこぼれ落ちて消えた。"
+  },
+  {
+   "en": "The contents of the {PRSO} spill to the ground.",
+   "id": "A-9",
+   "ja": "{PRSO}の中身が地面にこぼれ落ちた。"
+  },
+  {
+   "en": "The {WINNER} seems confused. \"I don't see any {OBJ} here!\"",
+   "id": "A-10",
+   "ja": "{WINNER}は戸惑っている。「{OBJ}など、ここには見当たらないが」"
+  },
+  {
+   "en": "The {OBJ} doesn't lead upward.",
+   "id": "A-11",
+   "ja": "{OBJ}は上には通じていない。"
+  },
+  {
+   "en": "The {OBJ} doesn't lead downward.",
+   "id": "A-12",
+   "ja": "{OBJ}は下には通じていない。"
+  },
+  {
+   "en": "There is a {OBJ} here.",
+   "id": "A-13",
+   "ja": "ここに{OBJ}がある。"
+  },
+  {
+   "en": "There is a {OBJ} here (providing light).",
+   "id": "A-14",
+   "ja": "ここに{OBJ}がある（明かりになっている）。"
+  },
+  {
+   "en": "A {OBJ}",
+   "id": "A-15",
+   "ja": "{OBJ}"
+  },
+  {
+   "en": "A {OBJ} (providing light)",
+   "id": "A-16",
+   "ja": "{OBJ}（明かりになっている）"
+  },
+  {
+   "en": "A {OBJ} (being worn)",
+   "id": "A-17",
+   "ja": "{OBJ}（身に着けている）"
+  },
+  {
+   "en": "{HERE}, in the {AV}",
+   "id": "A-18",
+   "ja": "{HERE}（{AV}の中）"
+  },
+  {
+   "en": "Which {X} do you mean, the {A} or the {B}?",
+   "id": "A-19",
+   "ja": "{A}と{B}の、どちらのことか。"
+  },
+  {
+   "en": "(the {OBJ})",
+   "id": "A-20",
+   "ja": "（{OBJ}）"
+  },
+  {
+   "en": "I don't know the word \"{WORD}\".",
+   "id": "P-1",
+   "ja": "「{WORD}」という語は知らない。"
+  },
+  {
+   "en": "You used the word \"{WORD}\" in a way that I don't understand.",
+   "id": "P-2",
+   "ja": "「{WORD}」の使い方が分からない。"
+  },
+  {
+   "en": "What do you want to {VERB}?",
+   "id": "P-3",
+   "ja": "何を{VERB}？"
+  },
+  {
+   "en": "(How about the {OBJ}?)",
+   "id": "P-4",
+   "ja": "（{OBJ}のことか？）"
+  },
+  {
+   "en": "You don't have the {OBJ}.",
+   "id": "P-5",
+   "ja": "{OBJ}は持っていない。"
+  },
+  {
+   "en": "You can't use multiple direct objects with \"{VERB}\".",
+   "id": "P-6",
+   "ja": "「{VERB}」に複数の目的語は使えない。"
+  },
+  {
+   "en": "Which {X} do you mean, the {A} or the {B}?",
+   "id": "P-7",
+   "ja": "{A}と{B}の、どちらのことか。"
+  },
+  {
+   "en": "The other object that you mentioned isn't here.",
+   "id": "S-1",
+   "ja": "きみが言ったもう一方のものは、ここにない。"
+  },
+  {
+   "en": "You can't see any {OBJ} here!",
+   "id": "S-2",
+   "ja": "{OBJ}など、ここには見当たらない。"
+  },
+  {
+   "en": "Oh, no! A lurking grue slithered into the room and devoured you!",
+   "id": "G-1",
+   "ja": "なんと、潜んでいたグルーが部屋に忍び込み、きみを食べてしまった。"
+  },
+  {
+   "en": "Swimming isn't usually allowed in the {PRSO}.",
+   "id": "G-2",
+   "ja": "{PRSO}で泳ぐのは、ふつう許されていない。"
+  },
+  {
+   "en": "Swimming isn't usually allowed in the dungeon.",
+   "id": "G-3",
+   "ja": "地下迷宮で泳ぐのは、ふつう許されていない。"
+  },
+  {
+   "en": "Here begins a transcript of interaction with {VERSION}",
+   "id": "G-4",
+   "ja": "ここから記録を始める —— {VERSION}"
+  },
+  {
+   "en": "Here ends a transcript of interaction with {VERSION}",
+   "id": "G-5",
+   "ja": "ここで記録を終える —— {VERSION}"
+  },
+  {
+   "en": "… a small window which is open.",
+   "id": "L-1",
+   "ja": "……小さな窓があり、開いている。"
+  },
+  {
+   "en": "… a small window which is slightly ajar.",
+   "id": "L-2",
+   "ja": "……小さな窓があり、わずかに開いている。"
+  },
+  {
+   "en": "The chimney leads downward, and looks climbable.",
+   "id": "L-3",
+   "ja": "煙突は下へ続いており、登れそうだ。"
+  },
+  {
+   "en": "You can see a clear area leading towards a forest.",
+   "id": "L-4",
+   "ja": "森へ向かう開けた場所が見える。"
+  },
+  {
+   "en": "You can see what appears to be a kitchen.",
+   "id": "L-5",
+   "ja": "台所らしい部屋が見える。"
+  },
+  {
+   "en": "The lamp has burned out.",
+   "id": "L-6",
+   "ja": "ランプは燃え尽きた。"
+  },
+  {
+   "en": "The lamp is on.",
+   "id": "L-7",
+   "ja": "ランプは点いている。"
+  },
+  {
+   "en": "The lamp is turned off.",
+   "id": "L-8",
+   "ja": "ランプは消えている。"
+  },
+  {
+   "en": "The rug is too heavy to lift, but in trying to take it you have noticed an irregularity beneath it.",
+   "id": "L-9",
+   "ja": "絨毯は重すぎて持ち上げられないが、動かそうとしたはずみに、その下に妙な起伏があることに気づいた。"
+  },
+  {
+   "en": "Your load is too heavy.",
+   "id": "L-10",
+   "ja": "荷が重すぎる。"
+  },
+  {
+   "en": "Your load is too heavy, especially in light of your condition.",
+   "id": "L-11",
+   "ja": "荷が重すぎる。とくに今の身体では、なおさらだ。"
+  },
+  {
+   "en": "{OBJ} falls to the ground.",
+   "id": "L-12",
+   "ja": "{OBJ}が地面に落ちた。"
+  },
+  {
+   "en": "What do you want to tell?",
+   "id": "A-21",
+   "ja": "何を伝える？"
+  },
+  {
+   "en": "a {F}",
+   "id": "A-22",
+   "ja": "{F}"
+  }
+ ],
+ "exact": {
+  "\"I don't understand! What are you referring to?\"": "「分からない。何のことだ？」",
+  "(Taken)": "（取った）",
+  "(floating in midair)": "（宙に浮いている）",
+  ", a wooden door with strange gothic lettering to the west, which appears to be nailed shut,": "、西には奇妙なゴシック文字の記された木の扉があり、釘で打ちつけられているように見える。そして",
+  ". To the west is a cyclops-shaped opening in an old wooden door, above which is some strange gothic lettering,": "、西には古い木の扉にサイクロプスの形の穴が開いていて、その上に奇妙なゴシック文字が記されている。そして",
+  "A brilliant maneuver destroys the bottle.": "見事な手際で瓶を割った。",
+  "A burned-out lamp won't light.": "燃え尽きたランプには火は入らない。",
+  "A good trick, as you are currently invisible.": "姿が見えない身では、なかなかの芸当だ。",
+  "A hollow voice says \"Fool.\"": "うつろな声が言う。「愚か者」",
+  "A secret path leads southwest into the forest.": "秘密の小道が南西へ、森の中へ続いている。",
+  "A strong odor of chocolate permeates the room.": "濃いチョコレートの匂いが部屋に広がっている。",
+  "Aaaarrrrgggghhhh!": "ぎゃああああああ。",
+  "An almost inaudible voice whispers in your ear, \"Look to your treasures for the final secret.\"": "ほとんど聞き取れない声が耳元でささやく。「最後の秘密は、集めた宝に問え」",
+  "As you sit, you notice an irregularity underneath it. Rather than be uncomfortable, you stand up again.": "腰を下ろすと、下に妙な起伏があるのに気づいた。落ち着かないので、また立ち上がった。",
+  "At your service!": "お望みのままに。",
+  "Auto-cannibalism is not the answer.": "自分を食べても答えは出ない。",
+  "Beats me.": "見当もつかない。",
+  "Beg pardon?": "もう一度？",
+  "Between the rocks and waves, you wouldn't last a minute!": "岩と波に挟まれては、一分も持たないだろう。",
+  "Bizarre!": "奇妙だ。",
+  "Brief descriptions.": "説明を簡略にする。",
+  "Bug? Not in a flawless program like this! (Cough, cough).": "不具合？ この完璧な作りにそんなものはない。（こほん、こほん）",
+  "Climbing the walls is to no avail.": "壁を登っても無駄だ。",
+  "Closed.": "閉めた。",
+  "Come on, now!": "おいおい。",
+  "Do you wish to leave the game? (Y is affirmative):": "ゲームを終えるか。（Y なら承諾）:",
+  "Do you wish to restart? (Y is affirmative):": "最初から始めるか。（Y なら承諾）:",
+  "Done.": "済んだ。",
+  "Dropped.": "置いた。",
+  "Failed.": "失敗した。",
+  "Filched!": "掠め取った。",
+  "Foo!": "ふん。",
+  "Getting tired?": "疲れてきたか。",
+  "Go jump in a lake!": "湖にでも飛び込んでこい。",
+  "Going up empty-handed is a bad idea.": "手ぶらで上がるのは良くない考えだ。",
+  "Having moved the carpet previously, you find it impossible to move it again.": "一度動かした絨毯を、もう一度動かすことはできない。",
+  "He looks like a sailor.": "船乗りのようだ。",
+  "He's wide awake, or haven't you noticed...": "目は覚めきっている。気づいていないのか……",
+  "How can you do that?": "どうやってそれをするというのか。",
+  "How can you drink that?": "それをどうやって飲むのか。",
+  "How can you inflate that?": "それをどうやって膨らませるのか。",
+  "How peculiar!": "妙なことだ。",
+  "How romantic!": "なんとも情緒的だ。",
+  "How singularly useless.": "まったく無益だ。",
+  "How, exactly, can you ring that?": "それをいったい、どうやって鳴らすのか。",
+  "Huh?": "は？",
+  "I beg your pardon?": "なんだって？",
+  "I can't help you there....": "そこは手伝えない……",
+  "I can't help your clumsiness.": "不器用さは助けようがない。",
+  "I can't see how to get in from here.": "ここから入る方法は見当たらない。",
+  "I couldn't understand that sentence.": "その文は理解できなかった。",
+  "I don't see what you are referring to.": "何を指しているのか分からない。",
+  "I don't see what you're referring to.": "何を指しているのか分からない。",
+  "I suppose you think it's a magic carpet?": "魔法の絨毯だとでも思っているのか。",
+  "I think that phrase is getting a bit worn out.": "その言い回しは、少し使い古された感がある。",
+  "I'd sooner kiss a pig.": "豚に口づけする方がましだ。",
+  "If you insist.... Poof, you're dead!": "どうしてもと言うなら……ぽん、きみは死んだ。",
+  "If you pray enough, your prayers may be answered.": "十分に祈れば、願いは聞き入れられるかもしれない。",
+  "If you wish, but heaven only knows why.": "望むならどうぞ。理由は天のみぞ知る。",
+  "In a feat of unaccustomed daring, you manage to land on your feet without killing yourself.": "慣れない大胆さを見せて、なんとか死なずに足で着地した。",
+  "Insults of this nature won't help you.": "その手の悪態は役に立たない。",
+  "It can't be followed.": "追うことはできない。",
+  "It could very well be too late!": "もう手遅れかもしれない。",
+  "It doesn't seem to work.": "うまくいかないようだ。",
+  "It is already closed.": "もう閉まっている。",
+  "It is already off.": "もう消えている。",
+  "It is already on.": "もう点いている。",
+  "It is already open.": "もう開いている。",
+  "It is impossible to read in the dark.": "暗くては読めない。",
+  "It is now pitch black.": "あたりは真っ暗になった。",
+  "It is pitch black.": "真っ暗だ。",
+  "It is securely anchored.": "しっかりと固定されている。",
+  "It makes no sound but is always lurking in the darkness nearby.": "音は立てないが、いつも近くの暗がりに潜んでいる。",
+  "It seems rooted to the spot.": "その場に根を張っているようだ。",
+  "It seems to be to the west.": "西の方にあるようだ。",
+  "It was here just a minute ago....": "ほんの少し前まで、ここにあった……",
+  "It won't open.": "開かない。",
+  "It's closed.": "閉まっている。",
+  "It's difficult to repeat fragments.": "断片を繰り返すのは難しい。",
+  "It's here!": "ここにある。",
+  "It's not clear what you're referring to.": "何を指しているのか、はっきりしない。",
+  "It's really not clear how.": "やり方がまるで分からない。",
+  "It's right here! Are you blind or something?": "すぐここにある。見えていないのか。",
+  "It's right here.": "すぐここにある。",
+  "It's too dark to see!": "暗すぎて何も見えない。",
+  "It's too dark to see.": "暗すぎて何も見えない。",
+  "Maximum verbosity.": "説明を詳しくする。",
+  "Naturally!": "当然だ。",
+  "Nice try.": "いい度胸だ。",
+  "Nobody seems to be awaiting your answer.": "返事を待っている者はいないようだ。",
+  "Nobody's home.": "誰もいない。",
+  "Not a bright idea, especially since you're in it.": "よい考えではない。まして自分がその中にいる。",
+  "Not a chance.": "望みはない。",
+  "Nothing happens anymore.": "もう何も起こらない。",
+  "Nothing happens here.": "ここでは何も起こらない。",
+  "Nothing happens yet.": "まだ何も起こらない。",
+  "Nothing happens.": "何も起こらない。",
+  "Oh, no! Dozen of lurking grues attack and devour you! You must have stumbled into an authentic grue lair!": "なんと、十数匹のグルーが襲いかかり、きみを食い尽くした。まさしく本物のグルーの巣に迷い込んだらしい。",
+  "Oh, no! You have walked into a den of hungry grues and it's dinner time!": "なんと、腹を空かせたグルーの巣に踏み込んでしまった。しかも食事の時間だ。",
+  "Oh, no! You have walked into the slavering fangs of a lurking grue!": "なんと、潜んでいたグルーの、涎の垂れる牙の中へ歩み入ってしまった。",
+  "Ok.": "よし。",
+  "On the ground below you can see:": "下の地面に見えるもの:",
+  "Only bats can see in the dark. And you're not one.": "暗闇で見えるのは蝙蝠だけだ。きみは蝙蝠ではない。",
+  "Only you can do that.": "それはきみにしかできない。",
+  "Opened.": "開けた。",
+  "Please consult your manual for the correct way to talk to other people or creatures.": "人や生き物への正しい話しかけ方は、説明書を見てくれ。",
+  "Preposterous!": "ばかばかしい。",
+  "Restarting.": "最初から始める。",
+  "Say what?": "なんと？",
+  "Shaken.": "振ってみた。",
+  "Sorry, my memory is poor. Please give a direction.": "あいにく覚えが悪い。方角を言ってくれ。",
+  "Sorry, you can't correct mistakes in quoted text.": "残念だが、引用の中の誤りは直せない。",
+  "Such language in a high-class establishment like this!": "こんな上品な場所で、その言葉遣いはないだろう。",
+  "Suicide is not the answer.": "自害は答えにならない。",
+  "Superbrief descriptions.": "説明を最小にする。",
+  "Taken.": "取った。",
+  "Talking to yourself is a sign of impending mental collapse.": "独り言は、心の限界が近い兆しだ。",
+  "Talking to yourself is said to be a sign of impending mental collapse.": "独り言は、心の限界が近い兆しだと言われている。",
+  "Thank you very much. I was rather thirsty (from all this talking, probably).": "ありがたい。少し喉が渇いていた（喋りすぎたせいだろう）。",
+  "Thank you very much. It really hit the spot.": "ありがたい。じつにうまかった。",
+  "That doesn't make sends.": "意味が通らない。",
+  "That hiding place is too obvious.": "その隠し場所は目立ちすぎる。",
+  "That question can't be answered.": "その問いには答えられない。",
+  "That sentence isn't one I recognize.": "その文は知らない形だ。",
+  "That was just a bit too far down.": "少しばかり、下がりすぎた。",
+  "That would be a good trick.": "それはなかなかの芸当だろう。",
+  "That would involve quite a contortion!": "ずいぶんな体のひねりが要りそうだ。",
+  "That would just repeat a mistake.": "それでは誤りを繰り返すだけだ。",
+  "That's difficult unless your eyes are prehensile.": "目が自在に動くのでなければ、それは難しい。",
+  "That's pretty weird.": "かなり妙だ。",
+  "That's silly!": "ばかげている。",
+  "The FROBOZZ Corporation created, owns, and operates this dungeon.": "この地下迷宮を造り、所有し、運営しているのはフロボッズ社である。",
+  "The balloon lands.": "気球が着地した。",
+  "The best way to find zorkmids is to go out and look for them.": "ゾークミッドを見つける一番の方法は、出かけて探すことだ。",
+  "The boards are securely fastened.": "板はしっかりと打ちつけられている。",
+  "The bottle hits the far wall and shatters.": "瓶は向かいの壁に当たって砕けた。",
+  "The cyclops, hearing the name of his father's deadly nemesis, flees the room by knocking down the wall on the east of the room.": "サイクロプスは父の宿敵の名を聞くと、部屋の東の壁を打ち壊して逃げ去った。",
+  "The door cannot be opened.": "その扉は開けられない。",
+  "The door closes and locks.": "扉が閉まり、鍵がかかった。",
+  "The door is locked from above.": "扉は上から施錠されている。",
+  "The door won't budge.": "扉はびくとも動かない。",
+  "The egg falls to the ground and springs open, seriously damaged.": "卵は地面に落ちて割れ開き、ひどく傷んだ。",
+  "The ground continues to slope upwards away from the lake. You can barely detect a dim light from the east.": "地面は湖から離れて上へ続いている。東の方向に、かすかな明かりがようやく見分けられる。",
+  "The ground is too hard for digging here.": "ここの地面は硬すぎて掘れない。",
+  "The grue is a sinister, lurking presence in the dark places of the earth. Its favorite diet is adventurers, but its insatiable appetite is tempered by its fear of light. No grue has ever been seen by the light of day, and few have survived its fearsome jaws to tell the tale.": "グルーは地の底の暗がりに潜む、不気味な影である。好物は冒険者だが、飽くことのない食欲は光への恐れによって抑えられている。日の光の下でグルーを見た者はなく、その恐ろしい顎から逃れて話を伝えた者も、ほとんどいない。",
+  "The house is a beautiful colonial house which is painted white. It is clear that the owners must have been extremely wealthy.": "白く塗られた美しいコロニアル様式の家だ。持ち主がたいへん裕福だったことは明らかだ。",
+  "The incantation echoes back faintly, but nothing else happens.": "呪文はかすかにこだまを返したが、それだけだった。",
+  "The lamp has already burned out.": "ランプはもう燃え尽きている。",
+  "The lamp has smashed into the floor, and the light has gone out.": "ランプは床に叩きつけられ、明かりは消えた。",
+  "The nest falls to the ground, and the egg spills out of it, seriously damaged.": "巣は地面に落ち、中から卵が転がり出て、ひどく傷んだ。",
+  "The pines and the hemlocks seem to be murmuring.": "松とツガの木々が、ささやいているようだ。",
+  "The rug is extremely heavy and cannot be carried.": "絨毯はきわめて重く、運ぶことはできない。",
+  "The seaman looks up and maneuvers the boat toward shore. He cries out \"I have waited three ages for someone to say those words and save me from sailing this endless ocean. Please accept this gift. You may find it useful!\" He throws something which falls near you in the sand, then sails off toward the west, singing a lively, but somewhat uncouth, sailor song.": "船乗りは顔を上げ、舟を岸へ寄せた。そして叫んだ。「その言葉を聞くために、三つの時代を待った。これで終わりのない海を渡る旅から解き放たれる。どうかこの贈り物を受け取ってくれ。役に立つはずだ」何かを投げると、それは砂の上、きみのすぐ近くに落ちた。船乗りは陽気だが少し品のない舟歌を口ずさみながら、西へ去っていった。",
+  "The songbird is not here but is probably nearby.": "小鳥はここにはいないが、近くにいるのだろう。",
+  "The sweet smell has dispersed.": "甘い匂いは散った。",
+  "The trap door crashes shut, and you hear someone barring it.": "揚げ戸が大きな音を立てて閉まり、誰かがそれに閂をかける音が聞こえる。",
+  "The trap door is closed.": "揚げ戸は閉まっている。",
+  "The trophy case is securely fastened to the wall.": "トロフィー箱は壁にしっかりと留められている。",
+  "The wand glows very brightly for a moment.": "杖が一瞬、まぶしく光った。",
+  "The wand stops glowing, but there is no other apparent effect.": "杖の光は消えたが、ほかに目立った変化はない。",
+  "The wand stops glowing, but there is no other obvious effect.": "杖の光は消えたが、ほかにはっきりした変化はない。",
+  "The water spills to the floor and evaporates.": "水は床にこぼれ、蒸発した。",
+  "The window is closed.": "窓は閉まっている。",
+  "The window is slightly ajar, but not enough to allow entry.": "窓はわずかに開いているが、入れるほどではない。",
+  "The windows are boarded and can't be opened.": "窓は板で塞がれており、開けられない。",
+  "The zorkmid is the unit of currency of the Great Underground Empire.": "ゾークミッドは大地下帝国の通貨単位である。",
+  "There are no climbable trees here.": "登れる木はない。",
+  "There are no stairs leading down.": "下へ続く階段はない。",
+  "There are odd noises in the darkness, and there is no exit in that direction.": "暗闇の中で妙な音がする。その方向に出口はない。",
+  "There are sinister gurgling noises in the darkness all around you!": "まわりの暗闇から、不気味なごろごろという音が聞こえる。",
+  "There is no grue here, but I'm sure there is at least one lurking in the darkness nearby. I wouldn't let my light go out if I were you!": "ここにグルーはいない。だが近くの暗がりに、少なくとも一匹は潜んでいるはずだ。きみが私なら、明かりを絶やしたりはしないだろう。",
+  "There is no sailor to be seen.": "船乗りの姿は見えない。",
+  "There is nothing but dust there.": "そこには埃しかない。",
+  "There is nothing special to be seen.": "特に見るべきものはない。",
+  "There is nothing to fill it with.": "満たすものがない。",
+  "There isn't any water here.": "ここに水はない。",
+  "There seems to be a noun missing in that sentence!": "その文には名詞が足りないようだ。",
+  "There was no verb in that sentence!": "その文には動詞がない。",
+  "There was no word to replace!": "置き換える語がない。",
+  "There were too many nouns in that sentence.": "その文には名詞が多すぎる。",
+  "There's no reason to be digging here.": "ここを掘る理由はない。",
+  "There's no room.": "場所がない。",
+  "There's nothing here you can take.": "ここに取れるものはない。",
+  "There's nothing to fill it with.": "満たすものがない。",
+  "This cannot be tied, so it cannot be untied!": "これは結べないのだから、解くこともできない。",
+  "This has no effect.": "効き目はない。",
+  "This seems to have no effect.": "効き目はないようだ。",
+  "This was not a very safe place to try jumping.": "跳ぶには、あまり安全な場所ではなかった。",
+  "Those things aren't here!": "それらはここにない。",
+  "Thrown.": "投げた。",
+  "Time passes...": "時が過ぎる……",
+  "Underneath the rug is a closed trap door. As you drop the corner of the rug, the trap door is once again concealed from view.": "絨毯の下には閉じた揚げ戸がある。絨毯の端を落とすと、揚げ戸はまた見えなくなった。",
+  "Use compass directions for movement.": "移動は方角で指示してくれ。",
+  "Warning: only the first word after OOPS is used.": "注意 —— OOPS の後は、最初の一語だけが使われる。",
+  "Wasn't he a sailor?": "船乗りではなかったか。",
+  "Well, for one, you are playing Zork...": "まず一つ、きみは Zork を遊んでいる……",
+  "What a (ahem!) strange idea.": "なんとも（こほん）変わった考えだ。",
+  "What a bizarre concept!": "奇妙な思いつきだ。",
+  "What a loony!": "なんという酔狂だ。",
+  "What do you think you're doing?": "何をしようというのか。",
+  "What the heck! You won't make friends this way, but nobody around here is too friendly anyhow. Gulp!": "まあいい。これで友ができるわけではないが、ここには愛想のよい者などいない。ごくり。",
+  "What you can see looks pretty much as usual, sorry to say.": "見えるかぎりでは、いつもと変わりない。残念ながら。",
+  "Whoosh!": "びゅっ。",
+  "Why don't you just walk like normal people?": "普通に歩いてはどうか。",
+  "Why not find your brains?": "自分の頭を探してはどうか。",
+  "With a great effort, the rug is moved to one side of the room, revealing the dusty cover of a closed trap door.": "力を尽くして絨毯を部屋の片側へ寄せると、埃をかぶった閉じた揚げ戸の蓋が現れた。",
+  "With luck, your wish will come true.": "運がよければ、願いは叶うだろう。",
+  "Within six feet of your head, assuming you haven't left that somewhere.": "頭から二メートルほどの範囲だ。頭をどこかに置き忘れていなければ。",
+  "Would you like to restart the game from the beginning, restore a saved game position, or end this session of the game?| (Type RESTART, RESTORE, or QUIT):| >": ">",
+  "You already have that!": "それはもう持っている。",
+  "You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach.": "地面から三メートルほどの高さ、太い枝の間に身を落ち着けている。すぐ上の枝は手の届かないところにある。",
+  "You are already standing, I think.": "もう立っていると思うが。",
+  "You are already wearing it.": "もう身に着けている。",
+  "You are behind the white house. A path leads into the forest to the east. In one corner of the house there is a small window which is": "白い家の裏手にいる。小道が東へ、森の中へ続いている。家の一角に小さな窓があり",
+  "You are carrying:": "持ち物:",
+  "You are empty-handed.": "手ぶらだ。",
+  "You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.": "暗く湿った地下室にいる。細い通路が北へ延び、南には這って進む道がある。西には急な金属の斜面の下端があり、登ることはできない。",
+  "You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is": "白い家の台所にいる。食卓は、つい先ほど食事の支度に使われたように見える。通路が西へ延び、暗い階段が上へ続いているのが見える。暗い煙突が下へ通じており、東には小さな窓があって",
+  "You are in the living room. There is a doorway to the east": "居間にいる。東には戸口があり",
+  "You are left in the dark...": "暗闇に取り残された……",
+  "You are likely to be eaten by a grue.": "グルーに食べられるかもしれない。",
+  "You are on your own feet again.": "自分の足で立った。",
+  "You are standing in an open field west of a white house, with a boarded front door.": "白い家の西、開けた野原に立っている。家の正面の扉には板が打ちつけられている。",
+  "You aren't an accomplished enough juggler.": "そこまで手練れの曲芸師ではない。",
+  "You aren't even in the forest.": "そもそも森の中にいない。",
+  "You can't blast anything by using words.": "言葉で吹き飛ばすことはできない。",
+  "You can't break the windows open.": "窓を破って開けることはできない。",
+  "You can't cross that!": "それは渡れない。",
+  "You can't do that!": "そんなことはできない。",
+  "You can't do that.": "そんなことはできない。",
+  "You can't get up there with what you're carrying.": "その荷物では、そこへは上がれない。",
+  "You can't go more than part way through the curtain.": "幕の途中までしか進めない。",
+  "You can't go that way.": "その方向へは行けない。",
+  "You can't go there without a vehicle.": "乗り物がなければ、そこへは行けない。",
+  "You can't hear the songbird now.": "今は小鳥の声は聞こえない。",
+  "You can't launch that by saying \"launch\"!": "「launch」と言っただけでは、それは出せない。",
+  "You can't pick that.": "それはこじ開けられない。",
+  "You can't pour that.": "それは注げない。",
+  "You can't push things to that.": "そこへは物を押していけない。",
+  "You can't reach something that's inside a closed container.": "閉じた容器の中のものには手が届かない。",
+  "You can't reach that. It's floating above your head.": "手が届かない。頭の上に浮かんでいる。",
+  "You can't see any songbird here.": "小鳥の姿は見えない。",
+  "You can't seem to damage the door.": "扉に傷をつけることはできそうにない。",
+  "You can't spin that!": "それは回せない。",
+  "You can't take it; thus, you can't shake it!": "手に取れないのだから、振ることもできない。",
+  "You can't talk to the sailor that way.": "その言い方では船乗りには通じない。",
+  "You can't throw anything off of that!": "そこから物を投げ落とすことはできない。",
+  "You can't tie anything to yourself.": "自分に何かを結びつけることはできない。",
+  "You can't turn that off.": "それは消せない。",
+  "You can't turn that on.": "それは点けられない。",
+  "You can't turn that!": "それは回せない。",
+  "You can't.": "できない。",
+  "You cannot burn this door.": "この扉は燃やせない。",
+  "You cannot close that.": "それは閉められない。",
+  "You cannot see the forest for the trees.": "木を見て森を見ず、というわけだ。",
+  "You cannot talk to that!": "それとは話せない。",
+  "You could certainly never tie it with that!": "それでは、とても結べない。",
+  "You didn't say with what!": "何を使うのか言っていない。",
+  "You don't have that!": "それは持っていない。",
+  "You find it.": "見つけた。",
+  "You find nothing unusual.": "変わったものは見つからない。",
+  "You have it.": "持っている。",
+  "You have lost your mind.": "正気を失ってしまった。",
+  "You have moved into a dark place.": "暗い場所に入った。",
+  "You hear in the distance the chirping of a song bird.": "遠くで小鳥のさえずりが聞こえる。",
+  "You may know how to do that, but I don't.": "きみは知っているのかもしれないが、こちらは知らない。",
+  "You must be joking.": "冗談だろう。",
+  "You must be more specific.": "もっと具体的に言ってくれ。",
+  "You must specify a direction to go.": "どちらへ行くのか、方角を言ってくれ。",
+  "You probably put spinach in your gas tank, too.": "きみは燃料タンクにほうれん草でも入れる人間だろう。",
+  "You realize that getting out here would be fatal.": "ここで降りれば命はない、と気づいた。",
+  "You see a rickety staircase descending into darkness.": "がたついた階段が、暗闇へ下っているのが見える。",
+  "You seem to be repeating yourself.": "同じことを繰り返しているようだ。",
+  "You should say whether you want to go up or down.": "上か下か、どちらへ行きたいのか言ってくれ。",
+  "You should supply a direction!": "方角を言ってくれ。",
+  "You will be lost without me!": "こちらがいなければ、きみは迷うだろう。",
+  "You will have to specify a direction.": "方角を言ってもらう必要がある。",
+  "You'll have to do that on your own.": "それは自分でやってもらうしかない。",
+  "You'll have to speak up if you expect me to hear you!": "聞き取ってほしければ、もっと大きな声で。",
+  "You're around here somewhere...": "このあたりにいるはずだが……",
+  "You're holding too many things already!": "もう手一杯だ。",
+  "You're inside of it!": "その中にいる。",
+  "You're not at the house.": "家のところにはいない。",
+  "You're not holding that.": "それを持っていない。",
+  "You're not in anything!": "何にも乗っていない。",
+  "You're not in that!": "それには乗っていない。",
+  "You're nuts!": "どうかしている。",
+  "Your bare hands don't appear to be enough.": "素手では足りないようだ。",
+  "Your collection of treasures consists of:": "集めた宝は次のとおり:",
+  "Your hand passes through its object.": "手はその物をすり抜けた。",
+  "Your image in the mirror looks tired.": "鏡に映るきみの姿は、疲れて見える。",
+  "Your sword has begun to glow very brightly.": "剣がまぶしく光りはじめた。",
+  "Your sword is glowing very brightly.": "剣がまぶしく光っている。",
+  "Your sword is glowing with a faint blue glow.": "剣がかすかな青い光を放っている。",
+  "Your sword is no longer glowing.": "剣の光は消えた。",
+  "a trophy case,": "トロフィー箱があり、",
+  "and a closed trap door at your feet.": "足元には閉じた揚げ戸がある。",
+  "and a large oriental rug in the center of the room.": "部屋の中央に大きな東洋風の絨毯が敷かれている。",
+  "and a rug lying beside an open trap door.": "開いた揚げ戸の傍らに絨毯が敷かれている。",
+  "and an open trap door at your feet.": "足元には開いた揚げ戸がある。",
+  "echo echo ...": "こだま こだま ……",
+  "your hands": "きみの手"
+ },
+ "fragments": [
+  "hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.",
+  ", but in trying to take it you have noticed an irregularity beneath it.",
+  "The {WINNER} seems confused. \"I don't see any",
+  "Here begins a transcript of interaction with",
+  "Here ends a transcript of interaction with",
+  "Oh, no! A lurking grue slithered into the",
+  ", especially in light of your condition.",
+  "a clear area leading towards a forest.",
+  "catches fire. Unfortunately, you were",
+  "Swimming isn't usually allowed in the",
+  "\" in a way that I don't understand.",
+  "Trying to destroy the {PRSO} with",
+  "The contents of the {PRSO} spill",
+  "what appears to be a kitchen.",
+  "The rug is too heavy to lift",
+  "A terrific throw! The {PRSO}",
+  "ward, and looks climbable.",
+  "Opening the {PRSO} reveals",
+  "I don't know the word \"",
+  "You can't use multiple",
+  "Your load is too heavy",
+  "direct objects with \"",
+  "There is a {OBJ} here",
+  "You used the word \"",
+  "What do you want to",
+  "You don't have the",
+  "that you mentioned",
+  "out and disappears",
+  "You can't see any",
+  "(providing light)",
+  "and devoured you!",
+  "The chimney leads",
+  "it at the time.",
+  "your bare hands",
+  "has burned out.",
+  "(How about the",
+  "slightly ajar.",
+  "is turned off.",
+  "to the ground",
+  ", in the {AV}",
+  "do you mean,",
+  "(being worn)",
+  "The {OBJ} do",
+  "You can see",
+  "is futile.",
+  "The {PRSO}",
+  "n't here.",
+  "the {OBJ}",
+  "n't lead",
+  "dungeon.",
+  "The lamp",
+  "a {PRSI}",
+  "holding",
+  "A {OBJ}",
+  "object",
+  "here!\"",
+  "is on.",
+  "Which",
+  "other",
+  "here!",
+  "ward.",
+  "open.",
+  "a {F}",
+  "tell",
+  "down",
+  "room"
+ ],
+ "props": {
+  "\"WELCOME TO ZORK!| | ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!\"": {
+   "ja": "ZORK は冒険と危険と、ささやかな狡知の物語である。人の目が見たなかでも最も驚くべき土地を、きみはこれから探索することになる。どのコンピュータにも一本は備えておきたい！」",
+   "owner": "ADVERTISEMENT",
+   "prop": "TEXT"
+  },
+  "A battery-powered brass lantern is on the trophy case.": {
+   "ja": "電池式の真鍮のランタンが、トロフィー箱の上にある。",
+   "owner": "LAMP",
+   "prop": "FDESC"
+  },
+  "A bottle is sitting on the table.": {
+   "ja": "瓶が食卓に置かれている。",
+   "owner": "BOTTLE",
+   "prop": "FDESC"
+  },
+  "A hot pepper sandwich is here.": {
+   "ja": "唐辛子のサンドイッチがある。",
+   "owner": "LUNCH",
+   "prop": "LDESC"
+  },
+  "A small leaflet is on the ground.": {
+   "ja": "小さなちらしが地面に落ちている。",
+   "owner": "ADVERTISEMENT",
+   "prop": "LDESC"
+  },
+  "Above the trophy case hangs an elvish sword of great antiquity.": {
+   "ja": "トロフィー箱の上に、たいへん古いエルフの剣が掛かっている。",
+   "owner": "SWORD",
+   "prop": "FDESC"
+  },
+  "Attic": {
+   "ja": "屋根裏",
+   "owner": "ATTIC",
+   "prop": "DESC"
+  },
+  "Behind House": {
+   "ja": "家の裏",
+   "owner": "EAST-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "Cellar": {
+   "ja": "地下室",
+   "owner": "CELLAR",
+   "prop": "DESC"
+  },
+  "Kitchen": {
+   "ja": "台所",
+   "owner": "KITCHEN",
+   "prop": "DESC"
+  },
+  "Living Room": {
+   "ja": "居間",
+   "owner": "LIVING-ROOM",
+   "prop": "DESC"
+  },
+  "North of House": {
+   "ja": "家の北",
+   "owner": "NORTH-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "On the table is an elongated brown sack, smelling of hot peppers.": {
+   "ja": "食卓の上に、細長い茶色の袋がある。唐辛子の匂いがする。",
+   "owner": "SANDWICH-BAG",
+   "prop": "FDESC"
+  },
+  "South of House": {
+   "ja": "家の南",
+   "owner": "SOUTH-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "The engravings translate to \"This space intentionally left blank.\"": {
+   "ja": "彫られた文字を訳すと、「この空白は意図的に空けられている」となる。",
+   "owner": "WOODEN-DOOR",
+   "prop": "TEXT"
+  },
+  "There is a brass lantern (battery-powered) here.": {
+   "ja": "真鍮のランタン（電池式）がここにある。",
+   "owner": "LAMP",
+   "prop": "LDESC"
+  },
+  "This is the attic. The only exit is a stairway leading down.": {
+   "ja": "屋根裏だ。出口は下へ続く階段のみ。",
+   "owner": "ATTIC",
+   "prop": "LDESC"
+  },
+  "West of House": {
+   "ja": "家の西",
+   "owner": "WEST-OF-HOUSE",
+   "prop": "DESC"
+  },
+  "You are facing the north side of a white house. There is no door here, and all the windows are boarded up. To the north a narrow path winds through the trees.": {
+   "ja": "白い家の北側に面して立っている。ここに扉はなく、窓はすべて板で塞がれている。北へは細い小道が、木々の間を抜けて続いている。",
+   "owner": "NORTH-OF-HOUSE",
+   "prop": "LDESC"
+  },
+  "You are facing the south side of a white house. There is no door here, and all the windows are boarded.": {
+   "ja": "白い家の南側に面して立っている。ここに扉はなく、窓はすべて板で塞がれている。",
+   "owner": "SOUTH-OF-HOUSE",
+   "prop": "LDESC"
+  },
+  "board": {
+   "ja": "板",
+   "owner": "BOARD",
+   "prop": "DESC"
+  },
+  "brass lantern": {
+   "ja": "真鍮のランタン",
+   "owner": "LAMP",
+   "prop": "DESC"
+  },
+  "brown sack": {
+   "ja": "茶色の袋",
+   "owner": "SANDWICH-BAG",
+   "prop": "DESC"
+  },
+  "carpet": {
+   "ja": "絨毯",
+   "owner": "RUG",
+   "prop": "DESC"
+  },
+  "chimney": {
+   "ja": "煙突",
+   "owner": "CHIMNEY",
+   "prop": "DESC"
+  },
+  "clove of garlic": {
+   "ja": "にんにくの一片",
+   "owner": "GARLIC",
+   "prop": "DESC"
+  },
+  "door": {
+   "ja": "扉",
+   "owner": "FRONT-DOOR",
+   "prop": "DESC"
+  },
+  "forest": {
+   "ja": "森",
+   "owner": "FOREST",
+   "prop": "DESC"
+  },
+  "glass bottle": {
+   "ja": "ガラス瓶",
+   "owner": "BOTTLE",
+   "prop": "DESC"
+  },
+  "kitchen window": {
+   "ja": "台所の窓",
+   "owner": "KITCHEN-WINDOW",
+   "prop": "DESC"
+  },
+  "leaflet": {
+   "ja": "ちらし",
+   "owner": "ADVERTISEMENT",
+   "prop": "DESC"
+  },
+  "lunch": {
+   "ja": "昼食",
+   "owner": "LUNCH",
+   "prop": "DESC"
+  },
+  "mountain range": {
+   "ja": "山並み",
+   "owner": "MOUNTAIN-RANGE",
+   "prop": "DESC"
+  },
+  "quantity of water": {
+   "ja": "いくらかの水",
+   "owner": "WATER",
+   "prop": "DESC"
+  },
+  "small mailbox": {
+   "ja": "小さな郵便箱",
+   "owner": "MAILBOX",
+   "prop": "DESC"
+  },
+  "songbird": {
+   "ja": "小鳥",
+   "owner": "SONGBIRD",
+   "prop": "DESC"
+  },
+  "sword": {
+   "ja": "剣",
+   "owner": "SWORD",
+   "prop": "DESC"
+  },
+  "trap door": {
+   "ja": "揚げ戸",
+   "owner": "TRAP-DOOR",
+   "prop": "DESC"
+  },
+  "tree": {
+   "ja": "木",
+   "owner": "TREE",
+   "prop": "DESC"
+  },
+  "trophy case": {
+   "ja": "トロフィー箱",
+   "owner": "TROPHY-CASE",
+   "prop": "DESC"
+  },
+  "white house": {
+   "ja": "白い家",
+   "owner": "WHITE-HOUSE",
+   "prop": "DESC"
+  },
+  "wooden door": {
+   "ja": "木の扉",
+   "owner": "WOODEN-DOOR",
+   "prop": "DESC"
+  }
+ },
+ "templates": [
+  {
+   "en": "The {PRSO} is rudely awakened.",
+   "ja": "{PRSO}は乱暴に起こされた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} isn't sleeping.",
+   "ja": "{PRSO}は眠っていない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "I've known strange people, but fighting a {PRSO}?",
+   "ja": "変わった者は見てきたが、{PRSO}と戦おうとは。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Trying to attack a {PRSO} with your bare hands is suicidal.",
+   "ja": "素手で{PRSO}に挑むのは自殺行為だ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You aren't even holding the {PRSI}.",
+   "ja": "{PRSI}を手にしてすらいない。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "Trying to attack the {PRSO} with a {PRSI} is suicidal.",
+   "ja": "{PRSI}で{PRSO}に挑むのは自殺行為だ。",
+   "slots": [
+    "PRSO",
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} must be on the ground to be boarded.",
+   "ja": "{PRSO}に乗り込むには、地面に降りていなければならない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You are already in the {AV}!",
+   "ja": "すでに{AV}の中にいる。",
+   "slots": [
+    "AV"
+   ]
+  },
+  {
+   "en": "You have a theory on how to board a {PRSO}, perhaps?",
+   "ja": "{PRSO}に乗り込む方法に、何か心当たりでもあるのか。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You are now in the {PRSO}.",
+   "ja": "{PRSO}の中に入った。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "With a {PRSI}??!?",
+   "ja": "{PRSI}で？ 本気か。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} catches fire and is consumed.",
+   "ja": "{PRSO}は燃え上がり、灰になった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't burn a {PRSO}.",
+   "ja": "{PRSO}は燃やせない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't climb onto the {PRSO}.",
+   "ja": "{PRSO}の上には登れない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You must tell me how to do that to a {PRSO}.",
+   "ja": "{PRSO}をどうしたいのか、はっきり言ってくれ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is now closed.",
+   "ja": "{PRSO}は閉まった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} pays no attention.",
+   "ja": "{PRSO}は聞く耳を持たない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Your skillful {PRSI}smanship slices the {PRSO} into innumerable slivers which blow away.",
+   "ja": "見事な{PRSI}さばきで{PRSO}を細切れにし、破片は風に散った。",
+   "slots": [
+    "PRSI",
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The \"cutting edge\" of a {PRSI} is hardly adequate.",
+   "ja": "{PRSI}の「切れ味」では、とても足りない。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "Strange concept, cutting the {PRSO}....",
+   "ja": "{PRSO}を切るとは、奇妙な思いつきだ……",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Digging with the {PRSI} is slow and tedious.",
+   "ja": "{PRSI}で掘るのは遅く、退屈な作業だ。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "Digging with a {PRSI} is silly.",
+   "ja": "{PRSI}で掘るなど馬鹿げている。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} seems stronger now.",
+   "ja": "{PRSO}は前より強くなったようだ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} no longer appears clumsy.",
+   "ja": "{PRSO}の動きから、もたつきが消えた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} no longer appears afraid.",
+   "ja": "{PRSO}はもう怯えていない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} moves again.",
+   "ja": "{PRSO}が再び動きだした。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} stops swaying.",
+   "ja": "{PRSO}の揺れが止まった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} appears more peaceful.",
+   "ja": "{PRSO}はいくぶん穏やかになったようだ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} sinks to the ground.",
+   "ja": "{PRSO}は地面に沈み込んだ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You have to be holding the {NOBJ} first.",
+   "ja": "まず{NOBJ}を手に持っていなければならない。",
+   "slots": [
+    "NOBJ"
+   ]
+  },
+  {
+   "en": "You'll have to open the {NOBJ} first.",
+   "ja": "まず{NOBJ}を開けなければならない。",
+   "slots": [
+    "NOBJ"
+   ]
+  },
+  {
+   "en": "I don't think that the {PRSO} would agree with you.",
+   "ja": "{PRSO}が同意するとは思えない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "That might have done something, but it's hard to tell with a {PRSO}.",
+   "ja": "何か起きたのかもしれないが、{PRSO}では見分けがつかない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} begins to glow.",
+   "ja": "{PRSO}が光りだした。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't filch the {PRSO}!",
+   "ja": "{PRSO}を掠め取ることはできない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} floats serenely in midair.",
+   "ja": "{PRSO}は宙にゆったりと浮かんでいる。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} goes up in a puff of smoke.",
+   "ja": "{PRSO}は一筋の煙になって消えた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "There's nothing special about the {PRSO}.",
+   "ja": "{PRSO}に変わったところはない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {L} has it.",
+   "ja": "{L}が持っている。",
+   "slots": [
+    "L"
+   ]
+  },
+  {
+   "en": "It's on the {L}.",
+   "ja": "{L}の上にある。",
+   "slots": [
+    "L"
+   ]
+  },
+  {
+   "en": "It's in the {L}.",
+   "ja": "{L}の中にある。",
+   "slots": [
+    "L"
+   ]
+  },
+  {
+   "en": "That's easy for you to say since you don't even have the {PRSO}.",
+   "ja": "{PRSO}を持ってもいないのだから、言うのは簡単だ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't give a {PRSO} to a {PRSI}!",
+   "ja": "{PRSI}に{PRSO}を渡すことはできない。",
+   "slots": [
+    "PRSO",
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSI} refuses it politely.",
+   "ja": "{PRSI}は丁重に断った。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} bows his head to you in greeting.",
+   "ja": "{PRSO}は挨拶に頭を下げた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It's a well known fact that only schizophrenics say \"Hello\" to a {PRSO}.",
+   "ja": "{PRSO}に「やあ」と声をかけるのは、正気を失った者だけだと言われている。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Why knock on a {PRSO}?",
+   "ja": "{PRSO}を叩いて何になる。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is now off.",
+   "ja": "{PRSO}は消えた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is now on.",
+   "ja": "{PRSO}が点いた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "If you wish to burn the {PRSO}, you should say so.",
+   "ja": "{PRSO}を燃やしたいなら、そう言ってくれ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is too big to jump over.",
+   "ja": "{PRSO}は大きすぎて飛び越えられない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} makes no sound.",
+   "ja": "{PRSO}は何の音も立てない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "There is nothing behind the {PRSO}.",
+   "ja": "{PRSO}の裏には何もない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is open, but I can't tell what's beyond it.",
+   "ja": "{PRSO}は開いているが、その先は分からない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is closed.",
+   "ja": "{PRSO}は閉まっている。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "There is nothing on the {PRSO}.",
+   "ja": "{PRSO}の上には何もない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} is empty.",
+   "ja": "{PRSO}は空だ。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't look inside a {PRSO}.",
+   "ja": "{PRSO}の中は覗けない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Look on a {PRSO}???",
+   "ja": "{PRSO}の上を見る？",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It's not clear that a {PRSO} can be melted.",
+   "ja": "{PRSO}が溶けるものかどうか、定かではない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Moving the {PRSO} reveals nothing.",
+   "ja": "{PRSO}を動かしても、何も出てこない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't move the {PRSO}.",
+   "ja": "{PRSO}は動かせない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} opens.",
+   "ja": "{PRSO}が開いた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Ahoy -- {PRSO} overboard!",
+   "ja": "おっと——{PRSO}が船から落ちた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You become so engrossed in the role of the {PRSO} that you kill yourself, just as he might have done!",
+   "ja": "{PRSO}の役に入り込みすぎて、当人がそうしたであろうとおりに自らを殺してしまった。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSI} is extinguished.",
+   "ja": "{PRSI}の火は消えた。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The water spills over the {PRSI}, to the floor, and evaporates.",
+   "ja": "水は{PRSI}からあふれて床に流れ、蒸発した。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "Pump it up with a {PRSI}?",
+   "ja": "{PRSI}で膨らませるつもりか。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSI} isn't open.",
+   "ja": "{PRSI}は開いていない。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "The {PRSO} is already in the {PRSI}.",
+   "ja": "{PRSO}はすでに{PRSI}の中にある。",
+   "slots": [
+    "PRSO",
+    "PRSI"
+   ]
+  },
+  {
+   "en": "You don't have the {PRSO}.",
+   "ja": "{PRSO}を持っていない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "There's no good surface on the {PRSI}.",
+   "ja": "{PRSI}には物を置けるような面がない。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "How does one look through a {PRSI}?",
+   "ja": "{PRSI}をどうやって覗くというのか。",
+   "slots": [
+    "PRSI"
+   ]
+  },
+  {
+   "en": "How does one read a {PRSO}?",
+   "ja": "{PRSO}をどうやって読むというのか。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It is hardly likely that the {PRSO} is interested.",
+   "ja": "{PRSO}が関心を持つとは、とても思えない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You must address the {V} directly.",
+   "ja": "{V}に直接話しかけなければならない。",
+   "slots": [
+    "V"
+   ]
+  },
+  {
+   "en": "Why would you send for the {PRSO}?",
+   "ja": "{PRSO}を呼び寄せて何になる。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It sounds like there is something inside the {PRSO}.",
+   "ja": "{PRSO}の中に何かあるような音がする。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} sounds empty.",
+   "ja": "{PRSO}は空のような音がする。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "It smells like a {PRSO}.",
+   "ja": "{PRSO}の匂いがする。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} does not understand this.",
+   "ja": "{PRSO}には通じない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "No doubt you propose to stab the {PRSO} with your pinky?",
+   "ja": "{PRSO}を小指で刺すつもりだとでも言うのか。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "Since you aren't versed in hand-to-hand combat, you'd better attack the {PRSO} with a weapon.",
+   "ja": "素手の戦いに通じていないのだから、{PRSO}には武器で挑んだ方がいい。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} isn't in the {PRSI}.",
+   "ja": "{PRSO}は{PRSI}の中にない。",
+   "slots": [
+    "PRSO",
+    "PRSI"
+   ]
+  },
+  {
+   "en": "You are now wearing the {PRSO}.",
+   "ja": "{PRSO}を身に着けた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} pauses for a moment, perhaps thinking that you should reread the manual.",
+   "ja": "{PRSO}はしばし動きを止めた。説明書を読み返せと言いたいのかもしれない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't talk to the {PRSO}!",
+   "ja": "{PRSO}と話すことはできない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You hit your head against the {PRSO} as you attempt this feat.",
+   "ja": "その離れ業を試したせいで、{PRSO}に頭をぶつけた。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSI} ducks as the {PRSO} flies by and crashes to the ground.",
+   "ja": "{PRSI}が身をかがめ、{PRSO}は頭上を越えて地面に叩きつけられた。",
+   "slots": [
+    "PRSI",
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't tie the {PRSO} to that.",
+   "ja": "{PRSO}をそれに結びつけることはできない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You should turn the {PRSO} to something.",
+   "ja": "{PRSO}を何かに合わせて回さなければならない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {OBJ} is closed.",
+   "ja": "{OBJ}は閉まっている。",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "You can't wear the {PRSO}.",
+   "ja": "{PRSO}は身に着けられない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You cannot wind up a {PRSO}.",
+   "ja": "{PRSO}のねじは巻けない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "(You are in the {AV}.)",
+   "ja": "（{AV}の中にいる。）",
+   "slots": [
+    "AV"
+   ]
+  },
+  {
+   "en": "(outside the {AV})",
+   "ja": "（{AV}の外）",
+   "slots": [
+    "AV"
+   ]
+  },
+  {
+   "en": "Sitting on the {OBJ} is:",
+   "ja": "{OBJ}の上にあるもの:",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "The {OBJ} is holding:",
+   "ja": "{OBJ}が持っているもの:",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "The {OBJ} contains:",
+   "ja": "{OBJ}の中身:",
+   "slots": [
+    "OBJ"
+   ]
+  },
+  {
+   "en": "When you touch the {PRSO} it immediately disappears!",
+   "ja": "{PRSO}に触れた途端、それは消え去った。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You're not carrying the {PRSO}.",
+   "ja": "{PRSO}を持ち歩いていない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "The {PRSO} isn't here!",
+   "ja": "{PRSO}はここにない。",
+   "slots": [
+    "PRSO"
+   ]
+  },
+  {
+   "en": "You can't go there in a {WLOC}.",
+   "ja": "{WLOC}でそこへは行けない。",
+   "slots": [
+    "WLOC"
+   ]
+  },
+  {
+   "en": "The {WLOC} comes to a rest on the shore.",
+   "ja": "{WLOC}は岸に着いて止まった。",
+   "slots": [
+    "WLOC"
+   ]
+  },
+  {
+   "en": "The {WLOC} comes to a stop.",
+   "ja": "{WLOC}は止まった。",
+   "slots": [
+    "WLOC"
+   ]
+  },
+  {
+   "en": "The {WINNER} leaves the room.",
+   "ja": "{WINNER}は部屋を出ていった。",
+   "slots": [
+    "WINNER"
+   ]
+  },
+  {
+   "en": "The {PRSO} falls to the ground.",
+   "ja": "{PRSO}は地面に落ちた。",
+   "slots": [
+    "PRSO"
+   ]
+  }
+ ]
+}

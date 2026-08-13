@@ -1,0 +1,29 @@
+{
+  "name": "zenmai",
+  "version": "1.0.0",
+  "description": "**日本語で読み、日本語で打つテキストアドベンチャー。** 1979 年の仮想機械をブラウザに載せ替え、 出力を日本語に、入力を日本語から。**ゲームコントローラだけで遊べる。**",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msonrm/zenmai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/msonrm/zenmai/issues"
+  },
+  "homepage": "https://github.com/msonrm/zenmai#readme",
+  "dependencies": {
+    "glkote-term": "^0.4.4",
+    "ifvms": "^1.1.6",
+    "mute-stream": "^4.0.0"
+  }
+}
