@@ -20,7 +20,8 @@
     "LEAFLET",
     "BOOKLET",
     "MAIL"
-   ]
+   ],
+   "vehicle": false
   },
   "ALTAR": {
    "adjs": [],
@@ -31,7 +32,8 @@
    ],
    "nouns": [
     "ALTAR"
-   ]
+   ],
+   "vehicle": false
   },
   "ATTIC-TABLE": {
    "adjs": [],
@@ -42,7 +44,8 @@
    ],
    "nouns": [
     "TABLE"
-   ]
+   ],
+   "vehicle": false
   },
   "AXE": {
    "adjs": [
@@ -59,7 +62,8 @@
    "nouns": [
     "AXE",
     "AX"
-   ]
+   ],
+   "vehicle": false
   },
   "BAG-OF-COINS": {
    "adjs": [
@@ -77,7 +81,8 @@
     "BAG",
     "COINS",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BAR": {
    "adjs": [
@@ -95,7 +100,8 @@
     "BAR",
     "PLATINUM",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BARROW": {
    "adjs": [
@@ -110,7 +116,8 @@
    "nouns": [
     "BARROW",
     "TOMB"
-   ]
+   ],
+   "vehicle": false
   },
   "BARROW-DOOR": {
    "adjs": [
@@ -130,7 +137,8 @@
    ],
    "nouns": [
     "DOOR"
-   ]
+   ],
+   "vehicle": false
   },
   "BAT": {
    "adjs": [
@@ -145,7 +153,8 @@
    "nouns": [
     "BAT",
     "VAMPIRE"
-   ]
+   ],
+   "vehicle": false
   },
   "BAUBLE": {
    "adjs": [
@@ -161,7 +170,8 @@
    "nouns": [
     "BAUBLE",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BELL": {
    "adjs": [
@@ -177,7 +187,8 @@
    ],
    "nouns": [
     "BELL"
-   ]
+   ],
+   "vehicle": false
   },
   "BLUE-BUTTON": {
    "adjs": [
@@ -191,7 +202,8 @@
    "nouns": [
     "BUTTON",
     "SWITCH"
-   ]
+   ],
+   "vehicle": false
   },
   "BOARD": {
    "adjs": [],
@@ -203,7 +215,8 @@
    "nouns": [
     "BOARDS",
     "BOARD"
-   ]
+   ],
+   "vehicle": false
   },
   "BOARDED-WINDOW": {
    "adjs": [
@@ -218,7 +231,8 @@
    ],
    "nouns": [
     "WINDOW"
-   ]
+   ],
+   "vehicle": false
   },
   "BOAT-LABEL": {
    "adjs": [
@@ -236,7 +250,8 @@
     "LABEL",
     "FINEPRINT",
     "PRINT"
-   ]
+   ],
+   "vehicle": false
   },
   "BODIES": {
    "adjs": [
@@ -252,7 +267,8 @@
     "BODY",
     "REMAINS",
     "PILE"
-   ]
+   ],
+   "vehicle": false
   },
   "BOLT": {
    "adjs": [
@@ -266,7 +282,8 @@
    "nouns": [
     "BOLT",
     "NUT"
-   ]
+   ],
+   "vehicle": false
   },
   "BONES": {
    "adjs": [],
@@ -279,7 +296,8 @@
     "BONES",
     "SKELETON",
     "BODY"
-   ]
+   ],
+   "vehicle": false
   },
   "BOOK": {
    "adjs": [
@@ -297,7 +315,8 @@
     "PRAYER",
     "PAGE",
     "BOOKS"
-   ]
+   ],
+   "vehicle": false
   },
   "BOTTLE": {
    "adjs": [
@@ -314,7 +333,8 @@
    "nouns": [
     "BOTTLE",
     "CONTAINER"
-   ]
+   ],
+   "vehicle": false
   },
   "BRACELET": {
    "adjs": [
@@ -331,7 +351,8 @@
     "JEWEL",
     "SAPPHIRE",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BROKEN-CANARY": {
    "adjs": [
@@ -348,7 +369,8 @@
    "nouns": [
     "CANARY",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BROKEN-EGG": {
    "adjs": [
@@ -367,7 +389,8 @@
    "nouns": [
     "EGG",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "BROKEN-LAMP": {
    "adjs": [
@@ -381,7 +404,8 @@
    "nouns": [
     "LAMP",
     "LANTERN"
-   ]
+   ],
+   "vehicle": false
   },
   "BROWN-BUTTON": {
    "adjs": [
@@ -395,7 +419,8 @@
    "nouns": [
     "BUTTON",
     "SWITCH"
-   ]
+   ],
+   "vehicle": false
   },
   "BUBBLE": {
    "adjs": [
@@ -411,7 +436,8 @@
    ],
    "nouns": [
     "BUBBLE"
-   ]
+   ],
+   "vehicle": false
   },
   "BUOY": {
    "adjs": [
@@ -425,7 +451,8 @@
    ],
    "nouns": [
     "BUOY"
-   ]
+   ],
+   "vehicle": false
   },
   "BURNED-OUT-LANTERN": {
    "adjs": [
@@ -442,7 +469,8 @@
    "nouns": [
     "LANTERN",
     "LAMP"
-   ]
+   ],
+   "vehicle": false
   },
   "CANARY": {
    "adjs": [
@@ -459,7 +487,8 @@
    "nouns": [
     "CANARY",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "CANDLES": {
    "adjs": [
@@ -475,7 +504,8 @@
    "nouns": [
     "CANDLES",
     "PAIR"
-   ]
+   ],
+   "vehicle": false
   },
   "CHALICE": {
    "adjs": [
@@ -492,7 +522,8 @@
     "CUP",
     "SILVER",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "CHIMNEY": {
    "adjs": [
@@ -506,7 +537,8 @@
    ],
    "nouns": [
     "CHIMNEY"
-   ]
+   ],
+   "vehicle": false
   },
   "CLIMBABLE-CLIFF": {
    "adjs": [
@@ -523,7 +555,8 @@
     "CLIFF",
     "WALLS",
     "LEDGE"
-   ]
+   ],
+   "vehicle": false
   },
   "COAL": {
    "adjs": [
@@ -540,7 +573,8 @@
     "COAL",
     "PILE",
     "HEAP"
-   ]
+   ],
+   "vehicle": false
   },
   "COFFIN": {
    "adjs": [
@@ -558,7 +592,8 @@
     "COFFIN",
     "CASKET",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "CONTROL-PANEL": {
    "adjs": [
@@ -571,7 +606,8 @@
    ],
    "nouns": [
     "PANEL"
-   ]
+   ],
+   "vehicle": false
   },
   "CRACK": {
    "adjs": [
@@ -584,7 +620,8 @@
    ],
    "nouns": [
     "CRACK"
-   ]
+   ],
+   "vehicle": false
   },
   "CYCLOPS": {
    "adjs": [
@@ -599,7 +636,8 @@
     "CYCLOPS",
     "MONSTER",
     "EYE"
-   ]
+   ],
+   "vehicle": false
   },
   "DAM": {
    "adjs": [],
@@ -612,7 +650,8 @@
     "GATE",
     "GATES",
     "FCD\\#3"
-   ]
+   ],
+   "vehicle": false
   },
   "DIAMOND": {
    "adjs": [
@@ -627,7 +666,8 @@
    "nouns": [
     "DIAMOND",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "EGG": {
    "adjs": [
@@ -644,7 +684,8 @@
    "nouns": [
     "EGG",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "EMERALD": {
    "adjs": [
@@ -658,7 +699,8 @@
    "nouns": [
     "EMERALD",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "ENGRAVINGS": {
    "adjs": [
@@ -675,7 +717,8 @@
     "WALL",
     "ENGRAVINGS",
     "INSCRIPTION"
-   ]
+   ],
+   "vehicle": false
   },
   "FOREST": {
    "adjs": [],
@@ -689,7 +732,8 @@
     "TREES",
     "PINES",
     "HEMLOCKS"
-   ]
+   ],
+   "vehicle": false
   },
   "FRONT-DOOR": {
    "adjs": [
@@ -708,7 +752,8 @@
    ],
    "nouns": [
     "DOOR"
-   ]
+   ],
+   "vehicle": false
   },
   "GARLIC": {
    "adjs": [],
@@ -722,7 +767,8 @@
    "nouns": [
     "GARLIC",
     "CLOVE"
-   ]
+   ],
+   "vehicle": false
   },
   "GHOSTS": {
    "adjs": [
@@ -741,7 +787,8 @@
     "SPIRITS",
     "FIENDS",
     "FORCE"
-   ]
+   ],
+   "vehicle": false
   },
   "GLOBAL-WATER": {
    "adjs": [],
@@ -753,7 +800,8 @@
    "nouns": [
     "WATER",
     "QUANTITY"
-   ]
+   ],
+   "vehicle": false
   },
   "GRANITE-WALL": {
    "adjs": [
@@ -768,7 +816,8 @@
    ],
    "nouns": [
     "WALL"
-   ]
+   ],
+   "vehicle": false
   },
   "GRATE": {
    "adjs": [],
@@ -780,7 +829,8 @@
    "nouns": [
     "GRATE",
     "GRATING"
-   ]
+   ],
+   "vehicle": false
   },
   "GUIDE": {
    "adjs": [
@@ -797,7 +847,8 @@
     "BOOK",
     "BOOKS",
     "GUIDEBOOKS"
-   ]
+   ],
+   "vehicle": false
   },
   "GUNK": {
    "adjs": [
@@ -813,7 +864,8 @@
     "GUNK",
     "PIECE",
     "SLAG"
-   ]
+   ],
+   "vehicle": false
   },
   "HOT-BELL": {
    "adjs": [
@@ -829,7 +881,8 @@
    ],
    "nouns": [
     "BELL"
-   ]
+   ],
+   "vehicle": false
   },
   "INFLATABLE-BOAT": {
    "adjs": [
@@ -848,7 +901,8 @@
     "PILE",
     "PLASTIC",
     "VALVE"
-   ]
+   ],
+   "vehicle": false
   },
   "INFLATED-BOAT": {
    "adjs": [
@@ -867,7 +921,8 @@
    "nouns": [
     "BOAT",
     "RAFT"
-   ]
+   ],
+   "vehicle": true
   },
   "JADE": {
    "adjs": [
@@ -884,7 +939,8 @@
    "nouns": [
     "FIGURINE",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "KEYS": {
    "adjs": [
@@ -897,7 +953,8 @@
    ],
    "nouns": [
     "KEY"
-   ]
+   ],
+   "vehicle": false
   },
   "KITCHEN-TABLE": {
    "adjs": [
@@ -910,7 +967,8 @@
    ],
    "nouns": [
     "TABLE"
-   ]
+   ],
+   "vehicle": false
   },
   "KITCHEN-WINDOW": {
    "adjs": [
@@ -926,7 +984,8 @@
    ],
    "nouns": [
     "WINDOW"
-   ]
+   ],
+   "vehicle": false
   },
   "KNIFE": {
    "adjs": [
@@ -943,7 +1002,8 @@
     "KNIVES",
     "KNIFE",
     "BLADE"
-   ]
+   ],
+   "vehicle": false
   },
   "LADDER": {
    "adjs": [
@@ -960,7 +1020,8 @@
    ],
    "nouns": [
     "LADDER"
-   ]
+   ],
+   "vehicle": false
   },
   "LAMP": {
    "adjs": [
@@ -977,7 +1038,8 @@
     "LAMP",
     "LANTERN",
     "LIGHT"
-   ]
+   ],
+   "vehicle": false
   },
   "LARGE-BAG": {
    "adjs": [
@@ -991,7 +1053,8 @@
    ],
    "nouns": [
     "BAG"
-   ]
+   ],
+   "vehicle": false
   },
   "LEAK": {
    "adjs": [],
@@ -1004,7 +1067,8 @@
     "LEAK",
     "DRIP",
     "PIPE"
-   ]
+   ],
+   "vehicle": false
   },
   "LEAVES": {
    "adjs": [],
@@ -1018,7 +1082,8 @@
     "LEAVES",
     "LEAF",
     "PILE"
-   ]
+   ],
+   "vehicle": false
   },
   "LOWERED-BASKET": {
    "adjs": [
@@ -1033,7 +1098,8 @@
     "CAGE",
     "DUMBWAITER",
     "BASKET"
-   ]
+   ],
+   "vehicle": false
   },
   "LUNCH": {
    "adjs": [
@@ -1051,7 +1117,8 @@
     "SANDWICH",
     "LUNCH",
     "DINNER"
-   ]
+   ],
+   "vehicle": false
   },
   "MACHINE": {
    "adjs": [],
@@ -1065,7 +1132,8 @@
     "PDP10",
     "DRYER",
     "LID"
-   ]
+   ],
+   "vehicle": false
   },
   "MACHINE-SWITCH": {
    "adjs": [],
@@ -1075,7 +1143,8 @@
    ],
    "nouns": [
     "SWITCH"
-   ]
+   ],
+   "vehicle": false
   },
   "MAILBOX": {
    "adjs": [
@@ -1091,7 +1160,8 @@
    "nouns": [
     "MAILBOX",
     "BOX"
-   ]
+   ],
+   "vehicle": false
   },
   "MAP": {
    "adjs": [
@@ -1108,7 +1178,8 @@
    "nouns": [
     "PARCHMENT",
     "MAP"
-   ]
+   ],
+   "vehicle": false
   },
   "MATCH": {
    "adjs": [
@@ -1124,7 +1195,8 @@
     "MATCH",
     "MATCHES",
     "MATCHBOOK"
-   ]
+   ],
+   "vehicle": false
   },
   "MIRROR-1": {
    "adjs": [],
@@ -1137,7 +1209,8 @@
     "REFLECTION",
     "MIRROR",
     "ENORMOUS"
-   ]
+   ],
+   "vehicle": false
   },
   "MIRROR-2": {
    "adjs": [],
@@ -1150,7 +1223,8 @@
     "REFLECTION",
     "MIRROR",
     "ENORMOUS"
-   ]
+   ],
+   "vehicle": false
   },
   "MOUNTAIN-RANGE": {
    "adjs": [
@@ -1167,7 +1241,8 @@
    "nouns": [
     "MOUNTAIN",
     "RANGE"
-   ]
+   ],
+   "vehicle": false
   },
   "NEST": {
    "adjs": [
@@ -1181,7 +1256,8 @@
    ],
    "nouns": [
     "NEST"
-   ]
+   ],
+   "vehicle": false
   },
   "OWNERS-MANUAL": {
    "adjs": [
@@ -1199,7 +1275,8 @@
     "MANUAL",
     "PIECE",
     "PAPER"
-   ]
+   ],
+   "vehicle": false
   },
   "PAINTING": {
    "adjs": [
@@ -1216,7 +1293,8 @@
     "ART",
     "CANVAS",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "PEDESTAL": {
    "adjs": [
@@ -1230,7 +1308,8 @@
    ],
    "nouns": [
     "PEDESTAL"
-   ]
+   ],
+   "vehicle": false
   },
   "POT-OF-GOLD": {
    "adjs": [
@@ -1247,7 +1326,8 @@
     "POT",
     "GOLD",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "PRAYER": {
    "adjs": [
@@ -1263,7 +1343,8 @@
    "nouns": [
     "PRAYER",
     "INSCRIPTION"
-   ]
+   ],
+   "vehicle": false
   },
   "PUMP": {
    "adjs": [
@@ -1282,7 +1363,8 @@
     "AIR-PUMP",
     "TOOL",
     "TOOLS"
-   ]
+   ],
+   "vehicle": false
   },
   "PUNCTURED-BOAT": {
    "adjs": [
@@ -1300,7 +1382,8 @@
     "BOAT",
     "PILE",
     "PLASTIC"
-   ]
+   ],
+   "vehicle": false
   },
   "PUTTY": {
    "adjs": [
@@ -1316,7 +1399,8 @@
    "nouns": [
     "MATERIAL",
     "GUNK"
-   ]
+   ],
+   "vehicle": false
   },
   "RAILING": {
    "adjs": [
@@ -1332,7 +1416,8 @@
    "nouns": [
     "RAILING",
     "RAIL"
-   ]
+   ],
+   "vehicle": false
   },
   "RAINBOW": {
    "adjs": [],
@@ -1343,7 +1428,8 @@
    ],
    "nouns": [
     "RAINBOW"
-   ]
+   ],
+   "vehicle": false
   },
   "RAISED-BASKET": {
    "adjs": [],
@@ -1356,7 +1442,8 @@
     "CAGE",
     "DUMBWAITER",
     "BASKET"
-   ]
+   ],
+   "vehicle": false
   },
   "RED-BUTTON": {
    "adjs": [
@@ -1370,7 +1457,8 @@
    "nouns": [
     "BUTTON",
     "SWITCH"
-   ]
+   ],
+   "vehicle": false
   },
   "RIVER": {
    "adjs": [
@@ -1383,7 +1471,8 @@
    ],
    "nouns": [
     "RIVER"
-   ]
+   ],
+   "vehicle": false
   },
   "ROPE": {
    "adjs": [
@@ -1398,7 +1487,8 @@
     "ROPE",
     "HEMP",
     "COIL"
-   ]
+   ],
+   "vehicle": false
   },
   "RUG": {
    "adjs": [
@@ -1414,7 +1504,8 @@
    "nouns": [
     "RUG",
     "CARPET"
-   ]
+   ],
+   "vehicle": false
   },
   "RUSTY-KNIFE": {
    "adjs": [
@@ -1428,7 +1519,8 @@
    "nouns": [
     "KNIVES",
     "KNIFE"
-   ]
+   ],
+   "vehicle": false
   },
   "SAND": {
    "adjs": [],
@@ -1439,7 +1531,8 @@
    ],
    "nouns": [
     "SAND"
-   ]
+   ],
+   "vehicle": false
   },
   "SANDWICH-BAG": {
    "adjs": [
@@ -1457,7 +1550,8 @@
    "nouns": [
     "BAG",
     "SACK"
-   ]
+   ],
+   "vehicle": false
   },
   "SCARAB": {
    "adjs": [
@@ -1477,7 +1571,8 @@
     "BUG",
     "BEETLE",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "SCEPTRE": {
    "adjs": [
@@ -1495,7 +1590,8 @@
     "SCEPTRE",
     "SCEPTER",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "SCREWDRIVER": {
    "adjs": [
@@ -1511,7 +1607,8 @@
     "TOOL",
     "TOOLS",
     "DRIVER"
-   ]
+   ],
+   "vehicle": false
   },
   "SHOVEL": {
    "adjs": [],
@@ -1523,7 +1620,8 @@
     "SHOVEL",
     "TOOL",
     "TOOLS"
-   ]
+   ],
+   "vehicle": false
   },
   "SKULL": {
    "adjs": [
@@ -1540,7 +1638,8 @@
     "SKULL",
     "HEAD",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "SLIDE": {
    "adjs": [
@@ -1557,7 +1656,8 @@
     "CHUTE",
     "RAMP",
     "SLIDE"
-   ]
+   ],
+   "vehicle": false
   },
   "SONGBIRD": {
    "adjs": [
@@ -1573,7 +1673,8 @@
    "nouns": [
     "BIRD",
     "SONGBIRD"
-   ]
+   ],
+   "vehicle": false
   },
   "STILETTO": {
    "adjs": [
@@ -1586,7 +1687,8 @@
    ],
    "nouns": [
     "STILETTO"
-   ]
+   ],
+   "vehicle": false
   },
   "SWORD": {
    "adjs": [
@@ -1606,7 +1708,8 @@
     "ORCRIST",
     "GLAMDRING",
     "BLADE"
-   ]
+   ],
+   "vehicle": false
   },
   "TEETH": {
    "adjs": [],
@@ -1618,7 +1721,8 @@
    "nouns": [
     "OVERBOARD",
     "TEETH"
-   ]
+   ],
+   "vehicle": false
   },
   "THIEF": {
    "adjs": [
@@ -1636,7 +1740,8 @@
     "ROBBER",
     "MAN",
     "PERSON"
-   ]
+   ],
+   "vehicle": false
   },
   "TIMBERS": {
    "adjs": [
@@ -1653,7 +1758,8 @@
    "nouns": [
     "TIMBERS",
     "PILE"
-   ]
+   ],
+   "vehicle": false
   },
   "TOOL-CHEST": {
    "adjs": [
@@ -1670,7 +1776,8 @@
     "CHESTS",
     "GROUP",
     "TOOLCHESTS"
-   ]
+   ],
+   "vehicle": false
   },
   "TORCH": {
    "adjs": [
@@ -1686,7 +1793,8 @@
     "TORCH",
     "IVORY",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "TRAP-DOOR": {
    "adjs": [
@@ -1711,7 +1819,8 @@
     "TRAPDOOR",
     "TRAP-DOOR",
     "COVER"
-   ]
+   ],
+   "vehicle": false
   },
   "TREE": {
    "adjs": [
@@ -1727,7 +1836,8 @@
    "nouns": [
     "TREE",
     "BRANCH"
-   ]
+   ],
+   "vehicle": false
   },
   "TRIDENT": {
    "adjs": [
@@ -1746,7 +1856,8 @@
     "TRIDENT",
     "FORK",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "TROLL": {
    "adjs": [
@@ -1758,7 +1869,8 @@
    ],
    "nouns": [
     "TROLL"
-   ]
+   ],
+   "vehicle": false
   },
   "TROPHY-CASE": {
    "adjs": [
@@ -1772,7 +1884,8 @@
    ],
    "nouns": [
     "CASE"
-   ]
+   ],
+   "vehicle": false
   },
   "TRUNK": {
    "adjs": [
@@ -1789,7 +1902,8 @@
     "CHEST",
     "JEWELS",
     "TREASURE"
-   ]
+   ],
+   "vehicle": false
   },
   "TUBE": {
    "adjs": [],
@@ -1802,7 +1916,8 @@
     "TUBE",
     "TOOTH",
     "PASTE"
-   ]
+   ],
+   "vehicle": false
   },
   "WALL": {
    "adjs": [
@@ -1816,7 +1931,8 @@
    "nouns": [
     "WALL",
     "WALLS"
-   ]
+   ],
+   "vehicle": false
   },
   "WATER": {
    "adjs": [],
@@ -1832,7 +1948,8 @@
     "QUANTITY",
     "LIQUID",
     "H2O"
-   ]
+   ],
+   "vehicle": false
   },
   "WHITE-CLIFF": {
    "adjs": [
@@ -1846,7 +1963,8 @@
    "nouns": [
     "CLIFF",
     "CLIFFS"
-   ]
+   ],
+   "vehicle": false
   },
   "WHITE-HOUSE": {
    "adjs": [
@@ -1863,7 +1981,8 @@
    ],
    "nouns": [
     "HOUSE"
-   ]
+   ],
+   "vehicle": false
   },
   "WOODEN-DOOR": {
    "adjs": [
@@ -1889,7 +2008,8 @@
     "DOOR",
     "LETTERING",
     "WRITING"
-   ]
+   ],
+   "vehicle": false
   },
   "WRENCH": {
    "adjs": [],
@@ -1901,7 +2021,8 @@
     "WRENCH",
     "TOOL",
     "TOOLS"
-   ]
+   ],
+   "vehicle": false
   },
   "YELLOW-BUTTON": {
    "adjs": [
@@ -1915,7 +2036,8 @@
    "nouns": [
     "BUTTON",
     "SWITCH"
-   ]
+   ],
+   "vehicle": false
   }
  },
  "preps": {

@@ -111,6 +111,7 @@ function createCommander(asset) {
         kind: 'obj',
         key,
         word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
+        vehicle: !!o.vehicle,
       })
     }
   }
@@ -169,7 +170,7 @@ function createCommander(asset) {
       i = j
     }
     if (hardStop) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
-    const verb = found.find((f) => f.kind === 'verb')
+    let verb = found.find((f) => f.kind === 'verb')
     const dirs = found.filter((f) => f.kind === 'dir')
     const objs = found.filter((f) => f.kind === 'obj')
 
@@ -209,9 +210,17 @@ function createCommander(asset) {
     const dest = objs.find((o) => ['TO', 'IN', 'ON', 'UNDER', 'BEHIND', 'FROM'].includes(o.role))
     if (!prso && dest && objs.length === 1) { prso = dest }
 
+    // ★同じ日本語の動詞でも、**対象が英語の動詞を決める**。
+    //   「降りる」は乗り物なら `disembark`、そうでなければ `climb down`
+    //   （実プレイ: 木の上で「きをおりる」→ `disembark tree` → 「それには乗っていない。」）
+    if (verb.key === 'DISEMBARK' && prso && !prso.vehicle) {
+      verb = { ...verb, key: 'CLIMB', shapes: (asset.verbs.CLIMB || {}).shapes || [], fixed: 'DOWN' }
+    }
+
     const out = [verb.key.toLowerCase()]
     const shapes = verb.shapes || []
     const has = (p) => shapes.some((sh) => sh.split(' ').includes(p))
+    if (verb.fixed && has(verb.fixed)) out.push(verb.fixed.toLowerCase())
     // ★前置詞つきの目的語が 1 つだけでも、その前置詞を動詞が取らないなら**裸で渡す**。
     //   「木に登る」の「に」は原作の CLIMB には無い形（`climb tree` が正しい）
     // ★動詞がその関係を取れないなら、**黙って落とさず断る**。
