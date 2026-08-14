@@ -101,9 +101,9 @@
     display: flex; align-items: center; gap: .45em;
   }
   #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
-  body.no-peek #peek-btn { opacity: .55 }
-  body.no-peek #stat { display: none }
-  body.no-peek #screen p.sent { display: none }
+  body.no-debug #debug-btn { opacity: .55 }
+  body.no-debug #stat { display: none }
+  body.no-debug #screen p.sent { display: none }
   /* 狭いときは説明を畳む（題だけ残す）→ さらに狭ければ成績も畳む */
   @media (max-width: 46em) { #title .tag { display: none } }
   /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
@@ -123,7 +123,7 @@
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
     </div>
-    <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="peek-btn" type="button" title="渡した英語コマンドと成績の表示を切り替える">種明かし</button><span id="stat"></span></span>
+    <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>

@@ -39,7 +39,7 @@ class El {
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'peek-btn', 'meta']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
