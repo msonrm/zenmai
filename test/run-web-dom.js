@@ -90,7 +90,7 @@ const pad = {}
 Object.defineProperty(global, 'navigator', { value: { getGamepads: () => [] }, configurable: true })
 window.GamepadEngine = {
   version: 'fake',
-  start(o) { pad.onOp = o.onOp; pad.onState = o.onState; return { stop() {}, setEnabled() {} } },
+  start(o) { pad.onOp = o.onOp; pad.onState = o.onState; pad.tail = o.getComposingTail; return { stop() {}, setEnabled() {} } },
   mount() { return { update() {}, destroy() {} } },
 }
 if (!window.ZVM) window.ZVM = module.exports && module.exports.prototype ? module.exports : global.ZVM
@@ -123,21 +123,37 @@ const finish = () => {
     const consonant = els['pad-btn'].textContent
     inp.value = ''; inp.selectionStart = 0
     for (const t of ['か', 'き', 'く']) { pad.onOp({ type: 'kana', text: t, replace: 0 }) }
-    pad.onOp({ type: 'kana', text: 'ぐ', replace: 1 })          // 濁点は末尾差し替え
     const typed = inp.value
     pad.onOp({ type: 'kana', text: '？', replace: 0 })           // 要らない記号は落とす
     const dropped = inp.value === typed
+    // ★濁点は「合成末尾」を見て置換を決める。実機と同じ経路で確かめる
+    const G = require('../vendor/gamepad-engine.js')
+    const dak = G.resolveDakutenOp(pad.tail())
+    if (dak) pad.onOp(dak)
+    const dakuten = inp.value
     pad.onOp({ type: 'key', tap: { key: 'Backspace' } })
     const afterBs = inp.value
+    const top0 = els.screen.scrollTop
+    pad.onOp({ type: 'key', tap: { key: 'ArrowDown' } })
+    const scrolled = els.screen.scrollTop > top0
+    pad.onOp({ type: 'key', tap: { key: 'ArrowUp' } })
+    const scrolledBack = els.screen.scrollTop === top0
     const before = els.screen.children.length
     pad.onOp({ type: 'kana', text: '、', replace: 0 })           // ★R🕹↓ は送信
     const sent = els.screen.children.length > before && inp.value === ''
+    const before2 = els.screen.children.length
+    pad.onOp({ type: 'kana', text: '、', replace: 0 })           // 空のまま連打しても送らない
+    const noEmpty = els.screen.children.length === before2
     const checks = [
       ['子音の札が出る（か行）', consonant === 'か'],
-      ['かなが入る', typed === 'かきぐ'],
+      ['かなが入る', typed === 'かきく'],
       ['要らない記号を落とす', dropped],
       ['R🕹← で 1 字消える', afterBs === 'かき'],
+      ['濁点が付く（末尾を見ている）', dakuten === 'かきぐ'],
+      ['L🕹↓ で本文が送られる', scrolled],
+      ['L🕹↑ で戻る', scrolledBack],
       ['R🕹↓ で送信される', sent],
+      ['空のまま連打しても送らない', noEmpty],
     ]
     for (const [name, ok] of checks) console.log(`--- ゲームパッド ${ok ? '✓' : '✗'} ${name}`)
     if (checks.some(([, ok]) => !ok)) { console.error('★ゲームパッドの配線が壊れている'); process.exit(1) }

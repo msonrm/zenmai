@@ -169,8 +169,10 @@
 
   // ★1 行を送る道は 1 本にする（キーボードもゲームパッドもここを通る）
   function send(text) {
+    if (Glk.waitingFor() === 'char') { $('input').value = ''; Glk.submitChar(32); return }
+    // ★空は送らない。R🕹↓ を握っていると送信が連発し、空コマンドが並んでいた
+    if (!String(text).trim()) { $('input').value = ''; return }
     $('input').value = ''
-    if (Glk.waitingFor() === 'char') { Glk.submitChar(32); return }
     // ★日本語で打たれたら英語コマンドへ翻訳する。英語ならそのまま通す
     // ★原作が「何を◯◯？」と聞き返している最中は、動詞がこちらの手元にある
     const r = cm.toCommand(text, { verb: pendingVerb })
@@ -233,7 +235,13 @@
     if (key === 'Enter') { send(el.value); return }
     if (key === 'Backspace') { padInsert('', 1); return }
     if (key === 'Escape') { el.value = ''; return }
-    // ★左スティックはキャレット移動だけ（変換が無いので候補送り・文節移動は要らない）
+    // ★左スティックの上下は**本文送り**。コマンド欄は 1 行なので上下が空いている
+    if (key === 'ArrowUp' || key === 'ArrowDown' || key === ' ') {
+      const d = key === 'ArrowUp' ? -1 : 1
+      screen.scrollTop += d * Math.max(80, (screen.clientHeight || 0) * 0.35)
+      return
+    }
+    // ★左右はキャレット移動だけ（変換が無いので候補送り・文節移動は要らない）
     if (key === 'ArrowLeft') { el.setSelectionRange(Math.max(0, at - 1), Math.max(0, at - 1)); return }
     if (key === 'ArrowRight') {
       const p = Math.min(el.value.length, at + 1)
@@ -244,17 +252,22 @@
   // ★操作図は labo のものをそのまま使い、**この企画で変えた所だけ札を書き換える**
   //   （エンジンには手を入れない。図と実際の挙動がずれるほうが害が大きい）
   function patchPad(root) {
-    const SWAP = { '、。␣': '送信', '「': '', '」': '', '？': '' }
+    // ★使わない操作と、見なくても分かる札は出さない
+    //   （押し込み＝取消/確定・機種名・「日本語」のモード札）
+    const SWAP = { '、。␣': '送信', '「': '', '」': '', '？': '', '取消': '' }
     for (const el of root.querySelectorAll('*')) {
       if (el.children.length) continue
       const t = (el.textContent || '').trim()
       if (t in SWAP) el.textContent = SWAP[t]
+      if (t === '日本語' && el.remove) el.remove()
     }
+    const name = root.querySelector('.ge-name')
+    if (name && name.remove) name.remove()
     const guide = root.querySelector('.ge-guide')
     if (!guide) return
     guide.textContent = ''
     for (const g of ['LT 拗音/っ', 'LT+RT っ', 'RT ん', 'R🕹↓ 送信', 'R🕹↑ ゛゜',
-      'R🕹→ ー', 'R🕹← 1字消す', 'L🕹←→ カーソル', 'LS 送信', 'RS 全部消す']) {
+      'R🕹→ ー', 'R🕹← 1字消す', 'L🕹←→ カーソル', 'L🕹↑↓ 画面送り']) {
       const sp = document.createElement('span')
       sp.textContent = g
       guide.appendChild(sp)
@@ -273,7 +286,13 @@
     $('pad-btn').addEventListener('click', () => { showPad(!padOpen()); $('input').focus() })
 
     window.GamepadEngine.start({
-      getComposingTail: () => '',           // 変換しないので合成末尾は常に空
+      // ★濁点（R🕹↑）と拗音（LT）は**末尾の文字を見て置換**を決める。
+      //   ここを常に空で返していたので、どちらも何も起きなかった（実機で判明）
+      getComposingTail: () => {
+        const el = $('input')
+        const at = el.selectionStart == null ? el.value.length : el.selectionStart
+        return el.value.slice(0, at)
+      },
       onOp(op) {
         if (op.type === 'kana') {
           // ★R🕹↓ は句読点だった。ここでは**コマンド送信**に使う（要らない記号は落とす）
