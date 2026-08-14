@@ -166,17 +166,25 @@
   /* ★下の段は「左に操作・その右に盤」。以前は右下に重ねていたが、
      フリック盤を出すと**改行キーと重なった**（実機の指摘）。
      重なりは z 順ではなく**場所で解く** —— 盤は中央に寄るので左が空く */
-  #bottom { display: flex; align-items: flex-end; gap: .8em; padding: 0 1.2em }
+  /* ★盤は**画面の中央**に置く（指の記憶は絶対位置に付いているので、寄せてはいけない）。
+     操作ボタンは**場所を取らずに左端へ重ねる** —— フリックの左端列は ← 以外が空なので、
+     その下半分が空き地になる（実機の指摘どおり） */
+  #bottom { position: relative; display: flex; justify-content: center; align-items: flex-end }
   #meta {
-    flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: .3em;
-    padding-bottom: .15em;
+    position: absolute; left: 1.2em; bottom: .15em;
+    display: flex; flex-direction: column; align-items: flex-start; gap: .3em;
   }
   #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
   body.no-debug #debug-btn { opacity: .55 }
   body.no-debug #stat { display: none }
   body.no-debug #screen p.sent { display: none }
-  /* 狭いときは説明を畳む（題だけ残す）→ さらに狭ければ成績も畳む */
-  @media (max-width: 46em) { #title .tag { display: none } }
+  /* ★狭いときは説明を**隠さず 2 行にする**（スマホで「ぜんまい」しか見えなかった）。
+     畳むと、その画面の人だけ「これが何か」を知らないまま遊ぶことになる */
+  @media (max-width: 46em) {
+    #head { align-items: flex-start }
+    #title .tag { display: block; font-size: .85em; margin-top: .1em }
+    #title .tag::before { content: none }
+  }
   /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
   @media (max-width: 40em) { #stat { display: none } }
 </style>
@@ -206,7 +214,7 @@
     <div id="prompt" class="gutter">
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
-             spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
+             spellcheck="false" placeholder="ひらがなで打つ">
       <button id="flick-btn" type="button" title="かなの盤を開閉">かな</button>
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>

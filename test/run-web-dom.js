@@ -50,7 +50,7 @@ class El {
 const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn', 'intro', 'intro-ok', 'bottom']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
-const window = {}
+const window = { innerWidth: 1024, addEventListener() {} }
 // ふりがなの入切は body の class と localStorage を使う
 const store = {}
 global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }

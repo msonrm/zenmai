@@ -165,8 +165,7 @@
       }
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
-      if (Glk.waitingFor() === 'char') $('input').placeholder = '何かキーを（Enter で進む）'
-      else $('input').placeholder = 'ひらがなで打つ（例: ゆうびんばこをあける）'
+      $('input').placeholder = Glk.waitingFor() === 'char' ? '何かキーを（Enter で進む）' : hint()
       $('input').focus()
     },
   })
@@ -366,6 +365,13 @@
     $('intro-ok').addEventListener('click', close)
     intro.addEventListener('click', (e) => { if (e.target === intro) close() })
   }
+
+  // ★狭い画面では例まで入らず**末尾が切れて読めない**。畳んで名詞だけ残す
+  const hint = () => (window.innerWidth < 520
+    ? 'ひらがなで打つ' : 'ひらがなで打つ（例: ゆうびんばこをあける）')
+  window.addEventListener('resize', () => {
+    if (Glk.waitingFor() === 'line') $('input').placeholder = hint()
+  })
 
   const vm = new window.ZVM()
   vm.prepare(story, { vm, Glk, GlkOte: null, Dialog: null })
