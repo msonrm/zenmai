@@ -673,7 +673,7 @@
   {
    "en": "Your score is {N} (total of 350 points), in {M} moves.",
    "id": "X-12",
-   "ja": "得点は三百五十点満点中 {N} 点、手数は {M}。"
+   "ja": "得点は 350 点満点中 {N} 点、手数は {M}。"
   },
   {
    "en": "This gives you the rank of {RANK}.",
@@ -734,7 +734,7 @@
   "\"WELCOME TO ZORK!| | ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!\"": "「ZORK へようこそ！| | ZORK は冒険と危険と、ささやかな狡知の物語である。人の目が見たなかでも最も驚くべき土地を、きみはこれから探索することになる。どのコンピュータにも一本は備えておきたい！」",
   "(Taken)": "（取った）",
   "(floating in midair)": "（宙に浮いている）",
-  "(total of 350 points), in": "（三百五十点満点）、手数は",
+  "(total of 350 points), in": "（350 点満点）、手数は",
   "(with the match)": "（マッチで）",
   ", a wooden door with strange gothic lettering to the west, which appears to be nailed shut,": "、西には奇妙なゴシック文字の記された木の扉があり、釘で打ちつけられているように見える。そして",
   ", but the contents of his bag fall on the floor.": "。だが袋の中身が床にこぼれ落ちた。",
