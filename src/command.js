@@ -228,7 +228,17 @@ function createCommander(asset) {
       //   **打った本人は動詞を打っているので誤解を招く**（今日の方針: 黙って外すより言う）
       if (unknown.length) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
       // 名詞だけ（「絨毯」）→ 原作の「何を？」に任せる
-      if (objs.length) return { command: objs[0].word, trace: '名詞のみ', unknown, echo: echo.join('') }
+      // ★聞き返しへの答えはここを通る。別案もここで出す（`じょう` = 格子 / 揚げ戸）
+      if (objs.length) {
+        return {
+          command: objs[0].word,
+          trace: '名詞のみ',
+          unknown,
+          echo: echo.join(''),
+          alts: (objs[0].others || []).slice(),
+          objDisp: objs[0].disp,
+        }
+      }
       return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
     }
 
