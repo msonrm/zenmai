@@ -190,23 +190,24 @@ const finish = () => {
     const play = (row, col, dir) => {
       for (const op of R.resolve({ row, col, kind: dir ? 'flick' : 'tap', dir })) flick.opts.onOp(op)
     }
-    play(1, 1)            // な
-    play(1, 1, 'up')      // ぬ
-    play(0, 1)            // か
+    play(1, 2)            // な
+    play(1, 2, 'up')      // ぬ
+    play(0, 2)            // か
     const typed = inp.value
-    play(3, 0)            // ゛゜小 → が
+    play(3, 1)            // ゛゜小 → が
     const dakuten = inp.value
-    play(2, 1, 'left')    // や← は消してある
+    play(2, 2, 'left')    // や← は消してある
     const noParen = inp.value === dakuten
-    play(0, 3)            // ⌫
+    play(0, 4)            // ⌫
     const afterBs = inp.value
     const before = els.screen.children.length
-    play(3, 3)            // 送信
+    play(3, 4)            // 送信（↵）
     const sent = els.screen.children.length > before && inp.value === ''
     const checks = [
       ['かなが入る', typed === 'なぬか'],
       ['゛゜小で濁点', dakuten === 'なぬが'],
       ['や の左右は無い（括弧を消した）', noParen],
+      ['左端列に ← がある（標準の位置）', flick.map.layers.kana.keys.some((k) => k.row === 1 && k.col === 0)],
       ['⌫ で 1 字消える', afterBs === 'なぬ'],
       ['送信される', sent],
     ]

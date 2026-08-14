@@ -101,7 +101,9 @@
   body.pad-on.pad-open #pad { display: block }
 
   /* ★フリック盤も入力欄の下。#foot は縦並びの末尾なので、置くと本文が自動で縮む */
-  #flick { display: none; margin-top: .6em;
+  /* ★キーは正方形に近くないと押せない。エンジンの盤は `height:100%` の grid なので、
+     器が高さを持たないと**細い棒**になる（実機の指摘）。列数×行数の比で高さを決める */
+  #flick { display: none; margin: .6em auto 0; max-width: min(100%, 26em); aspect-ratio: 5 / 4;
     /* 盤の色は本文の紙に合わせる（エンジンが読む変数） */
     --fe-bg: transparent;
     --fe-key-bg: var(--panel); --fe-key-fg: var(--ink);

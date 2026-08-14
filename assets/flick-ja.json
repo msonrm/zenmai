@@ -1,36 +1,173 @@
 {
   "formatVersion": "flick-1",
   "name": "ぜんまい かなフリック",
-  "description": "ひらがなだけの 4x4 フリック。変換が無いので「変換/空白」「戻す」「英数」「かな」「句読点」を持たない。原作のパーサが受けない文字（括弧・疑問符）も出さない。",
+  "description": "ひらがなだけのフリック。12 キー標準の並びをそのまま守り（左端列・右端列も残す）、変換が無いので要らないキーだけを空けてある。括弧・疑問符・句読点は出さない。",
   "output": "kana",
   "flickConfig": {
     "inputStyle": "flick",
     "threshold": 0.35,
     "petalDelayMs": 350,
-    "repeat": { "delayMs": 500, "intervalMs": 80 }
+    "repeat": {
+      "delayMs": 500,
+      "intervalMs": 80
+    }
   },
   "initialLayer": "kana",
-  "_comment_layout": "左 3 列はかな（あかさ/たなは/まやら/小わ）で 12 キー標準と同じ並び = 指の記憶が効く。右端 1 列が機能キー（⌫ / ← / → / 送信）。標準では左右に分かれている機能キーを右に寄せ、左手側を空けた",
+  "_comment_layout": "★12 キー標準の 4 行 5 列を崩さない —— 指の記憶はキーの位置そのものに付いているので、列を詰めると効かなくなる。左端列は ← だけ残して他は空、右端列は ⌫ / → / ↵。中央 3 列は標準どおり あかさ / たなは / まやら / 小わ（、。の枠は空ける）",
   "layers": {
     "kana": {
-      "grid": { "rows": 4, "cols": 4 },
+      "grid": {
+        "rows": 4,
+        "cols": 5
+      },
       "keys": [
-        { "row": 0, "col": 0, "tap": "あ", "flick": { "left": "い", "up": "う", "right": "え", "down": "お" } },
-        { "row": 0, "col": 1, "tap": "か", "flick": { "left": "き", "up": "く", "right": "け", "down": "こ" } },
-        { "row": 0, "col": 2, "tap": "さ", "flick": { "left": "し", "up": "す", "right": "せ", "down": "そ" } },
-        { "row": 1, "col": 0, "tap": "た", "flick": { "left": "ち", "up": "つ", "right": "て", "down": "と" } },
-        { "row": 1, "col": 1, "tap": "な", "flick": { "left": "に", "up": "ぬ", "right": "ね", "down": "の" } },
-        { "row": 1, "col": 2, "tap": "は", "flick": { "left": "ひ", "up": "ふ", "right": "へ", "down": "ほ" } },
-        { "row": 2, "col": 0, "tap": "ま", "flick": { "left": "み", "up": "む", "right": "め", "down": "も" } },
-        { "row": 2, "col": 1, "tap": "や", "flick": { "up": "ゆ", "down": "よ" } },
-        { "row": 2, "col": 2, "tap": "ら", "flick": { "left": "り", "up": "る", "right": "れ", "down": "ろ" } },
-        { "row": 3, "col": 0, "label": "゛゜小", "tap": { "action": "postModify" } },
-        { "row": 3, "col": 1, "tap": "わ", "flick": { "left": "を", "up": "ん", "right": "ー" } },
-
-        { "row": 0, "col": 3, "label": "⌫", "tap": { "action": "deleteBack" } },
-        { "row": 1, "col": 3, "label": "←", "tap": { "action": "moveLeft" } },
-        { "row": 2, "col": 3, "label": "→", "tap": { "action": "moveRight" } },
-        { "row": 3, "col": 3, "label": "送信", "tap": { "action": "confirm" } }
+        {
+          "row": 0,
+          "col": 1,
+          "tap": "あ",
+          "flick": {
+            "left": "い",
+            "up": "う",
+            "right": "え",
+            "down": "お"
+          }
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "tap": "か",
+          "flick": {
+            "left": "き",
+            "up": "く",
+            "right": "け",
+            "down": "こ"
+          }
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "tap": "さ",
+          "flick": {
+            "left": "し",
+            "up": "す",
+            "right": "せ",
+            "down": "そ"
+          }
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "label": "⌫",
+          "tap": {
+            "action": "deleteBack"
+          }
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "label": "←",
+          "tap": {
+            "action": "moveLeft"
+          }
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "tap": "た",
+          "flick": {
+            "left": "ち",
+            "up": "つ",
+            "right": "て",
+            "down": "と"
+          }
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "tap": "な",
+          "flick": {
+            "left": "に",
+            "up": "ぬ",
+            "right": "ね",
+            "down": "の"
+          }
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "tap": "は",
+          "flick": {
+            "left": "ひ",
+            "up": "ふ",
+            "right": "へ",
+            "down": "ほ"
+          }
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "label": "→",
+          "tap": {
+            "action": "moveRight"
+          }
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "tap": "ま",
+          "flick": {
+            "left": "み",
+            "up": "む",
+            "right": "め",
+            "down": "も"
+          }
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "tap": "や",
+          "flick": {
+            "up": "ゆ",
+            "down": "よ"
+          }
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "tap": "ら",
+          "flick": {
+            "left": "り",
+            "up": "る",
+            "right": "れ",
+            "down": "ろ"
+          }
+        },
+        {
+          "row": 3,
+          "col": 1,
+          "label": "゛゜小",
+          "tap": {
+            "action": "postModify"
+          }
+        },
+        {
+          "row": 3,
+          "col": 2,
+          "tap": "わ",
+          "flick": {
+            "left": "を",
+            "up": "ん",
+            "right": "ー"
+          }
+        },
+        {
+          "row": 3,
+          "col": 4,
+          "label": "↵",
+          "tap": {
+            "action": "confirm"
+          }
+        }
       ]
     }
   }
