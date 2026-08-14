@@ -128,7 +128,7 @@
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
       if (Glk.waitingFor() === 'char') $('input').placeholder = '何かキーを（Enter で進む）'
-      else $('input').placeholder = '日本語で打つ（例: 郵便箱を開ける）'
+      else $('input').placeholder = 'ひらがなで打つ（例: ゆうびんばこをあける）'
       $('input').focus()
     },
   })

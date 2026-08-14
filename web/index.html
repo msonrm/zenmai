@@ -62,8 +62,11 @@
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
   #screen p { margin: 0 0 .9em; white-space: pre-wrap }
   /* ★場所名の行。原作は改行だけで区切る（1980 年の端末の書式）が、
-     ここは HTML なので段落の頭だと分かるようにする。太字にはしない */
-  #screen p.room { color: var(--accent); letter-spacing: .06em; margin: 1.6em 0 .35em }
+     ここは HTML なので段落の頭だと分かるようにする。
+     ★色は**本文と同じ**にする —— 場所名は情景描写の側であって、
+     打ったコマンド（--accent）と同じ色にすると出所が混ざって見える。
+     差は字間と余白だけ。太字にもしない */
+  #screen p.room { color: var(--ink); letter-spacing: .12em; margin: 1.7em 0 .4em }
   #screen p.room:first-child { margin-top: 0 }
   #screen p.cmd { color: var(--accent) }
   #screen p.cmd::before { content: "> " }
@@ -112,7 +115,7 @@
     <div id="prompt" class="gutter">
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
-             spellcheck="false" placeholder="日本語で打つ（例: 郵便箱を開ける）">
+             spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
     </div>
     <span id="stat"></span>
   </div>
