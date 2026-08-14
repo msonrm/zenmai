@@ -51,11 +51,13 @@
   ruby { ruby-position: over }
   ruby rt { font-size: .5em; color: var(--dim); letter-spacing: 0; font-weight: normal }
   body.no-ruby rt { display: none }
-  #ruby-btn {
-    flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
-    color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
+  /* ★操作はすべて右下に集める。ヘッダは**状態行**（ゲームが持つ情報）を描く場所なので、
+     そこに操作を置かない */
+  #meta button {
+    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--dim); font: inherit; font-size: .7rem; padding: 0 .45em; cursor: pointer;
   }
-  #ruby-btn:hover { color: var(--ink); border-color: var(--accent) }
+  #meta button:hover { color: var(--ink); border-color: var(--accent) }
   body.no-ruby #ruby-btn { opacity: .55 }
 
   /* ── 本文 ── */
@@ -96,14 +98,9 @@
      ★種明かし（渡した英語コマンド）と成績は**同じ性質**なので、まとめて 1 つで入切する */
   #meta {
     position: absolute; right: 1.2em; bottom: .15em;
-    display: flex; align-items: center; gap: .6em;
+    display: flex; align-items: center; gap: .45em;
   }
   #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
-  #peek-btn {
-    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
-    color: var(--dim); font: inherit; font-size: .7rem; padding: 0 .45em; cursor: pointer;
-  }
-  #peek-btn:hover { color: var(--ink); border-color: var(--accent) }
   body.no-peek #peek-btn { opacity: .55 }
   body.no-peek #stat { display: none }
   body.no-peek #screen p.sent { display: none }
@@ -118,7 +115,6 @@
     <span id="title"><b>ぜんまい</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
     <span id="place">　</span>
     <span id="score"></span>
-    <button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button>
   </div>
   <div id="screen" class="gutter" aria-live="polite"></div>
   <div id="foot">
@@ -127,7 +123,7 @@
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
     </div>
-    <span id="meta"><button id="peek-btn" type="button" title="渡した英語コマンドと成績の表示を切り替える">種明かし</button><span id="stat"></span></span>
+    <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="peek-btn" type="button" title="渡した英語コマンドと成績の表示を切り替える">種明かし</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
