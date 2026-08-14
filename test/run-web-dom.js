@@ -36,10 +36,14 @@ class El {
   remove() { for (const el of Object.values(els)) { const i = el.children.indexOf(this); if (i >= 0) el.children.splice(i, 1) } }
   get lastElementChild() { return this.children[this.children.length - 1] }
   addEventListener(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn) }
+  // 入力欄のキャレット（ゲームパッドの挿入・削除に要る）
+  setSelectionRange(a, b) { this.selectionStart = a; this.selectionEnd = b }
+  querySelectorAll() { return [] }
+  querySelector() { return null }
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
@@ -48,7 +52,19 @@ const store = {}
 global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }
 global.atob = (b64) => Buffer.from(b64, 'base64').toString('binary')
 global.btoa = (bin) => Buffer.from(bin, 'binary').toString('base64')
-document.body = { classList: { _s: new Set(), add(c) { this._s.add(c) }, toggle(c) { this._s.has(c) ? this._s.delete(c) : this._s.add(c); return this._s.has(c) } } }
+document.body = {
+  classList: {
+    _s: new Set(),
+    add(c) { this._s.add(c) },
+    contains(c) { return this._s.has(c) },
+    toggle(c, on) {
+      const want = on === undefined ? !this._s.has(c) : !!on
+      if (want) this._s.add(c); else this._s.delete(c)
+      return want
+    },
+  },
+}
+document.querySelectorAll = () => []
 global.window = window
 global.document = document
 global.fetch = async (url) => {
@@ -67,6 +83,15 @@ for (const rel of srcs) {
   if (rel === 'main.js') continue                    // main.js は DOM を用意してから
   const f = path.normalize(path.join('web', rel))
   vm2.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f })
+}
+// ★ゲームパッドの配線を器のまま試す。実機が無くても**こちらが書いた部分**は確かめられる
+const pad = {}
+// node 22 の navigator は getter だけなので上書きする
+Object.defineProperty(global, 'navigator', { value: { getGamepads: () => [] }, configurable: true })
+window.GamepadEngine = {
+  version: 'fake',
+  start(o) { pad.onOp = o.onOp; pad.onState = o.onState; return { stop() {}, setEnabled() {} } },
+  mount() { return { update() {}, destroy() {} } },
 }
 if (!window.ZVM) window.ZVM = module.exports && module.exports.prototype ? module.exports : global.ZVM
 vm2.runInThisContext(fs.readFileSync(path.join(ROOT, 'web', 'main.js'), 'utf8'), { filename: 'web/main.js' })
@@ -91,6 +116,32 @@ const finish = () => {
   const rooms = els.screen.children.filter((p) => p.className === 'room')
   console.log('--- 場所名の段落: ' + rooms.length + ' 件　' + rooms.map((p) => p.textContent).join(' / '))
   if (cmds.length && !rooms.length) { console.error('★場所名が切り出されていない'); process.exit(1) }
+  // ★ゲームパッドの配線（実機が無くても op から先は同じ道を通る）
+  if (pad.onOp) {
+    const inp = els.input
+    pad.onState({ connected: true, activeRow: 1, activeLayer: 'base', previewChar: null, pressed: new Set(), axes: [] })
+    const consonant = els['pad-btn'].textContent
+    inp.value = ''; inp.selectionStart = 0
+    for (const t of ['か', 'き', 'く']) { pad.onOp({ type: 'kana', text: t, replace: 0 }) }
+    pad.onOp({ type: 'kana', text: 'ぐ', replace: 1 })          // 濁点は末尾差し替え
+    const typed = inp.value
+    pad.onOp({ type: 'kana', text: '？', replace: 0 })           // 要らない記号は落とす
+    const dropped = inp.value === typed
+    pad.onOp({ type: 'key', tap: { key: 'Backspace' } })
+    const afterBs = inp.value
+    const before = els.screen.children.length
+    pad.onOp({ type: 'kana', text: '、', replace: 0 })           // ★R🕹↓ は送信
+    const sent = els.screen.children.length > before && inp.value === ''
+    const checks = [
+      ['子音の札が出る（か行）', consonant === 'か'],
+      ['かなが入る', typed === 'かきぐ'],
+      ['要らない記号を落とす', dropped],
+      ['R🕹← で 1 字消える', afterBs === 'かき'],
+      ['R🕹↓ で送信される', sent],
+    ]
+    for (const [name, ok] of checks) console.log(`--- ゲームパッド ${ok ? '✓' : '✗'} ${name}`)
+    if (checks.some(([, ok]) => !ok)) { console.error('★ゲームパッドの配線が壊れている'); process.exit(1) }
+  }
   // ★ふりがなが実際に振られているか（入力はかなだけなので、これは操作系）
   const html = els.screen.children.map((p) => p.innerHTML).join('')
   const rt = [...html.matchAll(/<ruby>([^<]*)<rt>([^<]*)<\/rt><\/ruby>/g)]

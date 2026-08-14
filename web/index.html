@@ -86,6 +86,19 @@
   }
   /* `>` の左端が本文の左端、入力欄の右端が本文の右端に来る */
   #prompt { display: flex; align-items: baseline; gap: .5em }
+  /* ★ゲームパッドの札。**いま選んでいる子音**を出す（左手の探索の助けになる）。
+     押すと操作図の開閉。接続していないときは出さない */
+  #pad-btn {
+    flex: 0 0 auto; display: none; min-width: 2.6em; text-align: center;
+    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--accent); font: inherit; font-size: 1.05em; line-height: 1.5;
+    padding: 0 .35em; cursor: pointer;
+  }
+  #pad-btn:hover { border-color: var(--accent) }
+  body.pad-on #pad-btn { display: block }
+  /* 操作図は入力欄の下。畳めるようにする */
+  #pad { display: none; margin-top: .6em; overflow-x: auto }
+  body.pad-on.pad-open #pad { display: block }
   #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
   #input {
     flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
@@ -122,11 +135,14 @@
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
+      <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>
+    <div id="pad" class="gutter"></div>
     <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
+  <script src="../vendor/gamepad-engine.js"></script>
   <script src="../src/ruby.js"></script>
   <script src="../src/translate.js"></script>
   <script src="../src/command.js"></script>

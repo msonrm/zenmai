@@ -164,7 +164,11 @@
 
   $('input').addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return
-    const text = $('input').value
+    send($('input').value)
+  })
+
+  // ★1 行を送る道は 1 本にする（キーボードもゲームパッドもここを通る）
+  function send(text) {
     $('input').value = ''
     if (Glk.waitingFor() === 'char') { Glk.submitChar(32); return }
     // ★日本語で打たれたら英語コマンドへ翻訳する。英語ならそのまま通す
@@ -190,7 +194,7 @@
     // 送ったのが**動詞だけ**なら、次の入力は聞き返しへの答えとみなす
     pendingVerb = null
     submit(r.command)
-  })
+  }
 
   function sent(cmd, note) {
     const p = document.createElement('p')
@@ -205,6 +209,89 @@
     const t = rhs.match(/Time:\s*(\d+):(\d+)\s*([AP]M)/)
     if (t) return `${t[3] === 'PM' ? '午後' : '午前'} ${t[1]}時${t[2]}分`
     return rhs
+  }
+
+  // ================= ゲームパッド =================
+  // ★labo の GamepadEngine（v1.7.0）をそのまま使い、**ホスト側で op を絞る**。
+  //   ここは変換をしない（ひらがなをそのまま送る）ので、要らない操作を落とすだけで足りる。
+  const ROW_KANA = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ']
+  // ★この企画で要らない文字 —— 句読点・括弧・疑問符。原作のパーサは受け取らない
+  const DROP = new Set(['、', '。', '「', '」', '？', ' ', '　'])
+
+  function padInsert(text, replace) {
+    const el = $('input')
+    const at = el.selectionStart == null ? el.value.length : el.selectionStart
+    const cut = Math.max(0, at - (replace || 0))
+    el.value = el.value.slice(0, cut) + text + el.value.slice(at)
+    const pos = cut + text.length
+    el.setSelectionRange(pos, pos)
+  }
+
+  function padKey(key) {
+    const el = $('input')
+    const at = el.selectionStart == null ? el.value.length : el.selectionStart
+    if (key === 'Enter') { send(el.value); return }
+    if (key === 'Backspace') { padInsert('', 1); return }
+    if (key === 'Escape') { el.value = ''; return }
+    // ★左スティックはキャレット移動だけ（変換が無いので候補送り・文節移動は要らない）
+    if (key === 'ArrowLeft') { el.setSelectionRange(Math.max(0, at - 1), Math.max(0, at - 1)); return }
+    if (key === 'ArrowRight') {
+      const p = Math.min(el.value.length, at + 1)
+      el.setSelectionRange(p, p)
+    }
+  }
+
+  // ★操作図は labo のものをそのまま使い、**この企画で変えた所だけ札を書き換える**
+  //   （エンジンには手を入れない。図と実際の挙動がずれるほうが害が大きい）
+  function patchPad(root) {
+    const SWAP = { '、。␣': '送信', '「': '', '」': '', '？': '' }
+    for (const el of root.querySelectorAll('*')) {
+      if (el.children.length) continue
+      const t = (el.textContent || '').trim()
+      if (t in SWAP) el.textContent = SWAP[t]
+    }
+    const guide = root.querySelector('.ge-guide')
+    if (!guide) return
+    guide.textContent = ''
+    for (const g of ['LT 拗音/っ', 'LT+RT っ', 'RT ん', 'R🕹↓ 送信', 'R🕹↑ ゛゜',
+      'R🕹→ ー', 'R🕹← 1字消す', 'L🕹←→ カーソル', 'LS 送信', 'RS 全部消す']) {
+      const sp = document.createElement('span')
+      sp.textContent = g
+      guide.appendChild(sp)
+    }
+  }
+
+  if (window.GamepadEngine && typeof navigator !== 'undefined' && navigator.getGamepads) {
+    let vis = null
+    const padOpen = () => document.body.classList.contains('pad-open')
+    const showPad = (on) => {
+      document.body.classList.toggle('pad-open', on)
+      localStorage.setItem('zenmai-pad', on ? 'on' : 'off')
+      if (on && !vis) { vis = window.GamepadEngine.mount($('pad')); patchPad($('pad')) }
+      if (!on && vis) { vis.destroy(); vis = null }
+    }
+    $('pad-btn').addEventListener('click', () => { showPad(!padOpen()); $('input').focus() })
+
+    window.GamepadEngine.start({
+      getComposingTail: () => '',           // 変換しないので合成末尾は常に空
+      onOp(op) {
+        if (op.type === 'kana') {
+          // ★R🕹↓ は句読点だった。ここでは**コマンド送信**に使う（要らない記号は落とす）
+          if (op.text === '、') { send($('input').value); return }
+          if (DROP.has(op.text)) return
+          padInsert(op.text, op.replace || 0)
+          return
+        }
+        if (op.type === 'key' && op.tap) padKey(op.tap.key)
+      },
+      onState(st) {
+        document.body.classList.toggle('pad-on', !!st.connected)
+        if (st.connected && localStorage.getItem('zenmai-pad') !== 'off' && !padOpen()) showPad(true)
+        const row = ROW_KANA[st.activeRow] || 'あ'
+        $('pad-btn').textContent = st.previewChar || row
+        if (vis) vis.update(st)
+      },
+    })
   }
 
   const vm = new window.ZVM()
