@@ -146,6 +146,12 @@
     --fe-petal-bg: var(--panel); --fe-petal-fg: var(--ink); --fe-petal-hot-bg: var(--accent);
   }
   body.flick-open #flick { display: block }
+  /* ★キーの字は**盤の大きさ**で決める。エンジンの既定は `vmin` 基準なので、
+     スマホ（縦持ちは vmin = 画面幅）だと下限に張り付いて読めない ——
+     改行キーが何の記号か分からない、という指摘。盤を容れ物にして測る */
+  #flick { container-type: inline-size }
+  #flick .fe-key { font-size: clamp(16px, 7cqw, 30px) }
+  #flick .fe-key.fe-fn { font-size: clamp(14px, 6cqw, 24px) }
   #flick-btn {
     flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
     color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
@@ -178,13 +184,10 @@
   body.no-debug #debug-btn { opacity: .55 }
   body.no-debug #stat { display: none }
   body.no-debug #screen p.sent { display: none }
-  /* ★狭いときは説明を**隠さず 2 行にする**（スマホで「ぜんまい」しか見えなかった）。
-     畳むと、その画面の人だけ「これが何か」を知らないまま遊ぶことになる */
-  @media (max-width: 46em) {
-    #head { align-items: flex-start }
-    #title .tag { display: block; font-size: .85em; margin-top: .1em }
-    #title .tag::before { content: none }
-  }
+  /* ★狭いときは説明を隠す。2 行にしてみたが**場所名を押しつぶした**（実機の指摘）——
+     ヘッダは**状態行**（場所・得点という機能）なので、飾りが機能を押しのけてはいけない。
+     「これが何か」は入口の案内が毎回伝えるので、ここで失われるものは無い */
+  @media (max-width: 46em) { #title .tag { display: none } }
   /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
   @media (max-width: 40em) { #stat { display: none } }
 </style>
