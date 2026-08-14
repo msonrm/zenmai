@@ -11,7 +11,10 @@
   const { createCommander } = window.ZenmaiCommand
   const { createRubifier } = window.ZenmaiRuby
 
-  const asset = await (await fetch('../assets/zork1-ja.json')).json()
+  // ★アセットは差し替わる。ブラウザのキャッシュが残ると、訳文と語彙の版がずれて
+  //   「画面には新しい名前が出るのに、その名前で打てない」という混乱が起きる（実プレイで発生）
+  const load = async (p) => (await fetch(p, { cache: 'no-store' })).json()
+  const asset = await load('../assets/zork1-ja.json')
   const tr = new Translator(asset)
   const rb = createRubifier(asset.ruby)
 
@@ -22,7 +25,7 @@
     localStorage.setItem('zenmai-ruby', off ? 'off' : 'on')
     $('input').focus()
   })
-  const cm = createCommander(await (await fetch('../assets/zork1-cmd.json')).json())
+  const cm = createCommander(await load('../assets/zork1-cmd.json'))
 
   // story file は同梱しない（MIT のソースから各自でビルドするか取得する）
   let story = null
