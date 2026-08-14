@@ -53,7 +53,7 @@ const CASES = [
   ['きにのぼる', 'climb tree'],             // 「に・へ」だけは例外（ただ目的語を指す）
   // --- 同じ日本語が別の英単語の物を指す（2026-08-14 実プレイ）---
   //   原作は 1 語しか受けないので候補を順に試す。第一候補だけ固定表で見る
-  ['はこをみる', 'look at case'],     // 第一候補。外れたらホストが順に試す
+  ['とろふぃーけーすをみる', 'look at case'],   // 名前をずらしたので一発で当たる
   ['ゆうびんばこをあける', 'open mailbox'],
   // --- 知らない言葉は黙って捨てない ---
   ['ぶんぶんをあける', null],               // 「を」が付く未知語 = 物のつもり → 止める
@@ -62,6 +62,15 @@ const CASES = [
 ]
 
 let ng = 0
+// ★総称は**候補が揃っていること**を見る（第一候補は順位付けの都合で動く）
+{
+  const r = cm.toCommand('はこをみる')
+  const got = [r.command, ...(r.alts || [])].sort().join(' / ')
+  const want = ['look at case', 'look at chest', 'look at mailbox', 'look at trunk'].join(' / ')
+  const ok = got === want
+  if (!ok) ng++
+  console.log(`${ok ? '✓' : '✗'} はこをみる（候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+}
 for (const [ja, want] of CASES) {
   const r = cm.toCommand(ja)
   const ok = r.command === want

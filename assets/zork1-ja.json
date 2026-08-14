@@ -618,7 +618,7 @@
   "---> Frobozz Magic Gunk Company <---| All-Purpose Gunk": "---> フロボッズ魔法粘着剤商会 <---| 万能粘着剤",
   ". To the west is a cyclops-shaped opening in an old wooden door, above which is some strange gothic lettering,": "、西には古い木の扉にサイクロプスの形の穴が開いていて、その上に奇妙なゴシック文字が記されている。そして",
   "A \"lean and hungry\" gentleman just wandered through, carrying a large bag. Finding nothing of value, he left disgruntled.": "「痩せて飢えた」紳士が大きな袋を持って通りかかった。値打ちのあるものが無かったので、不満げに去っていった。",
-  "A battery-powered brass lantern is on the trophy case.": "電池式の真鍮のランタンが、トロフィー箱の上にある。",
+  "A battery-powered brass lantern is on the trophy case.": "電池式の真鍮のランタンが、トロフィーケースの上にある。",
   "A beautiful rainbow can be seen over the falls and to the west.": "美しい虹が滝の上、そして西の方に見える。",
   "A booming voice says \"Wrong, cretin!\" and you notice that you have turned into a pile of dust. How, I can't imagine.": "轟く声が「違う、愚か者」と言い、気づけばきみは塵の山になっている。どうやってかは想像もつかない。",
   "A bottle is sitting on the table.": "瓶が食卓に置かれている。",
@@ -656,7 +656,7 @@
   "A troll is here.": "トロルがいる。",
   "A valiant attempt.": "勇敢な試みだ。",
   "Aaaarrrrgggghhhh!": "ぎゃああああああ。",
-  "Above the trophy case hangs an elvish sword of great antiquity.": "トロフィー箱の上に、たいへん古いエルフの剣が掛かっている。",
+  "Above the trophy case hangs an elvish sword of great antiquity.": "トロフィーケースの上に、たいへん古いエルフの剣が掛かっている。",
   "Above you is a grating locked with a skull-and-crossbones lock.": "頭上には、髑髏と骨の錠で施錠された格子がある。",
   "Above you is a grating.": "頭上に格子がある。",
   "Above you is an open grating with sunlight pouring in.": "頭上には開いた格子があり、日の光が注ぎ込んでいる。",
@@ -799,7 +799,7 @@
   "In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile.": "鳥の巣の中に、宝石をちりばめた大きな卵がある。子のない小鳥が拾ってきたものらしい。卵は繊細な金の象嵌に覆われ、瑠璃と真珠母で飾られている。ふつうの卵とは違って蝶番が付いており、いかにも壊れやすそうな留め金で閉じられている。ひどく脆く見える。",
   "In the corner of the room on the ceiling is a large vampire bat who is obviously deranged and holding his nose.": "部屋の隅の天井に、大きな吸血蝙蝠がいる。明らかに気が触れており、鼻をつまんでいる。",
   "In the movies, your life would be passing before your eyes.": "映画なら、ここで人生が走馬灯になるところだ。",
-  "In the trophy case is an ancient parchment which appears to be a map.": "トロフィー箱の中に、地図らしい古い羊皮紙がある。",
+  "In the trophy case is an ancient parchment which appears to be a map.": "トロフィーケースの中に、地図らしい古い羊皮紙がある。",
   "In your confusion, the candles drop to the ground (and they are out).": "慌てたはずみに、蝋燭が地面に落ちた（そして消えた）。",
   "Inflating it further would probably burst it.": "これ以上膨らませたら破れるだろう。",
   "Insults of this nature won't help you.": "その手の悪態は役に立たない。",
@@ -1199,7 +1199,7 @@
   "The troll's swing almost knocks you over as you barely parry in time.": "きみはぎりぎりで受けたが、トロルの一振りに倒されかけた。",
   "The troll, angered and humiliated, recovers his weapon. He appears to have an axe to grind with you.": "怒りと恥辱にまみれたトロルが武器を取り戻す。きみに含むところがあるらしい。",
   "The troll, disarmed, cowers in terror, pleading for his life in the guttural tongue of the trolls.": "武器を失ったトロルは恐怖に縮み上がり、トロルの喉を鳴らす言葉で命乞いをする。",
-  "The trophy case is securely fastened to the wall.": "トロフィー箱は壁にしっかりと留められている。",
+  "The trophy case is securely fastened to the wall.": "トロフィーケースは壁にしっかりと留められている。",
   "The tube is apparently empty.": "筒は空のようだ。",
   "The tube is closed.": "筒は閉じている。",
   "The tube refuses to accept anything.": "筒は何も受け付けない。",
@@ -1569,7 +1569,7 @@
   "Your sword is no longer glowing.": "剣の光は消えた。",
   "ZORK owner's manual": "ZORK 取扱説明書",
   "ZORK: The Great Underground Empire.|": "ZORK：大地下帝国。|",
-  "a trophy case,": "トロフィー箱があり、",
+  "a trophy case,": "トロフィーケースがあり、",
   "ancient map": "古い地図",
   "and a closed trap door at your feet.": "足元には閉じた揚げ戸がある。",
   "and a large oriental rug in the center of the room.": "部屋の中央に大きな東洋風の絨毯が敷かれている。",
@@ -1640,8 +1640,8 @@
   "tan label": "黄褐色の札",
   "tour guidebook": "案内書",
   "trap door": "揚げ戸",
-  "trophy case": "トロフィー箱",
-  "trunk of jewels": "宝石の詰まった箱",
+  "trophy case": "トロフィーケース",
+  "trunk of jewels": "宝石の詰まったトランク",
   "viscous material": "粘りのある物質",
   "wall with engravings": "彫刻のある壁",
   "white cliffs": "白い崖",
@@ -1844,7 +1844,7 @@
    "prop": "TEXT"
   },
   "A battery-powered brass lantern is on the trophy case.": {
-   "ja": "電池式の真鍮のランタンが、トロフィー箱の上にある。",
+   "ja": "電池式の真鍮のランタンが、トロフィーケースの上にある。",
    "owner": "LAMP",
    "prop": "FDESC"
   },
@@ -1889,7 +1889,7 @@
    "prop": "LDESC"
   },
   "Above the trophy case hangs an elvish sword of great antiquity.": {
-   "ja": "トロフィー箱の上に、たいへん古いエルフの剣が掛かっている。",
+   "ja": "トロフィーケースの上に、たいへん古いエルフの剣が掛かっている。",
    "owner": "SWORD",
    "prop": "FDESC"
   },
@@ -2124,7 +2124,7 @@
    "prop": "FDESC"
   },
   "In the trophy case is an ancient parchment which appears to be a map.": {
-   "ja": "トロフィー箱の中に、地図らしい古い羊皮紙がある。",
+   "ja": "トロフィーケースの中に、地図らしい古い羊皮紙がある。",
    "owner": "MAP",
    "prop": "FDESC"
   },
@@ -3369,12 +3369,12 @@
    "prop": "DESC"
   },
   "trophy case": {
-   "ja": "トロフィー箱",
+   "ja": "トロフィーケース",
    "owner": "TROPHY-CASE",
    "prop": "DESC"
   },
   "trunk of jewels": {
-   "ja": "宝石の詰まった箱",
+   "ja": "宝石の詰まったトランク",
    "owner": "TRUNK",
    "prop": "DESC"
   },
@@ -3528,16 +3528,6 @@
    [
     "腕輪",
     "うでわ"
-   ]
-  ],
-  "トロフィー箱": [
-   [
-    "トロフィー",
-    null
-   ],
-   [
-    "箱",
-    "ばこ"
    ]
   ],
   "ビニールの塊": [
@@ -4054,7 +4044,7 @@
     "かんりょう"
    ]
   ],
-  "宝石の詰まった箱": [
+  "宝石の詰まったトランク": [
    [
     "宝石",
     "ほうせき"
@@ -4068,12 +4058,8 @@
     "つ"
    ],
    [
-    "まった",
+    "まったトランク",
     null
-   ],
-   [
-    "箱",
-    "はこ"
    ]
   ],
   "宝石をちりばめた卵": [
@@ -5164,9 +5150,9 @@
     "くさ"
    ]
   ],
-  "船": [
+  "舟": [
    [
-    "船",
+    "舟",
     "ふね"
    ]
   ],
@@ -6777,7 +6763,7 @@
   "board": "乗る",
   "boarded window": "板で塞がれた窓",
   "boards": "板",
-  "boat": "船",
+  "boat": "舟",
   "bodies": "死体の山",
   "bolt": "ボルト",
   "bones": "骸骨",
@@ -6805,7 +6791,7 @@
   "canary": "からくりカナリア",
   "candles": "一対の蝋燭",
   "carved": "美しい宝石の甲虫",
-  "case": "トロフィー箱",
+  "case": "トロフィーケース",
   "chalice": "聖杯",
   "chest": "道具箱の山",
   "chimney": "煙突",
@@ -6929,7 +6915,7 @@
   "knock": "叩く",
   "label": "黄褐色の札",
   "ladder": "木の梯子",
-  "lamp": "ランタン",
+  "lamp": "ランプ",
   "lantern": "燃え尽きたランタン",
   "large bag": "大きな袋",
   "large book": "黒い書物",
@@ -6976,7 +6962,7 @@
   "odysseus": "オデュッセウス",
   "off": "を外して",
   "old bag": "革の金貨袋",
-  "old trunk": "宝石の詰まった箱",
+  "old trunk": "宝石の詰まったトランク",
   "old wall": "彫刻のある壁",
   "on": "の上に",
   "open": "開ける",
@@ -7116,9 +7102,9 @@
   "tree": "木",
   "trident": "水晶の三叉槍",
   "troll": "トロル",
-  "trophy": "トロフィー箱",
-  "trophy case": "トロフィー箱",
-  "trunk": "宝石の詰まった箱",
+  "trophy": "トロフィーケース",
+  "trophy case": "トロフィーケース",
+  "trunk": "宝石の詰まったトランク",
   "tube": "筒",
   "turn": "回す",
   "twisting": "滑り台",
