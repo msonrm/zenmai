@@ -198,17 +198,17 @@
   {
    "en": "The lamp has burned out.",
    "id": "L-6",
-   "ja": "ランプは燃え尽きた。"
+   "ja": "ランタンは燃え尽きた。"
   },
   {
    "en": "The lamp is on.",
    "id": "L-7",
-   "ja": "ランプは点いている。"
+   "ja": "ランタンは点いている。"
   },
   {
    "en": "The lamp is turned off.",
    "id": "L-8",
-   "ja": "ランプは消えている。"
+   "ja": "ランタンは消えている。"
   },
   {
    "en": "The rug is too heavy to lift, but in trying to take it you have noticed an irregularity beneath it.",
@@ -633,7 +633,7 @@
   "A booming voice says \"Wrong, cretin!\" and you notice that you have turned into a pile of dust. How, I can't imagine.": "轟く声が「違う、愚か者」と言い、気づけばきみは塵の山になっている。どうやってかは想像もつかない。",
   "A bottle is sitting on the table.": "瓶が食卓に置かれている。",
   "A brilliant maneuver destroys the bottle.": "見事な手際で瓶を割った。",
-  "A burned-out lamp won't light.": "燃え尽きたランプには火は入らない。",
+  "A burned-out lamp won't light.": "燃え尽きたランタンには火は入らない。",
   "A chasm runs southwest to northeast and the path follows it. You are on the south side of the chasm, where a crack opens into a passage.": "裂け目が南西から北東へ走り、小道がそれに沿っている。きみは裂け目の南側にいて、そこでは割れ目が通路へと開いている。",
   "A cyclops, who looks prepared to eat horses (much less mere adventurers), blocks the staircase. From his state of health, and the bloodstains on the walls, you gather that he is not very friendly, though he likes people.": "馬でも食べそうな（ただの冒険者などなおさらだ）サイクロプスが階段を塞いでいる。その健康ぶりと壁の血の染みから、愛想はよくないが人は好きなのだと察せられる。",
   "A dazzling display of color briefly emanates from the sceptre.": "王笏から目を奪う色彩が、短いあいだ放たれた。",
@@ -1097,11 +1097,11 @@
   "The hole is getting deeper, but that's about it.": "穴は深くなってきたが、それだけだ。",
   "The house is a beautiful colonial house which is painted white. It is clear that the owners must have been extremely wealthy.": "白く塗られた美しいコロニアル様式の家だ。持ち主がたいへん裕福だったことは明らかだ。",
   "The incantation echoes back faintly, but nothing else happens.": "呪文はかすかにこだまを返したが、それだけだった。",
-  "The lamp appears a bit dimmer.": "ランプの明かりが少し弱くなったようだ。",
-  "The lamp has already burned out.": "ランプはもう燃え尽きている。",
-  "The lamp has smashed into the floor, and the light has gone out.": "ランプは床に叩きつけられ、明かりは消えた。",
-  "The lamp is definitely dimmer now.": "ランプの明かりは、はっきりと弱くなった。",
-  "The lamp is nearly out.": "ランプはもうほとんど尽きている。",
+  "The lamp appears a bit dimmer.": "ランタンの明かりが少し弱くなったようだ。",
+  "The lamp has already burned out.": "ランタンはもう燃え尽きている。",
+  "The lamp has smashed into the floor, and the light has gone out.": "ランタンは床に叩きつけられ、明かりは消えた。",
+  "The lamp is definitely dimmer now.": "ランタンの明かりは、はっきりと弱くなった。",
+  "The lamp is nearly out.": "ランタンはもうほとんど尽きている。",
   "The leaves burn, and so do you.": "落ち葉が燃え、きみも燃える。",
   "The leaves burn.": "落ち葉が燃える。",
   "The lid closes.": "蓋が閉じた。",
@@ -6798,7 +6798,7 @@
   "burning candles": "一対の蝋燭",
   "button": "ボタン",
   "cage": "籠",
-  "canary": "からくりカナリア",
+  "canary": "カナリア",
   "candles": "一対の蝋燭",
   "carved": "美しい宝石の甲虫",
   "case": "トロフィーケース",
@@ -6925,7 +6925,7 @@
   "knock": "叩く",
   "label": "黄褐色の札",
   "ladder": "木の梯子",
-  "lamp": "ランプ",
+  "lamp": "ランタン",
   "lantern": "燃え尽きたランタン",
   "large bag": "大きな袋",
   "large book": "黒い書物",

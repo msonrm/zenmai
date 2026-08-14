@@ -57,6 +57,8 @@ const kana = (s) => String(s)
 const NEGATIVE = /(ない|ないで|ぬ|ません|なかった)$/
 
 function createCommander(asset) {
+  // ★原作に無い言い方への案内（`zork1-guide.md`）。「知らない言葉」で突き放さない
+  const guide = asset.guide || {}
   // 語彙をひとつの表に畳んで、長いものから当てる（逐次入力の配列エンジンと同じ最長一致）
   const lex = []
   for (const [key, v] of Object.entries(asset.verbs || {})) {
@@ -207,7 +209,10 @@ function createCommander(asset) {
       echo.push(s.slice(i, j))
       i = j
     }
-    if (hardStop) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
+    if (hardStop) {
+      const g = unknown.map((w) => guide[kana(w)]).find(Boolean)
+      return { command: null, trace: '知らない言葉', note: g || '', unknown, echo: echo.join('') }
+    }
     let verb = found.find((f) => f.kind === 'verb')
     const dirs = found.filter((f) => f.kind === 'dir')
     const objs = found.filter((f) => f.kind === 'obj')
@@ -226,7 +231,10 @@ function createCommander(asset) {
       // ★知らない言葉が混じっているなら、それを言う。
       //   黙って名詞だけ送ると原作が「その文には動詞がない」と返し、
       //   **打った本人は動詞を打っているので誤解を招く**（今日の方針: 黙って外すより言う）
-      if (unknown.length) return { command: null, trace: '知らない言葉', unknown, echo: echo.join('') }
+      if (unknown.length) {
+        const g = unknown.map((w) => guide[kana(w)]).find(Boolean)
+        return { command: null, trace: '知らない言葉', note: g || '', unknown, echo: echo.join('') }
+      }
       // 名詞だけ（「絨毯」）→ 原作の「何を？」に任せる
       // ★聞き返しへの答えはここを通る。別案もここで出す（`じょう` = 格子 / 揚げ戸）
       if (objs.length) {
@@ -240,6 +248,7 @@ function createCommander(asset) {
         }
       }
       return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
+      
     }
 
     // ★「家の扉」の「家」は目的語ではなく**修飾語**。日本語は修飾語が前に来るので、
