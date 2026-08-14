@@ -93,6 +93,14 @@ class Translator {
   word(en) {
     const hit = this.one(en)
     if (hit !== null) return hit
+    // ★前置詞つきの句が入ることがある（`(with the sword)` ＝ パーサが道具を補った復唱）。
+    //   日本語では**助詞が後ろに付く**ので、訳語の後ろに回すだけで通る
+    const pp = String(en).match(/^(with|in|on|at|to|from|under|behind|over|through|around)\s+(.+)$/i)
+    if (pp) {
+      const obj = this.one(pp[2])
+      const par = this.words.get(pp[1].toLowerCase())
+      if (obj !== null && par) return obj + par
+    }
     // ★スロットには**並び**が入ることがある（`a clove of garlic, and a lunch`）。
     //   全部引けたときだけ「と」で繋ぐ。1 つでも引けなければ諦める（半分英語より、全部英語）
     const parts = String(en).split(/,\s*and\s+|\s+and\s+|,\s*/).filter((x) => x.trim())
