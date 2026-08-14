@@ -61,12 +61,22 @@
     screen.scrollTop = screen.scrollHeight
   }
 
+  // ★同じ日本語が別の英単語の物を指すことがある（箱 = mailbox / case / chest / trunk）。
+  //   原作は 1 語しか受けないので、**順に試す**。
+  //   `You can't see any X here!` は**手数を消費しない**ので、試しても盤面は動かない。
+  let trial = null        // { alts: [...], buf: '' }
+  let rawSince = ''       // 送ってからの英語（判定はここでする。訳文で判定しない）
+  const NOT_HERE = /can't see any .* here!/i
+
+  const sink = (t) => { if (trial) trial.buf += t; else show(t) }
+
   const Glk = createGlk({
     cols: 64,
     rows: 24,
     write(text) {
+      rawSince += text
       const out = tr.feed(text)
-      if (out) show(strip(out))
+      if (out) sink(strip(out))
     },
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
@@ -78,7 +88,22 @@
       // ★ゲーム自身が入力待ちの前に `>` を印字する。こちらは入力欄に自前の
       //   プロンプトを持っているので、二重に出さないよう落とす
       const rest = strip(tr.flush())
-      if (rest.trim()) show(rest)
+      if (rest.trim()) sink(rest)
+      if (trial) {
+        if (NOT_HERE.test(rawSince) && trial.alts.length) {
+          const next = trial.alts.shift()
+          // ★全部外れたときは**最初の返事**を見せる（打っていない名前を出さないため）
+          if (trial.first === null) trial.first = trial.buf
+          trial.buf = ''
+          sent(next, '　……別の物として試す')
+          return setTimeout(() => submit(next), 0)
+        }
+        // ★どれも無かった。**打った言葉**で断る（第一候補の名前を出さない）
+        const t = NOT_HERE.test(rawSince) && trial.first !== null
+          ? `${trial.disp}など、ここには見当たらない。\n` : trial.buf
+        trial = null
+        if (t.trim()) show(t)
+      }
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
       if (Glk.waitingFor() === 'char') $('input').placeholder = '何かキーを（Enter で進む）'
@@ -103,13 +128,17 @@
         : '（読み取れなかった）', 'raw')
       return
     }
-    if (r.trace !== '英語のまま') {
-      const p = document.createElement('p')
-      p.className = 'sent'; p.textContent = r.command + (r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')
-      screen.appendChild(p)
-    }
-    Glk.submitLine(r.command)
+    if (r.trace !== '英語のまま') sent(r.command, r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')
+    trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
+    submit(r.command)
   })
+
+  function sent(cmd, note) {
+    const p = document.createElement('p')
+    p.className = 'sent'; p.textContent = cmd + (note || '')
+    screen.appendChild(p)
+  }
+  function submit(cmd) { rawSince = ''; Glk.submitLine(cmd) }
 
   const vm = new window.ZVM()
   vm.prepare(story, { vm, Glk, GlkOte: null, Dialog: null })

@@ -82,6 +82,19 @@ function createCommander(asset) {
     nounUse[n] = (nounUse[n] || 0) + 1
   }
   const seen = new Set()
+  // ★英語が割れる言い方（箱 = mailbox / case / chest / trunk）の見せ方。
+  //   同じ物の組を名乗る形どうしで、**漢字を含む最短の形**を代表にする（はこ → 箱）
+  const ambigDisp = {}
+  for (const [key, o] of Object.entries(objOf)) {
+    const noun0 = (o.nouns[0] || '').toLowerCase()
+    for (const ja of o.ja) {
+      const own = owners[kana(ja)] || [key]
+      if (own.length < 2 || own.every((x) => (objOf[x].nouns[0] || '').toLowerCase() === noun0)) continue
+      const sig = own.slice().sort().join('|')
+      if (!/[一-龥]/.test(ja)) continue
+      if (!ambigDisp[sig] || ja.length < ambigDisp[sig].length) ambigDisp[sig] = ja
+    }
+  }
   // ★曖昧な言い方でも画面には漢字を出したい（打鍵はかなだから）。
   //   同じ英単語に寄る言い方のうち、**漢字を含む最短の形**を代表にする（まど → 窓 / とびら → 扉）
   const sharedDisp = {}
@@ -97,7 +110,7 @@ function createCommander(asset) {
   for (const [key, o] of Object.entries(objOf)) {
     const noun = (o.nouns[0] || '').toLowerCase()
     const adj = (o.adjs[0] || '').toLowerCase()
-    for (const ja of o.ja) {
+    for (const [rank, ja] of o.ja.entries()) {
       const k = kana(ja)
       const own = owners[k] || [key]
       // 複数の物が同じ言い方を名乗り、しかも英語の名詞が同じ → 原作に判断を返す
@@ -106,19 +119,36 @@ function createCommander(asset) {
       if (shared) seen.add(k)
       lex.push({
         ja,
-        disp: shared ? (sharedDisp[noun] || ja) : o.ja[0],
+        //   曖昧なら**打った言葉**で見せる（漢字形があればそれ、無ければそのまま）
+        disp: shared ? (sharedDisp[noun] || ja)
+          : own.length > 1 ? (ambigDisp[own.slice().sort().join('|')] || ja) : o.ja[0],
         kana: k,
         kind: 'obj',
         key,
+        // ★同じ言い方を複数の物が名乗るとき、**その物にとってどれだけ中心的な名前か**で順を決める
+        //   （`ランタン` は真鍮のランタンでは 2 番目・壊れたランタンでは 3 番目 → 真鍮を先に試す）
+        rank,
         word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
         // ★共有された言い方（舟 = ビニールの塊 / 魔法の舟 / 穴の空いた舟）は、
         //   **どれかが乗り物なら乗り物として扱う**。どれを指すかは場が決める
         vehicle: shared ? own.some((x) => objOf[x].vehicle) : !!o.vehicle,
+        // ★英語の名詞が違う物が同じ言い方を名乗ることがある（箱 = mailbox / case / chest /
+        //   trunk）。原作は 1 語しか受けないので**丸投げできない** → 候補として持ち、
+        //   「ここには見当たらない」が返ったら順に試す（この返事は手数を消費しない）
+        //   ★英語の名詞が同じなら候補は要らない —— 原作の聞き返しに任せる側だから
+        //   （`扉` は木の扉／揚げ戸を原作が訊いてくる。ここで先回りしない）
+        others: own.filter((x) => x !== key && (objOf[x].nouns[0] || '').toLowerCase() !== noun)
+          .map((x) => {
+            const oo = objOf[x]
+            const n2 = (oo.nouns[0] || '').toLowerCase()
+            const a2 = (oo.adjs[0] || '').toLowerCase()
+            return nounUse[n2] > 1 && a2 ? a2 + ' ' + n2 : n2
+          }),
       })
     }
   }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
-  lex.sort((a, b) => b.kana.length - a.kana.length)
+  lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
   /** @returns {{command:string|null, trace:string, unknown:string[]}} */
   function toCommand(input) {
@@ -229,6 +259,8 @@ function createCommander(asset) {
     }
 
     const out = [verb.key.toLowerCase()]
+    let prsoAt = -1
+    let toolAt = -1
     const shapes = verb.shapes || []
     const has = (p) => shapes.some((sh) => sh.split(' ').includes(p))
     if (verb.fixed && has(verb.fixed)) out.push(verb.fixed.toLowerCase())
@@ -268,9 +300,10 @@ function createCommander(asset) {
         const p = wants.find((x) => has(x))
         if (p) out.push(p.toLowerCase())
       }
+      prsoAt = out.length
       out.push(prso.word)
     }
-    if (tool) out.push('with', tool.word)
+    if (tool) { toolAt = out.length + 1; out.push('with', tool.word) }
     if (dest && dest !== prso) {
       const p = has(dest.role) ? dest.role.toLowerCase() : (has('IN') ? 'in' : 'to')
       out.push(p, dest.word)
@@ -280,7 +313,13 @@ function createCommander(asset) {
       out.push(dest.role.toLowerCase(), dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
-    return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join('') }
+    // ★別の物を指しているかもしれない言い方は、別案を添えて返す
+    const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others]
+      : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others] : null
+    const alts = at ? at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')) : []
+    // ★候補が全部外れたとき、**打った言葉**で断るために覚えておく
+    const objDisp = at ? (at[0] === prsoAt ? prso.disp : tool.disp) : ''
+    return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp }
   }
 
   return { toCommand, lex }

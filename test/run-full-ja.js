@@ -21,15 +21,36 @@ const cm = createCommander(JSON.parse(fs.readFileSync(A('zork1-cmd.json'), 'utf8
 const inputs = process.argv.slice(2)
 let n = 0
 let place = ''
+// ★別案（箱 = mailbox / case / …）を順に試す。「ここには見当たらない」は手数を消費しない
+let trial = null
+let rawSince = ''
+const NOT_HERE = /can't see any .* here!/i
+const sink = (t) => { if (trial) trial.buf += t; else process.stdout.write(t) }
 
 const Glk = createGlk({
   cols: 64,
   rows: 24,
-  write(text) { process.stdout.write(tr.feed(text).replace(/^[ \t]*>+[ \t]*$/gm, '')) },
+  write(text) { rawSince += text; sink(tr.feed(text).replace(/^[ \t]*>+[ \t]*$/gm, '')) },
   status(line) { place = tr.word((line.match(/^(.*?)\s{2,}/) || [0, line])[1]) },
   update() {
     const rest = tr.flush().replace(/^[ \t]*>+[ \t]*$/gm, '')
-    if (rest.trim()) process.stdout.write(rest)
+    if (rest.trim()) sink(rest)
+    if (trial) {
+      if (NOT_HERE.test(rawSince) && trial.alts.length) {
+        const next = trial.alts.shift()
+        // ★全部外れたときは**最初の返事**を見せる（打っていない名前を出さないため）
+        if (trial.first === null) trial.first = trial.buf
+        trial.buf = ''
+        process.stdout.write(`   → ${next}  ……別の物として試す\n`)
+        rawSince = ''
+        return setImmediate(() => Glk.submitLine(next))
+      }
+      // ★どれも無かった。**打った言葉**で断る（第一候補の名前を出さない）
+      const t = NOT_HERE.test(rawSince) && trial.first !== null
+        ? `${trial.disp}など、ここには見当たらない。\n` : trial.buf
+      trial = null
+      if (t.trim()) process.stdout.write(t)
+    }
     if (Glk.waitingFor() === 'char') return setImmediate(() => Glk.submitChar(32))
     if (Glk.waitingFor() !== 'line') return
     if (n >= inputs.length) {
@@ -42,6 +63,8 @@ const Glk = createGlk({
     process.stdout.write(`\n[${place}]\n> ${ja}`)
     if (!r.command) { process.stdout.write(`  ……（${r.note || r.trace}）\n`); return setImmediate(() => Glk.submitLine('look')) }
     process.stdout.write(`   → ${r.command}${r.unknown.length ? '  ※残: ' + r.unknown.join('|') : ''}\n`)
+    trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
+    rawSince = ''
     setImmediate(() => Glk.submitLine(r.command))
   },
 })
