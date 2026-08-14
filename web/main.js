@@ -20,6 +20,13 @@
 
   // ★ふりがなの入切。切っても組み直さないよう、CSS で隠すだけにする
   if (localStorage.getItem('zenmai-ruby') === 'off') document.body.classList.add('no-ruby')
+  // ★種明かし（英語コマンドの行と成績）。物語ではなく機械の側なので、まとめて隠せる
+  if (localStorage.getItem('zenmai-peek') === 'off') document.body.classList.add('no-peek')
+  $('peek-btn').addEventListener('click', () => {
+    const off = document.body.classList.toggle('no-peek')
+    localStorage.setItem('zenmai-peek', off ? 'off' : 'on')
+    $('input').focus()
+  })
   $('ruby-btn').addEventListener('click', () => {
     const off = document.body.classList.toggle('no-ruby')
     localStorage.setItem('zenmai-ruby', off ? 'off' : 'on')

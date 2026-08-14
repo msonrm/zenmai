@@ -92,11 +92,21 @@
   }
   #input:focus { border-bottom-color: var(--accent) }
   #input::placeholder { color: var(--dim) }
-  /* 右下。段の外なので本文の右端より外側に出る */
-  #stat {
+  /* 右下。段の外なので本文の右端より外側に出る。
+     ★種明かし（渡した英語コマンド）と成績は**同じ性質**なので、まとめて 1 つで入切する */
+  #meta {
     position: absolute; right: 1.2em; bottom: .15em;
-    font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums;
+    display: flex; align-items: center; gap: .6em;
   }
+  #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
+  #peek-btn {
+    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--dim); font: inherit; font-size: .7rem; padding: 0 .45em; cursor: pointer;
+  }
+  #peek-btn:hover { color: var(--ink); border-color: var(--accent) }
+  body.no-peek #peek-btn { opacity: .55 }
+  body.no-peek #stat { display: none }
+  body.no-peek #screen p.sent { display: none }
   /* 狭いときは説明を畳む（題だけ残す）→ さらに狭ければ成績も畳む */
   @media (max-width: 46em) { #title .tag { display: none } }
   /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
@@ -117,7 +127,7 @@
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
     </div>
-    <span id="stat"></span>
+    <span id="meta"><button id="peek-btn" type="button" title="渡した英語コマンドと成績の表示を切り替える">種明かし</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
