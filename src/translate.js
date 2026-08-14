@@ -163,10 +163,16 @@ class Translator {
     }
     const key = norm(raw)
     if (!key || /^>+$/.test(key)) return raw   // プロンプトだけの行は素通し
+    // ★行頭の字下げは**入れ子を見せる意味を持つ**（持ち物の中身は 2 字ずつ深くなる）。
+    //   照合では空白を潰すので、訳文の前に戻してやらないと入れ子が消える
+    //   ★字下げは**全角に置き換える**。原作は 1 段 2 字だが、半角のままだと
+    //   日本語の字面の中で浅く見えて入れ子が読み取れない
+    const sp = (raw.match(/^[ \t]*/) || [''])[0].length
+    const indent = '　'.repeat(Math.round(sp / 2))
     const whole = this.lookup(key)
-    if (whole !== null) { this.stats.hit++; return whole }
+    if (whole !== null) { this.stats.hit++; return indent + whole }
     const g = this.greedy(key)
-    if (g !== null) { this.stats.hit++; this.stats.greedy++; return g }
+    if (g !== null) { this.stats.hit++; this.stats.greedy++; return indent + g }
     // ★版権バナーは実行時に連結されて出る（`Copyright (c) 1981, … Infocom, Inc. All rights reserved.`）
     //   ので、完全一致では拾えない。包含関係で判定する（相手は定型の版権表示だけなので安全）
     if (this.notrans.has(key) || [...this.notrans].some((n) => n.includes(key) || key.includes(n))) {
