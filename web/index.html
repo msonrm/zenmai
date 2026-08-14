@@ -61,6 +61,10 @@
   /* ── 本文 ── */
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
   #screen p { margin: 0 0 .9em; white-space: pre-wrap }
+  /* ★場所名の行。原作は改行だけで区切る（1980 年の端末の書式）が、
+     ここは HTML なので段落の頭だと分かるようにする。太字にはしない */
+  #screen p.room { color: var(--accent); letter-spacing: .06em; margin: 1.6em 0 .35em }
+  #screen p.room:first-child { margin-top: 0 }
   #screen p.cmd { color: var(--accent) }
   #screen p.cmd::before { content: "> " }
   /* 実際に渡した英語コマンド（種明かし。薄く小さく） */

@@ -32,6 +32,8 @@ class El {
       .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
   }
   appendChild(c) { this.children.push(c); return c }
+  insertBefore(c, ref) { this.children.splice(this.children.indexOf(ref), 0, c); return c }
+  remove() { for (const el of Object.values(els)) { const i = el.children.indexOf(this); if (i >= 0) el.children.splice(i, 1) } }
   get lastElementChild() { return this.children[this.children.length - 1] }
   addEventListener(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn) }
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
@@ -83,6 +85,10 @@ const finish = () => {
   console.log('--- ' + els.stat.textContent.trim())
   const raw = els.screen.children.filter((p) => p.className === 'raw')
   console.log('--- 未訳として描かれた段落: ' + raw.length)
+  // ★場所名の行が段落の頭として切り出されているか
+  const rooms = els.screen.children.filter((p) => p.className === 'room')
+  console.log('--- 場所名の段落: ' + rooms.length + ' 件　' + rooms.map((p) => p.textContent).join(' / '))
+  if (cmds.length && !rooms.length) { console.error('★場所名が切り出されていない'); process.exit(1) }
   // ★ふりがなが実際に振られているか（入力はかなだけなので、これは操作系）
   const html = els.screen.children.map((p) => p.innerHTML).join('')
   const rt = [...html.matchAll(/<ruby>([^<]*)<rt>([^<]*)<\/rt><\/ruby>/g)]

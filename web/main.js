@@ -44,6 +44,8 @@
   const strip = (t) => t.replace(/^[ \t]*>+[ \t]*$/gm, '').replace(/(^|\n)[ \t]*>+[ \t]*$/g, '$1')
 
   let para = null
+  let place = ''          // ★いまの場所名。本文の中の「場所名だけの行」を見分けるのに使う
+  const fresh = []        // 直前の入力要求から後に足した段落
   function show(text, cls) {
     // 空行で段落を切る。段落の中の改行は活かす（pre-wrap）
     for (const chunk of text.split(/\n{2,}/)) {
@@ -52,13 +54,16 @@
       if (!para || cls) {
         para = document.createElement('p')
         if (cls) para.className = cls
+        para._raw = ''
         screen.appendChild(para)
+        fresh.push(para)
       }
       const p = para
       // 追記のときは行の境目を落とさない。★末尾の改行は残さない（余った空行になる）
-      if (p.textContent && !p.textContent.endsWith('\n')) p.innerHTML += '\n'
+      if (p._raw && !p._raw.endsWith('\n')) p._raw += '\n'
+      p._raw += t
       // ★英語のまま出す行（未訳・種明かし）にふりがなは要らない
-      p.innerHTML += cls === 'raw' || cls === 'sent' ? rb.esc(t) : rb.rubify(t)
+      p.innerHTML = cls === 'raw' || cls === 'sent' ? rb.esc(p._raw) : rb.rubify(p._raw)
       if (cls) para = null
     }
     screen.scrollTop = screen.scrollHeight
@@ -84,7 +89,8 @@
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
       const m = line.match(/^(.*?)\s{2,}(.*)$/)
-      $('place').innerHTML = rb.rubify(m ? tr.word(m[1]) : tr.word(line))
+      place = m ? tr.word(m[1]) : tr.word(line)
+      $('place').innerHTML = rb.rubify(place)
       $('score').textContent = m ? m[2] : ''
     },
     update() {
@@ -106,6 +112,18 @@
           ? `${trial.disp}など、ここには見当たらない。\n` : trial.buf
         trial = null
         if (t.trim()) show(t)
+      }
+      // ★場所名の行を段落の頭として切り出す。**状態行は入力要求のときに来る**ので、
+      //   書いた時点ではまだ場所が分からない。ここまで待ってから切る
+      for (const p of fresh.splice(0)) {
+        if (p.className || !place || !p._raw) continue
+        if (p._raw !== place && !p._raw.startsWith(place + '\n')) continue
+        const head = document.createElement('p')
+        head.className = 'room'; head._raw = place; head.innerHTML = rb.rubify(place)
+        screen.insertBefore(head, p)
+        p._raw = p._raw.slice(place.length).replace(/^\n+/, '')
+        if (p._raw) p.innerHTML = rb.rubify(p._raw)
+        else p.remove()
       }
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
