@@ -724,6 +724,46 @@
    "en": "The water level here is now up to your hips.",
    "id": "V-13",
    "ja": "ここの水位はいま尻の高さまで来ている。"
+  },
+  {
+   "en": "A seedy-looking individual with a large bag just wandered through the room. On the way through, he quietly abstracted some valuables from your possession, mumbling something about \"Doing unto others before...\"",
+   "id": "Y-1",
+   "ja": "うさんくさい風体の男が大きな袋を提げて部屋を通り過ぎた。通りざまに、きみの持ち物から値打ちのある物をそっと抜き取っていった。「やられる前にやる、だ」とかなんとか呟きながら。"
+  },
+  {
+   "en": "A seedy-looking individual with a large bag just wandered through the room. On the way through, he quietly abstracted some valuables from the room, mumbling something about \"Doing unto others before...\"",
+   "id": "Y-2",
+   "ja": "うさんくさい風体の男が大きな袋を提げて部屋を通り過ぎた。通りざまに、この部屋から値打ちのある物をそっと抜き取っていった。「やられる前にやる、だ」とかなんとか呟きながら。"
+  },
+  {
+   "en": "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is open.",
+   "id": "Z-1",
+   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記された切替がある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは開いている。"
+  },
+  {
+   "en": "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is closed.",
+   "id": "Z-2",
+   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記された切替がある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは閉じている。"
+  },
+  {
+   "en": "You evidently frightened the robber, though you didn't hit him. He flees, but the contents of his bag fall on the floor.",
+   "id": "Z-3",
+   "ja": "当たりはしなかったが、どうやら盗賊を怯えさせたらしい。逃げていった。だが袋の中身が床にこぼれ落ちた。"
+  },
+  {
+   "en": "You evidently frightened the robber, though you didn't hit him. He flees.",
+   "id": "Z-4",
+   "ja": "当たりはしなかったが、どうやら盗賊を怯えさせたらしい。逃げていった。"
+  },
+  {
+   "en": "The candles are already lit.",
+   "id": "Z-5",
+   "ja": "蝋燭はすでに点いている。"
+  },
+  {
+   "en": "The candles are lit.",
+   "id": "Z-6",
+   "ja": "蝋燭に火が点いた。"
   }
  ],
  "exact": {
@@ -7249,6 +7289,7 @@
   "storm": "木",
   "strange": "木の扉",
   "strike": "打つ",
+  "super": "ごく簡潔に(ごくかんけつに)",
   "surrounding": "周囲の壁",
   "surrounding wall": "周囲の壁",
   "suspicious": "盗賊",
