@@ -101,9 +101,15 @@
   body.pad-on.pad-open #pad { display: block }
 
   /* ★フリック盤も入力欄の下。#foot は縦並びの末尾なので、置くと本文が自動で縮む */
-  /* ★キーは正方形に近くないと押せない。エンジンの盤は `height:100%` の grid なので、
-     器が高さを持たないと**細い棒**になる（実機の指摘）。列数×行数の比で高さを決める */
-  #flick { display: none; margin: .6em auto 0; max-width: min(100%, 26em); aspect-ratio: 5 / 4;
+  /* ★盤の寸法（obsidian-hechima の実機往復から借りた規則）:
+     - エンジンの盤は `height:100%` の grid。器が高さを持たないと**細い棒**になる
+     - 比率（列:行 = 5:4）を器に与えるとキーが正方形になる。
+       ただし**余白のある器に掛けてはいけない** —— 比率は余白込みの箱に効くので、
+       中身が縦長に潰れる（`.gutter` を付けていて実際に潰れた）
+     - ★**px の上限を置く**。`vh` だけだと縦に長い画面で深くなりすぎる ——
+       **キーボードに要るのは指の届く大きさで、画面の大きさに比例する量ではない** */
+  #flick { display: none; margin: .5em auto 0; width: min(100%, 22em); aspect-ratio: 5 / 4;
+    max-height: min(38vh, 300px);
     /* 盤の色は本文の紙に合わせる（エンジンが読む変数） */
     --fe-bg: transparent;
     --fe-key-bg: var(--panel); --fe-key-fg: var(--ink);
@@ -156,7 +162,7 @@
       <button id="flick-btn" type="button" title="かなの盤を開閉">かな</button>
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>
-    <div id="flick" class="gutter"></div>
+    <div id="flick"></div>
     <div id="pad" class="gutter"></div>
     <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
   </div>
