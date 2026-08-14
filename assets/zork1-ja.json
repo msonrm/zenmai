@@ -68,7 +68,7 @@
   {
    "en": "There is a {OBJ} here (providing light).",
    "id": "A-14",
-   "ja": "ここに{OBJ}がある（明かりになっている）。"
+   "ja": "ここに{OBJ}がある（点いている）。"
   },
   {
    "en": "A {OBJ}",
@@ -78,7 +78,7 @@
   {
    "en": "A {OBJ} (providing light)",
    "id": "A-16",
-   "ja": "{OBJ}（明かりになっている）"
+   "ja": "{OBJ}（点いている）"
   },
   {
    "en": "A {OBJ} (being worn)",
