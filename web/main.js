@@ -98,7 +98,10 @@
       const m = line.match(/^(.*?)\s{2,}(.*)$/)
       place = m ? tr.word(m[1]) : tr.word(line)
       $('place').innerHTML = rb.rubify(place)
-      $('score').textContent = m ? m[2] : ''
+      // ★右側の `Score: 0  Turns: 2` は**原作ではなくインタプリタが書いている**
+      //   （v3 の状態行は仕様上インタプリタが描く。Infocom の実機は `Moves` だった）。
+      //   つまりここは訳してよい —— というより、ここだけ英語なのは筋が通らない
+      $('score').textContent = jaStatus(m ? m[2] : '')
     },
     update() {
       // ★ゲーム自身が入力待ちの前に `>` を印字する。こちらは入力欄に自前の
@@ -167,6 +170,14 @@
     screen.appendChild(p)
   }
   function submit(cmd) { rawSince = ''; Glk.submitLine(cmd) }
+
+  function jaStatus(rhs) {
+    const s = rhs.match(/Score:\s*(-?\d+)\s+Turns:\s*(\d+)/)
+    if (s) return `得点 ${s[1]}　手数 ${s[2]}`
+    const t = rhs.match(/Time:\s*(\d+):(\d+)\s*([AP]M)/)
+    if (t) return `${t[3] === 'PM' ? '午後' : '午前'} ${t[1]}時${t[2]}分`
+    return rhs
+  }
 
   const vm = new window.ZVM()
   vm.prepare(story, { vm, Glk, GlkOte: null, Dialog: null })
