@@ -13,6 +13,7 @@ const path = require('path')
 const vm2 = require('vm')
 
 const ROOT = path.join(__dirname, '..')
+process.on('unhandledRejection', (e) => { console.error('★未処理の拒否:', (e && e.stack) || e) })
 const cmds = process.argv.slice(2)
 
 // --- 最小の DOM ---
@@ -38,12 +39,14 @@ class El {
   addEventListener(ev, fn) { (this.handlers[ev] = this.handlers[ev] || []).push(fn) }
   // 入力欄のキャレット（ゲームパッドの挿入・削除に要る）
   setSelectionRange(a, b) { this.selectionStart = a; this.selectionEnd = b }
+  setAttribute(k, v) { this[k] = v }
+  getAttribute(k) { return this[k] }
   querySelectorAll() { return [] }
   querySelector() { return null }
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
@@ -84,6 +87,15 @@ for (const rel of srcs) {
   const f = path.normalize(path.join('web', rel))
   vm2.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f })
 }
+// ★UMD は `globalThis` に登録する。ブラウザでは window と同じものだが、
+//   この器では window を別に作っているので、載せ替えてやる必要がある
+for (const name of ['FlickEngine', 'GamepadEngine', 'ZenmaiRuby', 'ZenmaiTranslate', 'ZenmaiCommand', 'GlkShim']) {
+  if (!window[name] && globalThis[name]) window[name] = globalThis[name]
+}
+// ★フリックは**本物の resolver** を使う（flickmap の中身ごと確かめられる）。
+//   mount だけ差し替えて onOp を捕まえる
+const flick = {}
+store['zenmai-flick'] = 'on'
 // ★ゲームパッドの配線を器のまま試す。実機が無くても**こちらが書いた部分**は確かめられる
 const pad = {}
 // node 22 の navigator は getter だけなので上書きする
@@ -94,6 +106,15 @@ window.GamepadEngine = {
   mount() { return { update() {}, destroy() {} } },
 }
 if (!window.ZVM) window.ZVM = module.exports && module.exports.prototype ? module.exports : global.ZVM
+if (window.FlickEngine) {
+  const real = window.FlickEngine
+  window.FlickEngine = {
+    version: real.version,
+    decodeFlickmap: (j) => real.decodeFlickmap(j),
+    createResolver: (m, h) => real.createResolver(m, h),
+    mount(el, map, opts) { flick.map = map; flick.opts = opts; return { destroy() {} } },
+  }
+}
 vm2.runInThisContext(fs.readFileSync(path.join(ROOT, 'web', 'main.js'), 'utf8'), { filename: 'web/main.js' })
 
 // --- コマンドを順に流す ---
@@ -157,6 +178,40 @@ const finish = () => {
     ]
     for (const [name, ok] of checks) console.log(`--- ゲームパッド ${ok ? '✓' : '✗'} ${name}`)
     if (checks.some(([, ok]) => !ok)) { console.error('★ゲームパッドの配線が壊れている'); process.exit(1) }
+  }
+  // ★フリック（本物の flickmap + resolver を通す）
+  if (!flick.opts) { console.error('★フリックが載っていない'); process.exit(1) }
+  if (flick.opts) {
+    const R = require('../vendor/flick-engine.js').createResolver(flick.map, {
+      getComposingTail: flick.opts.getComposingTail,
+    })
+    const inp = els.input
+    inp.value = ''; inp.selectionStart = 0
+    const play = (row, col, dir) => {
+      for (const op of R.resolve({ row, col, kind: dir ? 'flick' : 'tap', dir })) flick.opts.onOp(op)
+    }
+    play(1, 1)            // な
+    play(1, 1, 'up')      // ぬ
+    play(0, 1)            // か
+    const typed = inp.value
+    play(3, 0)            // ゛゜小 → が
+    const dakuten = inp.value
+    play(2, 1, 'left')    // や← は消してある
+    const noParen = inp.value === dakuten
+    play(0, 3)            // ⌫
+    const afterBs = inp.value
+    const before = els.screen.children.length
+    play(3, 3)            // 送信
+    const sent = els.screen.children.length > before && inp.value === ''
+    const checks = [
+      ['かなが入る', typed === 'なぬか'],
+      ['゛゜小で濁点', dakuten === 'なぬが'],
+      ['や の左右は無い（括弧を消した）', noParen],
+      ['⌫ で 1 字消える', afterBs === 'なぬ'],
+      ['送信される', sent],
+    ]
+    for (const [name, ok] of checks) console.log(`--- フリック ${ok ? '✓' : '✗'} ${name}`)
+    if (checks.some(([, ok]) => !ok)) { console.error('★フリックの配線が壊れている'); process.exit(1) }
   }
   // ★ふりがなが実際に振られているか（入力はかなだけなので、これは操作系）
   const html = els.screen.children.map((p) => p.innerHTML).join('')

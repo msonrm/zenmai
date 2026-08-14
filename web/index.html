@@ -99,6 +99,22 @@
   /* 操作図は入力欄の下。畳めるようにする */
   #pad { display: none; margin-top: .6em; overflow-x: auto }
   body.pad-on.pad-open #pad { display: block }
+
+  /* ★フリック盤も入力欄の下。#foot は縦並びの末尾なので、置くと本文が自動で縮む */
+  #flick { display: none; margin-top: .6em;
+    /* 盤の色は本文の紙に合わせる（エンジンが読む変数） */
+    --fe-bg: transparent;
+    --fe-key-bg: var(--panel); --fe-key-fg: var(--ink);
+    --fe-fn-bg: var(--bg); --fe-fn-fg: var(--dim);
+    --fe-active-bg: var(--rule);
+    --fe-petal-bg: var(--panel); --fe-petal-fg: var(--ink); --fe-petal-hot-bg: var(--accent);
+  }
+  body.flick-open #flick { display: block }
+  #flick-btn {
+    flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
+  }
+  body.flick-open #flick-btn { color: var(--ink); border-color: var(--accent) }
   #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
   #input {
     flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
@@ -135,14 +151,17 @@
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="ひらがなで打つ（例: ゆうびんばこをあける）">
+      <button id="flick-btn" type="button" title="かなの盤を開閉">かな</button>
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>
+    <div id="flick" class="gutter"></div>
     <div id="pad" class="gutter"></div>
     <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>
   <script src="../vendor/gamepad-engine.js"></script>
+  <script src="../vendor/flick-engine.js"></script>
   <script src="../src/ruby.js"></script>
   <script src="../src/translate.js"></script>
   <script src="../src/command.js"></script>

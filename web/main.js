@@ -213,6 +213,42 @@
     return rhs
   }
 
+  // ================= フリック（スマホ）=================
+  // ★op の語彙はゲームパッドと同じ（kana / key）なので、配線は padInsert / padKey を使い回す。
+  //   盤の中身は flickmap（JSON）で決まる —— 要らないキーは**データから消してある**
+  //   （変換・戻す・英数・かな・句読点・括弧・疑問符）
+  if (window.FlickEngine) {
+    let kbd = null
+    const flickOpen = () => document.body.classList.contains('flick-open')
+    const showFlick = async (on) => {
+      document.body.classList.toggle('flick-open', on)
+      localStorage.setItem('zenmai-flick', on ? 'on' : 'off')
+      // ★盤を出しているあいだは OS のキーボードを出さない（二重に出ると本文が潰れる）
+      $('input').setAttribute('inputmode', on ? 'none' : 'text')
+      if (!on) { if (kbd) { kbd.destroy(); kbd = null } return }
+      if (kbd) return
+      const map = window.FlickEngine.decodeFlickmap(await load('../assets/flick-ja.json'))
+      kbd = window.FlickEngine.mount($('flick'), map, {
+        getComposingTail: () => {
+          const el = $('input')
+          const at = el.selectionStart == null ? el.value.length : el.selectionStart
+          return el.value.slice(0, at)
+        },
+        onOp(op) {
+          if (op.type === 'kana') { padInsert(op.text, op.replace || 0); return }
+          if (op.type === 'text') { padInsert(op.text, 0); return }
+          if (op.type === 'key' && op.tap) padKey(op.tap.key)
+        },
+      })
+    }
+    $('flick-btn').addEventListener('click', () => { showFlick(!flickOpen()) })
+    // ★触る画面なら最初から開いておく（スマホで来た人に「打てない」と思わせない）
+    const touch = (navigator.maxTouchPoints || 0) > 0
+    if (localStorage.getItem('zenmai-flick') === 'on' || (touch && localStorage.getItem('zenmai-flick') !== 'off')) {
+      showFlick(true)
+    }
+  }
+
   // ================= ゲームパッド =================
   // ★labo の GamepadEngine（v1.7.0）をそのまま使い、**ホスト側で op を絞る**。
   //   ここは変換をしない（ひらがなをそのまま送る）ので、要らない操作を落とすだけで足りる。
