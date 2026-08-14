@@ -28,9 +28,12 @@ let rawSince = ''
 const NOT_HERE = /can't see any .* here!/i
 const sink = (t) => { if (trial) trial.buf += t; else process.stdout.write(t) }
 
+// ★セーブの往復もここで試せるように、記憶の上のファイル置き場を渡す
+const saved = new Map()
 const Glk = createGlk({
   cols: 64,
   rows: 24,
+  files: { read: (n) => saved.get(n) || null, write: (n, b) => { saved.set(n, b) } },
   write(text) { rawSince += text; sink(tr.feed(text).replace(/^[ \t]*>+[ \t]*$/gm, '')) },
   status(line) { place = tr.word((line.match(/^(.*?)\s{2,}/) || [0, line])[1]) },
   update() {

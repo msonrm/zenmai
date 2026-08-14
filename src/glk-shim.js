@@ -11,7 +11,8 @@
  *   Glk.update()    → ここで画面を描く
  *   入力が来たら host が event を詰めて vm.resume() を呼ぶ
  *
- * 必要なのは 30 関数。うち 10 ほどはセーブ用のファイル系で、いまは素通り。
+ * 必要なのは 30 関数。うちファイル系 9 つがセーブ／復帰で、`host.files` に委ねる
+ * （ブラウザは localStorage、node は fs、既定は記憶のみ）。
  */
 
 const wintype_TextBuffer = 3
@@ -38,8 +39,21 @@ class RefStruct {
  *   host.status(line)     ステータス行（グリッド窓）の 1 行目
  *   host.update()         描画のタイミング
  *   host.cols, host.rows  画面の桁数・行数
+ *   host.files            省略可。{ read(name), write(name, bytes) }
+ *                         ★セーブは**枠を 1 つ**にしてある。名前を訊く画面を出すと
+ *                         コントローラだけでは操作できないため（この企画の芯を壊す）
  */
+// ★セーブの枠は 1 つ。名前を訊かない（コントローラだけで遊べることを壊さないため）
+const SLOT = 'zenmai-save'
+const filemode_Write = 0x01
+const filemode_WriteAppend = 0x05
+
 function createGlk(host) {
+  const mem = new Map()
+  const files = host.files || {
+    read: (n) => mem.get(n) || null,
+    write: (n, b) => { mem.set(n, b) },
+  }
   let vm = null
   let curwin = null
   let pending = null          // glk_select が待っている RefStruct
@@ -112,6 +126,8 @@ function createGlk(host) {
     glk_put_jstring_stream(str, text) { putStream(str, text) },
     glk_put_char_stream_uni(str, code) { putStream(str, String.fromCharCode(code)) },
     glk_put_buffer_stream(str, buf) {
+      // ★ファイルのストリームは画面ではなく保存先へ
+      if (str && str.file) { for (const b of buf || []) str.out.push(b); return }
       putStream(str, Array.from(buf || []).map((c) => String.fromCharCode(c)).join(''))
     },
     glk_set_style() {},
@@ -124,14 +140,34 @@ function createGlk(host) {
     glk_request_char_event_uni(win) { charReq = { win } },
     glk_select(ev) { pending = ev },
 
-    // --- セーブ関連（いまは素通り）---
-    glk_fileref_create_by_prompt() { return null },
+    // --- セーブ／復帰 ---
+    // ★ZVM は `glk_fileref_create_by_prompt` を**返り値で待たない**。
+    //   `glk_blocking_call` を立てて止まり、こちらが `vm.resume(fref)` を呼ぶまで動かない。
+    //   ここで null を返して放置していたので `save` が固まっていた（実プレイで判明）
+    glk_fileref_create_by_prompt(usage, mode) {
+      const write = mode === filemode_Write || mode === filemode_WriteAppend
+      const data = write ? null : files.read(SLOT)
+      const fref = (write || data) ? { name: SLOT, mode, data } : null   // 読めるものが無ければ失敗
+      setTimeout(() => { if (vm) vm.resume(fref) }, 0)
+      return fref
+    },
     glk_fileref_destroy() {},
-    glk_stream_open_file() { return null },
-    glk_stream_open_file_uni() { return null },
-    glk_stream_close() {},
+    glk_stream_open_file(fref, mode) {
+      if (!fref) return null
+      return { file: fref.name, mode, out: [], data: fref.data || new Uint8Array(0), pos: 0 }
+    },
+    glk_stream_open_file_uni(fref, mode) { return this.glk_stream_open_file(fref, mode) },
+    glk_stream_close(str) {
+      if (str && str.file && str.out.length) files.write(str.file, Uint8Array.from(str.out))
+    },
     glk_stream_iterate() { return null },
-    glk_get_buffer_stream() { return -1 },
+    glk_get_buffer_stream(str, buf) {
+      if (!str || !str.data) return -1
+      const n = Math.min(buf.length, str.data.length - str.pos)
+      buf.set(str.data.subarray(str.pos, str.pos + n), 0)
+      str.pos += n
+      return n
+    },
     glk_get_char_stream_uni() { return -1 },
     glk_get_line_stream_uni() { return -1 },
 

@@ -90,6 +90,23 @@
   const Glk = createGlk({
     cols: 64,
     rows: 24,
+    // ★セーブの置き場。localStorage に base64 で 1 枠だけ持つ
+    //   （枠を選ばせる画面を出すとコントローラだけでは操作できない）
+    files: {
+      read(name) {
+        const b64 = localStorage.getItem(name)
+        if (!b64) return null
+        const bin = atob(b64)
+        const out = new Uint8Array(bin.length)
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+        return out
+      },
+      write(name, bytes) {
+        let bin = ''
+        for (const b of bytes) bin += String.fromCharCode(b)
+        try { localStorage.setItem(name, btoa(bin)) } catch (e) { /* 容量超過は諦める */ }
+      },
+    },
     write(text) {
       rawSince += text
       const out = tr.feed(text)

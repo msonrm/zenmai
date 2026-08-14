@@ -46,6 +46,8 @@ const window = {}
 // ふりがなの入切は body の class と localStorage を使う
 const store = {}
 global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }
+global.atob = (b64) => Buffer.from(b64, 'base64').toString('binary')
+global.btoa = (bin) => Buffer.from(bin, 'binary').toString('base64')
 document.body = { classList: { _s: new Set(), add(c) { this._s.add(c) }, toggle(c) { this._s.has(c) ? this._s.delete(c) : this._s.add(c); return this._s.has(c) } } }
 global.window = window
 global.document = document
