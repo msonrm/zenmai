@@ -678,7 +678,7 @@
   {
    "en": "This gives you the rank of {RANK}.",
    "id": "X-13",
-   "ja": "これで位は{RANK}。"
+   "ja": "これで称号は{RANK}。"
   },
   {
    "en": "The water level here is now up to your waist.",
@@ -850,8 +850,8 @@
   "Dental hygiene is highly recommended, but I'm not sure what you want to brush them with.": "歯の手入れは大いに勧められるが、何で磨きたいのかは分からない。",
   "Ding, dong.": "チーン、ゴーン。",
   "Do you expect me to applaud?": "拍手でも期待しているのか。",
-  "Do you wish to leave the game? (Y is affirmative):": "ゲームを終えるか。（Y なら承諾）:",
-  "Do you wish to restart? (Y is affirmative):": "最初から始めるか。（Y なら承諾）:",
+  "Do you wish to leave the game? (Y is affirmative):": "ゲームを終えるか。（はい / いいえ）:",
+  "Do you wish to restart? (Y is affirmative):": "最初から始めるか。（はい / いいえ）:",
   "Dome Room": "円蓋の間",
   "Don't you believe me? The mountains are impassable!": "信じないのか。山並みは越えられない。",
   "Done.": "済んだ。",
