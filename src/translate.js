@@ -169,6 +169,13 @@ class Translator {
       const inner = this.line(p[2])
       return inner === null ? null : p[1] + inner
     }
+    // ★プロンプトは**行の後ろにも付く**。質問（`… (Y is affirmative): >`）は改行を伴わずに
+    //   出るので、次のプロンプトが同じ行に貼りつく。剥がしてから照合する
+    const q = raw.match(/^([\s\S]*?)(\s*>+\s*)$/)
+    if (q && q[1].trim()) {
+      const inner = this.line(q[1])
+      return inner === null ? null : inner + q[2]
+    }
     const key = norm(raw)
     if (!key || /^>+$/.test(key)) return raw   // プロンプトだけの行は素通し
     // ★行頭の字下げは**入れ子を見せる意味を持つ**（持ち物の中身は 2 字ずつ深くなる）。

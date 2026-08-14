@@ -42,6 +42,13 @@ const ROLE_JA = { IN: 'の中', ON: 'の上', UNDER: 'の下', BEHIND: 'の後�
 
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
 
+// ★はい／いいえの質問（終わるか・最初からやるか）は原作が Y/N で受ける。
+//   ここだけは動詞でも物でもないので、専用の写像を持つ
+const YESNO = {
+  はい: 'y', うん: 'y', そう: 'y', そうする: 'y', y: 'y', yes: 'y',
+  いいえ: 'n', いや: 'n', やめない: 'n', ちがう: 'n', n: 'n', no: 'n',
+}
+
 /**
  * ★照合はすべて「かな」に正規化してから行う。
  * コントローラ入力はかなしか出さないので、`じゅうたん` でも `絨毯` でも当たる必要がある。
@@ -164,6 +171,9 @@ function createCommander(asset) {
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
     if (/^[\x20-\x7e]+$/.test(input.trim())) {
       return { command: input.trim(), trace: '英語のまま', unknown: [], echo: input.trim() }
+    }
+    if (YESNO[raw] || YESNO[kana(raw)]) {
+      return { command: YESNO[raw] || YESNO[kana(raw)], trace: 'はい／いいえ', unknown: [], echo: raw }
     }
     if (NEGATIVE.test(raw)) {
       // ★「扉を開けない」の「ない」を捨てると逆の命令になる。止める
