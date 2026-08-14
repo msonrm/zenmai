@@ -151,6 +151,10 @@
     color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
   }
   body.flick-open #flick-btn { color: var(--ink); border-color: var(--accent) }
+  /* ★開閉できることを見せる —— 閉じているときは横向き、開いているときは下向き */
+  #flick-btn::after, #pad-btn::after { content: "\25B8"; font-size: .8em; opacity: .7; margin-left: .25em }
+  body.flick-open #flick-btn::after { content: "\25BE" }
+  body.pad-open #pad-btn::after { content: "\25BE" }
   #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
   #input {
     flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
@@ -182,7 +186,7 @@
       <p class="intro-title">ぜんまい —— 日本語で読むテキストアドベンチャー</p>
       <p>1980年の <i>Zork I</i>（Infocom）を、日本語で遊べるようにした。コマンドもひらがなで打てる。</p>
       <p class="intro-ex">ゆうびんばこをあける　／　きたへいく　／　じゅうたんをめくる　／　もちもの</p>
-      <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力盤が出る。
+      <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力キーが出る。
         ゲームコントローラーを繋げば、それでもひらがなが打てる。</p>
       <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
         ZORK は Infocom, Inc. の登録商標です（このプロジェクトは Infocom / Microsoft とは無関係）。</p>
