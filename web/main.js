@@ -147,6 +147,8 @@
       for (const p of fresh.splice(0)) {
         if (p.className || !place || !p._raw) continue
         if (p._raw !== place && !p._raw.startsWith(place + '\n')) continue
+        // ★版権表示と本文の境目に線を引く（最初の場所名の前だけ）
+        if (!screen.querySelector('hr')) screen.insertBefore(document.createElement('hr'), p)
         const head = document.createElement('p')
         head.className = 'room'; head._raw = place; head.innerHTML = rb.rubify(place)
         screen.insertBefore(head, p)
@@ -347,6 +349,15 @@
         if (vis) vis.update(st)
       },
     })
+  }
+
+  // ★入口の案内。軽いので毎回出す
+  const intro = $('intro')
+  if (intro) {
+    intro.hidden = false
+    const close = () => { intro.hidden = true; $('input').focus() }
+    $('intro-ok').addEventListener('click', close)
+    intro.addEventListener('click', (e) => { if (e.target === intro) close() })
   }
 
   const vm = new window.ZVM()

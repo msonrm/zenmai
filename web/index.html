@@ -34,6 +34,28 @@
   /* 押し込められても折り返さず、必要なら詰める */
   #title, #place, #score, #stat { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 
+  /* ── 入口の案内 ── */
+  #intro {
+    position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 1.2em;
+  }
+  #intro[hidden] { display: none }
+  #intro-box {
+    max-width: 30em; background: var(--panel); border: 1px solid var(--rule); border-radius: .5em;
+    padding: 1.4em 1.6em; line-height: 1.9;
+  }
+  #intro-box p { margin: 0 0 .7em }
+  .intro-title { font-size: 1.15em; letter-spacing: .04em }
+  .intro-ex { color: var(--accent) }
+  .intro-dim { color: var(--dim); font-size: .9em }
+  /* ★商標は名乗りではなく**帰属の明示**として書く（名前・ロゴ・ドメインには使わない） */
+  .intro-note { color: var(--dim); font-size: .78em; line-height: 1.7; margin-top: 1em }
+  #intro-ok {
+    margin-top: .4em; background: transparent; border: 1px solid var(--accent); border-radius: .3em;
+    color: var(--accent); font: inherit; padding: .25em 1.4em; cursor: pointer;
+  }
+  #intro-ok:hover { background: var(--accent); color: var(--panel) }
+
   /* ── ヘッダ: 左に題、右に場所と得点 ── */
   #head {
     flex: 0 0 auto; display: flex; align-items: baseline; gap: 1em;
@@ -75,6 +97,10 @@
   /* 実際に渡した英語コマンド（種明かし。薄く小さく） */
   #screen p.sent { margin: -.6em 0 .9em; font-size: .75rem; color: var(--dim); font-family: ui-monospace, monospace }
   #screen p.sent::before { content: "→ " }
+  /* ★版権表示と本文の境目。原作も「起動時の表示 → 部屋」の順に出すので、
+     位置は原作のまま。読む人には別物なので線で切る */
+  #screen hr { border: 0; border-top: 1px solid var(--rule); margin: 1.4em 0 1.2em }
+
   /* ★未訳の行は英語のまま出す。開発中は罫を付けて目で見えるようにする */
   #screen p.raw { color: var(--dim); border-left: 2px solid var(--warn); padding-left: .6em }
 
@@ -150,6 +176,20 @@
 </style>
 </head>
 <body>
+  <!-- ★入口の案内。軽いので毎回出す（初見の人に「何ができて、どう打つか」を渡す） -->
+  <div id="intro" hidden>
+    <div id="intro-box">
+      <p class="intro-title">ひらがなで打つと、日本語で返ってくる。</p>
+      <p>1980 年の <i>Zork I</i>（Infocom）を、訳文と語彙を用意して日本語のまま遊べるようにしたもの。
+         <b>変換はしない</b> —— ひらがなだけで通じる。</p>
+      <p class="intro-ex">ゆうびんばこをあける　／　きたへいく　／　じゅうたんをめくる　／　もちもの</p>
+      <p class="intro-dim">ゲームパッドでも、スマホのフリック（右下の「かな」）でも打てる。</p>
+      <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
+        ZORK は Infocom, Inc. の登録商標です（この企画は Infocom / Microsoft とは無関係）。</p>
+      <button id="intro-ok" type="button">はじめる</button>
+    </div>
+  </div>
+
   <div id="head" class="edge">
     <span id="title"><b>ぜんまい</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
     <span id="place">　</span>

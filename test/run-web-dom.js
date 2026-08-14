@@ -12,7 +12,7 @@ const fs = require('fs')
 const path = require('path')
 const vm2 = require('vm')
 
-const ROOT = path.join(__dirname, '..')
+const ROOT = process.env.ZENMAI_ROOT ? path.resolve(process.env.ZENMAI_ROOT) : path.join(__dirname, '..')
 process.on('unhandledRejection', (e) => { console.error('★未処理の拒否:', (e && e.stack) || e) })
 const cmds = process.argv.slice(2)
 
@@ -42,11 +42,12 @@ class El {
   setAttribute(k, v) { this[k] = v }
   getAttribute(k) { return this[k] }
   querySelectorAll() { return [] }
-  querySelector() { return null }
+  querySelector(sel) { return this.children.find((c) => c.tag === sel) || null }
+  insertBefore(c, ref) { this.children.splice(this.children.indexOf(ref), 0, c); return c }
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn', 'intro', 'intro-ok']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
@@ -68,10 +69,11 @@ document.body = {
   },
 }
 document.querySelectorAll = () => []
+document.createElement = (t) => new El(t)
 global.window = window
 global.document = document
 global.fetch = async (url) => {
-  const p = path.join(ROOT, 'web', url)
+  const p = path.join(ROOT, WEB, url)
   if (!fs.existsSync(p)) return { ok: false }
   const buf = fs.readFileSync(p)
   return { ok: true, json: async () => JSON.parse(buf.toString('utf8')), arrayBuffer: async () => buf }
@@ -80,11 +82,12 @@ global.fetch = async (url) => {
 // --- 本番のスクリプトを順に読み込む ---
 // ★一覧は index.html から読み取る。ここに書き写すと、ページに script を足したとき
 //   テストだけ古くなる（実際に command.js を足した回で落ちた）
-const html = fs.readFileSync(path.join(ROOT, 'web', 'index.html'), 'utf8')
+const WEB = fs.existsSync(path.join(ROOT, 'web', 'index.html')) ? 'web' : '.'
+const html = fs.readFileSync(path.join(ROOT, WEB, 'index.html'), 'utf8')
 const srcs = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1])
 for (const rel of srcs) {
   if (rel === 'main.js') continue                    // main.js は DOM を用意してから
-  const f = path.normalize(path.join('web', rel))
+  const f = path.normalize(path.join(WEB, rel))
   vm2.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f })
 }
 // ★UMD は `globalThis` に登録する。ブラウザでは window と同じものだが、
@@ -115,7 +118,7 @@ if (window.FlickEngine) {
     mount(el, map, opts) { flick.map = map; flick.opts = opts; return { destroy() {} } },
   }
 }
-vm2.runInThisContext(fs.readFileSync(path.join(ROOT, 'web', 'main.js'), 'utf8'), { filename: 'web/main.js' })
+vm2.runInThisContext(fs.readFileSync(path.join(ROOT, WEB, 'main.js'), 'utf8'), { filename: 'main.js' })
 
 // --- コマンドを順に流す ---
 let n = 0
@@ -179,6 +182,11 @@ const finish = () => {
     for (const [name, ok] of checks) console.log(`--- ゲームパッド ${ok ? '✓' : '✗'} ${name}`)
     if (checks.some(([, ok]) => !ok)) { console.error('★ゲームパッドの配線が壊れている'); process.exit(1) }
   }
+  // ★版権表示と本文のあいだに線が入っているか
+  const hrAt = els.screen.children.findIndex((c) => c.tag === 'hr')
+  const roomAt = els.screen.children.findIndex((c) => c.className === 'room')
+  console.log(`--- 区切り線: ${hrAt >= 0 && hrAt < roomAt ? '✓ 版権表示の後・最初の場所名の前' : '✗ 位置がおかしい'}`)
+  if (!(hrAt >= 0 && hrAt < roomAt)) process.exit(1)
   // ★フリック（本物の flickmap + resolver を通す）
   if (!flick.opts) { console.error('★フリックが載っていない'); process.exit(1) }
   if (flick.opts) {
