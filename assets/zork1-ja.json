@@ -604,6 +604,16 @@
    "en": "What do you want to {VERB} {PREP}?",
    "id": "P-11",
    "ja": "何{PREP}{VERB}？"
+  },
+  {
+   "en": "The unconscious {OBJ} cannot defend himself: He dies.",
+   "id": "A-23",
+   "ja": "気を失った{OBJ}はもう身を守れない。息絶えた。"
+  },
+  {
+   "en": "The unarmed {OBJ} cannot defend himself: He dies.",
+   "id": "A-24",
+   "ja": "武器を持たない{OBJ}はもう身を守れない。息絶えた。"
   }
  ],
  "exact": {
@@ -5150,9 +5160,9 @@
     "くさ"
    ]
   ],
-  "舟": [
+  "船": [
    [
-    "舟",
+    "船",
     "ふね"
    ]
   ],
@@ -6763,7 +6773,7 @@
   "board": "乗る",
   "boarded window": "板で塞がれた窓",
   "boards": "板",
-  "boat": "舟",
+  "boat": "船",
   "bodies": "死体の山",
   "bolt": "ボルト",
   "bones": "骸骨",

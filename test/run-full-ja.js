@@ -55,7 +55,8 @@ const Glk = createGlk({
     if (Glk.waitingFor() !== 'line') return
     if (n >= inputs.length) {
       const m = tr.stats
-      process.stderr.write(`\n--- 出力: 引けた ${m.hit} 行 / 未訳 ${m.miss} 行 ---\n`)
+      process.stderr.write(`\n--- 出力: 引けた ${m.hit} 行 / 未訳 ${m.miss} 行`
+        + (m.rawWords.size ? ` / ★スロットに英語 ${m.rawWords.size} 種: ${[...m.rawWords].join(' | ')}` : '') + ' ---\n')
       return process.exit(0)
     }
     const ja = inputs[n++]

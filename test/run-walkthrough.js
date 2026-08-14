@@ -40,8 +40,12 @@ function finish() {
   const m = tr.stats
   console.log(`--- ${cmds.length} 手を流した ---`)
   console.log(`引けた ${m.hit} 行（うち貪欲 ${m.greedy}）/ 訳さない ${m.notrans} / ★未訳 ${m.miss} 行`)
-  console.log(`未訳の異なり: ${seen.size} 種\n`)
+  console.log(`未訳の異なり: ${seen.size} 種`)
+  // ★スロットに英語が残ったもの。**行としては引けている**ので未訳には出ない
+  //   （実プレイで `a clove of garlic, and a lunch` が英語のまま出た）
+  console.log(`★スロットに英語が残った語: ${m.rawWords.size} 種\n`)
   for (const [s, where] of seen) console.log(`[${where}] ${s}`)
+  for (const w of m.rawWords) console.log(`[スロット] ${w}`)
   process.exit(0)
 }
 

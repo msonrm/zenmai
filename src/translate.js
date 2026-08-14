@@ -13,6 +13,7 @@
 // テンプレートの骨格（`The {PRSO} is closed.`）を名前付きスロットの正規表現にする
 function compile(en) {
   const names = []
+  const quotes = []      // ★引用符の中は**打った語そのもの**。訳してはいけない
   let re = ''
   let i = 0
   for (const m of en.matchAll(/\{([A-Z0-9,?!-]+)\}/g)) {
@@ -23,11 +24,12 @@ function compile(en) {
     // ただし**引用符で囲まれたスロット**は別 —— 未知語がそのまま入るので記号もありうる
     //   （`I don't know the word "!)".` が外れていた）
     const quoted = en[m.index - 1] === '"' && en[m.index + m[0].length] === '"'
+    quotes.push(quoted)
     re += quoted ? '([^"]*)' : '([^.!?]+?)'
     i = m.index + m[0].length
   }
   re += escapeRe(en.slice(i))
-  return { re: new RegExp('^' + re + '$'), names }
+  return { re: new RegExp('^' + re + '$'), names, quotes }
 }
 
 function escapeRe(s) {
@@ -72,22 +74,42 @@ class Translator {
     //   （`You can't see any window here!` の window は DESC ではなく辞書の裸の名詞）
     this.words = new Map(Object.entries(asset.words || {}))
     this.buf = ''
-    this.stats = { hit: 0, greedy: 0, miss: 0, notrans: 0, missed: new Set() }
+    // ★rawWords = **スロットに英語が残った**もの。行としては引けているので
+    //   miss には出ない（実プレイで `a clove of garlic, and a lunch` が英語のまま出た）
+    this.stats = { hit: 0, greedy: 0, miss: 0, notrans: 0, missed: new Set(), rawWords: new Set() }
   }
 
-  /** 1 語（または名詞句）を日本語へ。無ければそのまま返す */
-  word(en) {
+  /** 1 語（または名詞句）を日本語へ。無ければ null */
+  one(en) {
     const k = norm(en)
     // ★冠詞を剥がしてから引く（`a leaflet` は `leaflet` で登録されている）。
     //   日本語に冠詞は無いので、剥がすだけで済む
     const bare = k.replace(/^(a|an|the)\s+/i, '')
-    return this.props.get(k) || this.exact.get(k) || this.words.get(k)
-      || this.props.get(bare) || this.exact.get(bare) || this.words.get(bare) || en
+    return this.props.get(k) ?? this.exact.get(k) ?? this.words.get(k)
+      ?? this.props.get(bare) ?? this.exact.get(bare) ?? this.words.get(bare) ?? null
+  }
+
+  /** 1 語（または名詞句・**並び**）を日本語へ。無ければそのまま返す */
+  word(en) {
+    const hit = this.one(en)
+    if (hit !== null) return hit
+    // ★スロットには**並び**が入ることがある（`a clove of garlic, and a lunch`）。
+    //   全部引けたときだけ「と」で繋ぐ。1 つでも引けなければ諦める（半分英語より、全部英語）
+    const parts = String(en).split(/,\s*and\s+|\s+and\s+|,\s*/).filter((x) => x.trim())
+    if (parts.length > 1) {
+      const ja = parts.map((x) => this.one(x))
+      if (ja.every((x) => x !== null)) return ja.join('と')
+    }
+    // ★引けなかった。行としては引けているので miss には出ない —— ここで数える
+    // ★どの骨格に当てた結果かも残す —— 屑がスロットに入るのは**当て違い**の徴候
+    if (/[A-Za-z]/.test(String(en))) this.stats.rawWords.add(norm(en) + (this._curKey ? `　←　${this._curKey}` : ''))
+    return en
   }
 
   /** 1 単位（1 文 or 数文のまとまり）を引く。引けなければ null。統計は数えない */
   lookup(key) {
     if (!key) return null
+    this._curKey = key
     const hit = this.exact.get(key) ?? this.props.get(key)
     if (hit !== undefined) return hit
     for (const p of this.patterns) {
@@ -95,7 +117,9 @@ class Translator {
       if (!m) continue
       let out = p.ja
       p.names.forEach((name, idx) => {
-        out = out.replace('{' + name + '}', this.word(m[idx + 1]))
+        // ★引用された語（`I don't know the word "X".`）は**打った語そのもの**なので訳さない
+        const v = p.quotes[idx] ? m[idx + 1] : this.word(m[idx + 1])
+        out = out.replace('{' + name + '}', v)
       })
       return out
     }
