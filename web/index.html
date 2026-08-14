@@ -150,8 +150,10 @@
      スマホ（縦持ちは vmin = 画面幅）だと下限に張り付いて読めない ——
      改行キーが何の記号か分からない、という指摘。盤を容れ物にして測る */
   #flick { container-type: inline-size }
-  #flick .fe-key { font-size: clamp(16px, 7cqw, 30px) }
-  #flick .fe-key.fe-fn { font-size: clamp(14px, 6cqw, 24px) }
+  #flick .fe-key { font-size: clamp(15px, 6.2cqw, 27px) }
+  /* 機能キーは記号 1 つなので、かなより**大きめ**にしないと小さく見える
+     （字数が少ないほど、同じ級数でも小さく感じる） */
+  #flick .fe-key.fe-fn { font-size: clamp(15px, 6.6cqw, 28px) }
   #flick-btn {
     flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
     color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
@@ -175,11 +177,14 @@
   /* ★盤は**画面の中央**に置く（指の記憶は絶対位置に付いているので、寄せてはいけない）。
      操作ボタンは**場所を取らずに左端へ重ねる** —— フリックの左端列は ← 以外が空なので、
      その下半分が空き地になる（実機の指摘どおり） */
-  #bottom { position: relative; display: flex; justify-content: center; align-items: flex-end }
+  #bottom { position: relative; display: flex; align-items: flex-end }
   #meta {
-    position: absolute; left: 1.2em; bottom: .15em;
+    flex: 0 0 auto; margin-left: 1.2em;
     display: flex; flex-direction: column; align-items: flex-start; gap: .3em;
   }
+  /* ★盤を出しているあいだだけ流れから外して左端へ重ねる。
+     常に absolute にしていたら、閉じたとき**コマンド欄の裏に幽霊が残った**（実機の指摘）*/
+  body.flick-open #meta { position: absolute; left: 1.2em; bottom: .15em; margin-left: 0 }
   #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
   body.no-debug #debug-btn { opacity: .55 }
   body.no-debug #stat { display: none }

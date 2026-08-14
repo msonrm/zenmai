@@ -5,6 +5,13 @@
  */
 ;(async () => {
   const $ = (id) => document.getElementById(id)
+  // ★触る画面で盤を閉じているときは**入力欄に焦点を当てない** ——
+  //   毎手 focus していたので、OS のキーボードが勝手に出てきた（実機の指摘）
+  const touchDevice = () => typeof navigator !== 'undefined' && (navigator.maxTouchPoints || 0) > 0
+  const refocus = () => {
+    if (touchDevice() && !document.body.classList.contains('flick-open')) return
+    $('input').focus()
+  }
   const screen = $('screen')
   const { Translator } = window.ZenmaiTranslate
   const { createGlk } = window.GlkShim
@@ -26,12 +33,12 @@
   $('debug-btn').addEventListener('click', () => {
     const on = !document.body.classList.toggle('no-debug')
     localStorage.setItem('zenmai-debug', on ? 'on' : 'off')
-    $('input').focus()
+    refocus()
   })
   $('ruby-btn').addEventListener('click', () => {
     const off = document.body.classList.toggle('no-ruby')
     localStorage.setItem('zenmai-ruby', off ? 'off' : 'on')
-    $('input').focus()
+    refocus()
   })
   const cm = createCommander(await load('../assets/zork1-cmd.json'))
 
@@ -166,7 +173,7 @@
       $('stat').textContent = ` 引けた ${tr.stats.hit} 行 / 未訳 ${tr.stats.miss} 行`
       $('input').disabled = Glk.waitingFor() !== 'line'
       $('input').placeholder = Glk.waitingFor() === 'char' ? '何かキーを（Enter で進む）' : hint()
-      $('input').focus()
+      refocus()
     },
   })
 
@@ -249,7 +256,7 @@
         },
       })
     }
-    $('flick-btn').addEventListener('click', () => { showFlick(!flickOpen()) })
+    $('flick-btn').addEventListener('click', () => { showFlick(!flickOpen()).then(refocus) })
     // ★触る画面なら最初から開いておく（スマホで来た人に「打てない」と思わせない）
     const touch = (navigator.maxTouchPoints || 0) > 0
     if (localStorage.getItem('zenmai-flick') === 'on' || (touch && localStorage.getItem('zenmai-flick') !== 'off')) {
@@ -327,7 +334,7 @@
       if (on && !vis) { vis = window.GamepadEngine.mount($('pad')); patchPad($('pad')) }
       if (!on && vis) { vis.destroy(); vis = null }
     }
-    $('pad-btn').addEventListener('click', () => { showPad(!padOpen()); $('input').focus() })
+    $('pad-btn').addEventListener('click', () => { showPad(!padOpen()); refocus() })
 
     window.GamepadEngine.start({
       // ★濁点（R🕹↑）と拗音（LT）は**末尾の文字を見て置換**を決める。
@@ -361,7 +368,7 @@
   const intro = $('intro')
   if (intro) {
     intro.hidden = false
-    const close = () => { intro.hidden = true; $('input').focus() }
+    const close = () => { intro.hidden = true; refocus() }
     $('intro-ok').addEventListener('click', close)
     intro.addEventListener('click', (e) => { if (e.target === intro) close() })
   }
