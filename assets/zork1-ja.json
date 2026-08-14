@@ -103,12 +103,12 @@
   {
    "en": "I don't know the word \"{WORD}\".",
    "id": "P-1",
-   "ja": "「{WORD}」という語は知らない。"
+   "ja": "「{WORD}」という言葉は知らない。"
   },
   {
    "en": "You used the word \"{WORD}\" in a way that I don't understand.",
    "id": "P-2",
-   "ja": "「{WORD}」の使い方が分からない。"
+   "ja": "「{WORD}」という言葉の使い方が分からない。"
   },
   {
    "en": "What do you want to {VERB}?",
@@ -1347,7 +1347,7 @@
   "Up a Tree": "木の上",
   "Use compass directions for movement.": "移動は方角で指示してくれ。",
   "Very good. Now you can go to the second grade.": "よくできた。これで二年生に上がれる。",
-  "Warning: only the first word after OOPS is used.": "注意 —— OOPS の後は、最初の一語だけが使われる。",
+  "Warning: only the first word after OOPS is used.": "注意 —— OOPS の後は、最初の単語だけが使われる。",
   "Wasn't he a sailor?": "船乗りではなかったか。",
   "Well done. The boat is repaired.": "見事だ。舟は直った。",
   "Well, for one, you are playing Zork...": "まず一つ、きみは Zork を遊んでいる……",
