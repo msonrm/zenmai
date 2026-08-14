@@ -3,9 +3,9 @@ dist/
 .DS_Store
 *.log
 
-# 作品の story file とソースは同梱しない（各自で取得・ビルドする）
-/vendor/zork1/
-*.z3
+# ★story file は同梱する。`historicalsource/zork1` が 2025-11 に MIT で公開したもので、
+#   その COMPILED/zork1.z3 と byte 同一（出どころと表示義務は vendor/zork1/README.md）。
+#   公開ページで遊べることが企画の目的なので、各自で用意させる形は採らない
 *.z5
 *.z8
 *.zblorb
