@@ -110,9 +110,11 @@
        **キーボードに要るのは指の届く大きさで、画面の大きさに比例する量ではない** */
   #flick { display: none; margin: .5em auto 0; width: min(100%, 22em); aspect-ratio: 5 / 4;
     max-height: min(38vh, 300px);
-    /* 盤の色は本文の紙に合わせる（エンジンが読む変数） */
+    /* 盤の色（エンジンが読む変数）。★キーの地は**フッタの地と変えないと沈む** ——
+       かなのキーを --panel にしていたとき、コマンド欄の地と同じ色で境目が消えていた
+       （実機の指摘）。かなも機能キーも同じ地にし、differences は文字の濃さで出す */
     --fe-bg: transparent;
-    --fe-key-bg: var(--panel); --fe-key-fg: var(--ink);
+    --fe-key-bg: var(--bg); --fe-key-fg: var(--ink);
     --fe-fn-bg: var(--bg); --fe-fn-fg: var(--dim);
     --fe-active-bg: var(--rule);
     --fe-petal-bg: var(--panel); --fe-petal-fg: var(--ink); --fe-petal-hot-bg: var(--accent);
