@@ -55,6 +55,9 @@ const CASES = [
   //   原作は 1 語しか受けないので候補を順に試す。第一候補だけ固定表で見る
   ['とろふぃーけーすをみる', 'look at case'],   // 名前をずらしたので一発で当たる
   ['ゆうびんばこをあける', 'open mailbox'],
+  // --- 目的語が要る動詞は、原作に聞き返させずこちらで訊く（2026-08-14 実プレイ）---
+  //   原作の聞き返しの最中に完全な文を送るとパーサが混ぜて壊す（eat advertisement → 「eat advert」）
+  ['おりる', 'disembark'],                  // needsObject が立つ（下の別検査で見る）
   // --- 原作にない言い方には案内を返す（2026-08-14 実プレイ）---
   ['けんをつかう', null],                  // 「使う」に当たる動詞は原作にない
   ['ほんをよむ', 'read book'],             // 「本」が語彙に無かった
@@ -74,6 +77,13 @@ let ng = 0
   const ok = got === want
   if (!ok) ng++
   console.log(`${ok ? '✓' : '✗'} はこをみる（候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+}
+{
+  const a = cm.toCommand('おりる')
+  const b = cm.toCommand('き', { verb: a.verbKey })
+  const ok = a.needsObject && a.ask === '何を降りる？' && b.command === 'climb down tree'
+  if (!ok) ng++
+  console.log(`${ok ? '✓' : '✗'} おりる → 訊く → き　→ ${a.ask} / ${b.command}`)
 }
 for (const [ja, want] of CASES) {
   const r = cm.toCommand(ja)

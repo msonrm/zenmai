@@ -152,8 +152,14 @@ function createCommander(asset) {
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
-  /** @returns {{command:string|null, trace:string, unknown:string[]}} */
-  function toCommand(input) {
+  /**
+   * @param {string} input 日本語
+   * @param {{verb?: string}} [opts] ★原作が「何を◯◯？」と聞き返している最中は、
+   *   動詞がこちらの手元にある。それを渡すと**名詞だけの答えでも全部の規則が働く**
+   *   （「おりる」→「き」が `disembark tree` になり「それには乗っていない」と出ていた）
+   * @returns {{command:string|null, trace:string, unknown:string[]}}
+   */
+  function toCommand(input, opts) {
     const raw = strip(String(input || ''))
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
     if (/^[\x20-\x7e]+$/.test(input.trim())) {
@@ -214,6 +220,11 @@ function createCommander(asset) {
       return { command: null, trace: '知らない言葉', note: g || '', unknown, echo: echo.join('') }
     }
     let verb = found.find((f) => f.kind === 'verb')
+    // ★聞き返しの最中なら、こちらが送った動詞を補う
+    if (!verb && opts && opts.verb && asset.verbs[opts.verb]) {
+      const v = asset.verbs[opts.verb]
+      verb = { kind: 'verb', key: opts.verb, disp: v.ja[0], ja: v.ja[0], shapes: v.shapes, role: null }
+    }
     const dirs = found.filter((f) => f.kind === 'dir')
     const objs = found.filter((f) => f.kind === 'obj')
 
@@ -338,7 +349,21 @@ function createCommander(asset) {
     const alts = at ? at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')) : []
     // ★候補が全部外れたとき、**打った言葉**で断るために覚えておく
     const objDisp = at ? (at[0] === prsoAt ? prso.disp : tool.disp) : ''
-    return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp }
+    // ★目的語を取らないと成り立たない動詞なのに目的語が無いなら、**送らない**。
+    //   送ると原作が聞き返し、その最中に完全な文を渡すとパーサが混ぜて壊す
+    //   （`eat advertisement` が「eat advert」という名詞句として読まれた）。
+    //   こちらで訊いて、揃ってから 1 文として送る
+    const bareOk2 = shapes.some((sh) => sh === '')
+    const needsObject = !bareOk2 && !prso && !tool && !dest && !bareDirs.length
+    // ★知らない言葉が混じっていたなら、訊き直すのではなく**それを言う**
+    //   （「何を食べる？」→「ひるめし」→ また「何を食べる？」では手が止まる）
+    if (needsObject && unknown.length) {
+      const g = unknown.map((w) => guide[kana(w)]).find(Boolean)
+      return { command: null, trace: '知らない言葉', note: g || '', unknown, echo: echo.join('') }
+    }
+    const ask = verb.disp.includes('を') ? verb.disp.split('を').pop() : verb.disp
+    return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp,
+      verbKey: verb.key, hasObject: !!(prso || tool || dest), needsObject, ask: `何を${ask}？` }
   }
 
   return { toCommand, lex }

@@ -23,6 +23,7 @@ let n = 0
 let place = ''
 // ★別案（箱 = mailbox / case / …）を順に試す。「ここには見当たらない」は手数を消費しない
 let trial = null
+let pendingVerb = null   // 原作が聞き返している最中の動詞
 let rawSince = ''
 const NOT_HERE = /can't see any .* here!/i
 const sink = (t) => { if (trial) trial.buf += t; else process.stdout.write(t) }
@@ -60,11 +61,17 @@ const Glk = createGlk({
       return process.exit(0)
     }
     const ja = inputs[n++]
-    const r = cm.toCommand(ja)
+    const r = cm.toCommand(ja, { verb: pendingVerb })
     process.stdout.write(`\n[${place}]\n> ${ja}`)
+    if (r.needsObject) {
+      pendingVerb = r.verbKey
+      process.stdout.write(`  ……（${r.ask}）\n`)
+      return setImmediate(() => Glk.submitLine('look'))
+    }
     if (!r.command) { process.stdout.write(`  ……（${r.note || r.trace}）\n`); return setImmediate(() => Glk.submitLine('look')) }
     process.stdout.write(`   → ${r.command}${r.unknown.length ? '  ※残: ' + r.unknown.join('|') : ''}\n`)
     trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
+    pendingVerb = null
     rawSince = ''
     setImmediate(() => Glk.submitLine(r.command))
   },

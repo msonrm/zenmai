@@ -52,6 +52,7 @@
   const strip = (t) => t.replace(/^[ \t]*>+[ \t]*$/gm, '').replace(/(^|\n)[ \t]*>+[ \t]*$/g, '$1')
 
   let para = null
+  let pendingVerb = null  // 原作が聞き返している最中の動詞
   let place = ''          // ★いまの場所名。本文の中の「場所名だけの行」を見分けるのに使う
   const fresh = []        // 直前の入力要求から後に足した段落
   function show(text, cls) {
@@ -150,7 +151,8 @@
     $('input').value = ''
     if (Glk.waitingFor() === 'char') { Glk.submitChar(32); return }
     // ★日本語で打たれたら英語コマンドへ翻訳する。英語ならそのまま通す
-    const r = cm.toCommand(text)
+    // ★原作が「何を◯◯？」と聞き返している最中は、動詞がこちらの手元にある
+    const r = cm.toCommand(text, { verb: pendingVerb })
     show(text || ' ', 'cmd')
     if (!r.command) {
       const w = r.unknown.filter((x) => x.length > 1).map((x) => '「' + x + '」').join('・')
@@ -160,8 +162,16 @@
         : '（読み取れなかった）', 'raw')
       return
     }
+    // ★目的語が要る動詞なのに無いときは、原作に聞き返させずこちらで訊く
+    if (r.needsObject) {
+      pendingVerb = r.verbKey
+      show(r.ask, 'raw')
+      return
+    }
     if (r.trace !== '英語のまま') sent(r.command, r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')
     trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
+    // 送ったのが**動詞だけ**なら、次の入力は聞き返しへの答えとみなす
+    pendingVerb = null
     submit(r.command)
   })
 
