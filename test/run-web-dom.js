@@ -47,7 +47,7 @@ class El {
   dispatch(ev, arg) { for (const fn of this.handlers[ev] || []) fn(arg) }
   focus() {}
 }
-const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn', 'intro', 'intro-ok']
+const ids = ['status', 'place', 'score', 'screen', 'bar', 'input', 'hint', 'stat', 'ruby-btn', 'debug-btn', 'meta', 'pad', 'pad-btn', 'flick', 'flick-btn', 'intro', 'intro-ok', 'bottom']
 const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = {}
@@ -74,7 +74,12 @@ global.window = window
 global.document = document
 global.fetch = async (url) => {
   const p = path.join(ROOT, WEB, url)
-  if (!fs.existsSync(p)) return { ok: false }
+  // ★Cloudflare Pages は**無いパスにも index.html を 200 で返す**。器も同じ意地悪をして、
+  //   ホストが中身を確かめているかを試す（これを入れる前は本番だけで壊れた）
+  if (!fs.existsSync(p)) {
+    const fallback = fs.readFileSync(path.join(ROOT, WEB, 'index.html'))
+    return { ok: true, json: async () => JSON.parse(fallback.toString('utf8')), arrayBuffer: async () => fallback }
+  }
   const buf = fs.readFileSync(p)
   return { ok: true, json: async () => JSON.parse(buf.toString('utf8')), arrayBuffer: async () => buf }
 }

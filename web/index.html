@@ -134,7 +134,7 @@
        中身が縦長に潰れる（`.gutter` を付けていて実際に潰れた）
      - ★**px の上限を置く**。`vh` だけだと縦に長い画面で深くなりすぎる ——
        **キーボードに要るのは指の届く大きさで、画面の大きさに比例する量ではない** */
-  #flick { display: none; margin: .5em auto 0; width: min(100%, 22em); aspect-ratio: 5 / 4;
+  #flick { display: none; margin: .5em auto 0; width: min(100%, 22em); aspect-ratio: 5 / 4; flex: 0 1 auto;
     max-height: min(38vh, 300px);
     /* 盤の色（エンジンが読む変数）。★キーの地は**フッタの地と変えないと沈む** ——
        かなのキーを --panel にしていたとき、コマンド欄の地と同じ色で境目が消えていた
@@ -152,7 +152,7 @@
   }
   body.flick-open #flick-btn { color: var(--ink); border-color: var(--accent) }
   /* ★開閉できることを見せる —— 閉じているときは横向き、開いているときは下向き */
-  #flick-btn::after, #pad-btn::after { content: "\25B8"; font-size: .8em; opacity: .7; margin-left: .25em }
+  #flick-btn::after, #pad-btn::after { content: "\25B8"; font-size: 1em; opacity: .9; margin-left: .3em }
   body.flick-open #flick-btn::after { content: "\25BE" }
   body.pad-open #pad-btn::after { content: "\25BE" }
   #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
@@ -163,11 +163,13 @@
   }
   #input:focus { border-bottom-color: var(--accent) }
   #input::placeholder { color: var(--dim) }
-  /* 右下。段の外なので本文の右端より外側に出る。
-     ★種明かし（渡した英語コマンド）と成績は**同じ性質**なので、まとめて 1 つで入切する */
+  /* ★下の段は「左に操作・その右に盤」。以前は右下に重ねていたが、
+     フリック盤を出すと**改行キーと重なった**（実機の指摘）。
+     重なりは z 順ではなく**場所で解く** —— 盤は中央に寄るので左が空く */
+  #bottom { display: flex; align-items: flex-end; gap: .8em; padding: 0 1.2em }
   #meta {
-    position: absolute; right: 1.2em; bottom: .15em;
-    display: flex; align-items: center; gap: .45em;
+    flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: .3em;
+    padding-bottom: .15em;
   }
   #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
   body.no-debug #debug-btn { opacity: .55 }
@@ -208,9 +210,11 @@
       <button id="flick-btn" type="button" title="かなの盤を開閉">かな</button>
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>
-    <div id="flick"></div>
+    <div id="bottom">
+      <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
+      <div id="flick"></div>
+    </div>
     <div id="pad" class="gutter"></div>
-    <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>

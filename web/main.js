@@ -35,16 +35,23 @@
   })
   const cm = createCommander(await load('../assets/zork1-cmd.json'))
 
-  // story file は同梱しない（MIT のソースから各自でビルドするか取得する）
+  // story file を読む。★**中身を確かめてから使う** ——
+  //   Cloudflare Pages は**存在しないパスにも index.html を 200 で返す**ので、
+  //   `r.ok` は「そのファイルがあった」ことを意味しない（公開して初めて出た。
+  //   `[エラー] This is not a Z-Code file` の正体が HTML を食わせていたこと）。
+  //   Z-code は先頭バイトが版（1〜8）なので、そこで見分ける
+  const looksLikeStory = (b) => b && b.length > 1024 && b[0] >= 1 && b[0] <= 8
   let story = null
-  for (const url of ['zork1.z3', '../vendor/zork1/zork1.z3']) {
+  for (const url of ['vendor/zork1/zork1.z3', '../vendor/zork1/zork1.z3', 'zork1.z3']) {
     try {
-      const r = await fetch(url)
-      if (r.ok) { story = new Uint8Array(await r.arrayBuffer()); break }
+      const r = await fetch(url, { cache: 'no-store' })
+      if (!r.ok) continue
+      const b = new Uint8Array(await r.arrayBuffer())
+      if (looksLikeStory(b)) { story = b; break }
     } catch (e) { /* 次を試す */ }
   }
   if (!story) {
-    show('story file が見つからない。`vendor/zork1/zork1.z3` を置くか、ZILF でビルドしてください。', 'raw')
+    show('story file が読めなかった（`vendor/zork1/zork1.z3`）。', 'raw')
     return
   }
 
