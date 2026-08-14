@@ -42,6 +42,13 @@ const ROLE_JA = { IN: 'の中', ON: 'の上', UNDER: 'の下', BEHIND: 'の後�
 
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
 
+// ★パーサが直接受ける語（SYNTAX の動詞ではないので動詞表に載らない）。
+//   `again` は直前のコマンドの繰り返し、`oops` は打ち間違いの訂正
+const PARSER_WORDS = {
+  もういちど: 'again', もう一度: 'again', くりかえす: 'again', 繰り返す: 'again',
+  おなじ: 'again', 同じ: 'again', またやる: 'again', リピート: 'again', りぴーと: 'again',
+}
+
 // ★はい／いいえの質問（終わるか・最初からやるか）は原作が Y/N で受ける。
 //   ここだけは動詞でも物でもないので、専用の写像を持つ
 const YESNO = {
@@ -171,6 +178,9 @@ function createCommander(asset) {
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
     if (/^[\x20-\x7e]+$/.test(input.trim())) {
       return { command: input.trim(), trace: '英語のまま', unknown: [], echo: input.trim() }
+    }
+    if (PARSER_WORDS[raw] || PARSER_WORDS[kana(raw)]) {
+      return { command: PARSER_WORDS[raw] || PARSER_WORDS[kana(raw)], trace: 'パーサの語', unknown: [], echo: raw }
     }
     if (YESNO[raw] || YESNO[kana(raw)]) {
       return { command: YESNO[raw] || YESNO[kana(raw)], trace: 'はい／いいえ', unknown: [], echo: raw }
