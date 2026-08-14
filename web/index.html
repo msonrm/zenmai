@@ -51,7 +51,7 @@
   /* ★商標は名乗りではなく**帰属の明示**として書く（名前・ロゴ・ドメインには使わない） */
   .intro-note { color: var(--dim); font-size: .78em; line-height: 1.7; margin-top: 1em }
   #intro-ok {
-    margin-top: .4em; background: transparent; border: 1px solid var(--accent); border-radius: .3em;
+    display: block; margin: .8em auto 0; background: transparent; border: 1px solid var(--accent); border-radius: .3em;
     color: var(--accent); font: inherit; padding: .25em 1.4em; cursor: pointer;
   }
   #intro-ok:hover { background: var(--accent); color: var(--panel) }
@@ -179,13 +179,13 @@
   <!-- ★入口の案内。軽いので毎回出す（初見の人に「何ができて、どう打つか」を渡す） -->
   <div id="intro" hidden>
     <div id="intro-box">
-      <p class="intro-title">ひらがなで打つと、日本語で返ってくる。</p>
-      <p>1980 年の <i>Zork I</i>（Infocom）を、訳文と語彙を用意して日本語のまま遊べるようにしたもの。
-         <b>変換はしない</b> —— ひらがなだけで通じる。</p>
+      <p class="intro-title">ぜんまい —— 日本語で読むテキストアドベンチャー</p>
+      <p>1980年の <i>Zork I</i>（Infocom）を、日本語で遊べるようにした。コマンドもひらがなで打てる。</p>
       <p class="intro-ex">ゆうびんばこをあける　／　きたへいく　／　じゅうたんをめくる　／　もちもの</p>
-      <p class="intro-dim">ゲームパッドでも、スマホのフリック（右下の「かな」）でも打てる。</p>
+      <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力盤が出る。
+        ゲームコントローラーを繋げば、それでもひらがなが打てる。</p>
       <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
-        ZORK は Infocom, Inc. の登録商標です（この企画は Infocom / Microsoft とは無関係）。</p>
+        ZORK は Infocom, Inc. の登録商標です（このプロジェクトは Infocom / Microsoft とは無関係）。</p>
       <button id="intro-ok" type="button">はじめる</button>
     </div>
   </div>
