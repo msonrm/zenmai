@@ -73,6 +73,9 @@ const Glk = createGlk({
     }
     if (!r.command) { process.stdout.write(`  ……（${r.note || r.trace}）\n`); return setImmediate(() => Glk.submitLine('look')) }
     process.stdout.write(`   → ${r.command}${r.unknown.length ? '  ※残: ' + r.unknown.join('|') : ''}\n`)
+    // ★ブラウザ側（web/main.js）と**同じ手当て**を通す。片方だけが呼ぶ値は、
+    //   もう片方で必ず落ちる（反響が訳語に化けるのを、この器でも捕まえられるように）
+    tr.setEcho(r.echoWord || ja)
     trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
     pendingVerb = null
     rawSince = ''

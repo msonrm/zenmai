@@ -94,5 +94,33 @@ for (const [ja, want] of CASES) {
   if (!ok) ng++
   console.log(`${ok ? '✓' : '✗'} ${ja.padEnd(14, '　')} → ${String(r.command).padEnd(24)}${ok ? '' : ` ★期待: ${want}`}`)
 }
+// ★轟音の部屋の反響 —— 原作は**プレイヤーが打った語**を返す（`P-INBUF` から切り出す）ので、
+//   訳語ではなく打った呼び名が返らなければならない。
+//   walkthrough はこの部屋を通らないので、ここで押さえる
+{
+  const { Translator } = require('../src/translate.js')
+  const tr = new Translator(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets', 'zork1-ja.json'), 'utf8')))
+  // ★英語モード＝**訳すのをやめる**。原文がそのまま返る（行の貯め込みや
+  //   プロンプト剥がしはそのまま使いたいので、訳を引くところだけを止めている）
+  {
+    const raw = 'West of House'
+    const ja = tr.line(raw)
+    tr.setPassthrough(true)
+    const en = tr.line(raw)
+    tr.setPassthrough(false)
+    const ok = ja === '家の西' && en === raw
+    if (!ok) ng++
+    console.log(`${ok ? '✓' : '✗'} 英語モードは訳さず原文  → 日本語「${ja}」/ 英語「${en}」`)
+  }
+  for (const [ja, want] of [['のべぼうをとる', 'のべぼう のべぼう ……'], ['はんきょう', 'はんきょう はんきょう ……']]) {
+    const r = cm.toCommand(ja)
+    tr.setEcho(r.echoWord || ja)
+    const last = String(r.command).split(' ').pop()
+    const got = tr.line(`${last} ${last} ...`)
+    const ok = got === want
+    if (!ok) ng++
+    console.log(`${ok ? '✓' : '✗'} 反響 ${ja.padEnd(10, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+  }
+}
 console.log(`\n--- ${CASES.length} 件 / 食い違い ${ng} 件 ---`)
 process.exit(ng ? 1 : 0)

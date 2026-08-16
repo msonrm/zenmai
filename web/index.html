@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ぜんまい</title>
+<title>Zenmai</title>
 <style>
   :root {
     --bg: #f4efe6;        /* 本文の紙 */
@@ -55,6 +55,21 @@
     color: var(--accent); font: inherit; padding: .25em 1.4em; cursor: pointer;
   }
   #intro-ok:hover { background: var(--accent); color: var(--panel) }
+  /* 言語の選択（入口）。★英語は「訳さない＝原作のまま」なので、並べて選ばせる */
+  .intro-lang { display: flex; flex-wrap: wrap; gap: .6em; justify-content: center; margin: 1.1em 0 .1em }
+  /* ★`hidden` は UA の `display:none` なので、**こちらの `display` 指定に負ける**。
+     隠す要素には必ず `[hidden]` の打ち消しを書くこと（#intro / #panel では書いていたのに、
+     ここだけ忘れて「起動前に とじる が出る／起動後に言語ボタンが残る」になった） */
+  .intro-lang[hidden], #intro-ok[hidden] { display: none }
+  .intro-lang button {
+    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--ink); font: inherit; font-size: .9em; padding: .25em .9em; cursor: pointer;
+  }
+  .intro-lang button:hover { border-color: var(--accent); color: var(--accent) }
+  #panel select {
+    font: inherit; font-size: .9em; margin-left: .4em; padding: .1em .3em;
+    background: var(--bg); color: var(--ink); border: 1px solid var(--rule); border-radius: .3em;
+  }
 
   /* ── ヘッダ: 左に題、右に場所と得点 ── */
   #head {
@@ -63,8 +78,11 @@
     background: var(--panel); border-bottom: 1px solid var(--rule);
     font-size: .82rem; letter-spacing: .04em; color: var(--dim);
   }
-  #title { flex: 0 1 auto; min-width: 4em }
+  /* ★題は押せる —— 入口の案内をもう一度出す。ここは**名乗り**なので、
+     「これは何か」をもう一度読む入口として自然な場所（歯車＝設定とは役割が違う） */
+  #title { flex: 0 1 auto; min-width: 4em; cursor: pointer }
   #title b { color: var(--ink); font-weight: 600 }
+  #title:hover b { color: var(--accent) }
   #place { flex: 1 1 auto; min-width: 0; text-align: right; color: var(--ink); font-size: .95rem }
   #score { flex: 0 0 auto; font-variant-numeric: tabular-nums }
 
@@ -73,14 +91,47 @@
   ruby { ruby-position: over }
   ruby rt { font-size: .5em; color: var(--dim); letter-spacing: 0; font-weight: normal }
   body.no-ruby rt { display: none }
-  /* ★操作はすべて右下に集める。ヘッダは**状態行**（ゲームが持つ情報）を描く場所なので、
-     そこに操作を置かない */
-  #meta button {
-    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
-    color: var(--dim); font: inherit; font-size: .7rem; padding: 0 .45em; cursor: pointer;
+  /* ★操作は**歯車ひとつに畳んでヘッダの右端**へ。以前は右下に並べていたが、
+     フリック盤と場所を取り合った（重なり → 盤の左に貼り付け、と 2 度直している）。
+     「状態行に操作を置かない」という前の判断は、**畳んだことで両立する** ——
+     ヘッダに出ているのは入口 1 つだけで、中身はダイアログが持つ */
+  #menu-btn {
+    flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
+    color: var(--dim); font: inherit; font-size: .95rem; line-height: 1.5;
+    padding: 0 .4em; cursor: pointer;
   }
-  #meta button:hover { color: var(--ink); border-color: var(--accent) }
-  body.no-ruby #ruby-btn { opacity: .55 }
+  #menu-btn:hover { color: var(--ink); border-color: var(--accent) }
+
+  /* ── ダイアログ（設定と手引き／コントローラの使い方）── */
+  #panel, #pad-help {
+    position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 1.2em;
+  }
+  #panel[hidden], #pad-help[hidden] { display: none }
+  #panel-box, #pad-help-box {
+    width: min(34em, 100%); max-height: min(80vh, 44em); overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--rule); border-radius: .5em;
+    padding: 1.1em 1.4em 1.4em; line-height: 1.8;
+  }
+  .dlg-head { display: flex; align-items: baseline; gap: 1em; margin-bottom: .4em }
+  .dlg-head span { flex: 1 1 auto; font-size: 1.05em; letter-spacing: .04em }
+  .dlg-close {
+    flex: 0 0 auto; background: transparent; border: 0; color: var(--dim);
+    font: inherit; font-size: 1.1em; padding: 0 .2em; cursor: pointer;
+  }
+  .dlg-close:hover { color: var(--ink) }
+  #panel h3, #pad-help h3 {
+    margin: 1.2em 0 .35em; font-size: .8rem; font-weight: normal; color: var(--dim);
+    letter-spacing: .1em; border-bottom: 1px solid var(--rule); padding-bottom: .2em;
+  }
+  #panel label { display: block; cursor: pointer }
+  #panel label input { margin-right: .5em }
+  #panel .note, #pad-help .note { color: var(--dim); font-size: .8rem; line-height: 1.7 }
+  /* ★言い方の表。左が「何をするか」、右が**打つ言葉**（かなで出す。打鍵はかなだから） */
+  #sys-list { width: 100%; border-collapse: collapse; font-size: .9em }
+  #sys-list td { padding: .1em 0; vertical-align: baseline }
+  #sys-list td.k { white-space: nowrap; padding-right: 1em; color: var(--dim) }
+  #sys-list td.v { color: var(--accent) }
 
   /* ── 本文 ── */
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
@@ -94,7 +145,7 @@
   #screen p.room:first-child { margin-top: 0 }
   #screen p.cmd { color: var(--accent) }
   #screen p.cmd::before { content: "> " }
-  /* 実際に渡した英語コマンド（種明かし。薄く小さく） */
+  /* 実際に渡した英語コマンド（薄く小さく） */
   #screen p.sent { margin: -.6em 0 .9em; font-size: .75rem; color: var(--dim); font-family: ui-monospace, monospace }
   #screen p.sent::before { content: "→ " }
   /* ★版権表示と本文の境目。原作も「起動時の表示 → 部屋」の順に出すので、
@@ -114,17 +165,115 @@
   #prompt { display: flex; align-items: baseline; gap: .5em }
   /* ★ゲームパッドの札。**いま選んでいる子音**を出す（左手の探索の助けになる）。
      押すと操作図の開閉。接続していないときは出さない */
+  /* ★英語では 2 段（数字＋英字）になるので、**日本語のときも同じ高さ**を確保する
+     —— 言語を切り替えるたびにコマンド欄の高さが変わると、本文まで動いて落ち着かない */
   #pad-btn {
     flex: 0 0 auto; display: none; min-width: 2.6em; text-align: center;
     background: transparent; border: 1px solid var(--rule); border-radius: .3em;
-    color: var(--accent); font: inherit; font-size: 1.05em; line-height: 1.5;
-    padding: 0 .35em; cursor: pointer;
+    color: var(--accent); font: inherit; font-size: 1.05em; line-height: 1.15;
+    padding: .1em .35em; cursor: pointer;
+    min-height: 2.3em; flex-direction: column; align-items: center; justify-content: center;
   }
   #pad-btn:hover { border-color: var(--accent) }
-  body.pad-on #pad-btn { display: block }
+  body.pad-on #pad-btn { display: flex }
+  /* 2 段目（英字）は小さく。★色は 1 段目と同じ（どちらも打てば入る側の情報） */
+  #pad-btn .gp-l2 { font-size: .66em; letter-spacing: -.01em; line-height: 1; text-transform: uppercase }
   /* 操作図は入力欄の下。畳めるようにする */
-  #pad { display: none; margin-top: .6em; overflow-x: auto }
+  /* ★図は**見て理解するもの**なので、はみ出させない（スクロールさせても意味が伝わらない）。
+     エンジンの寸法は px 固定（セル 44px・字 44px・プレビュー 64px）で CSS 変数になっておらず、
+     合計で約 400px ある —— スマホの幅（Pixel は 412px）に `.gutter` の余白を足すと超える。
+     ★個々の寸法を上書きすると**エンジンの内部構造に依存して壊れやすい**ので、
+     まるごと縮める。`overflow-x` は最後の逃げ道として残す */
+  #pad { display: none; margin: .6em auto 0 }
   body.pad-on.pad-open #pad { display: block }
+  /* ★コントローラを繋いでいるあいだは、かなの盤を開く「かな」ボタンも出さない
+     （盤そのものを隠す指定は、後述の `body.flick-open #flick` より**後**に置く必要がある） */
+  body.pad-on #flick-btn { display: none }
+  /* ── 操作図（自前）──
+     ★色はフリック盤と揃える（地 = --bg、押下 = --rule）。同じ紙の上の道具に見せる。
+     ★寸法は em 基準。`#pad` の font-size ひとつで全体が伸び縮みする */
+  /* ★寸法はこの 1 行で決まる（中はすべて em）。
+     ★ボタンを 1.2 倍にすると図も 1.2 倍になり、そのままでは Pixel（412px）で 460px になる。
+     基準をここで下げて釣り合わせる —— 狙いは「ボタンと字の**比**」なので、
+     比は 2.18 → 2.62（＝ちょうど 1.2 倍）になり、実寸ではボタン 42→44px / 字 19.3→16.7px */
+  #pad { font-size: clamp(17px, 5.95vw, 26px) }
+  /* ★左右の間も詰める（側 6.72em × 2 ＋ 間 0.5em × 2 ＋「?」2.04em ＝ 16.48em）。
+     ★横に詰めたぶん**全体を大きくできる** —— 図の高さに上限は無いので、
+     縦は大きくした結果として自然に伸びる（縦は制約ではない） */
+  #pad .gp { display: flex; justify-content: center; align-items: stretch; gap: .5em }
+  /* ★十字とフェイスのあいだの空き地。使い方の「?」を**一番下**に置く
+     （盤の邪魔をせず、押したいときには必ず目に入る位置） */
+  /* ★上端に言語切替、一番下に「?」。padding-top は**面の上端に揃える**ための下駄
+     （肩 1.62em ＋ 肩と面の間 .4em ＋ 面の margin-top .3em ＝ 2.32em） */
+  #pad .gp-mid {
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+    padding-top: 2.32em; padding-bottom: .15em;
+  }
+  /* かな / 英字。★文字を出す側の色（--ink）—— いま何が入るかを示す札なので */
+  /* ★言語は 2 つ並べ、**選んでいるほうに枠線**を付ける（現在地と選択肢が同時に見える）。
+     枠は透明で確保しておく —— 付け外しで位置がずれないように */
+  #pad .gp-langs { display: flex; flex-direction: column; gap: .25em }
+  #pad .gp-lang {
+    width: 2em; height: 1.5em; border-radius: .3em; cursor: pointer;
+    background: transparent; border: 1px solid transparent; color: var(--dim);
+    /* ★ここだけサンセリフ —— 本文は明朝だが、これは読み物ではなく**札**（記号）。
+       明朝の欧文はグリフごとに左右の余白が違い、2 文字だと揃って見えない */
+    font: inherit; font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: .62em; line-height: 1;
+    /* ★中央に置くための 3 点。①`letter-spacing` は**最後の字のうしろにも**入るので、
+       付けると字が左へ寄る ②ボタンの既定 padding を消す ③中央揃えを明示する */
+    letter-spacing: 0; padding: 0; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #pad .gp-lang.on { border-color: var(--accent); color: var(--ink) }
+  #pad .gp-lang:hover { color: var(--ink) }
+  /* ★英語は**プッシュホン式の 2 段**（数字と英字）。日本語は 1 段しか使わない */
+  #pad .gp-btn { flex-direction: column; gap: .04em }
+  /* ★英字は数字と**同じ濃さ**（どちらも打てば入る側の情報なので、薄める理由がない）。
+     プッシュホンの刻印にならって**大文字**で置く —— 小文字より字面が大きく、小さくても読める
+     （実際に入るのは小文字。面のボタンには小文字が出ている） */
+  #pad .gp-l2 {
+    font-size: .48em; color: inherit; letter-spacing: -.02em; line-height: 1;
+    text-transform: uppercase;
+  }
+  #pad .gp-help {
+    /* ★盤の一員ではないので、ボタンより**一回り小さく**（目立ちすぎない） */
+    width: 1.5em; height: 1.5em; border-radius: 50%; cursor: pointer;
+    background: transparent; border: 1px solid var(--rule); color: var(--dim);
+    font: inherit; font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; font-size: .68em; line-height: 1;
+  }
+  #pad .gp-help:hover { color: var(--ink); border-color: var(--accent) }
+  #pad-help .gp-tbl { width: 100%; border-collapse: collapse; font-size: .88em }
+  #pad-help .gp-tbl td { padding: .12em 0; vertical-align: baseline }
+  #pad-help .gp-tbl td.k { white-space: nowrap; padding-right: 1em; color: var(--dim) }
+  #pad .gp-side { display: flex; flex-direction: column; align-items: center; gap: .4em }
+  /* ★肩は**横並び**。外側が LT / RT、内側が LB / RB —— 2 つ並べて面と同じ幅になる */
+  #pad .gp-shoulders { display: flex; gap: .3em }
+  #pad .gp-trigger {
+    /* ★横幅は**中身に合わせて詰める** —— ここが図全体の幅を決めていた。
+       最長の「は〜わ」でも 2.34em なので、3.15em あれば足りる（縦は 1.2 倍のまま）。
+       これで肩が面より狭くなり、側の幅は面が決めるようになる */
+    width: 3.15em; height: 1.62em; border-radius: .3em; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    /* ★肩 4 つは寸法も級数も揃える —— 役（文字／機能）が違っても、
+       並んでいるものの大きさが揃わないと乱れて見える。差は**色だけ**で付ける */
+    font-size: .78em; letter-spacing: -.02em; color: var(--dim); line-height: 1;
+  }
+  /* ★文字を出す肩（RB＝母音・RT＝ん/を）は面のボタンと同じ濃さ。機能キー（LT / LB）だけ薄い */
+  #pad .gp-trigger.gp-char { color: var(--ink) }
+  #pad .gp-grid { display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); gap: .3em; margin-top: .3em }
+  #pad .gp-btn {
+    width: 2.04em; height: 2.04em; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78em; line-height: 1; color: var(--ink);
+  }
+  /* ★形で役を分ける（字を書かなくても分かる）—— 十字は角、フェイスは丸 */
+  #pad .gp-dpad .gp-btn { border-radius: .25em }
+  #pad .gp-face .gp-btn { border-radius: 50% }
+  #pad .gp-blank { background: transparent }
+  /* ★十字の中央は**ボタンとしては特別**（押さないことを示す）だが、
+     **文字としては他と同じ**なので、見た目は他のボタンに揃える ——
+     特別さは「点いているかどうか」だけで足りる */
+  #pad .gp-btn.on, #pad .gp-trigger.on { background: var(--rule) }
 
   /* ★フリック盤も入力欄の下。#foot は縦並びの末尾なので、置くと本文が自動で縮む */
   /* ★盤の寸法（obsidian-hechima の実機往復から借りた規則）:
@@ -134,8 +283,14 @@
        中身が縦長に潰れる（`.gutter` を付けていて実際に潰れた）
      - ★**px の上限を置く**。`vh` だけだと縦に長い画面で深くなりすぎる ——
        **キーボードに要るのは指の届く大きさで、画面の大きさに比例する量ではない** */
-  #flick { display: none; margin: .5em auto 0; width: min(100%, 22em); aspect-ratio: 5 / 4; flex: 0 1 auto;
-    max-height: min(38vh, 300px);
+  /* ★外周が余るのは padding ではなく**幅の上限**だった（実機の指摘・2 度目）——
+     22em = 352px は、いまのスマホのビューポート（Pixel は約 412px）より狭い。
+     ★ただし比率を保ったまま広げると**縦が伸びて本文を圧迫する**（3 度目の指摘）。
+     幅は画面いっぱいに、高さは元のまま —— つまり **キーを横長にする**。
+     正方形にしていたのは 12 キー標準に合わせた名残で、
+     ★**画面は横より縦が惜しい**（本文を出す場所だから）。親指の的は横に広いほうが当たる */
+  #flick { display: none; margin: .5em auto 0; width: min(100%, 26em); aspect-ratio: 5 / 3.4; flex: 0 1 auto;
+    max-height: min(34vh, 300px);
     /* 盤の色（エンジンが読む変数）。★キーの地は**フッタの地と変えないと沈む** ——
        かなのキーを --panel にしていたとき、コマンド欄の地と同じ色で境目が消えていた
        （実機の指摘）。かなも機能キーも同じ地にし、differences は文字の濃さで出す */
@@ -146,6 +301,9 @@
     --fe-petal-bg: var(--panel); --fe-petal-fg: var(--ink); --fe-petal-hot-bg: var(--accent);
   }
   body.flick-open #flick { display: block }
+  /* ★コントローラを繋いでいるあいだは盤を出さない —— わざわざ繋いだ人にかなの盤は要らず、
+     下の段を取り合う。★`body.flick-open` と詳細度が同じなので、**この順序でないと効かない** */
+  body.pad-on #flick { display: none }
   /* ★キーの字は**盤の大きさ**で決める。エンジンの既定は `vmin` 基準なので、
      スマホ（縦持ちは vmin = 画面幅）だと下限に張り付いて読めない ——
      改行キーが何の記号か分からない、という指摘。盤を容れ物にして測る */
@@ -154,15 +312,25 @@
   /* 機能キーは記号 1 つなので、かなより**大きめ**にしないと小さく見える
      （字数が少ないほど、同じ級数でも小さく感じる） */
   #flick .fe-key.fe-fn { font-size: clamp(15px, 6.6cqw, 28px) }
+  /* ★ただし「゛゜小」だけは**3 文字**。記号 1 つと同じ級数だと溢れる（実機の指摘）。
+     字数で級数を変える術が CSS に無いので、ホストが `fe-multi` を付けている */
+  #flick .fe-key.fe-multi { font-size: clamp(10px, 3.6cqw, 16px); letter-spacing: -.04em }
+  /* ★外周も**キー間隔と同じだけ**空ける —— 0 にしたら端のキーが縁に貼り付いて、
+     見た目も押し心地も悪くなった（実機の指摘）。エンジンの既定（`6px / 4px`）は
+     固定値なので、盤の大きさに比例させて両方を同じ値にする */
+  #flick .fe-root { padding: 1.6cqw; gap: 1.6cqw }
+  /* ★影は落とさない —— 紙の意匠に合わず、キーが浮いて見える（実機の指摘） */
+  #flick .fe-key { box-shadow: none }
   #flick-btn {
     flex: 0 0 auto; background: transparent; border: 1px solid var(--rule); border-radius: .3em;
     color: var(--dim); font: inherit; font-size: .95em; padding: 0 .5em; cursor: pointer;
   }
   body.flick-open #flick-btn { color: var(--ink); border-color: var(--accent) }
   /* ★開閉できることを見せる —— 閉じているときは横向き、開いているときは下向き */
-  #flick-btn::after, #pad-btn::after { content: "\25B8"; font-size: 1em; opacity: .9; margin-left: .3em }
+  /* ★三角はフリックの「かな」だけに付ける。コントローラ側は札そのもの（いま何が打てるか）が
+     主役で、開閉の三角が横に付くと 2 段の字を押しのける（実機の指摘） */
+  #flick-btn::after { content: "\25B8"; font-size: 1em; opacity: .9; margin-left: .3em }
   body.flick-open #flick-btn::after { content: "\25BE" }
-  body.pad-open #pad-btn::after { content: "\25BE" }
   #prompt > span.caret { color: var(--accent); flex: 0 0 auto }
   #input {
     flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
@@ -175,47 +343,158 @@
      フリック盤を出すと**改行キーと重なった**（実機の指摘）。
      重なりは z 順ではなく**場所で解く** —— 盤は中央に寄るので左が空く */
   /* ★盤は**画面の中央**に置く（指の記憶は絶対位置に付いているので、寄せてはいけない）。
-     操作ボタンは**場所を取らずに左端へ重ねる** —— フリックの左端列は ← 以外が空なので、
-     その下半分が空き地になる（実機の指摘どおり） */
-  #bottom { position: relative; display: flex; align-items: flex-end }
-  #meta {
-    flex: 0 0 auto; margin-left: 1.2em;
-    display: flex; flex-direction: column; align-items: flex-start; gap: .3em;
-  }
-  /* ★盤を出しているあいだだけ流れから外して左端へ重ねる。
-     常に absolute にしていたら、閉じたとき**コマンド欄の裏に幽霊が残った**（実機の指摘）*/
-  body.flick-open #meta { position: absolute; left: 1.2em; bottom: .15em; margin-left: 0 }
-  #stat { font-size: .7rem; line-height: 1.4; color: var(--dim); font-variant-numeric: tabular-nums }
-  body.no-debug #debug-btn { opacity: .55 }
-  body.no-debug #stat { display: none }
+     操作を歯車へ畳んだので、下の段は**盤だけ**になった —— 場所の取り合いが消え、
+     「重なりは場所で解く」で入れた左端の逃げ場も要らなくなった */
+  #bottom { position: relative; display: flex; justify-content: center }
+  /* ★盤を出しているあいだは下の余白を詰める —— 盤そのものが外周の隙間を持っているので、
+     フッタの余白がそのまま二重になる。閉じているとき（コマンド欄だけ）の間は変えない。
+     ★`env(safe-area-inset-bottom)` を下限に置く —— iPad / iPhone のホームバーに
+     食い込ませない（Android では 0 なので .25em が効く） */
+  body.flick-open #foot { padding-bottom: max(.25em, env(safe-area-inset-bottom, 0px)) }
+  #stat { font-size: .8rem; color: var(--dim); font-variant-numeric: tabular-nums }
   body.no-debug #screen p.sent { display: none }
   /* ★狭いときは説明を隠す。2 行にしてみたが**場所名を押しつぶした**（実機の指摘）——
      ヘッダは**状態行**（場所・得点という機能）なので、飾りが機能を押しのけてはいけない。
      「これが何か」は入口の案内が毎回伝えるので、ここで失われるものは無い */
   @media (max-width: 46em) { #title .tag { display: none } }
-  /* 段の余白が尽きると入力欄に重なるので畳む（1em の余白しか無くなる幅） */
-  @media (max-width: 40em) { #stat { display: none } }
 </style>
 </head>
 <body>
   <!-- ★入口の案内。軽いので毎回出す（初見の人に「何ができて、どう打つか」を渡す） -->
   <div id="intro" hidden>
     <div id="intro-box">
-      <p class="intro-title">ぜんまい —— 日本語で読むテキストアドベンチャー</p>
+      <p class="intro-title">Zenmai —— 日本語で読むテキストアドベンチャー</p>
       <p>1980年の <i>Zork I</i>（Infocom）を、日本語で遊べるようにした。コマンドもひらがなで打てる。</p>
       <p class="intro-ex">ゆうびんばこをあける　／　きたへいく　／　じゅうたんをめくる　／　もちもの</p>
       <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力キーが出る。
         ゲームコントローラーを繋げば、それでもひらがなが打てる。</p>
       <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
         ZORK は Infocom, Inc. の登録商標です（このプロジェクトは Infocom / Microsoft とは無関係）。</p>
-      <button id="intro-ok" type="button">はじめる</button>
+      <!-- ★言語は最初に選ばせる（既定はブラウザの言語）。英語は「訳さない＝原作のまま」。
+           ★この 2 つが**始める合図**なので「はじめる」は要らない。
+           遊び始めたあとに題から開き直したときは、代わりに「とじる」だけを出す -->
+      <p class="intro-lang" id="intro-lang">
+        <button id="intro-ja" type="button">日本語ではじめる</button>
+        <button id="intro-en" type="button">Start in English</button>
+      </p>
+      <button id="intro-ok" type="button" hidden>とじる</button>
+    </div>
+  </div>
+
+  <!-- ★設定と手引き。ヘッダの歯車から開く。
+       ふりがなの入切・英語コマンドの表示・訳の成績・システムの言葉を 1 か所に集める -->
+  <div id="panel" hidden>
+    <div id="panel-box">
+      <div class="dlg-head">
+        <span>設定と手引き</span>
+        <button id="panel-close" class="dlg-close" type="button" title="閉じる">&#10005;</button>
+      </div>
+
+      <h3>表示</h3>
+      <label><input type="checkbox" id="ruby-chk"> ふりがなを出す</label>
+      <p class="note">入力はひらがなだけなので、★<b>読めない漢字は打てない</b>。既定では出す。</p>
+      <label><input type="checkbox" id="debug-chk"> 英語コマンドを表示</label>
+      <p class="note">打った日本語を原作へ渡すとき、実際に送った英語コマンドを本文の下に薄く並べる。</p>
+
+      <h3>訳の成績</h3>
+      <p id="stat"></p>
+      <p class="note" id="stat-note"></p>
+
+      <h3>システムの言葉</h3>
+      <p class="note">ゲームの中の行動ではなく、進行そのものへの指示。<b>ひらがなで打つ</b>。</p>
+      <table id="sys-list"></table>
+    </div>
+  </div>
+
+  <!-- ★コントローラの使い方。操作図の中央（十字とフェイスの間）の「?」から開く。
+       ★ここに書く内容は**実装と一対一**にすること —— 図や説明が実際の挙動とずれるのが
+       いちばん害が大きい。母音の割り当ては labo の `gamepad-kana-table.ts`、
+       送信・画面送りなどは `main.js` の `padKey` / `onOp` が正典 -->
+  <div id="pad-help" hidden>
+    <div id="pad-help-box">
+      <div class="dlg-head">
+        <span>コントローラの使い方</span>
+        <button id="pad-help-close" class="dlg-close" type="button" title="閉じる">&#10005;</button>
+      </div>
+
+      <div id="help-ja">
+      <h3>文字を打つ</h3>
+      <p class="note">左手で行、右手で母音を同時に押すと、かなが 1 文字入る。</p>
+      <table class="gp-tbl">
+        <tr><td class="k">左手（行）</td><td class="v">押さない＝あ行／← か行／↑ さ行／→ た行／↓ な行</td></tr>
+        <tr><td class="k">LB を押しながら</td><td class="v">押さない＝は行／← ま行／↑ や行／→ ら行／↓ わ行</td></tr>
+        <!-- ★フェイスボタンは**位置**で書く —— 呼び名は機種で入れ替わる
+             （Xbox は左が X、Nintendo は左が Y）。図の並びと合わせれば迷わない -->
+        <tr><td class="k">右手（母音）</td><td class="v">RB＝あ／左＝い／上＝う／右＝え／下＝お</td></tr>
+      </table>
+      <p class="note">← ＋ RB ＝「か」</p>
+
+      <h3>打ったあとに付ける</h3>
+      <table class="gp-tbl">
+        <tr><td class="k">LT</td><td class="v">「か」＋LT＝「きゃ」</td></tr>
+        <tr><td class="k">LT ＋ RT</td><td class="v">「っ」</td></tr>
+        <tr><td class="k">RT</td><td class="v">「ん」→「を」→「んを」（押すたびに変わる）</td></tr>
+        <tr><td class="k">右スティック ↑</td><td class="v">「か」＋↑＝「が」</td></tr>
+        <tr><td class="k">右スティック →</td><td class="v">「ー」</td></tr>
+      </table>
+
+      <h3>直す・進める</h3>
+      <table class="gp-tbl">
+        <tr><td class="k">左スティック 押し込み</td><td class="v">★打った文を<b>送る</b></td></tr>
+        <tr><td class="k">右スティック ←</td><td class="v">1 字消す</td></tr>
+        <tr><td class="k">左スティック ←→</td><td class="v">カーソルを動かす</td></tr>
+        <tr><td class="k">左スティック ↑↓</td><td class="v">本文を送る（読み返す）</td></tr>
+      </table>
+      <p class="note">★<b>送るのは左スティックの押し込みだけ</b>。右スティック ↓ では送らない
+        （誤って送ってしまうため）。</p>
+      <p class="note">盤の中央の「<b>あ</b>」を押すと<b>英字</b>に切り替わる。原作は英語のコマンドも受け付ける。</p>
+      </div>
+
+      <!-- ★英語モードの説明。★盤に出ているものと食い違わないよう、**モードに合わせて中身ごと差し替える**
+           （両方を常に並べると、いま打てないほうの説明が混ざって読みにくい） -->
+      <div id="help-en" hidden>
+      <h3>英字を打つ（プッシュホン式）</h3>
+      <p class="note">左手で数字キー、右手でその中の英字を同時に押す。</p>
+      <table class="gp-tbl">
+        <tr><td class="k">左手（数字）</td><td class="v">押さない＝1／← 2abc／↑ 3def／→ 4ghi／↓ 5jkl</td></tr>
+        <tr><td class="k">LB を押しながら</td><td class="v">押さない＝6mno／← 7pqrs／↑ 8tuv／→ 9wxyz／↓ 0</td></tr>
+        <tr><td class="k">右手</td><td class="v">RB＝数字／左・上・右・下＝その行の英字</td></tr>
+      </table>
+      <p class="note">← ＋ 左 ＝「a」</p>
+
+      <h3>大文字にする（LT）</h3>
+      <table class="gp-tbl">
+        <tr><td class="k">短押し</td><td class="v">次の 1 文字だけ大文字（札が <b>Shift</b>）</td></tr>
+        <tr><td class="k">長押し</td><td class="v">大文字のまま（札が <b>CAPS</b>）。★<b>もう一度長押し</b>で戻る</td></tr>
+        <tr><td class="k">短押し ×2</td><td class="v">大文字のまま（札が <b>CAPS</b>）。★<b>数字や記号を打つと自動で戻る</b></td></tr>
+      </table>
+      <p class="note">★札の字が状態を示す —— <b>shift</b>（そのまま）→ <b>Shift</b>（次の 1 文字）→ <b>CAPS</b>（固定）。</p>
+
+      <h3>直す・進める</h3>
+      <table class="gp-tbl">
+        <tr><td class="k">RT</td><td class="v">「0」</td></tr>
+        <tr><td class="k">右スティック →</td><td class="v">「/」</td></tr>
+        <tr><td class="k">右スティック ↑</td><td class="v">「'」</td></tr>
+        <tr><td class="k">右スティック ←</td><td class="v">1 字消す</td></tr>
+        <tr><td class="k">右スティック ↓</td><td class="v">空白（単語の区切り）。続けて押すと <b>.</b> → <b>,</b></td></tr>
+        <tr><td class="k">左スティック 押し込み</td><td class="v">★打った文を<b>送る</b></td></tr>
+        <tr><td class="k">左スティック ←→</td><td class="v">カーソルを動かす</td></tr>
+        <tr><td class="k">左スティック ↑↓</td><td class="v">本文を送る（読み返す）</td></tr>
+      </table>
+      <p class="note">★英語は <b>take lamp</b> のように空白で語を分ける。だから ↓ は空白のままで、
+        送るのは<b>左スティックの押し込み</b>（かなのときも同じ）。</p>
+      <p class="note">盤の中央の「<b>A</b>」を押すと<b>かな</b>に戻る。</p>
+      </div>
     </div>
   </div>
 
   <div id="head" class="edge">
-    <span id="title"><b>ぜんまい</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
+    <span id="title" title="案内をもう一度見る"><b>Zenmai</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
     <span id="place">　</span>
     <span id="score"></span>
+    <!-- ★字は**絵文字ではなく記号**として出す（︎）。付けないと端末によって
+         色付きの絵文字になり、明朝の紙の中で浮く -->
+    <button id="menu-btn" type="button" title="設定と手引き">&#9881;&#65038;</button>
   </div>
   <div id="screen" class="gutter" aria-live="polite"></div>
   <div id="foot">
@@ -227,10 +506,9 @@
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>
     <div id="bottom">
-      <span id="meta"><button id="ruby-btn" type="button" title="ふりがなの表示を切り替える">ふりがな</button><button id="debug-btn" type="button" title="渡した英語コマンドと訳の成績を出す（点検用）">デバッグ</button><span id="stat"></span></span>
       <div id="flick"></div>
     </div>
-    <div id="pad" class="gutter"></div>
+    <div id="pad"></div>
   </div>
 
   <script src="../vendor/zvm.min.js"></script>

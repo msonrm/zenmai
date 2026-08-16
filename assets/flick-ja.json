@@ -1,6 +1,6 @@
 {
   "formatVersion": "flick-1",
-  "name": "ぜんまい かなフリック",
+  "name": "Zenmai かなフリック",
   "description": "ひらがなだけのフリック。12 キー標準の並びをそのまま守り（左端列・右端列も残す）、変換が無いので要らないキーだけを空けてある。括弧・疑問符・句読点は出さない。",
   "output": "kana",
   "flickConfig": {

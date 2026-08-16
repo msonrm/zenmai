@@ -764,6 +764,96 @@
    "en": "The candles are lit.",
    "id": "Z-6",
    "ja": "蝋燭に火が点いた。"
+  },
+  {
+   "en": "You have a light wound, which will be cured after {N} moves.",
+   "id": "D-1",
+   "ja": "きみは軽い傷を負っている。あと {N} 手で癒える。"
+  },
+  {
+   "en": "You have a serious wound, which will be cured after {N} moves.",
+   "id": "D-2",
+   "ja": "きみは深い傷を負っている。あと {N} 手で癒える。"
+  },
+  {
+   "en": "You have several wounds, which will be cured after {N} moves.",
+   "id": "D-3",
+   "ja": "きみはいくつも傷を負っている。あと {N} 手で癒える。"
+  },
+  {
+   "en": "You have serious wounds, which will be cured after {N} moves.",
+   "id": "D-4",
+   "ja": "きみは深い傷をいくつも負っている。あと {N} 手で癒える。"
+  },
+  {
+   "en": "You can expect death soon.",
+   "id": "D-5",
+   "ja": "まもなく死ぬだろう。"
+  },
+  {
+   "en": "You can be killed by one more light wound.",
+   "id": "D-6",
+   "ja": "あと一度、軽い傷を負えば命を落とす。"
+  },
+  {
+   "en": "You can be killed by a serious wound.",
+   "id": "D-7",
+   "ja": "深い傷を一度負えば命を落とす。"
+  },
+  {
+   "en": "You can survive one serious wound.",
+   "id": "D-8",
+   "ja": "深い傷なら、あと一度は耐えられる。"
+  },
+  {
+   "en": "You can survive several wounds.",
+   "id": "D-9",
+   "ja": "傷をいくつか負っても耐えられる。"
+  },
+  {
+   "en": "You have been killed once.",
+   "id": "D-10",
+   "ja": "これまでに一度死んでいる。"
+  },
+  {
+   "en": "You have been killed twice.",
+   "id": "D-11",
+   "ja": "これまでに二度死んでいる。"
+  },
+  {
+   "en": "You are on the reservoir, or have you forgotten?",
+   "id": "B-1",
+   "ja": "いま貯水池の上にいるのを忘れたのか。"
+  },
+  {
+   "en": "You are on the stream, or have you forgotten?",
+   "id": "B-2",
+   "ja": "いま小川の上にいるのを忘れたのか。"
+  },
+  {
+   "en": "You are on the river, or have you forgotten?",
+   "id": "B-3",
+   "ja": "いま川の上にいるのを忘れたのか。"
+  },
+  {
+   "en": "It seems that the {OBJ} didn't agree with the boat, as evidenced by the loud hissing noise issuing therefrom. With a pathetic sputter, the boat deflates, leaving you without.",
+   "id": "B-4",
+   "ja": "{OBJ}は舟には合わなかったらしく、それは大きな漏れの音が証している。情けない音を立てて舟はしぼみ、きみは足を失った。"
+  },
+  {
+   "en": "A {X}, with {CONTENTS}",
+   "id": "A-25",
+   "ja": "{X}（中に{CONTENTS}）"
+  },
+  {
+   "en": "Your score is {N} (total of 350 points), in {M} move.",
+   "id": "X-14",
+   "ja": "得点は 350 点満点中 {N} 点、手数は {M}。"
+  },
+  {
+   "en": "{ECHO} {ECHO} ...",
+   "id": "E-1",
+   "ja": "{ECHO} {ECHO} ……"
   }
  ],
  "exact": {
@@ -1303,7 +1393,7 @@
   "The robber revives, briefly feigning continued unconsciousness, and, when he sees his moment, scrambles away from you.": "盗賊は目を覚まし、しばらく気を失ったふりを続けたあと、機を見てきみから逃げ出す。",
   "The robber, rummaging through his bag, dropped a few items he found valueless.": "盗賊は袋の中を探り、値打ちがないと見たものをいくつか落とした。",
   "The robber, somewhat surprised at this turn of events, nimbly retrieves his stiletto.": "盗賊はこの成り行きにいくぶん驚きながら、素早く短剣を拾い上げる。",
-  "The room is deafeningly loud with an undetermined rushing sound. The sound seems to reverberate from all of the walls, making it difficult even to think.": "部屋は正体の分からぬ激しい音で、耳を聾するほどうるさい。音はあらゆる壁から返ってくるようで、考えることさえ難しい。",
+  "The room is deafeningly loud with an undetermined rushing sound. The sound seems to reverberate from all of the walls, making it difficult even to think.": "部屋は正体の分からぬ激しい音で、耳を聾するほどうるさい。音はあらゆる壁に反響しているようで、考えることさえ難しい。",
   "The room is eerie in its quietness.": "部屋は不気味なほど静まっている。",
   "The room is full of water and cannot be entered.": "部屋は水で満ちていて、入れない。",
   "The room looks strange and unearthly": "部屋は奇妙で、この世のものならぬ様子に見える",
@@ -1774,6 +1864,7 @@
   "beautiful jeweled scarab": "美しい宝石の甲虫",
   "bird's nest": "鳥の巣",
   "black book": "黒い書物",
+  "blast of air": "空気",
   "bloody axe": "血のついた斧",
   "blue button": "青いボタン",
   "boarded window": "板で塞がれた窓",
@@ -1812,6 +1903,7 @@
   "large emerald": "大きなエメラルド",
   "leather bag of coins": "革の金貨袋",
   "lit.": "点いている。",
+  "lurking grue": "グルー",
   "magic boat": "魔法の舟",
   "match": "マッチ",
   "mountain range": "山並み",
@@ -1820,6 +1912,7 @@
   "number of ghosts": "亡霊の群れ",
   "over your head.": "頭の上まで来ている。",
   "pair of candles": "一対の蝋燭",
+  "pair of hands": "両手",
   "pile of bodies": "死体の山",
   "pile of leaves": "落ち葉の山",
   "pile of plastic": "ビニールの塊",
@@ -1827,6 +1920,7 @@
   "pot of gold": "金の壺",
   "punctured boat": "穴の空いた舟",
   "quantity of water": "いくらかの水",
+  "random object": "それ",
   "red buoy": "赤い浮標",
   "red button": "赤いボタン",
   "red hot brass bell": "赤熱した真鍮の鈴",
@@ -1842,6 +1936,7 @@
   "small pile of coal": "小さな石炭の山",
   "stone barrow": "石塚",
   "stone door": "石の扉",
+  "such thing": "そんなもの",
   "surrounding wall": "周囲の壁",
   "tan label": "黄褐色の札",
   "the first part of the ZORK trilogy. Those who pass over this bridge must be prepared to undertake an even greater adventure that will severely test your skill and bravery!| | The ZORK trilogy continues with \"ZORK II: The Wizard of Frobozz\" and is completed in \"ZORK III: The Dungeon Master.\"": "ZORK 三部作の第一部である。この橋を渡る者は、技と勇気をいっそう厳しく試される、さらに大きな冒険に臨む覚悟をせねばならない。| | ZORK 三部作は「ZORK II: フロボズの魔法使い」へ続き、「ZORK III: ダンジョンマスター」で完結する。",
@@ -1904,6 +1999,7 @@
   "is staggered, and drops to his knees.",
   "\" in a way that I don't understand.",
   "on the wrist, but it's not serious.",
+  "be killed by one more light wound",
   "is battered into unconsciousness.",
   "receives a deep gash in his side.",
   "The force of your blow knocks the",
@@ -1918,6 +2014,7 @@
   "square in the heart: He dies.",
   "Playing in this way with the",
   "The rug is too heavy to lift",
+  "be killed by a serious wound",
   "A terrific throw! The {PRSO}",
   "A furious exchange, and the",
   "The thief neatly flips your",
@@ -1925,6 +2022,9 @@
   "crashes down, knocking the",
   "The fatal blow strikes the",
   "Opening the {PRSO} reveals",
+  "which will be cured after",
+  "survive one serious wound",
+  ", or have you forgotten?",
   "I don't know the word \"",
   "A quick stroke, but the",
   "and knocks it spinning.",
@@ -1932,11 +2032,13 @@
   "You can't use multiple",
   "Your load is too heavy",
   "isn't notably helpful.",
+  "survive several wounds",
   "The Cyclops grabs your",
   "direct objects with \"",
   "doesn't seem to work.",
   "It's curtains for the",
   "There is a {OBJ} here",
+  "You have been killed",
   "You used the word \"",
   "What do you want to",
   "You charge, but the",
@@ -1950,19 +2052,26 @@
   "and devoured you!",
   "Fiddling with the",
   "The chimney leads",
+  "It seems that the",
+  "expect death soon",
   "Clang! Crash! The",
   "removes his head.",
   "The axe hits your",
+  "a serious wound,",
   "The haft of your",
   "it at the time.",
   "your bare hands",
   "has burned out.",
+  "several wounds,",
+  "serious wounds,",
   "into dreamland.",
   "is knocked out!",
   "(How about the",
   "has no effect.",
   "slightly ajar.",
   "is turned off.",
+  "You are on the",
+  "a light wound,",
   "knocks out the",
   "back, stunned.",
   "to the ground",
@@ -1971,7 +2080,6 @@
   "(being worn)",
   "is on guard.",
   "goes flying.",
-  "lurking grue",
   "The {OBJ} do",
   "Kicking the",
   "Pushing the",
@@ -1985,12 +2093,14 @@
   "by a mile.",
   "The {PRSO}",
   "n't here.",
+  "reservoir",
   "pinks the",
   "the {OBJ}",
   "n't lead",
   "dungeon.",
   "the room",
   "The lamp",
+  "You have",
   "parries.",
   "in pain.",
   "a {PRSI}",
@@ -2003,19 +2113,25 @@
   "A {OBJ}",
   "object",
   "here!\"",
+  ", with",
   "is on.",
+  "stream",
   "Which",
   "other",
   "here!",
   "ward.",
   "here.",
   "open.",
+  "twice",
+  "move.",
   "away.",
   "a {F}",
+  "A {X}",
   "tell",
   "down",
   "room",
   "out.",
+  "once",
   "arm.",
   "es."
  ],
@@ -2037,7 +2153,10 @@
   "The disk is correct.",
   "** Disk Failure **",
   "Illegal call to #RND.",
-  "..."
+  "...",
+  "Not Here",
+  "Room (M-BEG)",
+  "Renovated ZORK I: The Great Underground Empire"
  ],
  "props": {
   "!!!!FROBOZZ MAGIC BOAT COMPANY!!!!| | Hello, Sailor!| | Instructions for use:| | To get into a body of water, say \"Launch\".| To get to shore, say \"Land\" or the direction in which you want to maneuver the boat.| | Warranty:| | This boat is guaranteed against all defects for a period of 76 milliseconds from date of purchase or until first used, whichever comes first.| | Warning:| This boat is made of thin plastic.| Good Luck!": {
@@ -3095,6 +3214,16 @@
    "owner": "BOOK",
    "prop": "DESC"
   },
+  "blast of air": {
+   "ja": "空気",
+   "owner": "LUNGS",
+   "prop": "DESC"
+  },
+  "blessings": {
+   "ja": "祝福",
+   "owner": "BLESSINGS",
+   "prop": "DESC"
+  },
   "bloody axe": {
    "ja": "血のついた斧",
    "owner": "AXE",
@@ -3205,6 +3334,11 @@
    "owner": "CRACK",
    "prop": "DESC"
   },
+  "cretin": {
+   "ja": "まぬけ",
+   "owner": "ADVENTURER",
+   "prop": "DESC"
+  },
   "crystal skull": {
    "ja": "水晶の髑髏",
    "owner": "SKULL",
@@ -3263,6 +3397,11 @@
   "green bubble": {
    "ja": "緑の球",
    "owner": "BUBBLE",
+   "prop": "DESC"
+  },
+  "ground": {
+   "ja": "地面",
+   "owner": "GROUND",
    "prop": "DESC"
   },
   "group of tool chests": {
@@ -3330,6 +3469,11 @@
    "owner": "LUNCH",
    "prop": "DESC"
   },
+  "lurking grue": {
+   "ja": "グルー",
+   "owner": "GRUE",
+   "prop": "DESC"
+  },
   "machine": {
    "ja": "機械",
    "owner": "MACHINE",
@@ -3373,6 +3517,16 @@
   "pair of candles": {
    "ja": "一対の蝋燭",
    "owner": "CANDLES",
+   "prop": "DESC"
+  },
+  "pair of hands": {
+   "ja": "両手",
+   "owner": "HANDS",
+   "prop": "DESC"
+  },
+  "passage": {
+   "ja": "通路",
+   "owner": "PATHOBJ",
    "prop": "DESC"
   },
   "pedestal": {
@@ -3425,6 +3579,11 @@
    "owner": "RAINBOW",
    "prop": "DESC"
   },
+  "random object": {
+   "ja": "それ",
+   "owner": "IT",
+   "prop": "DESC"
+  },
   "red buoy": {
    "ja": "赤い浮標",
    "owner": "BUOY",
@@ -3453,6 +3612,11 @@
   "rusty knife": {
    "ja": "錆びたナイフ",
    "owner": "RUSTY-KNIFE",
+   "prop": "DESC"
+  },
+  "sailor": {
+   "ja": "船乗り",
+   "owner": "SAILOR",
    "prop": "DESC"
   },
   "sand": {
@@ -3515,6 +3679,11 @@
    "owner": "SONGBIRD",
    "prop": "DESC"
   },
+  "stairs": {
+   "ja": "階段",
+   "owner": "STAIRS",
+   "prop": "DESC"
+  },
   "stiletto": {
    "ja": "短剣",
    "owner": "STILETTO",
@@ -3528,6 +3697,11 @@
   "stone door": {
    "ja": "石の扉",
    "owner": "BARROW-DOOR",
+   "prop": "DESC"
+  },
+  "such thing": {
+   "ja": "そんなもの",
+   "owner": "NOT-HERE-OBJECT",
    "prop": "DESC"
   },
   "surrounding wall": {
@@ -3648,6 +3822,16 @@
   "yellow button": {
    "ja": "黄色のボタン",
    "owner": "YELLOW-BUTTON",
+   "prop": "DESC"
+  },
+  "you": {
+   "ja": "自分",
+   "owner": "ME",
+   "prop": "DESC"
+  },
+  "zorkmid": {
+   "ja": "ゾーキッド",
+   "owner": "ZORKMID",
    "prop": "DESC"
   },
   "| (Close cover before striking)| | YOU too can make BIG MONEY in the exciting field of PAPER SHUFFLING!| | Mr. Anderson of Muddle, Mass. says: \"Before I took this course I was a lowly bit twiddler. Now with what I learned at GUE Tech I feel really important and can obfuscate and confuse with the best.\"| | Dr. Blank had this to say: \"Ten short days ago all I could look forward to was a dead-end job as a doctor. Now I have a promising future and make really big Zorkmids.\"| | GUE Tech can't promise these fantastic results to everyone. But when you earn your degree from GUE Tech, your future will be brighter.": {
@@ -3833,6 +4017,12 @@
    [
     "不気味",
     "ぶきみ"
+   ]
+  ],
+  "両手": [
+   [
+    "両手",
+    "りょうて"
    ]
   ],
   "両端": [
@@ -4099,6 +4289,12 @@
     "じごく"
    ]
   ],
+  "地面": [
+   [
+    "地面",
+    "じめん"
+   ]
+  ],
   "坑木": [
    [
     "坑木",
@@ -4339,6 +4535,12 @@
    [
     "小川",
     "おがわ"
+   ]
+  ],
+  "小道": [
+   [
+    "小道",
+    "こみち"
    ]
   ],
   "小鳥": [
@@ -5107,6 +5309,12 @@
     "ことば"
    ]
   ],
+  "祝福": [
+   [
+    "祝福",
+    "しゅくふく"
+   ]
+  ],
   "神殿": [
    [
     "神殿",
@@ -5145,6 +5353,12 @@
    [
     "舟",
     "ふね"
+   ]
+  ],
+  "空気": [
+   [
+    "空気",
+    "くうき"
    ]
   ],
   "突進": [
@@ -5343,6 +5557,12 @@
     "はら"
    ]
   ],
+  "自分": [
+   [
+    "自分",
+    "じぶん"
+   ]
+  ],
   "自害": [
    [
     "自害",
@@ -5377,6 +5597,16 @@
    [
     "船乗",
     "ふなの"
+   ]
+  ],
+  "船乗り": [
+   [
+    "船乗",
+    "ふなの"
+   ],
+   [
+    "り",
+    null
    ]
   ],
   "船着": [
@@ -5769,6 +5999,12 @@
    [
     "隅",
     "すみ"
+   ]
+  ],
+  "階段": [
+   [
+    "階段",
+    "かいだん"
    ]
   ],
   "隙間風": [
@@ -6960,6 +7196,8 @@
   "back": "戻る",
   "bag": "袋",
   "bar": "白金の延べ棒",
+  "bare": "両手",
+  "bare pair": "両手",
   "barrow": "石塚",
   "bat": "蝙蝠",
   "bauble": "美しい真鍮の飾り玉",
@@ -6972,6 +7210,7 @@
   "birds nest": "鳥の巣",
   "black": "黒い書物",
   "blast": "爆破する",
+  "blessings": "祝福",
   "bloody": "血のついた斧",
   "bloody axe": "血のついた斧",
   "blow": "吹く",
@@ -6996,7 +7235,7 @@
   "broken lamp": "壊れたランタン",
   "brown bag": "茶色の袋",
   "brown button": "茶色のボタン",
-  "brush": "磨く",
+  "brush": "磨く(みがく)",
   "bubble": "緑の球",
   "buoy": "赤い浮標",
   "burn": "燃やす",
@@ -7034,7 +7273,6 @@
   "cut": "切る",
   "cyclops": "サイクロプス",
   "dam": "ダム",
-  "dark": "煙突",
   "dark chimney": "煙突",
   "dead": "燃え尽きたランタン",
   "deflate": "しぼませる",
@@ -7080,7 +7318,9 @@
   "follow": "追う",
   "food": "昼食",
   "for": "を求めて",
+  "forbidding": "階段",
   "forest": "森",
+  "forest trail": "小道",
   "frigid": "川",
   "frigid river": "川",
   "frobozz": "フロボズ",
@@ -7098,6 +7338,8 @@
   "granite wall": "花崗岩の壁",
   "grate": "格子",
   "green": "緑の球",
+  "ground": "地面",
+  "grue": "グルー",
   "guide": "案内書",
   "gunk": "ガラス質の鉱滓のかけら",
   "hand-held": "手押しの空気入れ",
@@ -7107,7 +7349,6 @@
   "house": "白い家",
   "huge diamond": "巨大なダイヤモンド",
   "huge door": "石の扉",
-  "hungry": "サイクロプス",
   "hungry cyclops": "サイクロプス",
   "impassable": "山並み",
   "impassable mountain": "山並み",
@@ -7118,6 +7359,7 @@
   "inventory": "持ち物",
   "invisible": "亡霊の群れ",
   "invisible ghosts": "亡霊の群れ",
+  "it": "それ",
   "ivory": "松明",
   "jade": "翡翠の像",
   "jewel": "壊れた宝石の卵",
@@ -7149,11 +7391,15 @@
   "light": "点ける",
   "listen": "聞く",
   "lock": "かける",
+  "long": "小道",
   "look": "見る",
   "lower": "下げる",
   "lowered": "籠",
   "lowered cage": "籠",
   "lubricate": "差す",
+  "lungs": "空気",
+  "lurking": "グルー",
+  "lurking grue": "グルー",
   "machine": "機械",
   "magic": "魔法の舟",
   "mailbox": "小さな郵便箱",
@@ -7161,12 +7407,12 @@
   "mangled": "死体の山",
   "mangled bodies": "死体の山",
   "manual": "ZORK 取扱説明書(とりあつかいせつめいしょ)",
-  "marble": "台座",
   "massive": "石塚",
   "massive barrow": "石塚",
   "match": "マッチ帳",
   "match match": "マッチ帳",
   "material": "粘りのある物質",
+  "me": "自分",
   "melt": "溶かす",
   "metal bolt": "ボルト",
   "mountain": "山並み",
@@ -7190,6 +7436,7 @@
   "own": "水晶の三叉槍",
   "owners": "ZORK 取扱説明書(とりあつかいせつめいしょ)",
   "painting": "絵画",
+  "pair": "両手",
   "panel": "制御盤",
   "parchment": "古い地図",
   "pedestal": "台座",
@@ -7231,10 +7478,11 @@
   "rocky wall": "崖",
   "roll": "転がす",
   "rope": "縄",
-  "rub": "こする",
+  "rub": "触る(さわる)",
   "rug": "絨毯",
   "rusty knives": "錆びたナイフ",
   "rusty lantern": "燃え尽きたランタン",
+  "sailor": "船乗り",
   "sand": "砂",
   "sapphire": "サファイアをちりばめた腕輪",
   "sapphire bracelet": "サファイアをちりばめた腕輪",
@@ -7257,8 +7505,10 @@
   "sharp sceptre": "王笏",
   "sheer": "崖",
   "shovel": "シャベル",
+  "silent": "グルー",
   "silver": "聖杯",
   "silver chalice": "聖杯",
+  "sinister": "グルー",
   "skeleton": "合鍵",
   "skeleton key": "合鍵",
   "skip": "スキップする",
@@ -7281,11 +7531,12 @@
   "spray": "吹きかける",
   "squeeze": "握る",
   "stab": "刺す",
+  "stairs": "階段",
   "stand": "立つ",
   "stay": "とどまる",
-  "steep": "滑り台",
   "steep chute": "滑り台",
   "stiletto": "短剣",
+  "stone stairs": "階段",
   "storm": "木",
   "strange": "木の扉",
   "strike": "打つ",
@@ -7314,6 +7565,7 @@
   "torch": "松明",
   "tour": "案内書",
   "tour guide": "案内書",
+  "trail": "小道",
   "trap": "揚げ戸",
   "trap door": "揚げ戸",
   "treasure": "宝",
@@ -7329,13 +7581,13 @@
   "under": "の下",
   "unlock": "開ける",
   "unrusty": "嫌な感じのナイフ",
-  "untie": "解く",
+  "untie": "解く(とく)",
   "up": "上へ",
   "useless": "燃え尽きたランタン",
   "vampire": "蝙蝠",
   "vampire bat": "蝙蝠",
   "verbose": "詳しく",
-  "version": "版",
+  "version": "バージョン",
   "vicious": "短剣",
   "vicious stiletto": "短剣",
   "viscous": "粘りのある物質",
@@ -7354,6 +7606,7 @@
   "white pedestal": "台座",
   "win": "勝つ",
   "wind": "巻く",
+  "winding": "小道",
   "window": "窓",
   "wish": "願う",
   "with": "で",
@@ -7366,6 +7619,7 @@
   "yellow": "黄色のボタン",
   "yellow button": "黄色のボタン",
   "zork": "ゾーク",
-  "zork manual": "ZORK 取扱説明書(とりあつかいせつめいしょ)"
+  "zork manual": "ZORK 取扱説明書(とりあつかいせつめいしょ)",
+  "zorkmid": "ゾーキッド"
  }
 }

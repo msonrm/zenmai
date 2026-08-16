@@ -79,6 +79,18 @@ class Translator {
     this.stats = { hit: 0, greedy: 0, miss: 0, notrans: 0, missed: new Set(), rawWords: new Set() }
   }
 
+  /** ★反響（`{ECHO}`）に使う「打った呼び名」をホストから受け取る。1 手ごとに更新する */
+  setEcho(word) { this.echoWord = word || null }
+
+  /**
+   * ★英語モード: 訳さず**原文のまま**返す。
+   *
+   * 行を貯める・プロンプトを剥がす・段落を組む、はそのまま使いたいので、
+   * 訳を引くところだけを止める（ここを切るのが「英語で遊ぶ」の実体 ——
+   * 英語版は**訳を足すのではなく、訳すのをやめたもの**）。
+   */
+  setPassthrough(on) { this.passthrough = !!on }
+
   /** 1 語（または名詞句）を日本語へ。無ければ null */
   one(en) {
     const k = norm(en)
@@ -118,6 +130,19 @@ class Translator {
   lookup(key) {
     if (!key) return null
     this._curKey = key
+    // ★反響（`{ECHO}`）だけは完全一致より先に試す —— `echo echo ...` は原作のソースに
+    //   文字列としてあるので exact にも入っているが、**打った語を返す**のが正しい。
+    //   「はんきょう」と打った人に「こだま」を返してはいけない
+    if (this.echoWord) {
+      for (const p of this.patterns) {
+        if (!p.names.includes('ECHO')) continue
+        const m = key.match(p.re)
+        if (!m) continue
+        let out = p.ja
+        p.names.forEach((name) => { out = out.replace('{' + name + '}', this.echoWord) })
+        return out
+      }
+    }
     const hit = this.exact.get(key) ?? this.props.get(key)
     if (hit !== undefined) return hit
     for (const p of this.patterns) {
@@ -125,8 +150,13 @@ class Translator {
       if (!m) continue
       let out = p.ja
       p.names.forEach((name, idx) => {
-        // ★引用された語（`I don't know the word "X".`）は**打った語そのもの**なので訳さない
-        const v = p.quotes[idx] ? m[idx + 1] : this.word(m[idx + 1])
+        // ★`{ECHO}` は轟音の部屋の反響。原作は**プレイヤーが打った語**を返しているので、
+        //   訳語ではなく**打った呼び名**を入れる（ホストが setEcho で教える）。
+        //   ここだけ「原作の英語を訳す」のではなく「こちらの入力を返す」——
+        //   その文字列の持ち主が、原作ではなく**打った人**だから
+        // ★引用された語（`I don't know the word "X".`）も**打った語そのもの**なので訳さない
+        const v = name === 'ECHO' && this.echoWord ? this.echoWord
+          : p.quotes[idx] ? m[idx + 1] : this.word(m[idx + 1])
         out = out.replace('{' + name + '}', v)
       })
       return out
@@ -162,6 +192,8 @@ class Translator {
 
   /** 完成した 1 行を日本語にする。引けなければ null */
   line(raw) {
+    // ★英語モードは原文のまま返す（統計も数えない —— 訳していないので「未訳」ではない）
+    if (this.passthrough) return raw
     // ★プロンプト `>` は改行を伴わずに出るので、次の行の頭に貼りつく。
     //   剥がしてから照合し、訳文の前に戻す（剥がさないと 1 行も引けない）
     const p = raw.match(/^(\s*>+\s*)([\s\S]*)$/)

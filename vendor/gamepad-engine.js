@@ -215,6 +215,14 @@
 		"ら行",
 		"わ行"
 	];
+	/** 母音名（ガイド表示用） */
+	const VOWEL_NAMES = [
+		"あ",
+		"い",
+		"う",
+		"え",
+		"お"
+	];
 	/** D-pad ラベル（レイヤー別、行名表記） */
 	const DPAD_LABELS = {
 		base: {
@@ -232,6 +240,79 @@
 			down: "わ行"
 		}
 	};
+	/** 英語 T9 テーブル（10行×5列）[RB, X(左), Y(上), B(右), A(下)] */
+	const ENGLISH_TABLE = [
+		[
+			"1",
+			"(",
+			"?",
+			")",
+			"!"
+		],
+		[
+			"2",
+			"a",
+			"b",
+			"c",
+			""
+		],
+		[
+			"3",
+			"d",
+			"e",
+			"f",
+			""
+		],
+		[
+			"4",
+			"g",
+			"h",
+			"i",
+			""
+		],
+		[
+			"5",
+			"j",
+			"k",
+			"l",
+			""
+		],
+		[
+			"6",
+			"m",
+			"n",
+			"o",
+			""
+		],
+		[
+			"7",
+			"p",
+			"q",
+			"r",
+			"s"
+		],
+		[
+			"8",
+			"t",
+			"u",
+			"v",
+			""
+		],
+		[
+			"9",
+			"w",
+			"x",
+			"y",
+			"z"
+		],
+		[
+			"0",
+			"@",
+			"#",
+			"-",
+			"_"
+		]
+	];
 	//#endregion
 	//#region src/gamepad/machine.ts
 	/** eager output を巻き戻せる同時打鍵の窓（ms） */
@@ -247,6 +328,10 @@
 		"を",
 		"んを"
 	];
+	/** 英語: LT 長押しで CapsLock に入るまでの時間（ms） */
+	const ENG_LONG_PRESS_MS = 500;
+	/** 英語: LT 短押し×2 を SmartCaps と見なす間隔（ms） */
+	const ENG_DOUBLE_TAP_MS = 300;
 	/** 初期状態を生成する。 */
 	function createMachineState() {
 		return {
@@ -261,7 +346,13 @@
 			eagerTime: 0,
 			rtUsed: false,
 			rtDuringLT: false,
-			rtCycleStep: 0
+			rtCycleStep: 0,
+			engShiftNext: false,
+			engCapsLock: false,
+			engSmartCaps: false,
+			engLTHolding: false,
+			engLTPressTime: 0,
+			engLastLTRelease: 0
 		};
 	}
 	/** フレーム末尾の prev 更新（試打サイトのフックと同じ順序）。 */
@@ -340,6 +431,86 @@
 				});
 				s.rtCycleStep = nextStep;
 			} else s.rtCycleStep = 0;
+			s.rtUsed = false;
+		}
+		return actions;
+	}
+	/**
+	* 英語: T9 入力（プッシュホン式）。行＝数字キー、母音ボタン＝その行の英字。
+	*
+	* 日本語との違いは 3 つだけ:
+	*   - 引く表が `ENGLISH_TABLE`（後置修飾が無いので拗音・濁点の分岐も無い）
+	*   - LT が**シフト**（短押し=次の 1 文字 / 長押し=固定 / 短押し×2=英字以外で解ける固定）
+	*   - RT が "0"
+	* eager output + rollback の骨格は `stepJapanese` と同じ。
+	*/
+	function stepEnglish(f, s) {
+		const actions = [];
+		const v = f.vowel ?? 0;
+		if (f.vowelNow) {
+			let char = ENGLISH_TABLE[f.row]?.[v] ?? "";
+			if (char) {
+				if (s.engCapsLock || s.engSmartCaps || s.engShiftNext) {
+					char = char.toUpperCase();
+					if (s.engShiftNext) s.engShiftNext = false;
+					if (s.engSmartCaps && !/[a-zA-Z]/.test(char)) {
+						s.engSmartCaps = false;
+						s.engCapsLock = false;
+					}
+				}
+				const rowChanged = f.row !== s.prevRow;
+				const vowelChanged = f.vowel !== s.prevVowelIndex;
+				if (!s.prevVowelPressed) {
+					actions.push({
+						type: "kana",
+						char
+					});
+					s.eagerChar = char;
+					s.eagerCharLen = 1;
+					s.eagerTime = f.now;
+				} else if (rowChanged || vowelChanged) {
+					if (!(rowChanged && f.consonantCount < s.prevConsonantCount)) {
+						if (s.eagerChar && f.now - s.eagerTime < 300) actions.push({
+							type: "kana",
+							char,
+							replace: s.eagerCharLen
+						});
+						else actions.push({
+							type: "kana",
+							char
+						});
+						s.eagerChar = char;
+						s.eagerCharLen = 1;
+						s.eagerTime = f.now;
+					}
+				}
+			}
+		}
+		if (s.prevVowelPressed && !f.vowelNow) s.eagerChar = null;
+		if (f.ltNow && !s.prevLT) {
+			s.engLTPressTime = f.now;
+			s.engLTHolding = true;
+		}
+		if (f.ltNow && s.engLTHolding && f.now - s.engLTPressTime >= 500) {
+			s.engCapsLock = !s.engCapsLock;
+			s.engSmartCaps = false;
+			s.engShiftNext = false;
+			s.engLTHolding = false;
+		}
+		if (!f.ltNow && s.prevLT) {
+			if (s.engLTHolding) if (f.now - s.engLastLTRelease < 300) {
+				s.engSmartCaps = true;
+				s.engShiftNext = false;
+			} else s.engShiftNext = true;
+			s.engLTHolding = false;
+			s.engLastLTRelease = f.now;
+		}
+		if (f.rtNow && !s.prevRT) s.rtUsed = false;
+		if (!f.rtNow && s.prevRT) {
+			if (!s.rtUsed && !f.ltNow) actions.push({
+				type: "kana",
+				char: "0"
+			});
 			s.rtUsed = false;
 		}
 		return actions;
@@ -466,11 +637,12 @@
 	}
 	//#endregion
 	//#region src/gamepad/engine.ts
-	function createResolver(host) {
+	function createResolver(host, lang = "japanese") {
 		let state = createMachineState();
+		let current = lang;
 		return {
 			stepFrame(f) {
-				const ops = stepJapanese(f, state).flatMap((a) => translateAction(a, host));
+				const ops = (current === "english" ? stepEnglish : stepJapanese)(f, state).flatMap((a) => translateAction(a, host));
 				syncPrev(f, state);
 				return ops;
 			},
@@ -485,6 +657,24 @@
 				state.rtUsed = true;
 			},
 			reset() {
+				state = createMachineState();
+			},
+			engShift() {
+				return {
+					shiftNext: state.engShiftNext,
+					capsLock: state.engCapsLock || state.engSmartCaps
+				};
+			},
+			lang() {
+				return current;
+			},
+			engClearSmartCaps() {
+				state.engSmartCaps = false;
+				state.engCapsLock = false;
+			},
+			setLang(next) {
+				if (next === current) return;
+				current = next;
 				state = createMachineState();
 			}
 		};
@@ -503,11 +693,12 @@
 	*/
 	function start(opts) {
 		let enabled = opts.enabled ?? true;
+		const autoConfirm = opts.autoConfirm ?? true;
 		let stopped = false;
 		let rafId = 0;
 		let connected = false;
 		let gamepadName = null;
-		const resolver = createResolver({ getComposingTail: opts.getComposingTail });
+		const resolver = createResolver({ getComposingTail: opts.getComposingTail }, opts.lang ?? "japanese");
 		let prevLS = false;
 		let prevRS = false;
 		let prevStart = false;
@@ -573,7 +764,9 @@
 						0,
 						0,
 						0
-					]
+					],
+					englishShiftNext: false,
+					englishCapsLock: false
 				});
 				return;
 			}
@@ -592,7 +785,10 @@
 			const row = resolveConsonantRow(buttons);
 			const vowel = resolveVowelIndex(buttons);
 			const v = vowel ?? 0;
-			const previewChar = vowelNow ? KANA_TABLE[row]?.[v] ?? null : null;
+			const isEng = resolver.lang() === "english";
+			const previewRaw = vowelNow ? (isEng ? ENGLISH_TABLE : KANA_TABLE)[row]?.[v] ?? null : null;
+			const engShift = resolver.engShift();
+			const previewChar = previewRaw && isEng && (engShift.capsLock || engShift.shiftNext) ? previewRaw.toUpperCase() : previewRaw;
 			const pressed = /* @__PURE__ */ new Set();
 			for (let i = 0; i < buttons.length; i++) if (isPressed(buttons, i)) pressed.add(i);
 			opts.onState?.({
@@ -602,7 +798,9 @@
 				activeLayer: lbNow ? "lb" : "base",
 				previewChar,
 				pressed,
-				axes: [...axes]
+				axes: [...axes],
+				englishShiftNext: resolver.engShift().shiftNext,
+				englishCapsLock: resolver.engShift().capsLock
 			});
 			const frame = {
 				now,
@@ -644,43 +842,71 @@
 			const rStickLeft = dominant === "x" && rsX < 0;
 			const rStickUp = dominant === "y" && rsY < 0;
 			const rStickDown = dominant === "y" && rsY > 0;
+			const rsEng = resolver.lang() === "english";
 			if (rStickRight && !prevRStickRight) emit({
 				type: "kana",
-				char: "ー"
+				char: rsEng ? "/" : "ー"
 			});
-			if (rStickUp && !prevRStickUp) emit({ type: "toggleDakuten" });
+			if (rStickUp && !prevRStickUp) emit(rsEng ? {
+				type: "kana",
+				char: "'"
+			} : { type: "toggleDakuten" });
 			if (rStickLeft && !prevRStickLeft) emit({ type: "deleteBack" });
 			if (rStickDown && !prevRStickDown) {
 				const withinWindow = now - lastPunctTime < PUNCTUATION_DOUBLE_TAP_MS;
 				clearPunctTimer();
 				punctTapCount = withinWindow ? punctTapCount + 1 : 1;
 				const tapCount = punctTapCount;
-				if (tapCount === 1) emit({
-					type: "kana",
-					char: "、"
-				});
-				else if (tapCount === 2) emit({
-					type: "kana",
-					char: "。",
-					replace: 1
-				});
-				else {
-					emit({
+				if (rsEng) {
+					if (tapCount === 1) {
+						emit({
+							type: "kana",
+							char: " "
+						});
+						resolver.engClearSmartCaps();
+					} else if (tapCount === 2) emit({
 						type: "kana",
-						char: "　",
+						char: ".",
 						replace: 1
 					});
-					emit({ type: "confirmOrNewline" });
-					punctTapCount = 0;
-					lastPunctTime = 0;
-				}
-				if (tapCount < 3) {
-					lastPunctTime = now;
-					punctTimerId = setTimeout(() => {
-						punctTimerId = null;
+					else {
+						emit({
+							type: "kana",
+							char: ",",
+							replace: 1
+						});
 						punctTapCount = 0;
-						if (!stopped && enabled) emit({ type: "confirmOrNewline" });
-					}, PUNCTUATION_DOUBLE_TAP_MS);
+						lastPunctTime = 0;
+					}
+					if (tapCount < 3) lastPunctTime = now;
+				} else {
+					if (tapCount === 1) emit({
+						type: "kana",
+						char: "、"
+					});
+					else if (tapCount === 2) emit({
+						type: "kana",
+						char: "。",
+						replace: 1
+					});
+					else {
+						emit({
+							type: "kana",
+							char: "　",
+							replace: 1
+						});
+						if (autoConfirm) emit({ type: "confirmOrNewline" });
+						punctTapCount = 0;
+						lastPunctTime = 0;
+					}
+					if (tapCount < 3) {
+						lastPunctTime = now;
+						punctTimerId = setTimeout(() => {
+							punctTimerId = null;
+							punctTapCount = 0;
+							if (!stopped && enabled && autoConfirm) emit({ type: "confirmOrNewline" });
+						}, PUNCTUATION_DOUBLE_TAP_MS);
+					}
 				}
 			}
 			prevRStickRight = rStickRight;
@@ -774,6 +1000,9 @@
 		return {
 			setEnabled(on) {
 				enabled = on;
+			},
+			setLang(lang) {
+				resolver.setLang(lang);
 			},
 			stop() {
 				stopped = true;
@@ -969,15 +1198,23 @@
 	}
 	//#endregion
 	//#region src/gamepad/version.ts
-	const GAMEPAD_ENGINE_VERSION = "1.7.0";
+	const GAMEPAD_ENGINE_VERSION = "1.11.0";
 	//#endregion
 	exports.CHORD_WINDOW_MS = CHORD_WINDOW_MS;
+	exports.DPAD_LABELS = DPAD_LABELS;
+	exports.ENGLISH_TABLE = ENGLISH_TABLE;
+	exports.ENG_DOUBLE_TAP_MS = ENG_DOUBLE_TAP_MS;
+	exports.ENG_LONG_PRESS_MS = ENG_LONG_PRESS_MS;
+	exports.KANA_TABLE = KANA_TABLE;
+	exports.ROW_NAMES = ROW_NAMES;
+	exports.VOWEL_NAMES = VOWEL_NAMES;
 	exports.createMachineState = createMachineState;
 	exports.createResolver = createResolver;
 	exports.mount = mount;
 	exports.resolveDakutenOp = resolveDakutenOp;
 	exports.resolveYouonOp = resolveYouonOp;
 	exports.start = start;
+	exports.stepEnglish = stepEnglish;
 	exports.stepJapanese = stepJapanese;
 	exports.translateAction = translateAction;
 	exports.version = GAMEPAD_ENGINE_VERSION;
