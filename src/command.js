@@ -387,13 +387,23 @@ function createCommander(asset) {
       const g = unknown.map((w) => guide[kana(w)]).find(Boolean)
       return { command: null, trace: '知らない言葉', note: g || '', unknown, echo: echo.join('') }
     }
-    const ask = verb.disp.includes('を') ? verb.disp.split('を').pop() : verb.disp
+    // ★問い返しには**打った言い方をそのまま映す**。
+    //   動詞の言い方に名詞が埋まっているもの（`ぜんまいをまく` `錠を開ける` 等 40 通り）で、
+    //   正式形だけから作ると埋まっていた名詞が消える —— 「ぜんまいをまく」→「何を巻く？」。
+    //   すると答えたくなる「ぜんまい」が**物ではない**ので行き止まる（実プレイで踏んだ）。
+    //   ★「鍵」「錠」「空気」は物として存在するぶんもっと悪く、**黙って別の命令になる**。
+    //   「何のぜんまいをまく？」と訊けば、自然な答え「カナリア」がそのまま通る。
+    const typed = typeof verb.ja === 'string' ? verb.ja : ''
+    const cut = typed.indexOf('を')
+    const ask = cut > 0 && cut < typed.length - 1
+      ? `何の${typed.slice(0, cut)}を${typed.slice(cut + 1)}？`
+      : `何を${verb.disp.includes('を') ? verb.disp.split('を').pop() : verb.disp}？`
     return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp,
       // ★轟音の部屋の反響に使う「**打った呼び名**」。原作は `P-INBUF`（プレイヤーが打った
       //   生の入力）から語を切り出して返すので、訳語や代表形では意味が変わる ——
       //   「のべぼう」と打った人には「のべぼう」が返らなければならない
       echoWord: (prso && prso.ja) || verb.ja || '',
-      verbKey: verb.key, hasObject: !!(prso || tool || dest), needsObject, ask: `何を${ask}？` }
+      verbKey: verb.key, hasObject: !!(prso || tool || dest), needsObject, ask }
   }
 
   return { toCommand, lex }
