@@ -46,15 +46,17 @@ const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
 //   `again` は直前のコマンドの繰り返し、`oops` は打ち間違いの訂正
 const PARSER_WORDS = {
   もういちど: 'again', もう一度: 'again', くりかえす: 'again', 繰り返す: 'again',
-  おなじ: 'again', 同じ: 'again', またやる: 'again', リピート: 'again', りぴーと: 'again',
+  またやる: 'again', リピート: 'again', りぴーと: 'again',
+  // ★「おなじ」は入れない —— 物を指す「同じ」と紛れる（`おなじものをとる` の頭を食う）
 }
 
-// ★はい／いいえの質問（終わるか・最初からやるか）は原作が Y/N で受ける。
-//   ここだけは動詞でも物でもないので、専用の写像を持つ
-const YESNO = {
-  はい: 'y', うん: 'y', そう: 'y', そうする: 'y', y: 'y', yes: 'y',
-  いいえ: 'n', いや: 'n', やめない: 'n', ちがう: 'n', n: 'n', no: 'n',
-}
+// ★はい／いいえの質問は**原作の 2 か所だけ**（`V-QUIT` / `V-RESTART` の
+//   `Do you wish to leave the game? (Y is affirmative):`）。しかも原作の `YES?` は
+//   **Y / YES 以外をすべて否定**として読むので、否定側は何を打っても通る。
+//   だから受けるのは「はい」「いいえ」だけでよい —— ★**この 2 語以外は
+//   ふつうの命令として解釈されるべき**で、`そう` や `いや` を予約すると
+//   ゲーム中の語を食う（`そうさする` の頭など）。英字（y/n）はかな入力では打たない
+const YESNO = { はい: 'y', いいえ: 'n' }
 
 /**
  * ★照合はすべて「かな」に正規化してから行う。
@@ -321,6 +323,10 @@ function createCommander(asset) {
     //   「に・へ」だけは例外 —— 日本語では目的語をただ指すことがある（木に登る = climb tree）
     for (const o of objs) {
       if (!SPATIAL.has(o.role) || has(o.role)) continue
+      // ★「窓から入る」は原作の `enter window`（`ENTER OBJECT = V-THROUGH`）と同じこと ——
+      //   日本語の「から」はここでは起点ではなく**通り道**を指している。
+      //   ENTER は OBJ 形を持つので、役を外して裸で渡せばそのまま通る
+      if (o.role === 'FROM' && verb.key === 'ENTER' && has('OBJ')) continue
       const hint = ['WALK', 'ENTER', 'EXIT'].includes(verb.key) ? ' —— 移動は方角で言う: 北・東・上・下' : ''
       return {
         command: null,
@@ -383,6 +389,10 @@ function createCommander(asset) {
     }
     const ask = verb.disp.includes('を') ? verb.disp.split('を').pop() : verb.disp
     return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp,
+      // ★轟音の部屋の反響に使う「**打った呼び名**」。原作は `P-INBUF`（プレイヤーが打った
+      //   生の入力）から語を切り出して返すので、訳語や代表形では意味が変わる ——
+      //   「のべぼう」と打った人には「のべぼう」が返らなければならない
+      echoWord: (prso && prso.ja) || verb.ja || '',
       verbKey: verb.key, hasObject: !!(prso || tool || dest), needsObject, ask: `何を${ask}？` }
   }
 
@@ -390,7 +400,9 @@ function createCommander(asset) {
 }
 
 {
-  const api = { createCommander, DIRS, PARTICLES }
+  // ★PARSER_WORDS / YESNO も出す —— 手引きの画面が**同じ表を見て**言い方を並べるため。
+  //   画面側に書き写すと、ここを直したとき手引きだけ古くなる（打てない語を案内する）
+  const api = { createCommander, DIRS, PARTICLES, PARSER_WORDS, YESNO }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   if (typeof window !== 'undefined') window.ZenmaiCommand = api
 }

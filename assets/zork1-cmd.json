@@ -10,6 +10,17 @@
   "はなしかける": "話しかけられる相手は限られている（「トロルと話す」など）"
  },
  "objects": {
+  "ADVENTURER": {
+   "adjs": [],
+   "desc": "cretin",
+   "ja": [
+    "まぬけ"
+   ],
+   "nouns": [
+    "ADVENTURER"
+   ],
+   "vehicle": false
+  },
   "ADVERTISEMENT": {
    "adjs": [
     "SMALL"
@@ -205,6 +216,19 @@
    ],
    "nouns": [
     "BELL"
+   ],
+   "vehicle": false
+  },
+  "BLESSINGS": {
+   "adjs": [],
+   "desc": "blessings",
+   "ja": [
+    "祝福",
+    "しゅくふく"
+   ],
+   "nouns": [
+    "BLESSINGS",
+    "GRACES"
    ],
    "vehicle": false
   },
@@ -916,6 +940,44 @@
    ],
    "vehicle": false
   },
+  "GROUND": {
+   "adjs": [],
+   "desc": "ground",
+   "ja": [
+    "地面",
+    "じめん",
+    "床",
+    "ゆか",
+    "砂",
+    "すな",
+    "土",
+    "つち"
+   ],
+   "nouns": [
+    "GROUND",
+    "SAND",
+    "DIRT",
+    "FLOOR"
+   ],
+   "vehicle": false
+  },
+  "GRUE": {
+   "adjs": [
+    "LURKING",
+    "SINISTER",
+    "HUNGRY",
+    "SILENT"
+   ],
+   "desc": "lurking grue",
+   "ja": [
+    "グルー",
+    "ぐるー"
+   ],
+   "nouns": [
+    "GRUE"
+   ],
+   "vehicle": false
+  },
   "GUIDE": {
    "adjs": [
     "TOUR",
@@ -956,6 +1018,24 @@
     "GUNK",
     "PIECE",
     "SLAG"
+   ],
+   "vehicle": false
+  },
+  "HANDS": {
+   "adjs": [
+    "BARE"
+   ],
+   "desc": "pair of hands",
+   "ja": [
+    "両手",
+    "りょうて",
+    "素手",
+    "すで"
+   ],
+   "nouns": [
+    "PAIR",
+    "HANDS",
+    "HAND"
    ],
    "vehicle": false
   },
@@ -1024,6 +1104,21 @@
     "RAFT"
    ],
    "vehicle": true
+  },
+  "IT": {
+   "adjs": [],
+   "desc": "random object",
+   "ja": [
+    "それ",
+    "そいつ"
+   ],
+   "nouns": [
+    "IT",
+    "THEM",
+    "HER",
+    "HIM"
+   ],
+   "vehicle": false
   },
   "JADE": {
    "adjs": [
@@ -1252,6 +1347,23 @@
    ],
    "vehicle": false
   },
+  "LUNGS": {
+   "adjs": [],
+   "desc": "blast of air",
+   "ja": [
+    "空気",
+    "くうき",
+    "息",
+    "いき"
+   ],
+   "nouns": [
+    "LUNGS",
+    "AIR",
+    "MOUTH",
+    "BREATH"
+   ],
+   "vehicle": false
+  },
   "MACHINE": {
    "adjs": [],
    "desc": "machine",
@@ -1336,6 +1448,26 @@
     "MATCH",
     "MATCHES",
     "MATCHBOOK"
+   ],
+   "vehicle": false
+  },
+  "ME": {
+   "adjs": [],
+   "desc": "you",
+   "ja": [
+    "自分",
+    "じぶん",
+    "私",
+    "わたし",
+    "自分自身",
+    "じぶんじしん",
+    "まぬけ"
+   ],
+   "nouns": [
+    "ME",
+    "MYSELF",
+    "SELF",
+    "CRETIN"
    ],
    "vehicle": false
   },
@@ -1453,6 +1585,28 @@
     "ART",
     "CANVAS",
     "TREASURE"
+   ],
+   "vehicle": false
+  },
+  "PATHOBJ": {
+   "adjs": [
+    "FOREST",
+    "NARROW",
+    "LONG",
+    "WINDING"
+   ],
+   "desc": "passage",
+   "ja": [
+    "小道",
+    "こみち",
+    "道",
+    "みち",
+    "通路",
+    "つうろ"
+   ],
+   "nouns": [
+    "TRAIL",
+    "PATH"
    ],
    "vehicle": false
   },
@@ -1696,6 +1850,22 @@
    ],
    "vehicle": false
   },
+  "SAILOR": {
+   "adjs": [],
+   "desc": "sailor",
+   "ja": [
+    "船乗り",
+    "ふなのり",
+    "水夫",
+    "すいふ"
+   ],
+   "nouns": [
+    "SAILOR",
+    "FOOTPAD",
+    "AVIATOR"
+   ],
+   "vehicle": false
+  },
   "SAND": {
    "adjs": [],
    "desc": "sand",
@@ -1855,6 +2025,31 @@
    "nouns": [
     "BIRD",
     "SONGBIRD"
+   ],
+   "vehicle": false
+  },
+  "STAIRS": {
+   "adjs": [
+    "STONE",
+    "DARK",
+    "MARBLE",
+    "FORBIDDING",
+    "STEEP"
+   ],
+   "desc": "stairs",
+   "ja": [
+    "階段",
+    "かいだん",
+    "石段",
+    "いしだん",
+    "段々",
+    "だんだん"
+   ],
+   "nouns": [
+    "STAIRS",
+    "STEPS",
+    "STAIRCASE",
+    "STAIRWAY"
    ],
    "vehicle": false
   },
@@ -2265,6 +2460,18 @@
     "SWITCH"
    ],
    "vehicle": false
+  },
+  "ZORKMID": {
+   "adjs": [],
+   "desc": "zorkmid",
+   "ja": [
+    "ゾーキッド",
+    "ぞーきっど"
+   ],
+   "nouns": [
+    "ZORKMID"
+   ],
+   "vehicle": false
   }
  },
  "preps": {
@@ -2436,7 +2643,9 @@
    "ja": [
     "磨く",
     "みがく",
-    "こする"
+    "きれいにする",
+    "掃除する",
+    "そうじする"
    ],
    "shapes": [
     "OBJ",
@@ -2655,7 +2864,11 @@
    "ja": [
     "エコー",
     "えこー",
-    "こだま"
+    "こだま",
+    "反響",
+    "はんきょう",
+    "山彦",
+    "やまびこ"
    ],
    "shapes": [
     ""
@@ -3260,8 +3473,7 @@
     "終わりにする",
     "おわりにする",
     "ゲームをやめる",
-    "げーむをやめる",
-    "クイット"
+    "げーむをやめる"
    ],
    "shapes": [
     ""
@@ -3355,7 +3567,12 @@
   },
   "RUB": {
    "ja": [
+    "触る",
+    "さわる",
+    "触れる",
+    "ふれる",
     "こする",
+    "撫でる",
     "なでる"
    ],
    "shapes": [
@@ -3700,7 +3917,10 @@
   "UNTIE": {
    "ja": [
     "解く",
-    "とく"
+    "とく",
+    "ほどく",
+    "解きほどく",
+    "ときほどく"
    ],
    "shapes": [
     "OBJ",
@@ -3718,11 +3938,8 @@
   },
   "VERSION": {
    "ja": [
-    "版",
-    "ばん",
     "バージョン",
-    "版数",
-    "はんすう"
+    "ばーじょん"
    ],
    "shapes": [
     ""
