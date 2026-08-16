@@ -122,5 +122,38 @@ for (const [ja, want] of CASES) {
     console.log(`${ok ? '✓' : '✗'} 反響 ${ja.padEnd(10, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
   }
 }
+// ★問い返しは**打った言い方を映す**こと。
+//   動詞の言い方に名詞が埋まっているもの（`ぜんまいをまく` `錠を開ける` …）で、
+//   正式形だけから問い返すと埋まっていた名詞が消え、答えたくなる語が通らなくなる。
+//   実プレイで「ぜんまいをまく → 何を巻く？ → ぜんまい → 知らない言葉」を踏んだ。
+//   ★1 件ではなく**類**なので、言い方を全部なめて固定する（増えても勝手に検査される）
+{
+  let n = 0
+  let miss = 0
+  for (const v of Object.values(asset.verbs)) {
+    for (const ja of v.ja || []) {
+      const cut = ja.indexOf('を')
+      if (cut <= 0 || cut >= ja.length - 1) continue
+      const r = cm.toCommand(ja)
+      if (!r || !r.needsObject) continue
+      n++
+      // 埋まっていた名詞が問い返しに残っているか
+      if (!String(r.ask).includes(ja.slice(0, cut))) { miss++; ng++; console.log(`✗ 問い返しが名詞を落とす ${ja} → 「${r.ask}」`) }
+    }
+  }
+  console.log(`${miss ? '✗' : '✓'} 問い返しが打った言い方を映す（${n} 通り / 落ち ${miss}）`)
+  // ★実プレイの流れがつながること
+  for (const [say, answer, want] of [
+    ['ぜんまいをまく', 'かなりあ', 'wind canary'],
+    ['じょうをあける', 'とびら', 'unlock door'],
+  ]) {
+    const r1 = cm.toCommand(say)
+    const r2 = cm.toCommand(answer, { verb: r1.verbKey })
+    const ok = r2 && r2.command === want
+    if (!ok) ng++
+    console.log(`${ok ? '✓' : '✗'} ${say} → 「${r1.ask}」 → ${answer} → ${r2 && r2.command}${ok ? '' : ` ★期待: ${want}`}`)
+  }
+}
+
 console.log(`\n--- ${CASES.length} 件 / 食い違い ${ng} 件 ---`)
 process.exit(ng ? 1 : 0)
