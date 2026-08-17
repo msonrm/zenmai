@@ -110,6 +110,17 @@ node build.mjs && npx wrangler pages deploy dist --project-name zenmai   # 公�
 `build.mjs` は `web/` を 1 階層に畳んで参照を書き換える（`web/` は `../assets` を見ているので
 そのまま root にできない）。検査は `ZENMAI_ROOT=dist` で**畳んだ後の形**にも通せる。
 
+★**wrangler は git のブランチ名を見る。** main 以外に居ると**プレビューに出る**のに
+「Deployment complete!」と言う（本番は旧版のまま）。作業ブランチから本番へ出したいなら
+`--branch main` を付けること。★確かめ方は**中身の照合**:
+
+```bash
+curl -sSL https://zenmai.pages.dev/ | md5sum ; md5sum < dist/index.html   # 一致するか
+```
+
+（`/index.html` はリダイレクトするので `-L` を付けるか `/` で取る。付けないと空が返り、
+**md5 が「空文字列のハッシュ」で揃って一致に見える**。）
+
 ### 残っている穴
 
 - ★**「未解決 0」は「抽出器が見た範囲での 0」** —— 監査の分母は抽出器が決めるので、
