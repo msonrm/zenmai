@@ -104,10 +104,16 @@ global.fetch = async (url) => {
   //   ホストが中身を確かめているかを試す（これを入れる前は本番だけで壊れた）
   if (!fs.existsSync(p)) {
     const fallback = fs.readFileSync(path.join(ROOT, WEB, 'index.html'))
-    return { ok: true, json: async () => JSON.parse(fallback.toString('utf8')), arrayBuffer: async () => fallback }
+    return {
+      ok: true, json: async () => JSON.parse(fallback.toString('utf8')),
+      text: async () => fallback.toString('utf8'), arrayBuffer: async () => fallback,
+    }
   }
   const buf = fs.readFileSync(p)
-  return { ok: true, json: async () => JSON.parse(buf.toString('utf8')), arrayBuffer: async () => buf }
+  return {
+    ok: true, json: async () => JSON.parse(buf.toString('utf8')),
+    text: async () => buf.toString('utf8'), arrayBuffer: async () => buf,
+  }
 }
 
 // --- 本番のスクリプトを順に読み込む ---
@@ -440,6 +446,21 @@ const finish = async () => {
   const cannot = cm2 ? words.filter((w) => !cm2.toCommand(w).command) : ['(アセットが読めない)']
   // ★かなだけで書かれているか（漢字の形を案内しても打てない）
   const notKana = words.filter((w) => !/^[ぁ-んァ-ヶーa-z]+$/.test(w))
+  // ★ライセンスの全文。画面に書き写していない（実ファイルを読む）ので、
+  //   器の意地悪 —— 無いパスにも index.html を 200 で返す —— に引っかかると
+  //   **HTML が全文の顔で並ぶ**。中身と、3 者ぶんが別々であることを見る
+  await new Promise((r) => setTimeout(r, 50))
+  const lic = els.license.children
+  const licTexts = lic.map((d) => (d.children[1] || {}).textContent || '')
+  const licOk = lic.length === 3
+    && licTexts.every((t) => /Permission is hereby granted/.test(t) && !/<!doctype/i.test(t))
+  const licWho = licTexts.map((t) => (t.match(/Copyright \(c\) [^\n]*/i) || [''])[0])
+  // ★案内（入口）からも全文へ行けること。押しても案内は閉じない＝まだ始めない
+  //   （閉じることが「はじめる」の合図なので、読んだだけで始まってはいけない）
+  els.panel.hidden = true
+  els.intro.hidden = false
+  els['intro-license'].dispatch('click')
+  const licFromIntro = els.panel.hidden === false && els.intro.hidden === false
   // ふりがなの入切
   els['ruby-chk'].checked = false; els['ruby-chk'].dispatch('change')
   const rubyOff = document.body.classList.contains('no-ruby')
@@ -469,6 +490,9 @@ const finish = async () => {
     ['案内はかなの形だけ', words.length >= 12 && notKana.length === 0],
     ['ふりがなを切れる', rubyOff],
     ['ふりがなを戻せる', rubyOn],
+    ['★ライセンス全文が 3 本とも本物（HTML ではない）', licOk],
+    ['★3 者ぶんが別々に読まれている', new Set(licWho).size === 3 && licWho.every(Boolean)],
+    ['案内からも全文へ行ける（案内は閉じない）', licFromIntro],
     ['成績が出ている', /引けた \d+ 行/.test(els.stat.textContent)],
   ]
   for (const [name, ok] of pchecks) console.log(`--- 手引き ${ok ? '✓' : '✗'} ${name}`)

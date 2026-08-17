@@ -50,6 +50,12 @@
   .intro-dim { color: var(--dim); font-size: .9em }
   /* ★商標は名乗りではなく**帰属の明示**として書く（名前・ロゴ・ドメインには使わない） */
   .intro-note { color: var(--dim); font-size: .78em; line-height: 1.7; margin-top: 1em }
+  /* ★案内から全文へ渡る道。押しても**案内は閉じない** —— 閉じることが「始める合図」なので、
+     ライセンスを読んだだけでゲームが始まってはいけない（#panel は #intro の上に出る） */
+  .linkish {
+    background: transparent; border: 0; border-bottom: 1px solid currentColor;
+    color: var(--accent); font: inherit; font-size: inherit; padding: 0; cursor: pointer;
+  }
   #intro-ok {
     display: block; margin: .8em auto 0; background: transparent; border: 1px solid var(--accent); border-radius: .3em;
     color: var(--accent); font: inherit; padding: .25em 1.4em; cursor: pointer;
@@ -132,6 +138,16 @@
   #sys-list td { padding: .1em 0; vertical-align: baseline }
   #sys-list td.k { white-space: nowrap; padding-right: 1em; color: var(--dim) }
   #sys-list td.v { color: var(--accent) }
+  /* ★ライセンスの全文。**画面に書き写さず実ファイルを読む**（言い方の表と同じ理由 ——
+     書き写すと LICENSE を直したときにここだけ古くなる）。畳んでおくのは、
+     全文が要る人だけが開けばよいから */
+  #license details { margin: .25em 0 }
+  #license summary { cursor: pointer; color: var(--accent); font-size: .85rem; padding: .15em 0 }
+  #license pre {
+    margin: .3em 0 .7em; padding: .6em .8em; max-height: 15em; overflow-y: auto;
+    background: var(--bg); border: 1px solid var(--rule); border-radius: .3em;
+    white-space: pre-wrap; font-size: .7rem; line-height: 1.65; color: var(--dim);
+  }
 
   /* ── 本文 ── */
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
@@ -369,7 +385,8 @@
       <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力キーが出る。
         ゲームコントローラーを繋げば、それでもひらがなが打てる。</p>
       <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
-        ZORK は Infocom, Inc. の登録商標です（このプロジェクトは Infocom / Microsoft とは無関係）。</p>
+        ZORK は Infocom, Inc. の登録商標です（このプロジェクトは Infocom / Microsoft とは無関係）。
+        <button id="intro-license" type="button" class="linkish">ライセンスと出典</button></p>
       <!-- ★言語は最初に選ばせる（既定はブラウザの言語）。英語は「訳さない＝原作のまま」。
            ★この 2 つが**始める合図**なので「はじめる」は要らない。
            遊び始めたあとに題から開き直したときは、代わりに「とじる」だけを出す -->
@@ -403,6 +420,15 @@
       <h3>システムの言葉</h3>
       <p class="note">ゲームの中の行動ではなく、進行そのものへの指示。<b>ひらがなで打つ</b>。</p>
       <table id="sys-list"></table>
+
+      <!-- ★3 つの MIT の上に立っている。MIT が求めているのは「複製物に含めること」で、
+           画面に出すことではない（配布物にファイルを置くのが本体）。ここはその**道**——
+           URL を知っている人しか辿れない状態を、押せば読める状態にする -->
+      <h3>ライセンスと出典</h3>
+      <p class="note">この企画は 3 つの MIT ライセンスの上に立っている。見出しを押すと全文が開く。</p>
+      <div id="license"></div>
+      <p class="note">★<b>商標は MIT の許諾に含まれない</b>。だから作品名はこの企画の名前・ロゴ・
+        ドメインに使わず（名前は Zenmai で通している）、作中に現れる商標表示は原文のまま出している。</p>
     </div>
   </div>
 

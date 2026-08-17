@@ -113,9 +113,38 @@
     }
     t._filled = true
   }
+  // ★ライセンスの全文は**実ファイルを読む** —— 画面に書き写すと、LICENSE を直したときに
+  //   ここだけ古くなる（言い方の表と同じ理由）。
+  //   ★MIT が求めているのは「複製物に著作権表示と許諾文を含めること」であって画面表示ではない。
+  //   本体は配布物にファイルが在ること（build.mjs）で、ここは**そこへ辿り着く道**を作っている
+  const LICENSES = [
+    ['この Zenmai（自作部分）', '../LICENSE'],
+    ['Z-machine 実装 — ifvms.js (ZVM)', '../vendor/LICENSE.ifvms'],
+    ['作品のソース — historicalsource（2025 年公開）', '../vendor/zork1/LICENSE'],
+  ]
+  async function renderLicense() {
+    const box = $('license')
+    if (!box || box._filled) return
+    box._filled = true
+    for (const [label, url] of LICENSES) {
+      const d = document.createElement('details')
+      const s = document.createElement('summary'); s.textContent = label
+      const pre = document.createElement('pre'); pre.textContent = '…'
+      d.appendChild(s); d.appendChild(pre); box.appendChild(d)
+      // ★Cloudflare Pages は**無いパスにも index.html を 200 で返す**ので `ok` では足りない。
+      //   中身を見て弾く（怠ると HTML が全文の顔で並ぶ）
+      let text = null
+      try {
+        const res = await fetch(url, { cache: 'no-store' })
+        const body = res.ok ? await res.text() : ''
+        if (body && !/^\s*<!doctype/i.test(body)) text = body
+      } catch (e) { /* 下で断る */ }
+      pre.textContent = text || `（${url} を読めなかった。リポジトリの同名ファイルが正）`
+    }
+  }
   const showPanel = (on) => {
     if (!panel) return
-    if (on) renderSys()
+    if (on) { renderSys(); renderLicense() }
     panel.hidden = !on
     if (!on) refocus()
   }
@@ -688,6 +717,9 @@
     introMode()
     $('intro-ok').addEventListener('click', closeIntro)
     intro.addEventListener('click', (e) => { if (e.target === intro) closeIntro() })
+    // ★ライセンスは案内の**上に重ねて**出す。案内を閉じない＝まだ始めない
+    //   （閉じることが始める合図なので、読んだだけで冒頭が印字されてはいけない）
+    if ($('intro-license')) $('intro-license').addEventListener('click', () => showPanel(true))
     // ★題を押すともう一度出す。★2 度目からは「はじめる」ではなく「とじる」——
     //   遊んでいる途中に押した人に「最初からやり直る」と読ませない
     if ($('title')) {
