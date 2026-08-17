@@ -20,8 +20,14 @@ for (const f of ['zvm.min.js', 'gamepad-engine.js', 'flick-engine.js', 'LICENSE.
 for (const f of ['zork1.z3', 'LICENSE', 'README.md']) {
   await cp(path.join(ROOT, 'vendor', 'zork1', f), path.join(OUT, 'vendor', 'zork1', f))
 }
+// ★自作分の LICENSE も配る。MIT が求めているのは「**複製物に**著作権表示と許諾文を含める」
+//   ことなので、リポジトリに置いてあるだけでは配布物に無い。
+//   実際 `/LICENSE` は 404 で index.html が返っていた（Pages のフォールバック）——
+//   MIT を名乗っているのに、受け取った人がそれを確かめる先が無い状態だった
+await cp(path.join(ROOT, 'LICENSE'), path.join(OUT, 'LICENSE'))
 
-const fold = (s) => s.replace(/\.\.\/(assets|vendor|src)\//g, '$1/')
+// ★`../LICENSE` も畳む（末尾が `/` でないので括弧の中に入れてある）
+const fold = (s) => s.replace(/\.\.\/(assets\/|vendor\/|src\/|LICENSE)/g, '$1')
 // ★main.js を先に書く（下のハッシュ付けが中身を読むため）
 await writeFile(path.join(OUT, 'main.js'), fold(await readFile(path.join(ROOT, 'web', 'main.js'), 'utf8')))
 

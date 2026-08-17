@@ -21,8 +21,16 @@ const DIRS = {
   東: 'east', ひがし: 'east', 西: 'west', にし: 'west',
   上: 'up', うえ: 'up', 下: 'down', した: 'down', 中: 'in', なか: 'in', 外: 'out', そと: 'out',
 }
+// ★「ぜんぶ」= 原作の `all`。物ではなく**パーサが直接受ける語**（z3 の辞書に
+//   `all` / `but` / `except` / `and` が入っている）。複数対象を捌くのは原作の仕事なので、
+//   こちらは語を渡すだけでよい。★代表形は「ぜんぶ」ひとつ（漢字に寄せる利得が無い）
+const ALL_WORDS = ['ぜんぶ', 'すべて', 'のこらず', '全部', '全て', '残らず']
+
 // 助詞 → 役。長いものから当てる
 const PARTICLES = [
+  // ★「〜以外」= `except`。**助詞ではなく名詞**だが、この表は「役を決める接尾辞」なので同じ扱いでよい。
+  //   ★「を」より前に置くこと（後ろだと「いがい」が未知語の側に飲まれる）
+  ['以外を', 'EXCEPT'], ['いがいを', 'EXCEPT'], ['以外', 'EXCEPT'], ['いがい', 'EXCEPT'],
   ['の中に', 'IN'], ['のなかに', 'IN'], ['の中へ', 'IN'], ['のなかへ', 'IN'],
   ['の下', 'UNDER'], ['のした', 'UNDER'], ['の後ろ', 'BEHIND'], ['のうしろ', 'BEHIND'],
   ['の裏', 'BEHIND'], ['のうら', 'BEHIND'],
@@ -165,6 +173,11 @@ function createCommander(asset) {
       })
     }
   }
+  // ★`all` は物ではないが、**目的語の位置に立つ**ので物として積むのがいちばん素直
+  //   （役の割り当ても、動詞が裸の目的語を取れるかの検査も、そのまま効く）
+  for (const ja of ALL_WORDS) {
+    lex.push({ ja, disp: ALL_WORDS[0], kana: kana(ja), kind: 'obj', key: '*ALL*', word: 'all', rank: 0, others: [], vehicle: false })
+  }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
@@ -206,7 +219,16 @@ function createCommander(asset) {
         let role = null
         for (const [p, r] of PARTICLES) {
           if (!s.startsWith(kana(p), i)) continue
-          role = r; i += p.length; echo.push(p)
+          // ★助詞を当てたら、**その先が続くか**を確かめる。行き止まりなら助詞ではなく
+          //   次の語の頭だったということ ——「ぜんぶとる」の「と」が AND に食われて
+          //   「る」だけが残り、知らない言葉になっていた（「ぜんぶをとる」なら通っていた）。
+          //   ★続きは語彙とは限らない。助詞は 2 つ並ぶ（「じゅうたんのしたを」の「のした」+「を」）
+          const next = i + p.length
+          const goes = next >= s.length
+            || lex.some((e) => s.startsWith(e.kana, next))
+            || PARTICLES.some(([q]) => s.startsWith(kana(q), next))
+          if (!goes) continue
+          role = r; i = next; echo.push(p)
           // ★「の後ろに」「の中へ」—— 空間の助詞は方向の「に・へ」を伴うことがある
           if (SPATIAL.has(r) && (s[i] === 'に' || s[i] === 'へ')) { echo.push(s[i]); i++ }
           break
@@ -302,6 +324,18 @@ function createCommander(asset) {
     const tool = objs.find((o) => o.role === 'WITH')
     const dest = objs.find((o) => ['TO', 'IN', 'ON', 'UNDER', 'BEHIND', 'FROM'].includes(o.role))
     if (!prso && dest && objs.length === 1) { prso = dest }
+    // ★「〜と〜」「〜以外」は**目的語の並び**の話。捌くのは原作の仕事なので、並べて渡すだけでよい
+    // ★「箱と剣以外を」= (箱と剣) 以外。「と」で繋いだ並びの末尾に「以外」が付いたら、
+    //   手前の物も除く側へ回る（並びに分配される）。後ろから見れば連鎖する
+    for (let k = objs.length - 1; k > 0; k--) {
+      if (objs[k].role === 'EXCEPT' && objs[k - 1].role === 'AND') objs[k - 1] = { ...objs[k - 1], role: 'EXCEPT' }
+    }
+    const ands = objs.filter((o) => o.role === 'AND' && o !== prso)
+    const excepts = objs.filter((o) => o.role === 'EXCEPT')
+    // ★「ランタン以外をとる」—— 除くものだけ言われたら、残り全部を指している
+    if (!prso && excepts.length) {
+      prso = { word: 'all', disp: ALL_WORDS[0], ja: ALL_WORDS[0], kind: 'obj', key: '*ALL*', others: [], vehicle: false }
+    }
 
     // ★同じ日本語の動詞でも、**対象が英語の動詞を決める**。
     //   「降りる」は乗り物なら `disembark`、そうでなければ `climb down`
@@ -356,6 +390,11 @@ function createCommander(asset) {
         const p = wants.find((x) => has(x))
         if (p) out.push(p.toLowerCase())
       }
+      // ★「と」で並べた物は**捨てずに並べて渡す**（原作は `take bottle and sack` を受ける）。
+      //   捨てていたので「びんとふくろをとる」が `take bag` になり、**瓶が黙って消えていた** ——
+      //   打った人は両方取ったつもりでいる。「黙って落とさず断る」の裏返しで、
+      //   ここは断るのではなく**渡せる形が原作にある**ほう
+      for (const o of ands) out.push(o.word, 'and')
       prsoAt = out.length
       out.push(prso.word)
     }
@@ -369,6 +408,11 @@ function createCommander(asset) {
       out.push(dest.role.toLowerCase(), dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
+    // ★除くものは目的語の並びの最後に付く（`take all except lamp` / `… except a and b`）
+    if (excepts.length) {
+      out.push('except')
+      excepts.forEach((o, k) => { if (k) out.push('and'); out.push(o.word) })
+    }
     // ★別の物を指しているかもしれない言い方は、別案を添えて返す
     const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others]
       : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others] : null
