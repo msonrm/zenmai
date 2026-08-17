@@ -181,6 +181,14 @@ function createCommander(asset) {
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
+  // ★語彙は**語の途中で切ってはいけない**。日本語の語は小書きかな・長音では始まらないので、
+  //   一致の直後がそれなら、その一致は語の途中を食っている。
+  //   実プレイ: 「きゅうをとる」で「き」（木）が食い、残った「ゅう」が
+  //   「『ゅう』は知らない言葉」として画面に出た —— 打った人には何が起きたか分からない。
+  //   ★語の切り出しは 3 か所（語彙・未知語の終わり・助詞の先）にあるので、述語を 1 つにする
+  const SMALL = /[ぁぃぅぇぉっゃゅょゎゕゖー]/
+  const wordAt = (s, at) => lex.find((e) => s.startsWith(e.kana, at) && !SMALL.test(s[at + e.kana.length] || ''))
+
   /**
    * @param {string} input 日本語
    * @param {{verb?: string}} [opts] ★原作が「何を◯◯？」と聞き返している最中は、
@@ -211,7 +219,7 @@ function createCommander(asset) {
     const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
     while (i < s.length) {
-      const hit = lex.find((e) => s.startsWith(e.kana, i))
+      const hit = wordAt(s, i)
       if (hit) {
         i += hit.kana.length
         echo.push(hit.disp)
@@ -225,7 +233,7 @@ function createCommander(asset) {
           //   ★続きは語彙とは限らない。助詞は 2 つ並ぶ（「じゅうたんのしたを」の「のした」+「を」）
           const next = i + p.length
           const goes = next >= s.length
-            || lex.some((e) => s.startsWith(e.kana, next))
+            || wordAt(s, next)
             || PARTICLES.some(([q]) => s.startsWith(kana(q), next))
           if (!goes) continue
           role = r; i = next; echo.push(p)
@@ -238,7 +246,7 @@ function createCommander(asset) {
       }
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
-      while (j < s.length && !lex.some((e) => s.startsWith(e.kana, j))) j++
+      while (j < s.length && !wordAt(s, j)) j++
       let word = s.slice(i, j)
       // ★未知語が格助詞を背負っていたら、それは「物のつもり」だ。捨ててはいけない。
       //   動詞だけ送るとゲームが**別の物を勝手に補う**ことがあり、たまたま正しく
