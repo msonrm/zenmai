@@ -65,6 +65,22 @@ const CASES = [
   // --- はい／いいえ（終わるか・最初からやるかの質問。原作は Y/N で受ける）---
   ['はい', 'y'], ['いいえ', 'n'], ['やめる', 'quit'],
   ['しゅうりょう', 'quit'], ['もういちど', 'again'],   // again はパーサが直接受ける語（動詞表に無い）
+  // --- 複数対象（ALL / EXCEPT / AND）---
+  //   ★捌くのは原作の仕事。z3 の辞書に `all` / `but` / `except` / `and` が入っている
+  //   （684 語を直接読んで確認した）ので、こちらは語を渡すだけでよい
+  ['ぜんぶとる', 'take all'],
+  ['すべてとる', 'take all'],
+  ['ぜんぶおく', 'drop all'],
+  ['ぜんぶ', 'all'],                                    // 「何を取る？」への答えにもなる
+  // ★「ぜんぶとる」の「と」は助詞ではなく**動詞の頭**。助詞を当てた先が行き止まりなら当てない
+  //   （直す前は「と」が AND に食われ、「る」だけ残って「知らない言葉」になっていた）
+  ['ぜんぶとじる', 'close all'],
+  ['らんたんいがいをぜんぶとる', 'take all except brass lamp'],
+  ['らんたんいがいをとる', 'take all except brass lamp'],  // 除くものだけ言われたら残り全部を指す
+  ['はことけんいがいをぜんぶとる', 'take all except chest and sword'],  // (箱と剣) 以外に分配される
+  // ★「と」で並べた物を捨てると**片方が黙って消える**（`take bag` になっていた）
+  ['びんとふくろをとる', 'take bottle and bag'],
+  ['けんとらんたんをとる', 'take sword and brass lamp'],
   // --- 知らない言葉は黙って捨てない ---
   ['ぶんぶんをあける', null],               // 「を」が付く未知語 = 物のつもり → 止める
   ['そっととびらをあける', 'open door'], // 助詞の付かない未知語は落としてよい
@@ -111,6 +127,33 @@ for (const [ja, want] of CASES) {
     const ok = ja === '家の西' && en === raw
     if (!ok) ng++
     console.log(`${ok ? '✓' : '✗'} 英語モードは訳さず原文  → 日本語「${ja}」/ 英語「${en}」`)
+  }
+  // ★複数対象になると、原作は対象ごとに `<名前>: <文>` の形で 1 行を出す。
+  //   行単位で引く設計なので、名前が頭に付いた瞬間に在庫から外れる（`Dropped.` は持っているのに
+  //   `brown sack: Dropped.` が引けなかった）。剥がして両方引いて組み直せているか。
+  //   ★在庫に `{OBJ}: Taken.` を 1 本だけ持っていたのはやめて、この規則に一本化した
+  {
+    const MULTI = [
+      ['glass bottle: Taken.', 'ガラス瓶：取った。'],
+      ['brown sack: Dropped.', '茶色の袋：置いた。'],
+      ['brown sack: You already have that!', '茶色の袋：それはもう持っている。'],
+      ['small mailbox: It is securely anchored.', '小さな郵便箱：しっかりと固定されている。'],
+      // ★引用符の中でも `{VERB}` は**打った語ではない**（こちらが送った英語）ので訳す。
+      //   「ぜんぶあける」と打った人の画面に `「open」に…` と出ていた
+      ['You can\'t use multiple direct objects with "open".', '「開ける」に複数の目的語は使えない。'],
+      // ★逆に `{WORD}` は打った語そのもの。訳してはいけない
+      ['I don\'t know the word "bunbun".', '「bunbun」という言葉は知らない。'],
+      // ★名前と本文の**両方**が引けたときだけ組む。片方でも欠けたら未訳のまま出す
+      //   （`:` を含むだけの行を、それらしい顔にして隠さない）
+      ['xyzzy plugh: Taken.', null],
+      ['glass bottle: Xyzzy plugh.', null],
+    ]
+    for (const [en, want] of MULTI) {
+      const got = tr.line(en)
+      const ok = got === want
+      if (!ok) ng++
+      console.log(`${ok ? '✓' : '✗'} 複数対象 ${en.padEnd(42)} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+    }
   }
   for (const [ja, want] of [['のべぼうをとる', 'のべぼう のべぼう ……'], ['はんきょう', 'はんきょう はんきょう ……']]) {
     const r = cm.toCommand(ja)

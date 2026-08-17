@@ -154,9 +154,12 @@ class Translator {
         //   訳語ではなく**打った呼び名**を入れる（ホストが setEcho で教える）。
         //   ここだけ「原作の英語を訳す」のではなく「こちらの入力を返す」——
         //   その文字列の持ち主が、原作ではなく**打った人**だから
-        // ★引用された語（`I don't know the word "X".`）も**打った語そのもの**なので訳さない
+        // ★引用された語（`I don't know the word "X".`）も**打った語そのもの**なので訳さない。
+        //   ★ただし `{VERB}` は別 —— 引用符の中に居るが、打った語ではなく
+        //   **こちらが送った英語の動詞**。「ぜんぶあける」と打った人の画面に
+        //   `「open」に複数の目的語は使えない。` と出た（複数対象を入れて踏んだ）
         const v = name === 'ECHO' && this.echoWord ? this.echoWord
-          : p.quotes[idx] ? m[idx + 1] : this.word(m[idx + 1])
+          : p.quotes[idx] && name !== 'VERB' ? m[idx + 1] : this.word(m[idx + 1])
         out = out.replace('{' + name + '}', v)
       })
       return out
@@ -220,6 +223,19 @@ class Translator {
     if (whole !== null) { this.stats.hit++; return indent + whole }
     const g = this.greedy(key)
     if (g !== null) { this.stats.hit++; this.stats.greedy++; return indent + g }
+    // ★複数対象（`take all` / `take bottle and sack`）のとき、原作は対象ごとに
+    //   `<名前>: <文>` の形で 1 行を出す。**行単位で引く**設計なので、名前が頭に付いた
+    //   瞬間に在庫から外れる —— `Dropped.` は持っているのに `glass bottle: Dropped.` は引けない。
+    //   組み合わせは（対象 × 応答文）だけあるので在庫に足しても追いつかない。
+    //   剥がして両方引いて組み直す。
+    //   ★名前と本文の**両方が引けたときだけ**成立させる —— 片方でも欠けたら諦めて未訳にする
+    //   （`:` を含むだけの未訳行を、それらしい形にして隠してしまわないため）
+    const multi = key.match(/^([^:]+): (.+)$/)
+    if (multi) {
+      const name = this.one(multi[1])
+      const body = this.lookup(norm(multi[2]))
+      if (name !== null && body !== null) { this.stats.hit++; return indent + name + '：' + body }
+    }
     // ★版権バナーは実行時に連結されて出る（`Copyright (c) 1981, … Infocom, Inc. All rights reserved.`）
     //   ので、完全一致では拾えない。包含関係で判定する（相手は定型の版権表示だけなので安全）
     if (this.notrans.has(key) || [...this.notrans].some((n) => n.includes(key) || key.includes(n))) {

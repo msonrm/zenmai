@@ -401,11 +401,6 @@
    "ja": "激しい打ち合いの末、{VILLAIN}は倒れて気を失った。"
   },
   {
-   "en": "{OBJ}: Taken.",
-   "id": "M-1",
-   "ja": "{OBJ}：取った。"
-  },
-  {
    "en": "The objects that you mentioned aren't here.",
    "id": "M-2",
    "ja": "きみが言ったものは、ここにない。"
