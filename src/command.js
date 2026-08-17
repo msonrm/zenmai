@@ -178,6 +178,28 @@ function createCommander(asset) {
   for (const ja of ALL_WORDS) {
     lex.push({ ja, disp: ALL_WORDS[0], kana: kana(ja), kind: 'obj', key: '*ALL*', word: 'all', rank: 0, others: [], vehicle: false })
   }
+  // ★上位語は**宣言から**積む（asset.hypernyms。原簿の「上位語」表がそのまま来る）。
+  //   原作は上位語を共有シノニムとして持っている（TREASURE は 21 個の物の名詞）ので、
+  //   `noun` があるものは**その語を渡すだけ** —— どれを指すかは原作のスコープと聞き返しが決める。
+  //   `noun` が無いものは日本語だけの上位語（箱 = mailbox / case / chest / trunk）。
+  //   原作は 1 語しか受けないので候補を順に試す。★**宣言の対象順 = 試行順**
+  //   （以前は各物の ja 内の位置から逆算していて、順序が編集のたびに揺れた）
+  for (const h of asset.hypernyms || []) {
+    const targets = (h.targets || []).filter((t) => objOf[t])
+    if (!targets.length) continue
+    const vehicle = targets.some((t) => !!objOf[t].vehicle)
+    const wordOf = (t) => {
+      const o = objOf[t]
+      const n = (o.nouns[0] || '').toLowerCase()
+      const a = (o.adjs[0] || '').toLowerCase()
+      return nounUse[n] > 1 && a ? a + ' ' + n : n
+    }
+    const word = h.noun ? h.noun.toLowerCase() : wordOf(targets[0])
+    const others = h.noun ? [] : targets.slice(1).map(wordOf)
+    for (const ja of [h.form, ...(h.yomi || [])]) {
+      lex.push({ ja, disp: h.form, kana: kana(ja), kind: 'obj', key: '*H*', rank: 0, word, others, vehicle })
+    }
+  }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
