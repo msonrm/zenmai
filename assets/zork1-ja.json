@@ -1020,7 +1020,7 @@
   "Heedless of your weapons, the Cyclops tosses you against the rock wall of the room.": "サイクロプスはきみの武器に構わず、部屋の岩壁へ投げつけた。",
   "Hello.": "やあ。",
   "His booty remains.": "奪った品はそのまま残っている。",
-  "Hmm. It appears the tube contained glue, not oil. Turning the bolt won't get any easier....": "ふむ。筒の中身は油ではなく糊だったようだ。ボルトを回すのが楽になることはあるまい……",
+  "Hmm. It appears the tube contained glue, not oil. Turning the bolt won't get any easier....": "ふむ。筒の中身は油ではなく糊だったようだ。閂を回すのが楽になることはあるまい……",
   "How can you attack a spirit with material objects?": "物で亡霊を攻撃するなど、どうやってできるのか。",
   "How can you do that?": "どうやってそれをするというのか。",
   "How can you drink that?": "それをどうやって飲むのか。",
@@ -1261,7 +1261,7 @@
   "The boat lifts gently out of the mud and is now floating on the reservoir.": "舟は静かに泥から浮き上がり、いまは貯水池に浮かんでいる。",
   "The boat must be on the ground to be deflated.": "空気を抜くには、舟が地面にある必要がある。",
   "The boat must be on the ground to be inflated.": "膨らませるには、舟が地面にある必要がある。",
-  "The bolt won't turn with your best effort.": "力を尽くしてもボルトは回らない。",
+  "The bolt won't turn with your best effort.": "力を尽くしても閂は回らない。",
   "The book is already open to page 569.": "書物はもう 569 ページが開いている。",
   "The bottle hits the far wall and shatters.": "瓶は向かいの壁に当たって砕けた。",
   "The bottle is closed.": "瓶は閉じている。",
@@ -3240,7 +3240,7 @@
    "prop": "DESC"
   },
   "bolt": {
-   "ja": "ボルト",
+   "ja": "閂",
    "owner": "BOLT",
    "prop": "DESC"
   },
@@ -7860,7 +7860,7 @@
   },
   {
    "en": "The bolt won't turn using the {PRSI}.",
-   "ja": "{PRSI}ではボルトは回らない。",
+   "ja": "{PRSI}では閂は回らない。",
    "slots": [
     "PRSI"
    ]
@@ -8121,7 +8121,7 @@
   "boards": "板",
   "boat": "舟",
   "bodies": "死体の山",
-  "bolt": "ボルト",
+  "bolt": "閂",
   "bones": "骸骨",
   "book": "本",
   "bottle": "ガラス瓶",
@@ -8314,7 +8314,7 @@
   "material": "粘りのある物質",
   "me": "自分",
   "melt": "溶かす",
-  "metal bolt": "ボルト",
+  "metal bolt": "閂",
   "mountain": "山並み",
   "move": "動かす",
   "mumble": "つぶやく",
@@ -8520,6 +8520,6 @@
   "yellow button": "黄色のボタン",
   "zork": "ゾーク",
   "zork manual": "ZORK 取扱説明書",
-  "zorkmid": "ゾーキッド"
+  "zorkmid": "ゾークミッド"
  }
 }
