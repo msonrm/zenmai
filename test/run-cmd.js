@@ -83,6 +83,10 @@ const CASES = [
   // ★「と」で並べた物を捨てると**片方が黙って消える**（`take bag` になっていた）
   ['びんとふくろをとる', 'take bottle and bag'],
   ['けんとらんたんをとる', 'take sword and lamp'],
+  // --- しまう / 収める = PUT（2026-08-18 実プレイ）---
+  //   ★行き先なしの PUT は原作が聞き返す（「何の中に〜入れる？」）ので、送ってよい
+  ['たまごをしまう', 'put egg'],
+  ['たまごをおさめる', 'put egg'],
   // --- 読み通りに打てるか（2026-08-17 実プレイ）---
   //   ★ダムで `たまをとる` が「『たま』は知らない言葉」で弾かれた。ふりがなは**表示名にしか
   //   振られない**ので、訳文の中の「球」は読みが二択（たま／きゅう）になる。両方受ける。
@@ -122,6 +126,16 @@ let ng = 0
   const ok = got === want
   if (!ok) ng++
   console.log(`${ok ? '✓' : '✗'} はこをみる（候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+}
+// ★行き先の位置にも候補が要る（2026-08-18 実プレイ）——「たまごをはこにいれる」の箱が
+//   郵便箱で外れたとき、ケース／トランクを試さずに止まっていた
+{
+  const r = cm.toCommand('たまごをはこにいれる')
+  const got = [r.command, ...(r.alts || [])].sort().join(' / ')
+  const want = ['put egg in case', 'put egg in chest', 'put egg in mailbox', 'put egg in trunk'].join(' / ')
+  const ok = got === want
+  if (!ok) ng++
+  console.log(`${ok ? '✓' : '✗'} たまごをはこにいれる（行き先の候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
 }
 {
   const a = cm.toCommand('おりる')

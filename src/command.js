@@ -429,13 +429,18 @@ function createCommander(asset) {
       out.push(prso.word)
     }
     if (tool) { toolAt = out.length + 1; out.push('with', tool.word) }
+    let destAt = -1
     if (dest && dest !== prso) {
       const p = has(dest.role) ? dest.role.toLowerCase() : (has('IN') ? 'in' : 'to')
-      out.push(p, dest.word)
+      out.push(p)
+      destAt = out.length
+      out.push(dest.word)
     } else if (dest && dest === prso && has(dest.role)) {
       // 「絨毯の下を見る」= 前置詞つきの目的語が 1 つだけ → `look under rug`
       out.length = 1
-      out.push(dest.role.toLowerCase(), dest.word)
+      out.push(dest.role.toLowerCase())
+      prsoAt = out.length          // ★out を作り直したので位置も引き直す（別案の差し替えに効く）
+      out.push(dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
     // ★除くものは目的語の並びの最後に付く（`take all except lamp` / `… except a and b`）
@@ -443,12 +448,16 @@ function createCommander(asset) {
       out.push('except')
       excepts.forEach((o, k) => { if (k) out.push('and'); out.push(o.word) })
     }
-    // ★別の物を指しているかもしれない言い方は、別案を添えて返す
-    const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others]
-      : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others] : null
+    // ★別の物を指しているかもしれない言い方は、別案を添えて返す。
+    //   ★行き先（〜に入れる）も対象 —— 「たまごをはこにいれる」の箱が郵便箱で外れたとき、
+    //   ケース／トランクを試さずに止まっていた（実プレイ: 居間で `put egg in mailbox` →
+    //   「小さな郵便箱など、ここには見当たらない。」で行き止まり）
+    const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others, prso]
+      : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others, tool]
+      : destAt >= 0 && dest.others && dest.others.length ? [destAt, dest.others, dest] : null
     const alts = at ? at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')) : []
     // ★候補が全部外れたとき、**打った言葉**で断るために覚えておく
-    const objDisp = at ? (at[0] === prsoAt ? prso.disp : tool.disp) : ''
+    const objDisp = at ? at[2].disp : ''
     // ★目的語を取らないと成り立たない動詞なのに目的語が無いなら、**送らない**。
     //   送ると原作が聞き返し、その最中に完全な文を渡すとパーサが混ぜて壊す
     //   （`eat advertisement` が「eat advert」という名詞句として読まれた）。
