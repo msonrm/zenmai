@@ -2322,8 +2322,8 @@
     "ナイフ"
    ],
    "nouns": [
-    "KNIVES",
     "KNIFE",
+    "KNIVES",
     "BLADE"
    ],
    "vehicle": false,
@@ -3470,8 +3470,8 @@
     "さびたないふ"
    ],
    "nouns": [
-    "KNIVES",
-    "KNIFE"
+    "KNIFE",
+    "KNIVES"
    ],
    "vehicle": false,
    "words": [
