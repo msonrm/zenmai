@@ -16,6 +16,16 @@ const { Translator } = require(path.join(Z, 'src/translate.js'))
 const cmds = fs.readFileSync(process.argv[2], 'utf8').split('\n').map((s) => s.trim()).filter(Boolean)
 const out = process.argv[3]
 
+// ★walkthrough では出ない行（下の update() の末尾で流す）。
+//   聞き返しはスロットが空白だけで隣り合う唯一の骨格で、**目的語が 2 語以上のとき**だけ壊れる
+const EXTRA = [
+  'What do you want to put the nasty knives in?',
+  'What do you want to put the jewel-encrusted egg in?',
+  'What do you want to put the sword in?',
+  'What do you want to attack the troll with?',
+  'What do you want to tie the rope to?',
+]
+
 const tr = new Translator(JSON.parse(fs.readFileSync(path.join(Z, 'assets/zork1-ja.json'), 'utf8')))
 const pairs = []
 const origLine = tr.line.bind(tr)
@@ -35,6 +45,13 @@ const Glk = createGlk({
     if (Glk.waitingFor() === 'char') return setImmediate(() => Glk.submitChar(32))
     if (Glk.waitingFor() !== 'line') return
     if (idx >= cmds.length) {
+      // ★walkthrough が踏まない行をここで足す。聞き返し（orphan）は最短の勝ち筋に出ないので、
+      //   捕獲だけでは C 側のゴールデンに入らない（実プレイ 2026-08-21 の
+      //   `何knives innastyを入れる？` は、この穴に落ちていた）。
+      //   ここは**流すだけ** —— 期待値の正しさは test/run-cmd.js が持ち、
+      //   こちらは「C が JS を再現するか」だけを見る（JS が正典）
+      tr.setEcho(null)
+      for (const raw of EXTRA) tr.line(raw)
       fs.writeFileSync(out, pairs.map((p) => JSON.stringify(p)).join('\n'))
       console.log(`${out}: ${pairs.length} 行(${cmds.length} 手)/ 未訳 ${tr.stats.miss}`)
       process.exit(0)

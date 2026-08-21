@@ -243,18 +243,33 @@ static int match_pat(const TrPat *pat, const char *key, int klen,
             /* 穴: 次のリテラルの最左出現まで(無ければ行末まで) */
             int quoted = sg->kind == TRK_QHOLE;
             const TrSeg *nx = 0;
+            int nx_i = -1;
             for (int t = si + 1; t < pat->en_n; t++)
-                if (segs[t].kind == TRK_LIT) { nx = &segs[t]; break; }
+                if (segs[t].kind == TRK_LIT) { nx = &segs[t]; nx_i = t; break; }
+            /* ★区切りが空白 1 個で、その先も穴なら**最右**を採る。最左だと左の穴が
+               1 語で止まり、残りが右の穴へ流れ込む(`the nasty knives in?` が
+               OBJ=`nasty` / PREP=`knives in` に割れて `何knives innastyを入れる？`)。
+               空白は語の中にも現れるので、区切りとして位置を決められない。
+               ※ JS 側(src/translate.js)は同じ形を正規表現の貪欲/非貪欲で書いてある。
+                 ただし向こうはバックトラックするのでこちらより粘る —— 最右の空白で
+                 右の穴が空になる骨格があれば、そこだけ挙動が割れる(原作には無い) */
+            int rightmost = nx && nx->len == 1 && tr_en_pool[nx->off] == ' '
+                            && nx_i + 1 < pat->en_n && segs[nx_i + 1].kind != TRK_LIT;
             int minlen = quoted ? 0 : 1;
             int start = pos;
             int end = -1;
             if (nx) {
-                for (int e = start + minlen; e + nx->len <= klen; e++) {
-                    if (bytes_eq(key + e, tr_en_pool + nx->off, nx->len)) { end = e; break; }
-                    /* 穴に入れられない字が来たら打ち切り */
-                    char c = key[e];
-                    if (quoted ? (c == '"') : is_term(c))
-                        return 0;
+                if (rightmost) {
+                    for (int e = klen - nx->len; e >= start + minlen; e--)
+                        if (bytes_eq(key + e, tr_en_pool + nx->off, nx->len)) { end = e; break; }
+                } else {
+                    for (int e = start + minlen; e + nx->len <= klen; e++) {
+                        if (bytes_eq(key + e, tr_en_pool + nx->off, nx->len)) { end = e; break; }
+                        /* 穴に入れられない字が来たら打ち切り */
+                        char c = key[e];
+                        if (quoted ? (c == '"') : is_term(c))
+                            return 0;
+                    }
                 }
                 if (end < 0)
                     return 0;
