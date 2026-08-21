@@ -14,6 +14,7 @@
 #include "cmd.h"
 #include "cmd_data.h"
 #include "card.h"
+#include "ui_data.h"
 
 #define main mojozork_main_unused
 #include "vendor/mojozork.c"
@@ -421,6 +422,91 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
     }
 }
 
+/* ---- オプション画面 ----
+ *
+ * ★入口は「コマンドを打っていないときの Start」。Start は入力中は確定なので、
+ *   空のときだけが空いている(実測して確かめた)。Select は濁点 / 空白で埋まっている。
+ * ★ここに出る文字列は全部**こちらのもの**で、原作の文は 1 つも出ない。だから訳の表は
+ *   通さず完成行で持つ(`gen_ui.py`)。「その文字列は誰のものか」がそのまま設計になる。
+ */
+
+/* ★ライセンスは専用の画面を作らず**本文の履歴へ流す**。長文のスクロールも遡りも
+ *   既にあるものがそのまま効くので、器が要らない。色を落として原作の文と見分ける。 */
+static void license_to_hist(void)
+{
+    const int want = lang_en ? 2 : 1;
+    for (int i = 0; i < LIC_N; i++) {
+        const LicLine *l = &LIC_LINES[i];
+        if (l->lang && l->lang != want)
+            continue;
+        hist_line(LIC_POOL + l->off, l->len, l->dim ? DIM : INK);
+    }
+    hist_blank();
+    view_bottom();
+}
+
+enum { OPT_LICENSE = 0, OPT_CLOSE, OPT_N };
+enum { OPT_Y_TITLE = 160, OPT_Y_ITEM = 248, OPT_Y_STEP = 40, OPT_Y_HINT = 392 };
+
+static void opt_line(int y, const uint16_t *ja, int jn, const uint16_t *en, int en_n, int sel)
+{
+    menu_line(y, lang_en ? en : ja, lang_en ? en_n : jn, sel);
+}
+
+static void options_draw(int sel)
+{
+    gp0_fill(0, 0, W, H, 0x0F1214);
+    opt_line(OPT_Y_TITLE, UI_TITLE_JA, UI_TITLE_JA_N, UI_TITLE_EN, UI_TITLE_EN_N, 0);
+    opt_line(OPT_Y_ITEM, UI_LICENSE_JA, UI_LICENSE_JA_N,
+             UI_LICENSE_EN, UI_LICENSE_EN_N, sel == OPT_LICENSE);
+    opt_line(OPT_Y_ITEM + OPT_Y_STEP, UI_CLOSE_JA, UI_CLOSE_JA_N,
+             UI_CLOSE_EN, UI_CLOSE_EN_N, sel == OPT_CLOSE);
+    opt_line(OPT_Y_HINT, UI_HINT_JA, UI_HINT_JA_N, UI_HINT_EN, UI_HINT_EN_N, 0);
+}
+
+static int opt_open, opt_sel;
+
+/* ★オプション画面は**別ループを回さない**。開いている間の 1 フレーム分をここで処理し、
+   パッドを読むのは対話ループの 1 箇所だけに保つ。
+   ★ネストしたループで読ませたら、入力が届かなくなった(sim で実測。START は届くのに
+   その後のボタンが 1 つも来ない)。読み口を 2 つ作った時点で無理があった —— 
+   [[hechima-dual-path-hazard]] の「経路を 1 つに」がここでも効く。
+   戻り値 0 = 閉じる。 */
+static int options_step(int edge)
+{
+    if (edge & (BTN_UP | BTN_DOWN)) {
+        opt_sel = (opt_sel + (edge & BTN_UP ? OPT_N - 1 : 1)) % OPT_N;
+        options_draw(opt_sel);
+    }
+    if (edge & BTN_CIR) {
+        if (opt_sel == OPT_LICENSE)
+            license_to_hist();
+        return 0;
+    }
+    if (edge & (BTN_X | BTN_START))      /* 開けたボタンで閉じられる */
+        return 0;
+    return 1;
+}
+
+static void options_open(void)
+{
+    opt_open = 1;
+    opt_sel = 0;
+    /* ★全ボタンを「押されている」扱いにしてから開く。そうしないと**開けた Start が
+       そのまま閉じるエッジになる**(実測。押しっぱなしでも閉じた —— 押下の引き継ぎを
+       ローカルに持つだけでは足りず、対話ループの pad_prev を直に埋める必要があった)。
+       離せば次のフレームでエッジは自然に消える。 */
+    pad_prev = -1;
+    options_draw(opt_sel);
+}
+
+static void options_close(void)
+{
+    opt_open = 0;
+    gp0_fill(0, 0, W, H, 0x0F1214);      /* メニューを消してから本文を描き直す */
+    render_window();
+}
+
 /* ---- 対話ループ(英語 = zm_main.c と同じ) ---- */
 
 __attribute__((noreturn)) static void interactive_en(void)
@@ -430,7 +516,12 @@ __attribute__((noreturn)) static void interactive_en(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    pad_prev = 0;
+    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
+       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
+       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
+    pad_prev = pad_read();
+    if (pad_prev < 0)
+        pad_prev = 0;
     for (;;) {
         wait_fields(1);
         fields++;
@@ -439,6 +530,14 @@ __attribute__((noreturn)) static void interactive_en(void)
         if (p < 0) { pad_prev = 0; continue; }
         int edge = p & ~pad_prev;
         pad_prev = p;
+
+        if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
+            if (!options_step(edge)) {
+                options_close();
+                dirty = 1;
+            }
+            continue;
+        }
 
         int dir = (p & BTN_LEFT) ? 1 : (p & BTN_UP) ? 2 : (p & BTN_RIGHT) ? 3
                 : (p & BTN_DOWN) ? 4 : 0;
@@ -486,6 +585,10 @@ __attribute__((noreturn)) static void interactive_en(void)
             caret = 0;
             gm.eagerSet = 0;
             dirty = 1;
+        }
+        if ((edge & BTN_START) && !clen) {   /* 打っていないときの Start = オプション */
+            options_open();
+            continue;
         }
         if ((edge & (BTN_START | BTN_L3)) && clen) {
             /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
@@ -556,7 +659,12 @@ __attribute__((noreturn)) static void interactive_ja(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    pad_prev = 0;
+    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
+       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
+       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
+    pad_prev = pad_read();
+    if (pad_prev < 0)
+        pad_prev = 0;
     for (;;) {
         wait_fields(1);
         fields++;
@@ -565,6 +673,14 @@ __attribute__((noreturn)) static void interactive_ja(void)
         if (p < 0) { pad_prev = 0; continue; }
         int edge = p & ~pad_prev;
         pad_prev = p;
+
+        if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
+            if (!options_step(edge)) {
+                options_close();
+                dirty = 1;
+            }
+            continue;
+        }
 
         int dir = (p & BTN_LEFT) ? 1 : (p & BTN_UP) ? 2 : (p & BTN_RIGHT) ? 3
                 : (p & BTN_DOWN) ? 4 : 0;
@@ -623,6 +739,10 @@ __attribute__((noreturn)) static void interactive_ja(void)
             caret = 0;
             gm.eagerSet = 0;
             dirty = 1;
+        }
+        if ((edge & BTN_START) && !clen) {   /* 打っていないときの Start = オプション */
+            options_open();
+            continue;
         }
         if (((edge & (BTN_START | BTN_L3)) || rs == 4) && clen) {
             /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
