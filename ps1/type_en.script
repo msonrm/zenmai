@@ -1,0 +1,9 @@
+# 英語版: T9 で "south" を打って Start で確定
+# s=T7(row6=L1+LEFT) 4番目=X / o=T6(row5=L1) 3番目=CIR / u=T8(row7=L1+UP) 2番目=TRI
+# t=T8 1番目=SQ / h=T4(row3=RIGHT) 2番目=TRI
+6000-6080:L1+LEFT+X    # s
+6200-6280:L1+CIR       # o
+6400-6480:L1+UP+TRI    # u
+6600-6680:L1+UP+SQ     # t
+6800-6880:RIGHT+TRI    # h
+7100-7120:START        # 確定

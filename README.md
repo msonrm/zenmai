@@ -114,6 +114,21 @@
 | 打ち方 | キーボード / ゲームパッド / スマホのフリック（★**op の語彙が同じなので配線は 1 本**） |
 | 検査 | **7 本**（`test/run-*.js`）—— 入力の固定表 56 件・通しの日本語・walkthrough の未訳ログ・Glk シム・セーブ復帰・ブラウザホストの配線・ZVM ハーネス |
 
+### PlayStation 版（`ps1/`）
+
+★**同じものが初代 PlayStation でも動く**（2026-08-21）。`zenmai-zork.psexe` 1 本で、
+起動時に にほんご / ENGLISH を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
+自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
+
+```bash
+cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
+python3 sim.py zenmai-zork.psexe --expect golden.png   # R3000 シミュレータで画素照合
+```
+
+**キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
+（計画 = `docs/ps1-port-plan.md`、作って分かったこと = `docs/ps1-implementation-notes.md`）。
+残件はメモリーカードのセーブ。
+
 差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
 描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・
 ふりがな・コントローラ入力を自分の手に置ける。

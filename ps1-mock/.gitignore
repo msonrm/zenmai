@@ -1,0 +1,5 @@
+# ビルド生成物(gen_mock.py / make_psexe.py で再生成できる)
+*.psexe
+*.bin
+*.cue
+__pycache__/

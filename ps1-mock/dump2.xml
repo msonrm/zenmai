@@ -1,0 +1,11 @@
+<iso_project image_name="mkpsxiso.bin" cue_sheet="mkpsxiso.cue">
+    <track type="data" cdvd_style="false">
+        <identifiers system="PLAYSTATION" application="PLAYSTATION" volume="ZENMAI_MOCK" publisher="MSONRM" data_preparer="MKPSXISO" creation_date="2026081900143800+36"/>
+        <license file="../../../../../tmp/claude-1000/-home-msonrm-development-logical-layout-labo/06415313-7ca6-4d38-ad94-cbe673480dac/scratchpad/dump2/license_data.dat"/>
+        <default_attributes gmt_offs="36" xa_attrib="255" xa_perm="1365" xa_gid="0" xa_uid="0"/>
+        <directory_tree source="../../../../../tmp/claude-1000/-home-msonrm-development-logical-layout-labo/06415313-7ca6-4d38-ad94-cbe673480dac/scratchpad/dump2">
+            <file name="SYSTEM.CNF" type="data" date="20260818233933"/>
+            <file name="ZENMAI.EXE" type="data" date="20260819001436"/>
+        </directory_tree>
+    </track>
+</iso_project>

@@ -1,0 +1,38 @@
+# ビルド生成物(build*.sh で再生成できる)
+*.o
+*.elf
+out*.bin
+*.psexe
+story.bin
+
+# ホスト側の検証バイナリ(*_test.c 等から都度ビルドする)
+cmd_test_host
+test_input
+test_translate
+zm_host_test
+zm_host_signed
+
+# sim / デバッグの出力(検証のたびに上書きされる。ゴールデンだけは追跡する)
+sim-*.png
+zoom-*.png
+canvas-*.png
+[gs]-t2-tail.png
+canvas.bin
+image.bin
+image.o
+dbglog.bin
+mips-trace.bin
+mojo-out.txt
+*.log
+
+# 照合コーパス(capture_*.js / make_corpus.py で再生成できる。数百 KB〜1MB)
+pairs.jsonl
+corpus.txt
+ref.jsonl
+c.jsonl
+
+__pycache__/
+
+# ★生成ヘッダ(glyphs.h / *_data.* / tables.h / pairs.h / golden_cases.h)は追跡する。
+#   glyphs.h は KH ドットフォント(リポジトリに同梱していない)が無いと作れないので、
+#   無視すると clone しただけではビルドできなくなる。
