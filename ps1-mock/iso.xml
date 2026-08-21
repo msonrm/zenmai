@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CD イメージ定義(mkpsxiso 用)。
+     Sony のライセンスデータは同梱しない(計画書の権利方針。エミュレータ・OpenBIOS は
+     無くても起動する。未改造実機では起動しないが、配布はエミュレータ向けまでの方針)。 -->
+<iso_project image_name="zenmai-ps1-mock.bin" cue_sheet="zenmai-ps1-mock.cue">
+  <track type="data">
+    <identifiers system="PLAYSTATION" application="PLAYSTATION"
+                 volume="ZENMAI_MOCK" publisher="MSONRM" data_preparer="MKPSXISO"/>
+    <directory_tree>
+      <file name="SYSTEM.CNF" type="data" source="SYSTEM.CNF"/>
+      <file name="ZENMAI.EXE" type="data" source="zenmai-ps1-mock.psexe"/>
+    </directory_tree>
+  </track>
+</iso_project>

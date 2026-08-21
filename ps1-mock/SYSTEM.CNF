@@ -1,0 +1,4 @@
+BOOT = cdrom:\ZENMAI.EXE;1
+TC = 4
+VMODE = NTSC
+MEM = 2
