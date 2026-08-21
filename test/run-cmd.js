@@ -195,6 +195,26 @@ for (const [ja, want] of CASES) {
       console.log(`${ok ? '✓' : '✗'} 複数対象 ${en.padEnd(42)} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
     }
   }
+  // ★スロットが**空白だけ**で隣り合う骨格（`{VERB} the {OBJ} {PREP}?`）。区切りが空白では
+  //   位置が決まらないので、左のスロットを最長に採らないと 1 語で止まって残りが右へ流れ込む。
+  //   実プレイ（2026-08-21）で「しまう」→「ないふ」が `何knives innastyを入れる？` になった。
+  //   ★walkthrough は聞き返し（orphan）を踏まないので、ここで押さえる。
+  //   ★目的語が 1 語のもの（剣・トロル）は元から通っていた —— **壊れるのは 2 語以上のとき**
+  {
+    const ORPHAN = [
+      ['What do you want to put the nasty knives in?', '何の中に嫌な感じのナイフを入れる？'],
+      ['What do you want to put the jewel-encrusted egg in?', '何の中に宝石をちりばめた卵を入れる？'],
+      ['What do you want to put the sword in?', '何の中に剣を入れる？'],
+      ['What do you want to attack the troll with?', '何でトロルを攻撃する？'],
+      ['What do you want to tie the rope to?', '何に縄を結ぶ？'],
+    ]
+    for (const [en, want] of ORPHAN) {
+      const got = tr.line(en)
+      const ok = got === want
+      if (!ok) ng++
+      console.log(`${ok ? '✓' : '✗'} 聞き返し ${en.padEnd(46)} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+    }
+  }
   for (const [ja, want] of [['のべぼうをとる', 'のべぼう のべぼう ……'], ['はんきょう', 'はんきょう はんきょう ……']]) {
     const r = cm.toCommand(ja)
     tr.setEcho(r.echoWord || ja)

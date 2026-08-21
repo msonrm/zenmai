@@ -25,7 +25,12 @@ function compile(en) {
     //   （`I don't know the word "!)".` が外れていた）
     const quoted = en[m.index - 1] === '"' && en[m.index + m[0].length] === '"'
     quotes.push(quoted)
-    re += quoted ? '([^"]*)' : '([^.!?]+?)'
+    // ★次のスロットとの区切りが**空白だけ**のときは最長で食う。非貪欲のままだと
+    //   左のスロットが 1 語で止まり、残りが右へ流れ込む（`the nasty knives in?` が
+    //   OBJ=`nasty` / PREP=`knives in` に割れて `何knives innastyを入れる？` になった）。
+    //   空白は語の中にも現れるので区切りとして位置を決められない —— 左を最長に採る
+    const adjacent = /^ \{[A-Z]/.test(en.slice(m.index + m[0].length))
+    re += quoted ? '([^"]*)' : adjacent ? '([^.!?]+)' : '([^.!?]+?)'
     i = m.index + m[0].length
   }
   re += escapeRe(en.slice(i))
