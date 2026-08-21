@@ -66,3 +66,10 @@ const Glk = createGlk({
 const vm = new ZVM()
 vm.prepare(fs.readFileSync(path.join(Z, 'vendor/zork1/zork1.z3')), { vm, Glk, GlkOte: null, Dialog: null })
 Glk.init({ vm })
+// ★乱数を固定する。ZVM は Z-machine 標準のシードモードを持っていて、`xorshift_seed` が
+//   0 以外なら Xorshift で決定的に返す（0 = `Math.random`）。`Glk.init` が 0 で初期化するので
+//   その**後**に入れる。
+//   ★これが無いと戦闘や泥棒の分岐が毎回ゆれ、`pairs.h` が再生成のたびに 900 行規模で変わる。
+//   行数は 709 → 711 でも diff が読めない ＝ **C 側ゴールデンの更新を人間が検算できない**。
+//   固定した今は、意味のある変更だけが diff に出る
+vm.xorshift_seed = 0x5EED5EED

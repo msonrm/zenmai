@@ -19,6 +19,13 @@ const CASES = [
   ['ゆうびんばこをあける', 'open mailbox'],
   ['てがみをよむ', 'read advertisement'],   // 原作は代表の名詞を受ける（leaflet も同義語）
   ['けんをとる', 'take sword'],
+  // ★送る名詞は DESC の呼び名に寄せる。SYNONYM の第一語は**辞書の代表語**であって
+  //   原作が画面に出す呼び名ではないので、食い違うと復唱が割れる
+  //   （`nasty knife` を `the nasty knives` と聞き返された。2026-08-21 の実プレイ）。
+  //   ★寄せるのは同じ語の単複だけ —— `いたをはずす` が `take boards` のままなのは、
+  //   原作自身が `The boards are securely fastened.` と複数形で答えるから（下にある）
+  ['ないふをとる', 'take nasty knife'],
+  ['さびたないふをとる', 'take rusty knife'],
   ['けんをつかむ', 'take sword'],          // 同じ英単語に寄せる（動詞の言い方は複数）
   ['じゅうたんをめくる', 'move rug'],
   // ★「扉」「窓」は**わざと曖昧なまま渡す**（2026-08-14）。どの扉かは部屋が決めるので
