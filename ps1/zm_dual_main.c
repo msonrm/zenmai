@@ -13,6 +13,7 @@
 #include "translate.h"
 #include "cmd.h"
 #include "cmd_data.h"
+#include "card.h"
 
 #define main mojozork_main_unused
 #include "vendor/mojozork.c"
@@ -106,8 +107,124 @@ static void zm_read(void)
     GState->step_completed = 1;
 }
 
-static void zm_save(void) { doBranch(0); }
-static void zm_restore(void) { doBranch(0); }
+/* ---- セーブ / ロード ----
+ *
+ * ★保存するのは動的メモリ・スタック・bp・PC の 4 つだけ。訳も入力方式も**状態ではない**
+ *   ので、英語で保存して日本語で再開しても、そのまま続く。
+ *
+ * 動的メモリ 11,282 バイトは 1 ブロック(8KB)に生では入らないので、初期イメージとの
+ * XOR を RLE で畳む(Quetzal の CMem と同じ考え)。本体が story の原本を持っているから、
+ * 比べる相手はタダで手に入る。
+ */
+static uint8_t savebuf[CARD_DATA_MAX];
+
+static int cmem_pack(const uint8_t *cur, const uint8_t *init, int len, uint8_t *out, int outmax)
+{
+    int o = 0;
+    for (int i = 0; i < len; ) {
+        uint8_t x = (uint8_t)(cur[i] ^ init[i]);
+        if (x) {
+            if (o >= outmax) return -1;
+            out[o++] = x;
+            i++;
+        } else {
+            int run = 0;
+            while (i < len && run < 256 && cur[i] == init[i]) { i++; run++; }
+            if (o + 2 > outmax) return -1;
+            out[o++] = 0;                          /* 0 の後ろは「同じが続く数-1」 */
+            out[o++] = (uint8_t)(run - 1);
+        }
+    }
+    return o;
+}
+
+static void cmem_unpack(const uint8_t *in, int inlen, const uint8_t *init, uint8_t *out, int len)
+{
+    int i = 0, o = 0;
+    while (i < inlen && o < len) {
+        uint8_t x = in[i++];
+        if (x) {
+            out[o] = (uint8_t)(init[o] ^ x);
+            o++;
+        } else if (i < inlen) {
+            int run = in[i++] + 1;
+            while (run-- > 0 && o < len) { out[o] = init[o]; o++; }
+        }
+    }
+    while (o < len) { out[o] = init[o]; o++; }     /* 残りは初期値のまま */
+}
+
+#define SAVE_HDR 14
+
+static int pack_state(uint8_t *out, int outmax)
+{
+    const int dyn = GState->header.staticmem_addr;
+    const int nstack = (int)(GState->sp - GState->stack);
+    const uint32 pc = (uint32) (GState->pc - GState->story);
+    if (outmax < SAVE_HDR + nstack * 2) return -1;
+    out[0] = 'Z'; out[1] = 'N'; out[2] = 'M'; out[3] = '1';
+    out[4] = (uint8_t)(dyn & 0xFF);        out[5] = (uint8_t)(dyn >> 8);
+    out[6] = (uint8_t)(nstack & 0xFF);     out[7] = (uint8_t)(nstack >> 8);
+    out[8] = (uint8_t)(GState->bp & 0xFF); out[9] = (uint8_t)(GState->bp >> 8);
+    out[10] = (uint8_t)(pc & 0xFF);        out[11] = (uint8_t)((pc >> 8) & 0xFF);
+    out[12] = (uint8_t)((pc >> 16) & 0xFF); out[13] = (uint8_t)((pc >> 24) & 0xFF);
+    int o = SAVE_HDR;
+    for (int i = 0; i < nstack; i++) {
+        out[o++] = (uint8_t)(GState->stack[i] & 0xFF);
+        out[o++] = (uint8_t)(GState->stack[i] >> 8);
+    }
+    const int n = cmem_pack(GState->story, _binary_story_bin_start, dyn, out + o, outmax - o);
+    return n < 0 ? -1 : o + n;
+}
+
+static int unpack_state(const uint8_t *in, int len)
+{
+    const int nmax = (int) (sizeof GState->stack / sizeof GState->stack[0]);
+    if (len < SAVE_HDR) return 0;
+    if (in[0] != 'Z' || in[1] != 'N' || in[2] != 'M' || in[3] != '1') return 0;
+    const int dyn = in[4] | (in[5] << 8);
+    const int nstack = in[6] | (in[7] << 8);
+    /* ★書き換える前に全部確かめる。途中で諦めると壊れた状態で続いてしまう */
+    if (dyn != GState->header.staticmem_addr) return 0;
+    if (nstack < 0 || nstack > nmax) return 0;
+    if (len < SAVE_HDR + nstack * 2) return 0;
+    const uint32 pc = (uint32) in[10] | ((uint32) in[11] << 8)
+                    | ((uint32) in[12] << 16) | ((uint32) in[13] << 24);
+    if (pc >= (uint32) GState->story_len) return 0;
+    int o = SAVE_HDR;
+    for (int i = 0; i < nstack; i++) {
+        GState->stack[i] = (uint16)(in[o] | (in[o + 1] << 8));
+        o += 2;
+    }
+    GState->sp = GState->stack + nstack;
+    GState->bp = (uint16)(in[8] | (in[9] << 8));
+    cmem_unpack(in + o, len - o, _binary_story_bin_start, GState->story, dyn);
+    GState->pc = GState->story + pc;
+    GState->logical_pc = pc;
+    return 1;
+}
+
+static void zm_save(void)
+{
+    /* ★分岐を先に解決してから状態を採る。restore は「save が成功した直後」へ戻るので、
+       保存する PC は**分岐を通った後**でなければならない。失敗したら巻き戻して偽で分岐する。 */
+    const uint8 *pc_before = GState->pc;
+    doBranch(1);
+    const int n = pack_state(savebuf, sizeof savebuf);
+    if (n > 0 && card_save(savebuf, n)) return;
+    GState->pc = pc_before;
+    doBranch(0);
+}
+
+static void zm_restore(void)
+{
+    const int n = card_load(savebuf, sizeof savebuf);
+    /* 成功すると PC は保存時のもの(= save の分岐先)に置き換わるので、
+       この命令の分岐は実行しない —— Z-machine の仕様どおり
+       (画面には save 側の「よし。」が出る)。 */
+    if (n > 0 && unpack_state(savebuf, n)) return;
+    doBranch(0);
+}
 
 static void run_until_read(void)
 {

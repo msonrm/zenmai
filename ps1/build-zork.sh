@@ -23,6 +23,7 @@ mipsel-linux-gnu-gcc $CFLAGS -c ruby_data.c -o ruby_data.o
 mipsel-linux-gnu-gcc $CFLAGS -c jp_text.c -o jp_text.o
 mipsel-linux-gnu-gcc $CFLAGS -c cmd.c -o cmd.o
 mipsel-linux-gnu-gcc $CFLAGS -c cmd_data.c -o cmd_data.o
-mipsel-linux-gnu-ld -T link.ld zm_dual_main.o render.o content_data.o input.o lib.o translate.o translate_data.o ruby_data.o jp_text.o cmd.o cmd_data.o story.o -o out-zork.elf
+mipsel-linux-gnu-gcc $CFLAGS -c card.c -o card.o
+mipsel-linux-gnu-ld -T link.ld zm_dual_main.o render.o content_data.o input.o lib.o translate.o translate_data.o ruby_data.o jp_text.o cmd.o cmd_data.o card.o story.o -o out-zork.elf
 mipsel-linux-gnu-objcopy -O binary out-zork.elf out-zork.bin
 "$PY" pack_exe.py out-zork.bin "$OUT"
