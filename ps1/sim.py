@@ -21,9 +21,72 @@ def s32(v):
     return v - 0x100000000 if v & 0x80000000 else v
 
 
-def run(exe_path, max_steps, pad=None):
+CARD_BYTES = 128 * 1024                        # 16 ブロック × 64 フレーム × 128B
+
+
+def card_reply(joy, card):
+    """メモリーカード(装置 81h)の応答。psx-spx の Read/Write シーケンスをそのまま写す。
+
+    ★sim が模すのは**論理**だけ。実機の /ACK の間合いや書き込み待ちは模していないので、
+    ここが緑でも「実機で速すぎて落ちる」型は捕まらない(GPU の FIFO と同じ穴)。
+    """
+    i, tx = joy['idx'], joy['tx']
+    cmd = tx[1] if len(tx) > 1 else 0
+    if i <= 0:
+        return 0xFF
+    if i == 1:
+        return 0x08                            # FLAG(bit3 = まだ書かれていない)
+    if i == 2:
+        return 0x5A
+    if i == 3:
+        return 0x5D
+    sect = (((tx[4] << 8) | tx[5]) & 0x3FF) if len(tx) > 5 else 0
+    if cmd == 0x52:                            # ---- Read Frame ----
+        if i in (4, 5):
+            return 0x00
+        if i == 6:
+            return 0x5C
+        if i == 7:
+            return 0x5D
+        if i == 8:
+            return (sect >> 8) & 0xFF
+        if i == 9:
+            return sect & 0xFF
+        if 10 <= i < 138:
+            return card[sect * 128 + (i - 10)]
+        if i == 138:
+            chk = (sect >> 8) ^ (sect & 0xFF)
+            for b in card[sect * 128:(sect + 1) * 128]:
+                chk ^= b
+            return chk & 0xFF
+        if i == 139:
+            return 0x47                        # "G" = Good
+        return 0xFF
+    if cmd == 0x57:                            # ---- Write Frame ----
+        if i <= 134:
+            return 0x00                        # アドレス・データ・CHK を送っている間
+        if i == 135:
+            data = bytes(tx[6:134])
+            chk = (sect >> 8) ^ (sect & 0xFF)
+            for b in data:
+                chk ^= b
+            joy['bad'] = (chk & 0xFF) != tx[134]
+            if not joy['bad']:
+                card[sect * 128:(sect + 1) * 128] = data
+                joy['dirty'] = True
+            return 0x5C
+        if i == 136:
+            return 0x5D
+        if i == 137:
+            return 0x4E if joy.get('bad') else 0x47
+        return 0xFF
+    return 0xFF
+
+
+def run(exe_path, max_steps, pad=None, card_path=None):
     """pad = (toggle, stop): デジタルパッドを接続扱いにし、× を toggle フィールド周期で
-    押し離しする。stop フィールドに達したら停止(最終画面の対話ループは自発終了しないため)。"""
+    押し離しする。stop フィールドに達したら停止(最終画面の対話ループは自発終了しないため)。
+    card_path: メモリーカードの像(128KB)。あれば読み込み、書き換わっていれば書き戻す。"""
     exe = Path(exe_path).read_bytes()
     assert exe[:8] == b'PS-X EXE'
     pc0, load, size = (struct.unpack_from('<I', exe, o)[0] for o in (0x10, 0x18, 0x1C))
@@ -42,7 +105,11 @@ def run(exe_path, max_steps, pad=None):
     def rd_h(a): return struct.unpack_from('<H', mem, a & 0x1FFFFE)[0]
     def rd_b(a): return mem[a & 0x1FFFFF]
 
-    joy = {'idx': 0, 'rx': 0xFF, 'polls': 0}
+    joy = {'idx': 0, 'rx': 0xFF, 'polls': 0, 'dev': 0, 'tx': [], 'dirty': False}
+    card = bytearray(CARD_BYTES)
+    if card_path and Path(card_path).exists():
+        raw = Path(card_path).read_bytes()[:CARD_BYTES]
+        card[:len(raw)] = raw
 
     def write(a, val, sz):
         pa = a & 0x1FFFFFFF
@@ -54,8 +121,19 @@ def run(exe_path, max_steps, pad=None):
             return
         if pa == 0x1F80104A:                          # JOY_CTRL → 交換をリセット
             joy['idx'] = 0
+            joy['tx'] = []
+            joy['dev'] = 0
             return
         if pa == 0x1F801040:                          # JOY_DATA 送信 → 応答を用意
+            joy['tx'].append(val & 0xFF)
+            if joy['idx'] == 0:
+                joy['dev'] = val & 0xFF
+            if joy['dev'] == 0x81:                    # メモリーカード
+                if joy['idx'] == 0:
+                    joy['cardio'] = joy.get('cardio', 0) + 1
+                joy['rx'] = card_reply(joy, card)
+                joy['idx'] += 1
+                return
             if pad is None:
                 joy['rx'] = 0xFF
             else:
@@ -186,11 +264,24 @@ def run(exe_path, max_steps, pad=None):
 
         if branch == pc:                              # 自己分岐(j / beq $0,$0 等)= 正常終了
             break
-        if pad is not None and steps // 2000 >= (pad[2] if pad[0] == 'script' else pad[1]):
-            break                                     # 台本の停止フィールドに到達
+        if pad is not None:
+            # ★--polls のときは停止も**ポーリング回数**で測る。フィールド数(steps//2000)で
+            #   止めると、起動が重い版では台本の 1 行目に着く前に切れる —— しかも
+            #   「exit 0 で完走」に見えるので、**打っていないのに通ったと読み違える**。
+            #   台本の時間軸をポーリングにした理由(処理の重さに追従する)は停止条件にも要る。
+            cur = joy['polls'] if (pad[0] == 'script' and len(pad) > 3 and pad[3]) \
+                else steps // 2000
+            if cur >= (pad[2] if pad[0] == 'script' else pad[1]):
+                break                                 # 台本の停止点に到達
         pc = npc
     else:
         raise SystemExit('終了せず(命令数上限)')
+    print('ポーリング %d 回 / カード交換 %d 回%s'
+          % (joy['polls'], joy.get('cardio', 0), ' ★書き換えあり' if joy['dirty'] else ''),
+          file=sys.stderr)
+    if card_path and joy['dirty']:
+        Path(card_path).write_bytes(bytes(card))
+        print('メモリーカード →', card_path)
     return steps, gp0, gp1, mem
 
 
@@ -242,6 +333,7 @@ def main():
     ap.add_argument('--dump', help='"hexaddr,hexlen": 終了時に RAM を印字(デバッグ用)')
     ap.add_argument('--stop', type=int, default=40000, help='--script 時の停止フィールド')
     ap.add_argument('--polls', action='store_true', help='台本の時間軸をパッドのポーリング回数にする(閉ループ)')
+    ap.add_argument('--card', help='メモリーカードの像(128KB)。読み込み、書き換わったら書き戻す')
     args = ap.parse_args()
 
     pad = tuple(int(x) for x in args.pad.split(',')) if args.pad else None
@@ -262,7 +354,7 @@ def main():
                 mask |= 1 << BITS[nm.strip()]
             windows.append((f0, f1, mask))
         pad = ('script', windows, args.stop, args.polls)
-    steps, gp0, gp1, mem = run(args.exe, args.max, pad)
+    steps, gp0, gp1, mem = run(args.exe, args.max, pad, args.card)
     print(f'実行 {steps} 命令 / GP1 {len(gp1)} 件: ' + ' '.join(f'0x{v:08X}' for v in gp1))
     if args.dump:
         parts = args.dump.split(',')
