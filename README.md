@@ -124,6 +124,7 @@
 cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
 python3 sim.py zenmai-zork.psexe --expect golden.png   # R3000 シミュレータで画素照合
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
+sh test-options.sh                              # オプション画面(打っていないときの Start)
 ```
 
 **キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
