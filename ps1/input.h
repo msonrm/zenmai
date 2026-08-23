@@ -50,5 +50,9 @@ void gp_break_rt_cycle(GpMachine *s);
 /* 行インジケータ用: その行のあ段の字 / 英語は T9 の数字 */
 unsigned short gp_row_char(int row);
 unsigned short gp_row_char_en(int row);
+/* 入力表の 1 マス(row 0..9 / vowel 0..4)。0 = そのマスは空。
+   ★図を描く側が表を持たないための窓。**写すと、図に出ている字と実際に入る字が
+     ずれても誰も気づけない**(web 版で踏んだ事故) */
+unsigned short gp_cell(int english, int row, int vowel);
 
 #endif

@@ -51,24 +51,8 @@ def rule():
 
 
 # ---- 頁 1: もじの うちかた ----
-# ★★ 仮の中身。動きを見るための置きもので、文言はこれから決める。
-#    同梱フォントに無い字を足さないよう、ひらがな・カタカナ・英字だけで書いてある。
-page(P_TYPING)
-put('（ここは かりの ないよう）', JA, 1)
-put('(placeholder text)', EN, 1)
-put('')
-put('じゅうじキー で ぎょうを えらび、', JA)
-put('ボタン で だんを えらぶ。', JA)
-put('The D-pad picks the row,', EN)
-put('the face buttons pick the vowel.', EN)
-put('')
-put('START  うちおわり（かくてい）', JA)
-put('SELECT  くうはく', JA)
-put('R2 ながおし  けす', JA)
-put('START  send the line', EN)
-put('SELECT  space', EN)
-put('hold R2  backspace', EN)
-
+# ★本文は持たない。**コントローラの図**そのものが説明になる（web 版と同じ考え方）。
+#   図の札は入力表 GP_KANA / GP_ENG から引くので、ここには**固定の札だけ**を置く。
 # ---- 頁 2: つかえる ことば ----
 # ★★ 仮の中身。本番は cmd_data から作る(手で書き写すと本体とずれる)。
 page(P_CMDS)
@@ -142,6 +126,17 @@ ITEM = [
 # ★起動の言語メニューに出す一行だけは残す。**メニューがあること**は作法ではないし、
 #   物語の紙面にシステムの字は混ぜないので、全員が通るここでしか知らせられない。
 BOOT = ('ゲームちゅう START で メニュー', 'PRESS START IN GAME FOR THE MENU')
+# ★「もじの うちかた」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
+#   ここには無い —— 図に出ている字と実際に入る字が違う、が最悪の事故（web 版の教訓）。
+HELP = [
+    ('L1 はまやらわ',    'L1 6-0'),
+    ('L2 ちいさく',      'L2 SHIFT'),
+    ('R2 ん を',         'R2 0'),
+    ('SELECT くうはく',  'SELECT SPACE'),
+    ('START かくてい',   'START SEND'),
+    ('じゅうじキー = ぎょう', 'D-PAD = ROW'),
+    ('ボタン = だん',         'BUTTONS = VOWEL'),
+]
 
 # ---- 画面幅で折り返す ----
 # ★専用画面で描くので、**折り返しはここで済ませておく**(C 側は行を y に並べるだけ)。
@@ -230,6 +225,7 @@ def sref(text):
 
 
 items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
+helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
 
 for i, text in strs:
@@ -241,13 +237,19 @@ for row in items:
     out.append('    { ' + ', '.join(row) + ' },')
 out.append('};')
 out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
+out.append('/* 図の固定札: L1 / L2 / R2 / SELECT / START */')
+out.append('#define UI_HELP_N %d' % len(HELP))
+out.append('static const UiStr UI_HELP[2][UI_HELP_N] = {')
+for row in helps:
+    out.append('    { ' + ', '.join(row) + ' },')
+out.append('};')
 out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
 
 used = set()
 for _, _, _, t in lines:
     used.update(t)
-for ja, en in ITEM + [BOOT]:
+for ja, en in ITEM + HELP + [BOOT]:
     used.update(ja)
     used.update(en)
 (HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')

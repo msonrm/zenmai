@@ -34,6 +34,18 @@ enum { STATUS_Y = 24, STATUS_H = 24 };
 #define PANEL 0x0863
 static uint16_t sbar[STATUS_H][W];
 
+/* 画面いっぱいを 1 色で塗る。
+   ★**GPU のフィル(gp0_fill)は地色に使わない**。字のある行はバッファ転送で描くので、
+     塗りと転送が混ざると**地色がほんのわずかに食い違う**（実機で見えた。転送は 15bit を
+     そのまま書き、フィルは 24bit を落として書く別経路なので、道が違えば食い違いうる）。
+     同じ道で塗れば食い違いようがない —— 色定数も 15bit の 1 本だけになる。 */
+static void paint_screen(uint16_t color)
+{
+    fill_rows(sbar, 0, STATUS_H, color);
+    for (int y = 0; y < H; y += STATUS_H)
+        gp0_upload(0, y, W, STATUS_H, sbar[0]);
+}
+
 static void draw_status(void)
 {
     fill_rows(sbar, 0, STATUS_H, PANEL);
@@ -377,6 +389,25 @@ static void row_label(int row, uint16_t out[4], int *n)
     while (s[*n] && *n < 4) { out[*n] = (uint16_t)s[*n]; (*n)++; }
 }
 
+/* ---- パッド → 行 / 段 ----
+ * ★**図を描く側と入力する側で同じ式を使う**。写すと、図に出ている字と実際に入る字が
+ *   ずれても誰も気づけない(web 版で踏んだ事故)。
+ * 行: 何も押さない=0 / ←=1 / ↑=2 / →=3 / ↓=4。L1 を押すと +5(はまやらわ)。
+ * 段: R1=あ / □=い / △=う / ○=え / ×=お。-1 = まだ選んでいない。
+ */
+static int pad_row(int p)
+{
+    const int dir = (p & BTN_LEFT) ? 1 : (p & BTN_UP) ? 2 : (p & BTN_RIGHT) ? 3
+                  : (p & BTN_DOWN) ? 4 : 0;
+    return dir + ((p & BTN_L1) ? 5 : 0);
+}
+
+static int pad_vowel(int p)
+{
+    return (p & BTN_R1) ? 0 : (p & BTN_SQ) ? 1 : (p & BTN_TRI) ? 2
+         : (p & BTN_CIR) ? 3 : (p & BTN_X) ? 4 : -1;
+}
+
 /* ★どのフェイスボタンでも決まる。「Start で開いて Start で閉じる」「開いた先で
    フェイスボタンを押せば決まる」は当時からの作法なので、画面に書かない */
 #define BTN_FACE (BTN_CIR | BTN_X | BTN_TRI | BTN_SQ)
@@ -446,14 +477,13 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
  *   画面がその分だけ狭くなるだけになる。だから**どのフェイスボタンでも決まる**
  *   (○/× を言語で入れ替える必要も消えた。作法に乗るほうが、地域差より強い)。
  */
-#define MAIN_BG24 0x0F1214             /* 本文の地色(GPU フィル = 0xBBGGRR) */
-#define OPT_BG24  0x3A1E10             /* 読み物の地色 = 濃い藍 */
-#define OPT_BG    0x1C62               /* 同じ色の RGB555(バッファ塗り用) */
+#define OPT_BG    0x1C62               /* 読み物の地色 = 濃い藍(RGB555 の 1 本だけ持つ) */
 #define OPT_EDGE  0x36B9               /* 板の枠(= ACCENT) */
 #define OPT_TEXT  0x4A52               /* 本文と案内(控えめ) */
 
 
 enum { OPTM_MENU = 0, OPTM_PAGE };
+enum { P_TYPING = 0, P_CMDS, P_LICENSE };   /* gen_ui.py の並びと同じ */
 /* 重ねる板は**本文窓の中**(ステータス行の下)に置く。★部屋名が見えたままだと
    「まだゲームの中にいる」感が残るし、戻すのが render_window() だけで済む */
 enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
@@ -555,9 +585,133 @@ static void page_frame(void)
     gp0_upload(FR_X + FR_W - FR_T, FR_Y, FR_T, FR_H, frbuf);   /* 右 */
 }
 
+/* ---- 「もじの うちかた」= コントローラの図 ----
+ *
+ * ★本文を持たない。**押している状態がそのまま図に出る**のが説明になる(web 版と同じ)。
+ * ★札は入力表から引く(`gp_cell`)。写さないので、表を直せば図も直る ——
+ *   **図に出ている字と実際に入る字が違う**、が最悪の事故(web 版で踏んでいる)。
+ * ★この頁だけは**面ボタンで戻らない**。面ボタンは字を出すボタンそのものだから、
+ *   出口は Start(本文へ)の 1 つに絞る。
+ */
+enum { HLX = 168, HRX = 472, HDX = 104 };            /* 群の中心 x と左右のずれ */
+enum { HYC = 96,                                     /* 群の見出し */
+       HY0 = 136, HY1 = 176, HY2 = 216,              /* 上 / 中 / 下 */
+       HY3 = 272, HY4 = 304, HY5 = 360 };            /* 肩の札 2 段 + 機能キーの札 */
+enum { HDIV_X = 318, HDIV_Y = 124, HDIV_H = 128 };   /* 左右の群を分ける縦線 */
+static int help_prev;
+
+/* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る) */
+static void help_put(int cx, const uint16_t *s, int n, uint16_t color)
+{
+    int w = 0;
+    for (int i = 0; i < n; i++)
+        w += glyph_w(s[i]);
+    int x = cx - w / 2;
+    for (int i = 0; i < n; i++) {
+        draw24(sbar, x, 0, s[i], color);
+        x += glyph_w(s[i]);
+    }
+}
+
+static void help_put1(int cx, uint16_t ch, uint16_t color)
+{
+    if (ch)                              /* 表に穴がある(や行の い/え)ときは何も置かない */
+        help_put(cx, &ch, 1, color);
+}
+
+/* R1 の札だけは動く = その行の「あ段」そのもの */
+static void help_put_r1(int cx, uint16_t ch, uint16_t color)
+{
+    static const uint16_t pre[3] = {'R', '1', ' '};
+    uint16_t buf[4];
+    int n = 0;
+    for (; n < 3; n++)
+        buf[n] = pre[n];
+    if (ch)
+        buf[n++] = ch;
+    help_put(cx, buf, n, color);
+}
+
+static void help_row_head(int cx, int row, int on)
+{
+    help_put1(cx, lang_en ? gp_row_char_en(row) : gp_row_char(row), on ? ACCENT : INK);
+}
+
+static void help_draw(int p)
+{
+    const int base = (p & BTN_L1) ? 5 : 0;
+    const int row = pad_row(p), dir = row - base;
+    const int vowel = pad_vowel(p);
+    const int en = lang_en;
+    const UiStr *lbl = UI_HELP[en];
+
+    /* 群の見出し。★どちらの手で何を選ぶのかを名指しする */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[5].s, lbl[5].n, OPT_TEXT);
+    help_put(HRX, lbl[6].s, lbl[6].n, OPT_TEXT);
+    gp0_upload(0, HYC, W, STATUS_H, sbar[0]);
+
+    /* 上: ↑ の行 / △ の字 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_row_head(HLX, base + 2, dir == 2);
+    help_put1(HRX, gp_cell(en, row, 2), vowel == 2 ? ACCENT : INK);
+    gp0_upload(0, HY0, W, STATUS_H, sbar[0]);
+
+    /* 中: ← 中 → の行 / □ ○ の字。★中央 = どの向きも押していないとき */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_row_head(HLX - HDX, base + 1, dir == 1);
+    help_row_head(HLX,       base + 0, dir == 0);
+    help_row_head(HLX + HDX, base + 3, dir == 3);
+    help_put1(HRX - HDX, gp_cell(en, row, 1), vowel == 1 ? ACCENT : INK);
+    help_put1(HRX + HDX, gp_cell(en, row, 3), vowel == 3 ? ACCENT : INK);
+    gp0_upload(0, HY1, W, STATUS_H, sbar[0]);
+
+    /* 下: ↓ の行 / × の字 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_row_head(HLX, base + 4, dir == 4);
+    help_put1(HRX, gp_cell(en, row, 4), vowel == 4 ? ACCENT : INK);
+    gp0_upload(0, HY2, W, STATUS_H, sbar[0]);
+
+    /* 肩: L1 / R1 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[0].s, lbl[0].n, (p & BTN_L1) ? ACCENT : OPT_TEXT);
+    help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row),
+                (p & BTN_R1) ? ACCENT : OPT_TEXT);
+    gp0_upload(0, HY3, W, STATUS_H, sbar[0]);
+
+    /* 肩: L2 / R2 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[1].s, lbl[1].n, (p & BTN_L2) ? ACCENT : OPT_TEXT);
+    help_put(HRX, lbl[2].s, lbl[2].n, (p & BTN_R2) ? ACCENT : OPT_TEXT);
+    gp0_upload(0, HY4, W, STATUS_H, sbar[0]);
+
+    /* 機能キー: SELECT / START。★ここでの Start は「本文へ戻る」だが、
+       札が説明しているのは**本文での**役 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[3].s, lbl[3].n, (p & BTN_SELECT) ? ACCENT : OPT_TEXT);
+    help_put(HRX, lbl[4].s, lbl[4].n, OPT_TEXT);
+    gp0_upload(0, HY5, W, STATUS_H, sbar[0]);
+
+    /* ★左右の群を縦線で分ける。無いと真ん中の帯が**1 行の字の並び**に見えて、
+       十字の面とボタンの面の区別が付かなかった(描いてみて分かった) */
+    for (int i = 0; i < HDIV_H * 2; i++)
+        frbuf[i] = OPT_TEXT;
+    gp0_upload(HDIV_X, HDIV_Y, 2, HDIV_H, frbuf);
+    page_frame();                        /* 帯は幅 640 なので縁を引き直す(frbuf も塗り直す) */
+}
+
+static void help_open(int p)
+{
+    const UiStr *t = &UI_ITEM[lang_en][P_TYPING];
+    paint_screen(OPT_BG);
+    page_row(PAGE_Y_TITLE, t->s, t->n, ACCENT, 1);
+    help_prev = p;
+    help_draw(p);
+}
+
 static void page_draw(void)
 {
-    gp0_fill(0, 0, W, H, OPT_BG24);
+    paint_screen(OPT_BG);
     const UiStr *t = &UI_ITEM[lang_en][opt_page];
     page_row(PAGE_Y_TITLE, t->s, t->n, ACCENT, 1);
     for (int r = 0; r < PAGE_ROWS; r++) {
@@ -576,7 +730,7 @@ static void page_draw(void)
 static void restore_main(int full)
 {
     if (full) {
-        gp0_fill(0, 0, W, H, MAIN_BG24);
+        paint_screen(BG);
         draw_status();
         draw_strip(comp, 0, 0, comp, 0);   /* 開くのは clen==0 のときだけ */
     }
@@ -586,8 +740,17 @@ static void restore_main(int full)
 /* ★オプションは**別ループを回さない**。開いている間の 1 フレーム分をここで処理し、
    パッドを読むのは対話ループの 1 箇所だけに保つ([[hechima-dual-path-hazard]])。
    戻り値 0 = オプションを閉じて本文へ戻る。 */
-static int options_step(int edge)
+static int options_step(int p, int edge)
 {
+    if (opt_mode == OPTM_PAGE && opt_page == P_TYPING) {
+        if (edge & BTN_START)            /* ★出口は Start だけ(面ボタンは字を出す側) */
+            return 0;
+        if (p != help_prev) {            /* 押している状態が変わったときだけ描き直す */
+            help_prev = p;
+            help_draw(p);
+        }
+        return 1;
+    }
     if (opt_mode == OPTM_PAGE) {
         const int maxtop = page_count > PAGE_ROWS ? page_count - PAGE_ROWS : 0;
         int moved = 0;
@@ -614,8 +777,12 @@ static int options_step(int edge)
         opt_page = opt_sel;
         opt_mode = OPTM_PAGE;
         page_top = 0;
-        page_index();
-        page_draw();
+        if (opt_page == P_TYPING) {
+            help_open(p);
+        } else {
+            page_index();
+            page_draw();
+        }
         return 1;
     }
     if (edge & BTN_START)                /* Start で開いたら Start で閉じる */
@@ -666,18 +833,15 @@ __attribute__((noreturn)) static void interactive_en(void)
         pad_prev = p;
 
         if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
-            if (!options_step(edge)) {
+            if (!options_step(p, edge)) {
                 options_close();
                 dirty = 1;
             }
             continue;
         }
 
-        int dir = (p & BTN_LEFT) ? 1 : (p & BTN_UP) ? 2 : (p & BTN_RIGHT) ? 3
-                : (p & BTN_DOWN) ? 4 : 0;
-        int row = dir + ((p & BTN_L1) ? 5 : 0);
-        int vowel = (p & BTN_R1) ? 0 : (p & BTN_SQ) ? 1 : (p & BTN_TRI) ? 2
-                  : (p & BTN_CIR) ? 3 : (p & BTN_X) ? 4 : -1;
+        int row = pad_row(p);
+        int vowel = pad_vowel(p);
         int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
                + !!(p & BTN_DOWN) + !!(p & BTN_L1);
         GpFrame f = { fields * 17, row, vowel, vowel >= 0,
@@ -809,18 +973,15 @@ __attribute__((noreturn)) static void interactive_ja(void)
         pad_prev = p;
 
         if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
-            if (!options_step(edge)) {
+            if (!options_step(p, edge)) {
                 options_close();
                 dirty = 1;
             }
             continue;
         }
 
-        int dir = (p & BTN_LEFT) ? 1 : (p & BTN_UP) ? 2 : (p & BTN_RIGHT) ? 3
-                : (p & BTN_DOWN) ? 4 : 0;
-        int row = dir + ((p & BTN_L1) ? 5 : 0);
-        int vowel = (p & BTN_R1) ? 0 : (p & BTN_SQ) ? 1 : (p & BTN_TRI) ? 2
-                  : (p & BTN_CIR) ? 3 : (p & BTN_X) ? 4 : -1;
+        int row = pad_row(p);
+        int vowel = pad_vowel(p);
         int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
                + !!(p & BTN_DOWN) + !!(p & BTN_L1);
         GpFrame f = { fields * 17, row, vowel, vowel >= 0,
@@ -1012,7 +1173,7 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
     for (char *p = __bss_start; p < __bss_end; p++)
         *p = 0;
     gpu_init();
-    gp0_fill(0, 0, W, H, 0x0F1214);
+    paint_screen(BG);
     render_init();
     jp_text_init();                    /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
     body_top = STATUS_Y + STATUS_H + 8;
@@ -1020,7 +1181,7 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
 
     pad_try_analog();
     lang_en = lang_menu();
-    gp0_fill(0, 0, W, H, 0x0F1214);    /* メニューを消す */
+    paint_screen(BG);                  /* メニューを消す */
 
     vm_init();
     run_until_read();
