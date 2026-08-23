@@ -596,12 +596,14 @@ static void page_frame(void)
 /* ★並びは**実物のコントローラのまま**にする。上から L2 / L1 / 十字(面ボタン)。
    左右のボタンは中心へ寄せる(離しすぎると 1 行の字の並びに見える) */
 enum { HLX = 168, HRX = 472, HDX = 56 };             /* 群の中心 x と左右のずれ */
-enum { HYC = 84,                                     /* 群の見出し */
-       HY_L2 = 124, HY_L1 = 156,                     /* 肩(外側が上) */
-       HY0 = 204, HY1 = 244, HY2 = 284,              /* 上 / 中 / 下 */
-       HY5 = 344 };                                  /* 機能キーの札 */
-enum { HDIV_X = 318, HDIV_Y = 76, HDIV_H = 236 };    /* 左右の群を分ける縦線 */
-static int help_prev;
+enum { HYC = 80,                                     /* 群の見出し */
+       HY_L2 = 116, HY_L1 = 148,                     /* 肩(外側が上) */
+       HY0 = 192, HY1 = 232, HY2 = 272,              /* 上 / 中 / 下 */
+       HY5 = 320 };                                  /* 機能キーの札 */
+enum { HDIV_X = 318, HDIV_Y = 72, HDIV_H = 240 };    /* 左右の群を分ける縦線 */
+/* 試し打ち: 横線 → 一行の説明 → コマンド欄を模した行 */
+enum { HRULE_Y = 358, HY_TIP = 372, HY_STRIP = 408 };
+static int help_prev, help_gate;
 
 /* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る) */
 static void help_put(int cx, const uint16_t *s, int n, uint16_t color)
@@ -709,6 +711,18 @@ static void help_draw(int p)
     help_band(HY5, 0);
 }
 
+/* 試し打ちの行。★本物のコマンド欄と**同じ絵**を使う(build_strip)。地色と y だけ違う。
+   帯が縁を消さないよう、送る前に縁を書き込む(図の帯と同じ手) */
+static void help_strip(const uint16_t *cmd, int len, int car, const uint16_t *ind, int ilen)
+{
+    build_strip(OPT_BG, cmd, len, car, ind, ilen);
+    for (int r = 0; r < CMD_H; r++) {
+        strip[r][FR_X] = strip[r][FR_X + 1] = OPT_EDGE;
+        strip[r][FR_X + FR_W - 2] = strip[r][FR_X + FR_W - 1] = OPT_EDGE;
+    }
+    gp0_upload(0, HY_STRIP, W, CMD_H, strip[0]);
+}
+
 static void help_open(int p)
 {
     const UiStr *t = &UI_ITEM[lang_en][P_TYPING];
@@ -718,8 +732,24 @@ static void help_open(int p)
     for (int i = 0; i < HDIV_H * 2; i++)
         frbuf[i] = OPT_TEXT;
     gp0_upload(HDIV_X, HDIV_Y, 2, HDIV_H, frbuf);
+    /* 試し打ちの仕切りと説明 */
+    for (int i = 0; i < (FR_W - 96) * 2; i++)
+        frbuf[i] = OPT_TEXT;
+    gp0_upload(FR_X + 48, HRULE_Y, FR_W - 96, 2, frbuf);
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(W / 2, UI_HELP[lang_en][7].s, UI_HELP[lang_en][7].n, OPT_TEXT);
+    help_band(HY_TIP, 0);
+    /* ★試し打ちは**本文と同じ入力の道**を使う。だから器も本物と同じ comp を空にするだけ
+       (別の器を持つと、片方でしか通らない値が必ず出る) */
+    clen = 0;
+    caret = 0;
+    /* ★頁を開けたボタンを離すまでは打たせない。離さないと**開けた ○ がそのまま
+       「え」になる**(実測。エッジではなく押している状態で字が出る仕組みなので、
+       pad_prev を潰すだけでは止まらない) */
+    help_gate = 1;
     help_prev = p;
     help_draw(p);
+    help_strip(comp, 0, 0, comp, 0);
 }
 
 static void page_draw(void)
@@ -762,7 +792,12 @@ static int options_step(int p, int edge)
             help_prev = p;
             help_draw(p);
         }
-        return 1;
+        if (help_gate) {                 /* 開けたボタンを離すまで打たせない */
+            if (pad_vowel(p) < 0)
+                help_gate = 0;
+            return 1;
+        }
+        return 2;                        /* ★試し打ち = このあと**本文と同じ入力処理**へ落とす */
     }
     if (opt_mode == OPTM_PAGE) {
         const int maxtop = page_count > PAGE_ROWS ? page_count - PAGE_ROWS : 0;
@@ -816,6 +851,10 @@ static void options_open(void)
 
 static void options_close(void)
 {
+    /* ★試し打ちの字を本文のコマンド欄へ持ち出さない(器は同じものを使っている) */
+    clen = 0;
+    caret = 0;
+    gm.eagerSet = 0;
     restore_main(opt_mode == OPTM_PAGE);
     opt_open = 0;
     opt_mode = OPTM_MENU;
@@ -846,11 +885,16 @@ __attribute__((noreturn)) static void interactive_en(void)
         pad_prev = p;
 
         if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
-            if (!options_step(p, edge)) {
+            const int r = options_step(p, edge);
+            if (!r) {
                 options_close();
                 dirty = 1;
+                continue;
             }
-            continue;
+            /* ★2 = 試し打ち。**横取りせず、下の入力処理をそのまま通す** ——
+               打つ道を分けると、片方でしか通らない値が必ず出る */
+            if (r != 2)
+                continue;
         }
 
         int row = pad_row(p);
@@ -901,7 +945,7 @@ __attribute__((noreturn)) static void interactive_en(void)
             options_open();
             continue;
         }
-        if ((edge & (BTN_START | BTN_L3)) && clen) {
+        if ((edge & (BTN_START | BTN_L3)) && clen && !opt_open) {
             /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
             if (view_px < hist_total() - body_h) {
                 view_bottom();
@@ -925,8 +969,8 @@ __attribute__((noreturn)) static void interactive_en(void)
             if (GState->quit)
                 break;
         }
-        /* L2+↑↓ / 左スティック縦 = 履歴スクロール */
-        if (fields % 3 == 0) {
+        /* L2+↑↓ / 左スティック縦 = 履歴スクロール(試し打ち中は本文を触らない) */
+        if (fields % 3 == 0 && !opt_open) {
             int up = (clen == 0 && (p & BTN_L2) && (p & BTN_UP)) || axes[3] < 0x40;
             int dn = (clen == 0 && (p & BTN_L2) && (p & BTN_DOWN)) || axes[3] > 0xC0;
             if (up) view_scroll(-SCROLL_STEP);
@@ -951,7 +995,10 @@ __attribute__((noreturn)) static void interactive_en(void)
             uint16_t ind[4];
             int in_;
             row_label(row, ind, &in_);
-            draw_strip(comp, clen, caret, ind, in_);
+            if (opt_open)
+                help_strip(comp, clen, caret, ind, in_);
+            else
+                draw_strip(comp, clen, caret, ind, in_);
             prev_row = row;
             dirty = 0;
         }
@@ -986,11 +1033,16 @@ __attribute__((noreturn)) static void interactive_ja(void)
         pad_prev = p;
 
         if (opt_open) {                 /* オプションを開いている間は入力を横取りする */
-            if (!options_step(p, edge)) {
+            const int r = options_step(p, edge);
+            if (!r) {
                 options_close();
                 dirty = 1;
+                continue;
             }
-            continue;
+            /* ★2 = 試し打ち。**横取りせず、下の入力処理をそのまま通す** ——
+               打つ道を分けると、片方でしか通らない値が必ず出る */
+            if (r != 2)
+                continue;
         }
 
         int row = pad_row(p);
@@ -1052,7 +1104,7 @@ __attribute__((noreturn)) static void interactive_ja(void)
             options_open();
             continue;
         }
-        if (((edge & (BTN_START | BTN_L3)) || rs == 4) && clen) {
+        if (((edge & (BTN_START | BTN_L3)) || rs == 4) && clen && !opt_open) {
             /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
             if (view_px < hist_total() - body_h) {
                 view_bottom();
@@ -1149,8 +1201,8 @@ after_msg:
             if (GState->quit)
                 break;
         }
-        /* L2+↑↓ / 左スティック縦 = 履歴スクロール */
-        if (fields % 3 == 0) {
+        /* L2+↑↓ / 左スティック縦 = 履歴スクロール(試し打ち中は本文を触らない) */
+        if (fields % 3 == 0 && !opt_open) {
             int up = (clen == 0 && (p & BTN_L2) && (p & BTN_UP)) || axes[3] < 0x40;
             int dn = (clen == 0 && (p & BTN_L2) && (p & BTN_DOWN)) || axes[3] > 0xC0;
             if (up) view_scroll(-SCROLL_STEP);
@@ -1173,7 +1225,11 @@ after_msg:
         }
         uint16_t rowchar = gp_row_char(row);
         if (dirty || rowchar != prev_rowchar) {
-            draw_strip(comp, clen, caret, &rowchar, 1);
+            /* ★同じ絵を、試し打ちのときだけ別の場所に出す */
+            if (opt_open)
+                help_strip(comp, clen, caret, &rowchar, 1);
+            else
+                draw_strip(comp, clen, caret, &rowchar, 1);
             prev_rowchar = rowchar;
             dirty = 0;
         }

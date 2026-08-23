@@ -27,6 +27,17 @@ print('top=%d page=%d mode=%d sel=%d open=%d' % tuple(v))
 "
 }
 
+# clen と comp を読んで、打たれた字をそのまま出す
+typed() {
+    "$PY" sim.py zenmai-zork.psexe --script "$1" --polls --stop "$2" --max 400000000 \
+        --dump "$TYPED,28" 2>/dev/null | sed -n 's/^DUMP: //p' | "$PY" -c "
+import sys, ast
+b = ast.literal_eval(sys.stdin.read().strip())
+n = int.from_bytes(b[0:4], 'little')
+print(''.join(chr(int.from_bytes(b[4 + 2*i:6 + 2*i], 'little')) for i in range(min(n, 12))))
+"
+}
+
 check() {
     if [ "$2" = "$3" ]; then echo "✓ $1"
     else echo "✗ $1"; echo "    実際: $2"; echo "    期待: $3"; ng=$((ng + 1)); fi
@@ -56,5 +67,11 @@ SHOWN=$("$PY" sim.py zenmai-zork.psexe --script opt_page2.script --polls --stop 
        --max 400000000 --dump "$TOTAL,4" 2>/dev/null | sed -n 's/^DUMP: //p')
 check "★カナリア: 本文が汚れない(履歴が伸びない)" "$SHOWN" "$BASE"
 
+# ★試し打ち: 本文と**同じ道**で打っているか（clen / comp をそのまま読む）。
+#   ★頭が「え」なら、頁を開けた ○ がそのまま字になっている（一度そうなった）
+TYPED=$(sym clen)
+check "★試し打ちで字が入る(開けたボタンは字にならない)" "$(typed help_type.script 900)" "かじ"
+check "★試し打ちの字を本文へ持ち出さない"       "$(typed help_leave.script 950)"  ""
+
 echo
-if [ "$ng" = 0 ]; then echo "--- 13 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 15 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

@@ -595,9 +595,13 @@ void draw_echo(const uint16_t *s, int n)
 
 /* ---- コマンド欄 ---- */
 
-void draw_strip(const uint16_t *cmd, int len, int caret, const uint16_t *ind, int ilen)
+/* コマンド欄を strip[][] に組む(送りはしない)。
+   ★試し打ちの行が**同じ絵**を使えるように分けてある —— 描き方を写すと、
+     本物と模したものがいつか食い違う。 */
+void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
+                 const uint16_t *ind, int ilen)
 {
-    fill_rows(strip, 0, CMD_H, BG);
+    fill_rows(strip, 0, CMD_H, bg);
     draw24(strip, MARGIN, 0, 0xFF1E, ACCENT);
     int x = MARGIN + 24;
     int caret_x = x;
@@ -625,5 +629,10 @@ void draw_strip(const uint16_t *cmd, int len, int caret, const uint16_t *ind, in
         draw24(strip, ix, 0, ind[i], ACCENT);
         ix += glyph_w(ind[i]);
     }
+}
+
+void draw_strip(const uint16_t *cmd, int len, int caret, const uint16_t *ind, int ilen)
+{
+    build_strip(BG, cmd, len, caret, ind, ilen);
     gp0_upload(0, CMD_Y, W, CMD_H, strip[0]);
 }
