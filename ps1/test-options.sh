@@ -38,6 +38,15 @@ print(''.join(chr(int.from_bytes(b[4 + 2*i:6 + 2*i], 'little')) for i in range(m
 "
 }
 
+# clen だけを読む
+typed_n() {
+    "$PY" sim.py zenmai-zork.psexe --script "$1" --polls --stop "$2" --max 900000000 \
+        --dump "$TYPED,4" 2>/dev/null | sed -n 's/^DUMP: //p' | "$PY" -c "
+import sys, ast
+print(int.from_bytes(ast.literal_eval(sys.stdin.read().strip()), 'little'))
+"
+}
+
 check() {
     if [ "$2" = "$3" ]; then echo "✓ $1"
     else echo "✗ $1"; echo "    実際: $2"; echo "    期待: $3"; ng=$((ng + 1)); fi
@@ -72,6 +81,7 @@ check "★カナリア: 本文が汚れない(履歴が伸びない)" "$SHOWN" "
 TYPED=$(sym clen)
 check "★試し打ちで字が入る(開けたボタンは字にならない)" "$(typed help_type.script 900)" "かじ"
 check "★試し打ちの字を本文へ持ち出さない"       "$(typed help_leave.script 950)"  ""
+check "★欄は幅で止まる(かな 21 字)"              "$(typed_n help_full.script 1950)" "21"
 
 echo
-if [ "$ng" = 0 ]; then echo "--- 15 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 16 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

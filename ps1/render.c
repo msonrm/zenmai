@@ -607,6 +607,10 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
     int caret_x = x;
     for (int i = 0; i < len; i++) {
         if (i == caret) caret_x = x;
+        /* ★欄からはみ出す字は描かない。draw24 は範囲を見ないので、放っておくと
+           strip[] の外へ書く（入力側でも幅で止めているが、ここでも止める） */
+        if (x + glyph_w(cmd[i]) > W - MARGIN - 24)
+            break;
         draw24(strip, x, 0, cmd[i], INK);
         x += glyph_w(cmd[i]);
     }

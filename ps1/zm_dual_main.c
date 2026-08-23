@@ -351,6 +351,11 @@ static GpMachine gm;
 static uint16_t comp[CMD_MAX];
 static int clen, caret;
 
+/* コマンド欄に収まる幅（欄の左端から、右端の印の箱の手前まで）。
+   ★**字数ではなく幅**で止める —— かなは 24px・英字は 12px なので、
+     字数で決めるとどちらかで必ず外す（36 字入れるとかなでは欄を突き抜けていた）。 */
+enum { COMP_X0 = MARGIN + 24, COMP_W_MAX = W - MARGIN - 24 - 12 - COMP_X0 };
+
 static void comp_insert(const uint16_t *t, int tn, int replace)
 {
     int del = replace > caret ? caret : replace;
@@ -360,6 +365,17 @@ static void comp_insert(const uint16_t *t, int tn, int replace)
     caret -= del;
     if (clen + tn > CMD_MAX)
         tn = CMD_MAX - clen;
+    {                                  /* 欄からはみ出す分は入れない */
+        int w = 0;
+        for (int i = 0; i < clen; i++)
+            w += glyph_w(comp[i]);
+        int keep = 0;
+        while (keep < tn && w + glyph_w(t[keep]) <= COMP_W_MAX) {
+            w += glyph_w(t[keep]);
+            keep++;
+        }
+        tn = keep;
+    }
     for (int i = clen - 1; i >= caret; i--)
         comp[i + tn] = comp[i];
     for (int i = 0; i < tn; i++)
@@ -594,23 +610,31 @@ enum { HDIV_X = 318, HDIV_Y = 72, HDIV_H = 192 };    /* 左右の群を分ける
 enum { HRULE_Y = 322, HY_TIP = 336, HY_BS = 372, HY_STRIP = 408 };
 static int help_prev, help_gate;
 
-/* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る) */
-static void help_put(int cx, const uint16_t *s, int n, uint16_t color)
+/* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る)。
+   ★押しているものは**面を塗って字を抜く**。字の色だけを変えても、藍の上では
+     金と白の差が小さくて分からなかった(実機の指摘)。 */
+static void help_put(int cx, const uint16_t *s, int n, uint16_t color, int on)
 {
     int w = 0;
     for (int i = 0; i < n; i++)
         w += glyph_w(s[i]);
     int x = cx - w / 2;
+    if (on) {
+        for (int r = 0; r < STATUS_H; r++)
+            for (int c = x - 8; c < x + w + 8; c++)
+                sbar[r][c] = OPT_EDGE;
+        color = OPT_BG;                  /* 面の上は地色で抜く */
+    }
     for (int i = 0; i < n; i++) {
         draw24(sbar, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
 }
 
-static void help_put1(int cx, uint16_t ch, uint16_t color)
+static void help_put1(int cx, uint16_t ch, uint16_t color, int on)
 {
     if (ch)                              /* 表に穴がある(や行の い/え)ときは何も置かない */
-        help_put(cx, &ch, 1, color);
+        help_put(cx, &ch, 1, color, on);
 }
 
 /* R1 の札だけは動く = その行の「あ段」そのもの。
@@ -625,12 +649,17 @@ static void help_put_r1(int cx, uint16_t ch, int on)
     if (ch)
         w += glyph_w(ch);
     int x = cx - w / 2;
+    if (on) {
+        for (int r = 0; r < STATUS_H; r++)
+            for (int c = x - 8; c < x + w + 8; c++)
+                sbar[r][c] = OPT_EDGE;
+    }
     for (int i = 0; i < 3; i++) {
-        draw24(sbar, x, 0, pre[i], on ? ACCENT : OPT_TEXT);
+        draw24(sbar, x, 0, pre[i], on ? OPT_BG : OPT_TEXT);
         x += glyph_w(pre[i]);
     }
     if (ch)
-        draw24(sbar, x, 0, ch, on ? ACCENT : INK);
+        draw24(sbar, x, 0, ch, on ? OPT_BG : INK);
 }
 
 /* 帯を**縦の仕切りごと**送る。★仕切りを毎回引き直すと、ボタンを押すたびにちらつく
@@ -645,7 +674,7 @@ static void help_band(int y, int div)
 
 static void help_row_head(int cx, int row, int on)
 {
-    help_put1(cx, lang_en ? gp_row_char_en(row) : gp_row_char(row), on ? ACCENT : INK);
+    help_put1(cx, lang_en ? gp_row_char_en(row) : gp_row_char(row), INK, on);
 }
 
 static void help_draw(int p)
@@ -658,20 +687,20 @@ static void help_draw(int p)
 
     /* 肩(外側): L2 / R2 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[1].s, lbl[1].n, (p & BTN_L2) ? ACCENT : OPT_TEXT);
-    help_put(HRX, lbl[2].s, lbl[2].n, (p & BTN_R2) ? ACCENT : OPT_TEXT);
+    help_put(HLX, lbl[1].s, lbl[1].n, OPT_TEXT, (p & BTN_L2) != 0);
+    help_put(HRX, lbl[2].s, lbl[2].n, OPT_TEXT, (p & BTN_R2) != 0);
     help_band(HY_L2, 1);
 
     /* 肩(内側): L1 / R1。R1 の札は動く = その行の「あ段」そのもの */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[0].s, lbl[0].n, (p & BTN_L1) ? ACCENT : OPT_TEXT);
+    help_put(HLX, lbl[0].s, lbl[0].n, OPT_TEXT, (p & BTN_L1) != 0);
     help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row), (p & BTN_R1) != 0);
     help_band(HY_L1, 1);
 
     /* 上: ↑ の行 / △ の字 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_row_head(HLX, base + 2, dir == 2);
-    help_put1(HRX, gp_cell(en, row, 2), vowel == 2 ? ACCENT : INK);
+    help_put1(HRX, gp_cell(en, row, 2), INK, vowel == 2);
     help_band(HY0, 1);
 
     /* 中: ← 中 → の行 / □ ○ の字。★中央 = どの向きも押していないとき */
@@ -679,21 +708,21 @@ static void help_draw(int p)
     help_row_head(HLX - HDX, base + 1, dir == 1);
     help_row_head(HLX,       base + 0, dir == 0);
     help_row_head(HLX + HDX, base + 3, dir == 3);
-    help_put1(HRX - HDX, gp_cell(en, row, 1), vowel == 1 ? ACCENT : INK);
-    help_put1(HRX + HDX, gp_cell(en, row, 3), vowel == 3 ? ACCENT : INK);
+    help_put1(HRX - HDX, gp_cell(en, row, 1), INK, vowel == 1);
+    help_put1(HRX + HDX, gp_cell(en, row, 3), INK, vowel == 3);
     help_band(HY1, 1);
 
     /* 下: ↓ の行 / × の字 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_row_head(HLX, base + 4, dir == 4);
-    help_put1(HRX, gp_cell(en, row, 4), vowel == 4 ? ACCENT : INK);
+    help_put1(HRX, gp_cell(en, row, 4), INK, vowel == 4);
     help_band(HY2, 1);
 
     /* 機能キー: SELECT / START。★ここでの Start は「本文へ戻る」だが、
        札が説明しているのは**本文での**役 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[3].s, lbl[3].n, (p & BTN_SELECT) ? ACCENT : OPT_TEXT);
-    help_put(HRX, lbl[4].s, lbl[4].n, OPT_TEXT);
+    help_put(HLX, lbl[3].s, lbl[3].n, OPT_TEXT, (p & BTN_SELECT) != 0);
+    help_put(HRX, lbl[4].s, lbl[4].n, OPT_TEXT, 0);
     help_band(HY5, 0);
 }
 
@@ -718,10 +747,10 @@ static void help_open(int p)
         frbuf[i] = OPT_TEXT;
     gp0_upload(RULE_X, HRULE_Y, RULE_W, 2, frbuf);
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(W / 2, UI_HELP[lang_en][5].s, UI_HELP[lang_en][5].n, OPT_TEXT);
+    help_put(W / 2, UI_HELP[lang_en][5].s, UI_HELP[lang_en][5].n, OPT_TEXT, 0);
     help_band(HY_TIP, 0);
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(W / 2, UI_HELP[lang_en][6].s, UI_HELP[lang_en][6].n, OPT_TEXT);
+    help_put(W / 2, UI_HELP[lang_en][6].s, UI_HELP[lang_en][6].n, OPT_TEXT, 0);
     help_band(HY_BS, 0);
     /* ★試し打ちは**本文と同じ入力の道**を使う。だから器も本物と同じ comp を空にするだけ
        (別の器を持つと、片方でしか通らない値が必ず出る) */
