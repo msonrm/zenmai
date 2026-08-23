@@ -19,6 +19,8 @@ HERE = Path(__file__).parent
 ROOT = HERE.parent
 
 JA, EN, BOTH = 1, 2, 0
+# ★本文幅。zm_dual_main.c の PAGE_X と**必ず同じ余白**にすること(縁取りの内側)
+TEXT_W = 640 - 2 * 48
 P_TYPING, P_CMDS, P_LICENSE = 0, 1, 2
 PAGE_N = 3
 
@@ -43,7 +45,9 @@ def put_file(path):
 def rule():
     # ★罫線は ASCII で引く。同梱フォントは「使う字だけ」なので、
     #   訳文に出てこない記号(─ など)は**入っていない**(照合して分かった)
-    put('-' * 48, BOTH, 1)
+    # ★長さは本文幅から決める。固定の 48 本だと余白を変えた途端に**折り返して
+    #   「---」が次行にこぼれる**(実際にこぼした)
+    put('-' * (TEXT_W // 12), BOTH, 1)
 
 
 # ---- 頁 1: もじの うちかた ----
@@ -131,17 +135,18 @@ ITEM = [
     ('つかえる ことば', 'COMMANDS'),
     ('ライセンス',      'LICENSE'),
 ]
-# ★決定/取消は**言語で入れ替える**(PS1 期の地域の作法)。だから案内の字も別々に持つ。
-HINT = ('O きめる    X とじる', 'X SELECT    O CLOSE')
-SCROLL = ('じょうげで おくる    X もどる', 'UP/DOWN SCROLL    O BACK')
-# ★起動の言語メニューに出す一行。**メニューの入口はここでしか知らせない**
-#   (物語の紙面にシステムの字を混ぜないので、本文には出せない)
+# ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
+#   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
+#   いちいち書くと**画面がその分だけ狭くなるだけ**になる。
+#   (だから決定を ○/× で入れ替える必要も無くなった = **どのフェイスボタンでも決まる**)
+# ★起動の言語メニューに出す一行だけは残す。**メニューがあること**は作法ではないし、
+#   物語の紙面にシステムの字は混ぜないので、全員が通るここでしか知らせられない。
 BOOT = ('ゲームちゅう START で メニュー', 'PRESS START IN GAME FOR THE MENU')
 
 # ---- 画面幅で折り返す ----
 # ★専用画面で描くので、**折り返しはここで済ませておく**(C 側は行を y に並べるだけ)。
-#   半角 12px / 全角 24px、本文幅は W - 2*MARGIN = 576px。
-TEXT_W = 640 - 2 * 32
+#   半角 12px / 全角 24px。★左右の余白は**縁取りの内側**にとるので、
+#   zm_dual_main.c の PAGE_X と**必ず同じ値**にすること。
 
 
 def width(t):
@@ -225,8 +230,6 @@ def sref(text):
 
 
 items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
-hints = [sref(HINT[0]), sref(HINT[1])]
-scrolls = [sref(SCROLL[0]), sref(SCROLL[1])]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
 
 for i, text in strs:
@@ -237,15 +240,14 @@ out.append('static const UiStr UI_ITEM[2][UI_PAGE_N] = {')
 for row in items:
     out.append('    { ' + ', '.join(row) + ' },')
 out.append('};')
-for name, pair in (('UI_HINT', hints), ('UI_SCROLL', scrolls), ('UI_BOOT', boots)):
-    out.append('static const UiStr %s[2] = { %s, %s };' % (name, pair[0], pair[1]))
+out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
 out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
 
 used = set()
 for _, _, _, t in lines:
     used.update(t)
-for ja, en in ITEM + [HINT, SCROLL, BOOT]:
+for ja, en in ITEM + [BOOT]:
     used.update(ja)
     used.update(en)
 (HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')

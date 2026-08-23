@@ -5,7 +5,7 @@
 #   メニューは道しるべ、頁が目的地。だから確かめるのは
 #     ・板とメニューの状態が動くか
 #     ・頁から Start で**一足で**本文へ戻るか(× は一段だけ)
-#     ・決定/取消が**言語で入れ替わる**か(にほんご ○ / ENGLISH ×)
+#     ・★**どのフェイスボタンでも決まる**か(案内を画面に書かないので、作法に乗る)
 #     ・★**本文が汚れていないこと**(一度はライセンスを本文へ流す形で作り、
 #       実機の指摘で作り直した。その名残を履歴の伸びで見張る)
 set -e
@@ -38,14 +38,13 @@ TOTAL=$(sym total_h)
 check "Start でメニューが開く"          "$(state opt_open.script 700)"     "top=0 page=0 mode=0 sel=0 open=1"
 check "↓ で選択が動く"                  "$(state opt_move.script 800)"     "top=0 page=0 mode=0 sel=1 open=1"
 check "○ で 1 つめの頁へ"               "$(state opt_page0.script 800)"    "top=0 page=0 mode=1 sel=0 open=1"
+check "★△でも決まる(面ボタンはどれでも)" "$(state opt_face_tri.script 800)" "top=0 page=0 mode=1 sel=0 open=1"
 check "↓↓ ○ でライセンスの頁へ"         "$(state opt_page2.script 900)"    "top=0 page=2 mode=1 sel=2 open=1"
 check "頁の中を ↓×3 で送る"             "$(state opt_scroll.script 1000)"  "top=3 page=2 mode=1 sel=2 open=1"
-check "× で一段もどる(メニューは開いたまま)" "$(state opt_back.script 900)" "top=0 page=0 mode=0 sel=0 open=1"
+check "面ボタンで一段もどる(メニューは開いたまま)" "$(state opt_back.script 900)" "top=0 page=0 mode=0 sel=0 open=1"
 check "★頁の Start は一足で本文へ"      "$(state opt_startout.script 900)" "top=0 page=0 mode=0 sel=0 open=0"
-check "メニューの Start でとじる"       "$(state opt_toggle.script 800)"   "top=0 page=0 mode=0 sel=0 open=0"
-check "メニューの × でとじる"           "$(state opt_close.script 800)"    "top=0 page=0 mode=0 sel=0 open=0"
-check "★ENGLISH では × がきめる"        "$(state opt_en.script 800)"       "top=0 page=0 mode=1 sel=0 open=1"
-check "★ENGLISH では ○ がとじる"        "$(state opt_en_cancel.script 800)" "top=0 page=0 mode=0 sel=0 open=0"
+check "★Start で開いたら Start で閉じる" "$(state opt_close.script 800)"   "top=0 page=0 mode=0 sel=0 open=0"
+check "★ENGLISH でも作法は同じ(× で頁へ)" "$(state opt_en.script 800)"     "top=0 page=0 mode=1 sel=0 open=1"
 
 # ★カナリア: 頁を開いても**本文の履歴は 1 行も伸びない**
 BASE=$("$PY" sim.py zenmai-zork.psexe --script opt_open.script --polls --stop 800 \
@@ -55,4 +54,4 @@ SHOWN=$("$PY" sim.py zenmai-zork.psexe --script opt_page2.script --polls --stop 
 check "★カナリア: 本文が汚れない(履歴が伸びない)" "$SHOWN" "$BASE"
 
 echo
-if [ "$ng" = 0 ]; then echo "--- 12 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 11 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

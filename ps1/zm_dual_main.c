@@ -377,6 +377,10 @@ static void row_label(int row, uint16_t out[4], int *n)
     while (s[*n] && *n < 4) { out[*n] = (uint16_t)s[*n]; (*n)++; }
 }
 
+/* ★どのフェイスボタンでも決まる。「Start で開いて Start で閉じる」「開いた先で
+   フェイスボタンを押せば決まる」は当時からの作法なので、画面に書かない */
+#define BTN_FACE (BTN_CIR | BTN_X | BTN_TRI | BTN_SQ)
+
 /* ---- 言語選択メニュー ---- */
 
 /* selected = 1 で ＞ 付きの強調、dim = 1 で控えめ(選べる項目と見間違えないように) */
@@ -422,7 +426,7 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
             menu_line(Y_EN, o_en, 7, sel == 1, 0);
             menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, 0, 1);
         }
-        if (edge & (BTN_START | BTN_CIR | BTN_X))
+        if (edge & (BTN_START | BTN_FACE))   /* どのフェイスボタンでも決まる */
             return sel;
     }
 }
@@ -437,8 +441,10 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
  *   通さず完成行で持つ(`gen_ui.py`)。「その文字列は誰のものか」がそのまま設計になる。
  * ★**画面に出す字は同梱フォントに入っていなければならない**。glyphs.h は「使う字だけ」
  *   なので、gen_ui.py が `ui_chars.txt` を書き出し gen_data.py がそれを読む。
- * ★決定と取消は**言語で入れ替える**(にほんご = ○きめる/×もどる、ENGLISH = ×/○)。
- *   両方を「きめる」にすると**もどるが消える**。行き先が 3 つある以上それは高い。
+ * ★**ボタンの案内は画面に書かない**。Start で開いたら Start で閉じる、開いた先で
+ *   フェイスボタンを押せば決まる —— 当時から今まで浸透している作法なので、書くと
+ *   画面がその分だけ狭くなるだけになる。だから**どのフェイスボタンでも決まる**
+ *   (○/× を言語で入れ替える必要も消えた。作法に乗るほうが、地域差より強い)。
  */
 #define MAIN_BG24 0x0F1214             /* 本文の地色(GPU フィル = 0xBBGGRR) */
 #define OPT_BG24  0x3A1E10             /* 読み物の地色 = 濃い藍 */
@@ -446,19 +452,21 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
 #define OPT_EDGE  0x36B9               /* 板の枠(= ACCENT) */
 #define OPT_TEXT  0x4A52               /* 本文と案内(控えめ) */
 
-#define BTN_OK     (lang_en ? BTN_X : BTN_CIR)
-#define BTN_CANCEL (lang_en ? BTN_CIR : BTN_X)
 
 enum { OPTM_MENU = 0, OPTM_PAGE };
 /* 重ねる板は**本文窓の中**(ステータス行の下)に置く。★部屋名が見えたままだと
    「まだゲームの中にいる」感が残るし、戻すのが render_window() だけで済む */
 enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
-enum { PAGE_Y_TITLE = 24, PAGE_Y_TOP = 72, PAGE_ROW_H = 24, PAGE_ROWS = 13,
-       PAGE_Y_HINT = 400 };
+/* 縁取り。★安全域(y=24..456)の内側に置く。CRT の端は削られる */
+enum { FR_X = 24, FR_Y = 24, FR_W = 592, FR_H = 432, FR_T = 2 };
+/* ★左右の余白は縁取りより内側にとる(MARGIN=32 だと枠に字が触る)。
+   折り返し幅は gen_ui.py の TEXT_W と**必ず同じ値**にすること */
+enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 24, PAGE_ROWS = 14 };
 
 static int opt_open, opt_sel, opt_mode, opt_page, page_top, page_count;
 static short page_idx[UI_LINE_N];
 static uint16_t ovl[OVL_ROW][OVL_W];   /* 板の転送用に詰め直す小バッファ */
+static uint16_t frbuf[FR_W * FR_T];    /* 縁取り(横線 1 本 = 縦線 1 本より広い) */
 
 /* 板の帯を 1 本送る。★gp0_upload は矩形をリニアに読むので、幅 640 の sbar からは
    左上だけを送れない。ここで幅 OVL_W に詰め直すのが唯一の引っかかりだった。
@@ -502,12 +510,8 @@ static void menu_draw(void)
     for (int i = 0; i < UI_PAGE_N; i++) {
         const int y = OVL_Y + OVL_GAP + i * OVL_ROW;
         ovl_row(y, &UI_ITEM[lang_en][i], i == opt_sel ? ACCENT : INK, i == opt_sel);
-        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, 0);
+        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, i == UI_PAGE_N - 1);
     }
-    const int hy = OVL_Y + OVL_GAP + UI_PAGE_N * OVL_ROW + 4;
-    ovl_band(hy - 4, 4, 0, 0, 0);
-    ovl_row(hy, &UI_HINT[lang_en], OPT_TEXT, 0);
-    ovl_band(hy + STATUS_H, OVL_GAP, 0, 0, 1);
 }
 
 /* 読み物の 1 行(全画面)。center=0 で左揃え(本文)、1 で中央(見出し・案内)。 */
@@ -517,9 +521,9 @@ static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center
     int w = 0;
     for (int i = 0; i < n; i++)
         w += glyph_w(s[i]);
-    int x = center ? (W - w) / 2 : MARGIN;
+    int x = center ? (W - w) / 2 : PAGE_X;
     for (int i = 0; i < n; i++) {
-        if (x + glyph_w(s[i]) > W - MARGIN)
+        if (x + glyph_w(s[i]) > W - PAGE_X)
             break;
         draw24(sbar, x, 0, s[i], color);
         x += glyph_w(s[i]);
@@ -538,6 +542,19 @@ static void page_index(void)
             page_idx[page_count++] = (short)i;
 }
 
+/* 頁のまわりを縁取る。★gp0_fill は x が 16 画素単位に丸められる(実機の仕様)ので、
+   細い縦線はフィルでは引けない。転送で引く。★行を送ったあとに引く —— 行は幅 640 の
+   帯なので、先に引くと縦線が消える。 */
+static void page_frame(void)
+{
+    for (int i = 0; i < FR_W * FR_T; i++)
+        frbuf[i] = OPT_EDGE;
+    gp0_upload(FR_X, FR_Y, FR_W, FR_T, frbuf);                 /* 上 */
+    gp0_upload(FR_X, FR_Y + FR_H - FR_T, FR_W, FR_T, frbuf);   /* 下 */
+    gp0_upload(FR_X, FR_Y, FR_T, FR_H, frbuf);                 /* 左 */
+    gp0_upload(FR_X + FR_W - FR_T, FR_Y, FR_T, FR_H, frbuf);   /* 右 */
+}
+
 static void page_draw(void)
 {
     gp0_fill(0, 0, W, H, OPT_BG24);
@@ -551,7 +568,7 @@ static void page_draw(void)
         page_row(PAGE_Y_TOP + r * PAGE_ROW_H, UI_POOL + l->off, l->len,
                  l->dim ? OPT_TEXT : INK, 0);
     }
-    page_row(PAGE_Y_HINT, UI_SCROLL[lang_en].s, UI_SCROLL[lang_en].n, OPT_TEXT, 1);
+    page_frame();
 }
 
 /* 本文の画面へ戻す。★重ねた板と全画面の頁で**戻す範囲が違う**。板は本文窓の中しか
@@ -582,7 +599,7 @@ static int options_step(int edge)
             page_draw();
         if (edge & BTN_START)            /* ★頁からは一足で本文へ戻る */
             return 0;
-        if (edge & BTN_CANCEL) {         /* 一段もどってメニューへ */
+        if (edge & BTN_FACE) {           /* 一段もどってメニューへ */
             opt_mode = OPTM_MENU;
             restore_main(1);
             menu_draw();
@@ -593,7 +610,7 @@ static int options_step(int edge)
         opt_sel = (opt_sel + (edge & BTN_UP ? UI_PAGE_N - 1 : 1)) % UI_PAGE_N;
         menu_draw();
     }
-    if (edge & BTN_OK) {
+    if (edge & BTN_FACE) {               /* ★どのフェイスボタンでも決まる */
         opt_page = opt_sel;
         opt_mode = OPTM_PAGE;
         page_top = 0;
@@ -601,7 +618,7 @@ static int options_step(int edge)
         page_draw();
         return 1;
     }
-    if (edge & (BTN_CANCEL | BTN_START))
+    if (edge & BTN_START)                /* Start で開いたら Start で閉じる */
         return 0;
     return 1;
 }
