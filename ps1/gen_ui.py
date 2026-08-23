@@ -31,10 +31,12 @@ def put_file(path):
 
 
 def rule():
-    put('────────────────', BOTH, 1)
+    # ★罫線は ASCII で引く。同梱フォントは「使う字だけ」なので、
+    #   訳文に出てこない記号(─ など)は**入っていない**(照合して分かった)
+    put('-' * 48, BOTH, 1)
 
 
-put('ライセンスと出典', JA)
+put('ライセンスと出どころ', JA)
 put('LICENSE & CREDITS', EN)
 put('')
 put('このソフトは自由に使えるものだけで組み立ててある。', JA)
@@ -65,17 +67,17 @@ put_file(HERE / 'vendor/LICENSE.txt')
 put('')
 
 rule()
-put('KH ドットフォント —— 画面の字', JA)
+put('KH Dot Font —— 画面の字', JA)
 put('KH Dot Font -- the glyphs on screen', EN)
 rule()
-put('24 日比谷 / 12 神楽坂', BOTH, 1)
+put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
 put('Copyright (c) 1990-2015 Keitarou Hiraki and Font Silo', BOTH, 1)
 put('SIL Open Font License 1.1', BOTH, 1)
 put('http://jikasei.me/font/kh-dotfont/', BOTH, 1)
 put('')
 
 put('作品名は商標であり、上の許諾には含まれない。', JA)
-put('この企画は名前・ロゴに作品名を使わない。', JA)
+put('ここでは名前・ロゴに作品名を使わない。', JA)
 put('Game titles are trademarks and are not covered above;', EN)
 put('this project does not use them in its name or logo.', EN)
 
@@ -86,8 +88,54 @@ UI = [
     ('TITLE',   'せってい',   'OPTIONS'),
     ('LICENSE', 'ライセンス', 'LICENSE'),
     ('CLOSE',   'とじる',     'CLOSE'),
-    ('HINT',    '○ きめる  × とじる', 'O SELECT   X CLOSE'),
+    ('HINT',    'O きめる   X とじる', 'O SELECT   X CLOSE'),
+    # ★矢印(↑↓)も同梱フォントに無い。ひらがなで書く
+    ('SCROLL',  'じょうげで おくる   X もどる', 'UP/DOWN SCROLL   X BACK'),
 ]
+
+# ---- 画面幅で折り返す ----
+# ★専用画面で描くので、**折り返しはここで済ませておく**(C 側は行を y に並べるだけ)。
+#   半角 12px / 全角 24px、本文幅は W - 2*MARGIN = 576px。
+TEXT_W = 640 - 2 * 32
+
+
+def width(t):
+    return sum(12 if ord(c) < 0x80 else 24 for c in t)
+
+
+def wrap(t):
+    if width(t) <= TEXT_W:
+        return [t]
+    out = []
+    if ' ' in t.strip():                      # 英文は語で折る
+        cur = ''
+        for w in t.split(' '):
+            cand = (cur + ' ' + w) if cur else w
+            if width(cand) > TEXT_W and cur:
+                out.append(cur)
+                cur = w
+            else:
+                cur = cand
+        if cur:
+            out.append(cur)
+        return out
+    cur = ''                                  # 日本語は字で折る
+    for c in t:
+        if width(cur + c) > TEXT_W:
+            out.append(cur)
+            cur = c
+        else:
+            cur += c
+    if cur:
+        out.append(cur)
+    return out
+
+
+wrapped = []
+for lang, dim, text in lines:
+    for part in wrap(text):
+        wrapped.append((lang, dim, part))
+lines = wrapped
 
 pool = []
 recs = []
@@ -124,6 +172,14 @@ for name, ja, en in UI:
         out.append('#define UI_%s_%s_N %d' % (name, suf, len(text)))
 out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
+
+used = set()
+for _, _, t in lines:
+    used.update(t)
+for _, ja, en in UI:
+    used.update(ja)
+    used.update(en)
+(HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')
 
 longest = max((len(t) for _, _, t in lines), default=0)
 print('ui_data.h: ライセンス %d 行 / %d 字 / 最長 %d 字' % (len(recs), len(pool), longest))

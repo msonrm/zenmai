@@ -40,6 +40,10 @@ INPUT_CHARS = ('あいうえおかきくけこさしすせそたちつてとな�
 NOTICE = '（このためしばんは、きまったてじゅんだけすすむ）'
 base_chars.update(INPUT_CHARS)
 base_chars.update(NOTICE)
+# ★オプション画面で使う字(gen_ui.py が書き出す)。無いとその字だけ空白になる
+ui_txt = HERE / 'ui_chars.txt'
+if ui_txt.exists():
+    base_chars.update(ui_txt.read_text(encoding='utf-8'))
 base_chars.update(chr(c) for c in range(0x20, 0x7F))   # 英語版(T9 入力・VM 出力)用に ASCII 全部
 
 # 日本語版: 訳アセットに出うる全字種(訳文・語・ルビの親字と読み)
