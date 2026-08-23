@@ -379,7 +379,8 @@ static void row_label(int row, uint16_t out[4], int *n)
 
 /* ---- 言語選択メニュー ---- */
 
-static void menu_line(int y, const uint16_t *s, int n, int selected)
+/* selected = 1 で ＞ 付きの強調、dim = 1 で控えめ(選べる項目と見間違えないように) */
+static void menu_line(int y, const uint16_t *s, int n, int selected, int dim)
 {
     fill_rows(sbar, 0, STATUS_H, 0x0442 /* BG */);
     int w = 0;
@@ -388,7 +389,7 @@ static void menu_line(int y, const uint16_t *s, int n, int selected)
     if (selected)
         draw24(sbar, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], selected ? ACCENT : INK);
+        draw24(sbar, x, 0, s[i], selected ? ACCENT : dim ? DIM : INK);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
@@ -399,11 +400,14 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
     static const uint16_t title[] = {'Z','E','N','M','A','I',' ',' ','Z','O','R','K',' ','I'};
     static const uint16_t o_ja[] = {0x306B, 0x307B, 0x3093, 0x3054};   /* にほんご */
     static const uint16_t o_en[] = {'E','N','G','L','I','S','H'};
-    enum { Y_TITLE = 168, Y_JA = 240, Y_EN = 280 };
+    enum { Y_TITLE = 168, Y_JA = 240, Y_EN = 280, Y_HINT = 360 };
     int sel = 0;
-    menu_line(Y_TITLE, title, 14, 0);
-    menu_line(Y_JA, o_ja, 4, sel == 0);
-    menu_line(Y_EN, o_en, 7, sel == 1);
+    menu_line(Y_TITLE, title, 14, 0, 0);
+    menu_line(Y_JA, o_ja, 4, sel == 0, 0);
+    menu_line(Y_EN, o_en, 7, sel == 1, 0);
+    /* ★メニューの入口を知らせるのはここだけ。本文にシステムの字は混ぜないし、
+       いちばん助けが要る人ほど Start を試しに押さない(だから全員が通るここに置く) */
+    menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, 0, 1);
     GP1 = 0x03000000;                  /* 表示オン(メニューが最初の画面) */
     int prev = 0;
     for (;;) {
@@ -414,49 +418,106 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
         prev = p;
         if (edge & (BTN_UP | BTN_DOWN)) {
             sel ^= 1;
-            menu_line(Y_JA, o_ja, 4, sel == 0);
-            menu_line(Y_EN, o_en, 7, sel == 1);
+            menu_line(Y_JA, o_ja, 4, sel == 0, 0);
+            menu_line(Y_EN, o_en, 7, sel == 1, 0);
+            menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, 0, 1);
         }
         if (edge & (BTN_START | BTN_CIR | BTN_X))
             return sel;
     }
 }
 
-/* ---- オプション画面 ----
+/* ---- オプション ----
  *
  * ★入口は「コマンドを打っていないときの Start」。Start は入力中は確定なので、
  *   空のときだけが空いている(実測して確かめた)。Select は濁点 / 空白で埋まっている。
+ * ★**メニューは本文に重ねる小さな板**、**行き先は全画面**。メニューは道しるべであって
+ *   目的地ではないから軽い板で足り、行き先は読み物だから画面を占める。
  * ★ここに出る文字列は全部**こちらのもの**で、原作の文は 1 つも出ない。だから訳の表は
  *   通さず完成行で持つ(`gen_ui.py`)。「その文字列は誰のものか」がそのまま設計になる。
- * ★**本文とは別の画面で完結させ、背景色から変える**。ここはゲームの外側なので、
- *   物語の紙面にシステムの文字列を混ぜない —— 一度は履歴へ流す形で作ったが、
- *   「専用画面で完結し、閉じたら本文へ戻る」が正しい姿だった(実機の指摘で作り直した)。
  * ★**画面に出す字は同梱フォントに入っていなければならない**。glyphs.h は「使う字だけ」
  *   なので、gen_ui.py が `ui_chars.txt` を書き出し gen_data.py がそれを読む。
- *   繋ぐ前は ─ ○ ォ 企 典 坂 の 6 字が**無いまま空白で描かれる**ところだった。
+ * ★決定と取消は**言語で入れ替える**(にほんご = ○きめる/×もどる、ENGLISH = ×/○)。
+ *   両方を「きめる」にすると**もどるが消える**。行き先が 3 つある以上それは高い。
  */
-#define OPT_BG24 0x3A1E10              /* GPU フィル(0xBBGGRR) = 濃い藍。本文は 0x0F1214 */
-#define OPT_BG   0x1C62                /* 同じ色の RGB555(バッファ塗り用) */
-#define OPT_TEXT 0x4A52                /* ライセンス全文(控えめ) */
+#define MAIN_BG24 0x0F1214             /* 本文の地色(GPU フィル = 0xBBGGRR) */
+#define OPT_BG24  0x3A1E10             /* 読み物の地色 = 濃い藍 */
+#define OPT_BG    0x1C62               /* 同じ色の RGB555(バッファ塗り用) */
+#define OPT_EDGE  0x36B9               /* 板の枠(= ACCENT) */
+#define OPT_TEXT  0x4A52               /* 本文と案内(控えめ) */
 
-enum { OPT_LICENSE = 0, OPT_CLOSE, OPT_N };
-enum { OPTM_MENU = 0, OPTM_LICENSE };
-enum { OPT_Y_TITLE = 152, OPT_Y_ITEM = 248, OPT_Y_STEP = 40, OPT_Y_HINT = 400 };
-enum { LIC_Y_TITLE = 24, LIC_Y_TOP = 72, LIC_ROW_H = 24, LIC_ROWS = 13 };
+#define BTN_OK     (lang_en ? BTN_X : BTN_CIR)
+#define BTN_CANCEL (lang_en ? BTN_CIR : BTN_X)
 
-static int opt_open, opt_sel, opt_mode, lic_top, lic_count;
-static short lic_idx[LIC_N];
+enum { OPTM_MENU = 0, OPTM_PAGE };
+/* 重ねる板は**本文窓の中**(ステータス行の下)に置く。★部屋名が見えたままだと
+   「まだゲームの中にいる」感が残るし、戻すのが render_window() だけで済む */
+enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
+enum { PAGE_Y_TITLE = 24, PAGE_Y_TOP = 72, PAGE_ROW_H = 24, PAGE_ROWS = 13,
+       PAGE_Y_HINT = 400 };
 
-/* オプション画面の 1 行。center=0 で左揃え(ライセンス本文)、1 で中央(見出し・項目)。 */
-static void opt_row(int y, const uint16_t *s, int n, uint16_t color, int center, int mark)
+static int opt_open, opt_sel, opt_mode, opt_page, page_top, page_count;
+static short page_idx[UI_LINE_N];
+static uint16_t ovl[OVL_ROW][OVL_W];   /* 板の転送用に詰め直す小バッファ */
+
+/* 板の帯を 1 本送る。★gp0_upload は矩形をリニアに読むので、幅 640 の sbar からは
+   左上だけを送れない。ここで幅 OVL_W に詰め直すのが唯一の引っかかりだった。
+   use_sbar=0 は地色だけの帯(行間と枠)。 */
+static void ovl_band(int y, int h, int use_sbar, int top, int bot)
+{
+    for (int r = 0; r < h; r++) {
+        for (int c = 0; c < OVL_W; c++)
+            ovl[r][c] = use_sbar ? sbar[r][OVL_X + c] : OPT_BG;
+        ovl[r][0] = ovl[r][1] = OPT_EDGE;
+        ovl[r][OVL_W - 2] = ovl[r][OVL_W - 1] = OPT_EDGE;
+    }
+    if (top)
+        for (int c = 0; c < OVL_W; c++)
+            ovl[0][c] = ovl[1][c] = OPT_EDGE;
+    if (bot)
+        for (int c = 0; c < OVL_W; c++)
+            ovl[h - 2][c] = ovl[h - 1][c] = OPT_EDGE;
+    gp0_upload(OVL_X, y, OVL_W, h, ovl[0]);
+}
+
+/* 板の 1 行(左揃え)。mark=1 で ＞ を付ける */
+static void ovl_row(int y, const UiStr *s, uint16_t color, int mark)
+{
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    if (mark)
+        draw24(sbar, OVL_X + 16, 0, 0xFF1E, ACCENT);   /* ＞ */
+    int x = OVL_X + 48;
+    for (int i = 0; i < s->n; i++) {
+        if (x + glyph_w(s->s[i]) > OVL_X + OVL_W - 16)
+            break;
+        draw24(sbar, x, 0, s->s[i], color);
+        x += glyph_w(s->s[i]);
+    }
+    ovl_band(y, STATUS_H, 1, 0, 0);
+}
+
+static void menu_draw(void)
+{
+    ovl_band(OVL_Y, OVL_GAP, 0, 1, 0);
+    for (int i = 0; i < UI_PAGE_N; i++) {
+        const int y = OVL_Y + OVL_GAP + i * OVL_ROW;
+        ovl_row(y, &UI_ITEM[lang_en][i], i == opt_sel ? ACCENT : INK, i == opt_sel);
+        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, 0);
+    }
+    const int hy = OVL_Y + OVL_GAP + UI_PAGE_N * OVL_ROW + 4;
+    ovl_band(hy - 4, 4, 0, 0, 0);
+    ovl_row(hy, &UI_HINT[lang_en], OPT_TEXT, 0);
+    ovl_band(hy + STATUS_H, OVL_GAP, 0, 0, 1);
+}
+
+/* 読み物の 1 行(全画面)。center=0 で左揃え(本文)、1 で中央(見出し・案内)。 */
+static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center)
 {
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     int w = 0;
     for (int i = 0; i < n; i++)
         w += glyph_w(s[i]);
     int x = center ? (W - w) / 2 : MARGIN;
-    if (mark)
-        draw24(sbar, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
     for (int i = 0; i < n; i++) {
         if (x + glyph_w(s[i]) > W - MARGIN)
             break;
@@ -466,85 +527,81 @@ static void opt_row(int y, const uint16_t *s, int n, uint16_t color, int center,
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
 }
 
-static void opt_pick(int y, const uint16_t *ja, int jn, const uint16_t *en, int en_n, int sel)
-{
-    opt_row(y, lang_en ? en : ja, lang_en ? en_n : jn, sel ? ACCENT : INK, 1, sel);
-}
-
-static void options_draw(int sel)
-{
-    gp0_fill(0, 0, W, H, OPT_BG24);
-    opt_pick(OPT_Y_TITLE, UI_TITLE_JA, UI_TITLE_JA_N, UI_TITLE_EN, UI_TITLE_EN_N, 0);
-    opt_pick(OPT_Y_ITEM, UI_LICENSE_JA, UI_LICENSE_JA_N,
-             UI_LICENSE_EN, UI_LICENSE_EN_N, sel == OPT_LICENSE);
-    opt_pick(OPT_Y_ITEM + OPT_Y_STEP, UI_CLOSE_JA, UI_CLOSE_JA_N,
-             UI_CLOSE_EN, UI_CLOSE_EN_N, sel == OPT_CLOSE);
-    opt_pick(OPT_Y_HINT, UI_HINT_JA, UI_HINT_JA_N, UI_HINT_EN, UI_HINT_EN_N, 0);
-}
-
-/* 表示する行だけを集める(言語で出し分けるので番号が飛ぶ) */
-static void license_index(void)
+/* 出す行だけを集める(言語と頁で出し分けるので番号が飛ぶ) */
+static void page_index(void)
 {
     const int want = lang_en ? 2 : 1;
-    lic_count = 0;
-    for (int i = 0; i < LIC_N; i++)
-        if (!LIC_LINES[i].lang || LIC_LINES[i].lang == want)
-            lic_idx[lic_count++] = (short)i;
+    page_count = 0;
+    for (int i = 0; i < UI_LINE_N; i++)
+        if (UI_LINES[i].page == opt_page &&
+            (!UI_LINES[i].lang || UI_LINES[i].lang == want))
+            page_idx[page_count++] = (short)i;
 }
 
-static void license_draw(void)
+static void page_draw(void)
 {
     gp0_fill(0, 0, W, H, OPT_BG24);
-    opt_pick(LIC_Y_TITLE, UI_LICENSE_JA, UI_LICENSE_JA_N,
-             UI_LICENSE_EN, UI_LICENSE_EN_N, 0);
-    for (int r = 0; r < LIC_ROWS; r++) {
-        const int i = lic_top + r;
-        if (i >= lic_count)
+    const UiStr *t = &UI_ITEM[lang_en][opt_page];
+    page_row(PAGE_Y_TITLE, t->s, t->n, ACCENT, 1);
+    for (int r = 0; r < PAGE_ROWS; r++) {
+        const int i = page_top + r;
+        if (i >= page_count)
             break;
-        const LicLine *l = &LIC_LINES[lic_idx[i]];
-        opt_row(LIC_Y_TOP + r * LIC_ROW_H, LIC_POOL + l->off, l->len,
-                l->dim ? OPT_TEXT : INK, 0, 0);
+        const UiLine *l = &UI_LINES[page_idx[i]];
+        page_row(PAGE_Y_TOP + r * PAGE_ROW_H, UI_POOL + l->off, l->len,
+                 l->dim ? OPT_TEXT : INK, 0);
     }
-    opt_pick(OPT_Y_HINT, UI_SCROLL_JA, UI_SCROLL_JA_N, UI_SCROLL_EN, UI_SCROLL_EN_N, 0);
+    page_row(PAGE_Y_HINT, UI_SCROLL[lang_en].s, UI_SCROLL[lang_en].n, OPT_TEXT, 1);
 }
 
-/* ★オプション画面は**別ループを回さない**。開いている間の 1 フレーム分をここで処理し、
+/* 本文の画面へ戻す。★重ねた板と全画面の頁で**戻す範囲が違う**。板は本文窓の中しか
+   汚していないので、full=0 なら本文窓を描き直すだけでいい。 */
+static void restore_main(int full)
+{
+    if (full) {
+        gp0_fill(0, 0, W, H, MAIN_BG24);
+        draw_status();
+        draw_strip(comp, 0, 0, comp, 0);   /* 開くのは clen==0 のときだけ */
+    }
+    render_window();
+}
+
+/* ★オプションは**別ループを回さない**。開いている間の 1 フレーム分をここで処理し、
    パッドを読むのは対話ループの 1 箇所だけに保つ([[hechima-dual-path-hazard]])。
    戻り値 0 = オプションを閉じて本文へ戻る。 */
 static int options_step(int edge)
 {
-    if (opt_mode == OPTM_LICENSE) {
-        const int maxtop = lic_count > LIC_ROWS ? lic_count - LIC_ROWS : 0;
+    if (opt_mode == OPTM_PAGE) {
+        const int maxtop = page_count > PAGE_ROWS ? page_count - PAGE_ROWS : 0;
         int moved = 0;
-        if ((edge & BTN_UP) && lic_top > 0) { lic_top--; moved = 1; }
-        if ((edge & BTN_DOWN) && lic_top < maxtop) { lic_top++; moved = 1; }
-        if (edge & BTN_L1) { lic_top -= LIC_ROWS; if (lic_top < 0) lic_top = 0; moved = 1; }
-        if (edge & BTN_R1) { lic_top += LIC_ROWS; if (lic_top > maxtop) lic_top = maxtop; moved = 1; }
+        if ((edge & BTN_UP) && page_top > 0) { page_top--; moved = 1; }
+        if ((edge & BTN_DOWN) && page_top < maxtop) { page_top++; moved = 1; }
+        if (edge & BTN_L1) { page_top -= PAGE_ROWS; if (page_top < 0) page_top = 0; moved = 1; }
+        if (edge & BTN_R1) { page_top += PAGE_ROWS; if (page_top > maxtop) page_top = maxtop; moved = 1; }
         if (moved)
-            license_draw();
-        if (edge & BTN_START)                /* Start はいつでも「閉じる」(トグル) */
+            page_draw();
+        if (edge & BTN_START)            /* ★頁からは一足で本文へ戻る */
             return 0;
-        if (edge & (BTN_X | BTN_CIR)) {      /* 一段戻ってメニューへ */
+        if (edge & BTN_CANCEL) {         /* 一段もどってメニューへ */
             opt_mode = OPTM_MENU;
-            options_draw(opt_sel);
+            restore_main(1);
+            menu_draw();
         }
         return 1;
     }
     if (edge & (BTN_UP | BTN_DOWN)) {
-        opt_sel = (opt_sel + (edge & BTN_UP ? OPT_N - 1 : 1)) % OPT_N;
-        options_draw(opt_sel);
+        opt_sel = (opt_sel + (edge & BTN_UP ? UI_PAGE_N - 1 : 1)) % UI_PAGE_N;
+        menu_draw();
     }
-    if (edge & BTN_CIR) {
-        if (opt_sel == OPT_LICENSE) {
-            opt_mode = OPTM_LICENSE;
-            lic_top = 0;
-            license_index();
-            license_draw();
-            return 1;
-        }
-        return 0;                            /* とじる */
+    if (edge & BTN_OK) {
+        opt_page = opt_sel;
+        opt_mode = OPTM_PAGE;
+        page_top = 0;
+        page_index();
+        page_draw();
+        return 1;
     }
-    if (edge & (BTN_X | BTN_START))
+    if (edge & (BTN_CANCEL | BTN_START))
         return 0;
     return 1;
 }
@@ -557,14 +614,14 @@ static void options_open(void)
     /* ★全ボタンを「押されている」扱いにしてから開く。そうしないと**開けた Start が
        そのまま閉じるエッジになる**。離せば次のフレームでエッジは自然に消える。 */
     pad_prev = -1;
-    options_draw(opt_sel);
+    menu_draw();
 }
 
 static void options_close(void)
 {
+    restore_main(opt_mode == OPTM_PAGE);
     opt_open = 0;
-    gp0_fill(0, 0, W, H, 0x0F1214);      /* オプションの色を消してから本文を描き直す */
-    render_window();
+    opt_mode = OPTM_MENU;
 }
 
 /* ---- 対話ループ(英語 = zm_main.c と同じ) ---- */
