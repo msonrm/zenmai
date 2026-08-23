@@ -593,11 +593,14 @@ static void page_frame(void)
  * ★この頁だけは**面ボタンで戻らない**。面ボタンは字を出すボタンそのものだから、
  *   出口は Start(本文へ)の 1 つに絞る。
  */
-enum { HLX = 168, HRX = 472, HDX = 104 };            /* 群の中心 x と左右のずれ */
-enum { HYC = 96,                                     /* 群の見出し */
-       HY0 = 136, HY1 = 176, HY2 = 216,              /* 上 / 中 / 下 */
-       HY3 = 272, HY4 = 304, HY5 = 360 };            /* 肩の札 2 段 + 機能キーの札 */
-enum { HDIV_X = 318, HDIV_Y = 124, HDIV_H = 128 };   /* 左右の群を分ける縦線 */
+/* ★並びは**実物のコントローラのまま**にする。上から L2 / L1 / 十字(面ボタン)。
+   左右のボタンは中心へ寄せる(離しすぎると 1 行の字の並びに見える) */
+enum { HLX = 168, HRX = 472, HDX = 56 };             /* 群の中心 x と左右のずれ */
+enum { HYC = 84,                                     /* 群の見出し */
+       HY_L2 = 124, HY_L1 = 156,                     /* 肩(外側が上) */
+       HY0 = 204, HY1 = 244, HY2 = 284,              /* 上 / 中 / 下 */
+       HY5 = 344 };                                  /* 機能キーの札 */
+enum { HDIV_X = 318, HDIV_Y = 76, HDIV_H = 236 };    /* 左右の群を分ける縦線 */
 static int help_prev;
 
 /* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る) */
@@ -632,6 +635,19 @@ static void help_put_r1(int cx, uint16_t ch, uint16_t color)
     help_put(cx, buf, n, color);
 }
 
+/* 帯を**縁と縦線ごと**送る。★毎回 page_frame() を引き直すと、ボタンを押すたびに
+   枠がちらつく(実機で見えた)。帯が縁を持てば消えないので、引き直す必要がなくなる。 */
+static void help_band(int y, int div)
+{
+    for (int r = 0; r < STATUS_H; r++) {
+        sbar[r][FR_X] = sbar[r][FR_X + 1] = OPT_EDGE;
+        sbar[r][FR_X + FR_W - 2] = sbar[r][FR_X + FR_W - 1] = OPT_EDGE;
+        if (div)
+            sbar[r][HDIV_X] = sbar[r][HDIV_X + 1] = OPT_TEXT;
+    }
+    gp0_upload(0, y, W, STATUS_H, sbar[0]);
+}
+
 static void help_row_head(int cx, int row, int on)
 {
     help_put1(cx, lang_en ? gp_row_char_en(row) : gp_row_char(row), on ? ACCENT : INK);
@@ -649,13 +665,26 @@ static void help_draw(int p)
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_put(HLX, lbl[5].s, lbl[5].n, OPT_TEXT);
     help_put(HRX, lbl[6].s, lbl[6].n, OPT_TEXT);
-    gp0_upload(0, HYC, W, STATUS_H, sbar[0]);
+    help_band(HYC, 1);
+
+    /* 肩(外側): L2 / R2 */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[1].s, lbl[1].n, (p & BTN_L2) ? ACCENT : OPT_TEXT);
+    help_put(HRX, lbl[2].s, lbl[2].n, (p & BTN_R2) ? ACCENT : OPT_TEXT);
+    help_band(HY_L2, 1);
+
+    /* 肩(内側): L1 / R1。R1 の札は動く = その行の「あ段」そのもの */
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(HLX, lbl[0].s, lbl[0].n, (p & BTN_L1) ? ACCENT : OPT_TEXT);
+    help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row),
+                (p & BTN_R1) ? ACCENT : OPT_TEXT);
+    help_band(HY_L1, 1);
 
     /* 上: ↑ の行 / △ の字 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_row_head(HLX, base + 2, dir == 2);
     help_put1(HRX, gp_cell(en, row, 2), vowel == 2 ? ACCENT : INK);
-    gp0_upload(0, HY0, W, STATUS_H, sbar[0]);
+    help_band(HY0, 1);
 
     /* 中: ← 中 → の行 / □ ○ の字。★中央 = どの向きも押していないとき */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
@@ -664,40 +693,20 @@ static void help_draw(int p)
     help_row_head(HLX + HDX, base + 3, dir == 3);
     help_put1(HRX - HDX, gp_cell(en, row, 1), vowel == 1 ? ACCENT : INK);
     help_put1(HRX + HDX, gp_cell(en, row, 3), vowel == 3 ? ACCENT : INK);
-    gp0_upload(0, HY1, W, STATUS_H, sbar[0]);
+    help_band(HY1, 1);
 
     /* 下: ↓ の行 / × の字 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_row_head(HLX, base + 4, dir == 4);
     help_put1(HRX, gp_cell(en, row, 4), vowel == 4 ? ACCENT : INK);
-    gp0_upload(0, HY2, W, STATUS_H, sbar[0]);
-
-    /* 肩: L1 / R1 */
-    fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[0].s, lbl[0].n, (p & BTN_L1) ? ACCENT : OPT_TEXT);
-    help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row),
-                (p & BTN_R1) ? ACCENT : OPT_TEXT);
-    gp0_upload(0, HY3, W, STATUS_H, sbar[0]);
-
-    /* 肩: L2 / R2 */
-    fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[1].s, lbl[1].n, (p & BTN_L2) ? ACCENT : OPT_TEXT);
-    help_put(HRX, lbl[2].s, lbl[2].n, (p & BTN_R2) ? ACCENT : OPT_TEXT);
-    gp0_upload(0, HY4, W, STATUS_H, sbar[0]);
+    help_band(HY2, 1);
 
     /* 機能キー: SELECT / START。★ここでの Start は「本文へ戻る」だが、
        札が説明しているのは**本文での**役 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_put(HLX, lbl[3].s, lbl[3].n, (p & BTN_SELECT) ? ACCENT : OPT_TEXT);
     help_put(HRX, lbl[4].s, lbl[4].n, OPT_TEXT);
-    gp0_upload(0, HY5, W, STATUS_H, sbar[0]);
-
-    /* ★左右の群を縦線で分ける。無いと真ん中の帯が**1 行の字の並び**に見えて、
-       十字の面とボタンの面の区別が付かなかった(描いてみて分かった) */
-    for (int i = 0; i < HDIV_H * 2; i++)
-        frbuf[i] = OPT_TEXT;
-    gp0_upload(HDIV_X, HDIV_Y, 2, HDIV_H, frbuf);
-    page_frame();                        /* 帯は幅 640 なので縁を引き直す(frbuf も塗り直す) */
+    help_band(HY5, 0);
 }
 
 static void help_open(int p)
@@ -705,6 +714,10 @@ static void help_open(int p)
     const UiStr *t = &UI_ITEM[lang_en][P_TYPING];
     paint_screen(OPT_BG);
     page_row(PAGE_Y_TITLE, t->s, t->n, ACCENT, 1);
+    page_frame();                        /* ★縁と縦線はここで 1 回だけ。以降は帯が運ぶ */
+    for (int i = 0; i < HDIV_H * 2; i++)
+        frbuf[i] = OPT_TEXT;
+    gp0_upload(HDIV_X, HDIV_Y, 2, HDIV_H, frbuf);
     help_prev = p;
     help_draw(p);
 }
