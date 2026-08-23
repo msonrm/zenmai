@@ -32,6 +32,11 @@ static int lang_en;                    /* 1 = ENGLISH / 0 = にほんご */
 /* ---- ステータス行(日本語では部屋名を訳す) ---- */
 enum { STATUS_Y = 24, STATUS_H = 24 };
 #define PANEL 0x0863
+/* ★本文の外側（言語メニュー・オプション）はこの藍で塗る。
+   **地色だけで本文と区別が付く**ので、枠線は引かない（実機の判断） */
+#define OPT_BG   0x1C62                /* 濃い藍(RGB555 の 1 本だけ持つ) */
+#define OPT_EDGE 0x36B9                /* 板の枠・仕切り(= ACCENT) */
+#define OPT_TEXT 0x4A52                /* 札と本文(控えめ) */
 static uint16_t sbar[STATUS_H][W];
 
 /* 画面いっぱいを 1 色で塗る。
@@ -417,7 +422,7 @@ static int pad_vowel(int p)
 /* selected = 1 で ＞ 付きの強調、dim = 1 で控えめ(選べる項目と見間違えないように) */
 static void menu_line(int y, const uint16_t *s, int n, int selected, int dim)
 {
-    fill_rows(sbar, 0, STATUS_H, 0x0442 /* BG */);
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);   /* ★本文の外側は藍 */
     int w = 0;
     for (int i = 0; i < n; i++) w += glyph_w(s[i]);
     int x = (W - w) / 2;
@@ -477,18 +482,14 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
  *   画面がその分だけ狭くなるだけになる。だから**どのフェイスボタンでも決まる**
  *   (○/× を言語で入れ替える必要も消えた。作法に乗るほうが、地域差より強い)。
  */
-#define OPT_BG    0x1C62               /* 読み物の地色 = 濃い藍(RGB555 の 1 本だけ持つ) */
-#define OPT_EDGE  0x36B9               /* 板の枠(= ACCENT) */
-#define OPT_TEXT  0x4A52               /* 本文と案内(控えめ) */
-
 
 enum { OPTM_MENU = 0, OPTM_PAGE };
 enum { P_TYPING = 0, P_CMDS, P_LICENSE };   /* gen_ui.py の並びと同じ */
 /* 重ねる板は**本文窓の中**(ステータス行の下)に置く。★部屋名が見えたままだと
    「まだゲームの中にいる」感が残るし、戻すのが render_window() だけで済む */
 enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
-/* 縁取り。★安全域(y=24..456)の内側に置く。CRT の端は削られる */
-enum { FR_X = 24, FR_Y = 24, FR_W = 592, FR_H = 432, FR_T = 2 };
+/* 仕切り線用の置き場（縁取りは廃止 —— 地色だけで本文と区別が付く） */
+enum { RULE_X = 96, RULE_W = 448 };
 /* ★左右の余白は縁取りより内側にとる(MARGIN=32 だと枠に字が触る)。
    折り返し幅は gen_ui.py の TEXT_W と**必ず同じ値**にすること */
 enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 24, PAGE_ROWS = 14 };
@@ -496,7 +497,7 @@ enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 24, PAGE_RO
 static int opt_open, opt_sel, opt_mode, opt_page, page_top, page_count;
 static short page_idx[UI_LINE_N];
 static uint16_t ovl[OVL_ROW][OVL_W];   /* 板の転送用に詰め直す小バッファ */
-static uint16_t frbuf[FR_W * FR_T];    /* 縁取り(横線 1 本 = 縦線 1 本より広い) */
+static uint16_t frbuf[RULE_W * 2];     /* 仕切り線(横 448x2。縦の 2x192 も収まる) */
 
 /* 板の帯を 1 本送る。★gp0_upload は矩形をリニアに読むので、幅 640 の sbar からは
    左上だけを送れない。ここで幅 OVL_W に詰め直すのが唯一の引っかかりだった。
@@ -572,19 +573,6 @@ static void page_index(void)
             page_idx[page_count++] = (short)i;
 }
 
-/* 頁のまわりを縁取る。★gp0_fill は x が 16 画素単位に丸められる(実機の仕様)ので、
-   細い縦線はフィルでは引けない。転送で引く。★行を送ったあとに引く —— 行は幅 640 の
-   帯なので、先に引くと縦線が消える。 */
-static void page_frame(void)
-{
-    for (int i = 0; i < FR_W * FR_T; i++)
-        frbuf[i] = OPT_EDGE;
-    gp0_upload(FR_X, FR_Y, FR_W, FR_T, frbuf);                 /* 上 */
-    gp0_upload(FR_X, FR_Y + FR_H - FR_T, FR_W, FR_T, frbuf);   /* 下 */
-    gp0_upload(FR_X, FR_Y, FR_T, FR_H, frbuf);                 /* 左 */
-    gp0_upload(FR_X + FR_W - FR_T, FR_Y, FR_T, FR_H, frbuf);   /* 右 */
-}
-
 /* ---- 「もじの うちかた」= コントローラの図 ----
  *
  * ★本文を持たない。**押している状態がそのまま図に出る**のが説明になる(web 版と同じ)。
@@ -596,13 +584,14 @@ static void page_frame(void)
 /* ★並びは**実物のコントローラのまま**にする。上から L2 / L1 / 十字(面ボタン)。
    左右のボタンは中心へ寄せる(離しすぎると 1 行の字の並びに見える) */
 enum { HLX = 168, HRX = 472, HDX = 56 };             /* 群の中心 x と左右のずれ */
-enum { HYC = 80,                                     /* 群の見出し */
-       HY_L2 = 116, HY_L1 = 148,                     /* 肩(外側が上) */
-       HY0 = 192, HY1 = 232, HY2 = 272,              /* 上 / 中 / 下 */
-       HY5 = 320 };                                  /* 機能キーの札 */
-enum { HDIV_X = 318, HDIV_Y = 72, HDIV_H = 240 };    /* 左右の群を分ける縦線 */
-/* 試し打ち: 横線 → 一行の説明 → コマンド欄を模した行 */
-enum { HRULE_Y = 358, HY_TIP = 372, HY_STRIP = 408 };
+/* ★群の見出し(「じゅうじキー = ぎょう」)は落とした —— 説明の一行が
+   **左右の役をすでに言っている**ので、その分を消す操作の説明に回す */
+enum { HY_L2 = 80, HY_L1 = 112,                      /* 肩(外側が上) */
+       HY0 = 156, HY1 = 196, HY2 = 236,              /* 上 / 中 / 下 */
+       HY5 = 284 };                                  /* 機能キーの札 */
+enum { HDIV_X = 318, HDIV_Y = 72, HDIV_H = 192 };    /* 左右の群を分ける縦線 */
+/* 試し打ち: 横線 → 説明 → 消し方 → コマンド欄を模した行 */
+enum { HRULE_Y = 322, HY_TIP = 336, HY_BS = 372, HY_STRIP = 408 };
 static int help_prev, help_gate;
 
 /* sbar に中央揃えで 1 語置く(帯はあとでまとめて送る) */
@@ -624,29 +613,33 @@ static void help_put1(int cx, uint16_t ch, uint16_t color)
         help_put(cx, &ch, 1, color);
 }
 
-/* R1 の札だけは動く = その行の「あ段」そのもの */
-static void help_put_r1(int cx, uint16_t ch, uint16_t color)
+/* R1 の札だけは動く = その行の「あ段」そのもの。
+   ★字は**面ボタンと同じ色**にする —— 役が同じ(字を出すボタン)だから。
+     「R1」の側は他の肩の札と同じ控えめのまま。 */
+static void help_put_r1(int cx, uint16_t ch, int on)
 {
     static const uint16_t pre[3] = {'R', '1', ' '};
-    uint16_t buf[4];
-    int n = 0;
-    for (; n < 3; n++)
-        buf[n] = pre[n];
+    int w = 0;
+    for (int i = 0; i < 3; i++)
+        w += glyph_w(pre[i]);
     if (ch)
-        buf[n++] = ch;
-    help_put(cx, buf, n, color);
+        w += glyph_w(ch);
+    int x = cx - w / 2;
+    for (int i = 0; i < 3; i++) {
+        draw24(sbar, x, 0, pre[i], on ? ACCENT : OPT_TEXT);
+        x += glyph_w(pre[i]);
+    }
+    if (ch)
+        draw24(sbar, x, 0, ch, on ? ACCENT : INK);
 }
 
-/* 帯を**縁と縦線ごと**送る。★毎回 page_frame() を引き直すと、ボタンを押すたびに
-   枠がちらつく(実機で見えた)。帯が縁を持てば消えないので、引き直す必要がなくなる。 */
+/* 帯を**縦の仕切りごと**送る。★仕切りを毎回引き直すと、ボタンを押すたびにちらつく
+   (縁でそれを踏んだ)。帯が仕切りを持てば消えないので、引き直す必要がなくなる。 */
 static void help_band(int y, int div)
 {
-    for (int r = 0; r < STATUS_H; r++) {
-        sbar[r][FR_X] = sbar[r][FR_X + 1] = OPT_EDGE;
-        sbar[r][FR_X + FR_W - 2] = sbar[r][FR_X + FR_W - 1] = OPT_EDGE;
-        if (div)
+    if (div)
+        for (int r = 0; r < STATUS_H; r++)
             sbar[r][HDIV_X] = sbar[r][HDIV_X + 1] = OPT_TEXT;
-    }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
 }
 
@@ -663,12 +656,6 @@ static void help_draw(int p)
     const int en = lang_en;
     const UiStr *lbl = UI_HELP[en];
 
-    /* 群の見出し。★どちらの手で何を選ぶのかを名指しする */
-    fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(HLX, lbl[5].s, lbl[5].n, OPT_TEXT);
-    help_put(HRX, lbl[6].s, lbl[6].n, OPT_TEXT);
-    help_band(HYC, 1);
-
     /* 肩(外側): L2 / R2 */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_put(HLX, lbl[1].s, lbl[1].n, (p & BTN_L2) ? ACCENT : OPT_TEXT);
@@ -678,8 +665,7 @@ static void help_draw(int p)
     /* 肩(内側): L1 / R1。R1 の札は動く = その行の「あ段」そのもの */
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     help_put(HLX, lbl[0].s, lbl[0].n, (p & BTN_L1) ? ACCENT : OPT_TEXT);
-    help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row),
-                (p & BTN_R1) ? ACCENT : OPT_TEXT);
+    help_put_r1(HRX, en ? gp_row_char_en(row) : gp_row_char(row), (p & BTN_R1) != 0);
     help_band(HY_L1, 1);
 
     /* 上: ↑ の行 / △ の字 */
@@ -711,15 +697,10 @@ static void help_draw(int p)
     help_band(HY5, 0);
 }
 
-/* 試し打ちの行。★本物のコマンド欄と**同じ絵**を使う(build_strip)。地色と y だけ違う。
-   帯が縁を消さないよう、送る前に縁を書き込む(図の帯と同じ手) */
+/* 試し打ちの行。★本物のコマンド欄と**同じ絵**を使う(build_strip)。地色と y だけ違う */
 static void help_strip(const uint16_t *cmd, int len, int car, const uint16_t *ind, int ilen)
 {
     build_strip(OPT_BG, cmd, len, car, ind, ilen);
-    for (int r = 0; r < CMD_H; r++) {
-        strip[r][FR_X] = strip[r][FR_X + 1] = OPT_EDGE;
-        strip[r][FR_X + FR_W - 2] = strip[r][FR_X + FR_W - 1] = OPT_EDGE;
-    }
     gp0_upload(0, HY_STRIP, W, CMD_H, strip[0]);
 }
 
@@ -728,17 +709,20 @@ static void help_open(int p)
     const UiStr *t = &UI_ITEM[lang_en][P_TYPING];
     paint_screen(OPT_BG);
     page_row(PAGE_Y_TITLE, t->s, t->n, ACCENT, 1);
-    page_frame();                        /* ★縁と縦線はここで 1 回だけ。以降は帯が運ぶ */
+    /* ★縦の仕切りはここで 1 回だけ。以降は帯が運ぶ */
     for (int i = 0; i < HDIV_H * 2; i++)
         frbuf[i] = OPT_TEXT;
     gp0_upload(HDIV_X, HDIV_Y, 2, HDIV_H, frbuf);
     /* 試し打ちの仕切りと説明 */
-    for (int i = 0; i < (FR_W - 96) * 2; i++)
+    for (int i = 0; i < RULE_W * 2; i++)
         frbuf[i] = OPT_TEXT;
-    gp0_upload(FR_X + 48, HRULE_Y, FR_W - 96, 2, frbuf);
+    gp0_upload(RULE_X, HRULE_Y, RULE_W, 2, frbuf);
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
-    help_put(W / 2, UI_HELP[lang_en][7].s, UI_HELP[lang_en][7].n, OPT_TEXT);
+    help_put(W / 2, UI_HELP[lang_en][5].s, UI_HELP[lang_en][5].n, OPT_TEXT);
     help_band(HY_TIP, 0);
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    help_put(W / 2, UI_HELP[lang_en][6].s, UI_HELP[lang_en][6].n, OPT_TEXT);
+    help_band(HY_BS, 0);
     /* ★試し打ちは**本文と同じ入力の道**を使う。だから器も本物と同じ comp を空にするだけ
        (別の器を持つと、片方でしか通らない値が必ず出る) */
     clen = 0;
@@ -749,7 +733,14 @@ static void help_open(int p)
     help_gate = 1;
     help_prev = p;
     help_draw(p);
-    help_strip(comp, 0, 0, comp, 0);
+    /* ★行インジケータは**開いた時点から**出す(ボタンを触るまで空だった) */
+    uint16_t ind[4];
+    int in_ = 1;
+    if (lang_en)
+        row_label(pad_row(p), ind, &in_);
+    else
+        ind[0] = gp_row_char(pad_row(p));
+    help_strip(comp, 0, 0, ind, in_);
 }
 
 static void page_draw(void)
@@ -765,7 +756,6 @@ static void page_draw(void)
         page_row(PAGE_Y_TOP + r * PAGE_ROW_H, UI_POOL + l->off, l->len,
                  l->dim ? OPT_TEXT : INK, 0);
     }
-    page_frame();
 }
 
 /* 本文の画面へ戻す。★重ねた板と全画面の頁で**戻す範囲が違う**。板は本文窓の中しか
@@ -1242,7 +1232,7 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
     for (char *p = __bss_start; p < __bss_end; p++)
         *p = 0;
     gpu_init();
-    paint_screen(BG);
+    paint_screen(OPT_BG);              /* ★言語メニューも本文の外側 = 藍 */
     render_init();
     jp_text_init();                    /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
     body_top = STATUS_Y + STATUS_H + 8;
