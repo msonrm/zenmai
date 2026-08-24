@@ -431,7 +431,14 @@ function createCommander(asset) {
     if (tool) { toolAt = out.length + 1; out.push('with', tool.word) }
     let destAt = -1
     if (dest && dest !== prso) {
-      const p = has(dest.role) ? dest.role.toLowerCase() : (has('IN') ? 'in' : 'to')
+      // ★「に」は TO で受けるが、原作の構文に TO を持たない動詞がある。そのときは
+      //   **同じ「に」が指しうる役**のうち、その動詞が持つものを選ぶ。
+      //   ★AT を先に見る —— 「ふくろをトロルになげる」は `throw bag at troll` であって
+      //   `throw bag in troll`（＝原作は「場所がない。」と断る）ではない。
+      //   AT と IN を両方持つ動詞は THROW と LOOK の 2 つだけで、どちらも AT が正しい
+      //   （2026-08-24 の実プレイ）
+      const p = has(dest.role) ? dest.role.toLowerCase()
+        : (['AT', 'IN', 'ON', 'TO'].find((x) => has(x)) || 'TO').toLowerCase()
       out.push(p)
       destAt = out.length
       out.push(dest.word)
