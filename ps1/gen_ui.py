@@ -111,7 +111,7 @@ def _kana(words, n=2):
 
 page(P_CMDS)
 put('ゲームの中の行動ではなく、', JA, 1)
-put('進行そのものへの指示。ひらがなで打つ。', JA, 1)
+put('進行そのものへの指示。', JA, 1)
 put('Not actions in the world --', EN, 1)
 put('instructions to the game itself.', EN, 1)
 put('')
@@ -139,10 +139,6 @@ for _label, _key in SYS:
 
 # ---- 頁 3: ライセンス ----
 page(P_LICENSE)
-put('このソフトは自由に使えるものだけで組み立ててある。', JA)
-put('Built only from freely licensed parts.', EN)
-put('')
-
 rule()
 put('Zenmai —— このソフト', JA)
 put('Zenmai -- this software', EN)
@@ -151,8 +147,8 @@ put_file(ROOT / 'LICENSE')
 put('')
 
 rule()
-put('Zork I —— 動かしている物語（story file）', JA)
-put('Zork I -- the story file being run', EN)
+put('Zork I —— オリジナル', JA)
+put('Zork I -- the original', EN)
 put('https://github.com/historicalsource/zork1', BOTH, 1)
 rule()
 put_file(ROOT / 'vendor/zork1/LICENSE')
@@ -167,8 +163,11 @@ put_file(HERE / 'vendor/LICENSE.txt')
 put('')
 
 rule()
-put('KH Dot Font —— 画面の字', JA)
-put('KH Dot Font -- the glyphs on screen', EN)
+# ★正式名称は「KH ドットフォント」だが、**小さい「ォ」が同梱フォントに無い**。
+#   「使用フォント」も同じ理由で書けないので、いまは「使用書体」と出す。
+#   （下の WANT に ォ を入れてあるので、glyphs.h を作り直せば両方書き換えられる）
+put('KH Dot Font —— 使用書体', JA)
+put('KH Dot Font -- the font used', EN)
 rule()
 put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
 put('Copyright (c) 1990-2015 Keitarou Hiraki and Font Silo', BOTH, 1)
@@ -176,10 +175,8 @@ put('SIL Open Font License 1.1', BOTH, 1)
 put('http://jikasei.me/font/kh-dotfont/', BOTH, 1)
 put('')
 
-put('作品名は商標であり、上の許諾には含まれない。', JA)
-put('ここでは名前・ロゴに作品名を使わない。', JA)
-put('Game titles are trademarks and are not covered above;', EN)
-put('this project does not use them in its name or logo.', EN)
+put('Zork という名称は商標です。', JA)
+put('Zork is a trademark.', EN)
 
 # ---- 画面の文言 ----
 # ★ここに出る文字列は全部「こちらのもの」。原作の文は 1 つも出ないので、
@@ -250,6 +247,20 @@ def wrap(t):
         out.append(cur_)
     return out
 
+
+# ★頁の末尾の空行は落とす。**画面に収まっているのに 1 行だけ動く**（十字キーの上下で
+#   カタッと下がる）のは、末尾の空行が行数に入っていたせい。
+# ★落とす判定は**頁 × 言語ごと**にやる —— 画面に出るのはその組み合わせで濾したあとの
+#   並びなので、「全体の末尾」だけ見ても足りない（日本語の表と英語の表の境目に置いた
+#   空行が、日本語から見ると末尾になっていた）。
+_drop = set()
+for _pg in range(PAGE_N):
+    for _view in (JA, EN):
+        _idx = [i for i, ln in enumerate(lines)
+                if ln[0] == _pg and ln[1] in (BOTH, _view)]
+        while _idx and not lines[_idx[-1]][3]:
+            _drop.add(_idx.pop())
+lines = [ln for i, ln in enumerate(lines) if i not in _drop]
 
 wrapped = []
 for pg, lang, dim, text in lines:
@@ -327,11 +338,15 @@ for _, _, _, t in lines:
 for ja, en in ITEM + HELP + [BOOT]:
     used.update(ja)
     used.update(en)
-(HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')
+# ★いまは出せないが**次に glyphs.h を作り直すときは入れておきたい字**。
+#   ここに書いておけば gen_data.py が拾う（フォントのある環境で作り直したら、
+#   「KH ドットフォント」と正式名称で書けるようになる）
+WANT = 'ォ'
+(HERE / 'ui_chars.txt').write_text(''.join(sorted(set(used) | set(WANT))), encoding='utf-8')
 
 # ★**出す字は全部フォントに入っていなければならない**。glyphs.h は「使う字だけ」を
 #   焼いてあり、無い字は**黙って空白で描かれる**。ここで止める（実際に「写」で踏んだ）。
-_missing = sorted(c for c in used if ord(c) not in FONT)
+_missing = sorted(c for c in used if ord(c) not in FONT)   # WANT は出さないので除く
 if _missing:
     raise SystemExit('★同梱フォントに無い字を出そうとしている: ' + ''.join(_missing)
                      + '\n  言い換えるか、フォントのある環境で glyphs.h を作り直すこと')

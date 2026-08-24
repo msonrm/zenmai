@@ -228,76 +228,71 @@ static int tr_word(const char *en, int en_len, u16 *out, int o, int outmax)
 static int is_term(char c) { return c == '.' || c == '!' || c == '?'; }
 
 /* key に pat を当てる。成功なら 1、captures に (off,len) を入れる */
+/* 穴つき型の照合。★JS 側は正規表現なので**バックトラックする** —— ここも同じに
+   すること。以前は「貪欲なら最右・非貪欲なら最左」を 1 回だけ試して打ち切っていて、
+   `{ECHO} {ECHO} ...`（轟音の部屋の反響）が引けなくなっていた
+   （最右の空白を採ると右の穴が空になり、そこで諦めていた。JS は戻って次を試す）。
+   貪欲は右から、非貪欲は左から候補を出し、**合わなければ次の候補へ戻る**。 */
+static int match_from(const TrPat *pat, const TrSeg *segs, int si, int pos,
+                      const char *key, int klen, int cap_off[CAP_MAX], int cap_len[CAP_MAX],
+                      int ncap)
+{
+    if (si >= pat->en_n)
+        return pos == klen;
+    const TrSeg *sg = &segs[si];
+    if (sg->kind == TRK_LIT) {
+        if (pos + sg->len > klen || !bytes_eq(key + pos, tr_en_pool + sg->off, sg->len))
+            return 0;
+        return match_from(pat, segs, si + 1, pos + sg->len, key, klen, cap_off, cap_len, ncap);
+    }
+
+    const int quoted = sg->kind == TRK_QHOLE;
+    const int minlen = quoted ? 0 : 1;
+    const TrSeg *nx = 0;
+    int nx_i = -1;
+    for (int t = si + 1; t < pat->en_n; t++)
+        if (segs[t].kind == TRK_LIT) { nx = &segs[t]; nx_i = t; break; }
+    /* ★区切りが空白 1 個で、その先も穴なら貪欲（JS の `([^.!?]+)`）。
+       そうでなければ非貪欲（`([^.!?]+?)`）。引用の中は貪欲だが、引用符を跨げないので
+       どちらから探しても同じ位置になる。 */
+    const int greedy = quoted || (nx && nx->len == 1 && tr_en_pool[nx->off] == ' '
+                                  && nx_i + 1 < pat->en_n && segs[nx_i + 1].kind != TRK_LIT);
+
+    /* 穴に入れられる右端（終止符・引用符で打ち切り） */
+    int limit = pos;
+    while (limit < klen) {
+        const char c = key[limit];
+        if (quoted ? (c == '"') : is_term(c))
+            break;
+        limit++;
+    }
+    if (pos + minlen > limit)
+        return 0;
+
+    if (!nx) {                             /* 続くリテラルが無い = 行末まで */
+        if (limit != klen)
+            return 0;
+        if (ncap < CAP_MAX) { cap_off[ncap] = pos; cap_len[ncap] = klen - pos; }
+        return match_from(pat, segs, si + 1, klen, key, klen, cap_off, cap_len, ncap + 1);
+    }
+
+    const int lo = pos + minlen;
+    const int hi = limit < klen - nx->len ? limit : klen - nx->len;
+    for (int k = 0; k <= hi - lo; k++) {
+        const int e = greedy ? hi - k : lo + k;
+        if (!bytes_eq(key + e, tr_en_pool + nx->off, nx->len))
+            continue;
+        if (ncap < CAP_MAX) { cap_off[ncap] = pos; cap_len[ncap] = e - pos; }
+        if (match_from(pat, segs, nx_i + 1, e + nx->len, key, klen, cap_off, cap_len, ncap + 1))
+            return 1;
+    }
+    return 0;
+}
+
 static int match_pat(const TrPat *pat, const char *key, int klen,
                      int cap_off[CAP_MAX], int cap_len[CAP_MAX])
 {
-    int pos = 0, ncap = 0;
-    const TrSeg *segs = tr_segs + pat->seg_off;
-    for (int si = 0; si < pat->en_n; si++) {
-        const TrSeg *sg = &segs[si];
-        if (sg->kind == TRK_LIT) {
-            if (pos + sg->len > klen || !bytes_eq(key + pos, tr_en_pool + sg->off, sg->len))
-                return 0;
-            pos += sg->len;
-        } else {
-            /* 穴: 次のリテラルの最左出現まで(無ければ行末まで) */
-            int quoted = sg->kind == TRK_QHOLE;
-            const TrSeg *nx = 0;
-            int nx_i = -1;
-            for (int t = si + 1; t < pat->en_n; t++)
-                if (segs[t].kind == TRK_LIT) { nx = &segs[t]; nx_i = t; break; }
-            /* ★区切りが空白 1 個で、その先も穴なら**最右**を採る。最左だと左の穴が
-               1 語で止まり、残りが右の穴へ流れ込む(`the nasty knives in?` が
-               OBJ=`nasty` / PREP=`knives in` に割れて `何knives innastyを入れる？`)。
-               空白は語の中にも現れるので、区切りとして位置を決められない。
-               ※ JS 側(src/translate.js)は同じ形を正規表現の貪欲/非貪欲で書いてある。
-                 ただし向こうはバックトラックするのでこちらより粘る —— 最右の空白で
-                 右の穴が空になる骨格があれば、そこだけ挙動が割れる(原作には無い) */
-            int rightmost = nx && nx->len == 1 && tr_en_pool[nx->off] == ' '
-                            && nx_i + 1 < pat->en_n && segs[nx_i + 1].kind != TRK_LIT;
-            int minlen = quoted ? 0 : 1;
-            int start = pos;
-            int end = -1;
-            if (nx) {
-                if (rightmost) {
-                    for (int e = klen - nx->len; e >= start + minlen; e--)
-                        if (bytes_eq(key + e, tr_en_pool + nx->off, nx->len)) { end = e; break; }
-                } else {
-                    for (int e = start + minlen; e + nx->len <= klen; e++) {
-                        if (bytes_eq(key + e, tr_en_pool + nx->off, nx->len)) { end = e; break; }
-                        /* 穴に入れられない字が来たら打ち切り */
-                        char c = key[e];
-                        if (quoted ? (c == '"') : is_term(c))
-                            return 0;
-                    }
-                }
-                if (end < 0)
-                    return 0;
-            } else {
-                end = klen;                    /* 行末まで */
-            }
-            for (int e = start; e < end; e++) {
-                char c = key[e];
-                if (quoted ? (c == '"') : is_term(c))
-                    return 0;
-            }
-            if (end - start < minlen)
-                return 0;
-            if (ncap < CAP_MAX) {
-                cap_off[ncap] = start;
-                cap_len[ncap] = end - start;
-            }
-            ncap++;
-            /* 次のリテラルを消費(あれば) */
-            if (nx) {
-                pos = end + nx->len;
-                si = (int)(nx - segs);          /* nx まで飛ぶ */
-            } else {
-                pos = end;
-            }
-        }
-    }
-    return pos == klen;
+    return match_from(pat, tr_segs + pat->seg_off, 0, 0, key, klen, cap_off, cap_len, 0);
 }
 
 static int subst_ja(const TrPat *pat, const char *key,
