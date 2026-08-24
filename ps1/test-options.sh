@@ -61,7 +61,7 @@ check "↓ で選択が動く"                  "$(state opt_move.script 800)"  
 check "○ で 1 つめの頁へ"               "$(state opt_page0.script 800)"    "top=0 page=0 mode=1 sel=0 open=1"
 check "★△でも決まる(面ボタンはどれでも)" "$(state opt_face_tri.script 800)" "top=0 page=0 mode=1 sel=0 open=1"
 check "↓↓ ○ でライセンスの頁へ"         "$(state opt_page2.script 900)"    "top=0 page=2 mode=1 sel=2 open=1"
-check "頁の中を ↓×3 で送る"             "$(state opt_scroll.script 1000)"  "top=3 page=2 mode=1 sel=2 open=1"
+check "★頁の中は ↓ 1 回で 1 頁送る"      "$(state opt_scroll.script 950)"   "top=14 page=2 mode=1 sel=2 open=1"
 check "面ボタンで一段もどる(メニューは開いたまま)" "$(state opt_back.script 950)" "top=0 page=2 mode=0 sel=2 open=1"
 check "★うちかたの頁は面ボタンで戻らない" "$(state help_face.script 800)"  "top=0 page=0 mode=1 sel=0 open=1"
 check "★うちかたの頁は Start で本文へ"   "$(state help_start.script 800)" "top=0 page=0 mode=0 sel=0 open=0"
@@ -81,7 +81,8 @@ check "★カナリア: 本文が汚れない(履歴が伸びない)" "$SHOWN" "
 TYPED=$(sym clen)
 check "★試し打ちで字が入る(開けたボタンは字にならない)" "$(typed help_type.script 900)" "かじ"
 check "★試し打ちの字を本文へ持ち出さない"       "$(typed help_leave.script 950)"  ""
+check "★わ行はフリックと同じ並び(を / ん / ー)"   "$(typed help_wa.script 950)"     "をんー"
 check "★欄は幅で止まる(かな 21 字)"              "$(typed_n help_full.script 1950)" "21"
 
 echo
-if [ "$ng" = 0 ]; then echo "--- 16 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 17 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

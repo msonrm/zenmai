@@ -37,5 +37,25 @@ int main(void)
         return 1;
     }
     printf("全 %d 行一致\n", PAIR_N);
+
+    /* ★かなの反響（轟音の部屋）。pairs.h の echo は ASCII なので**この形は corpus に
+       載らない** —— 実際、貪欲な穴の探索を入れたとき `{ECHO} {ECHO} ...` が
+       引けなくなったのに 711 行は全部通っていた（実プレイで見つかった）。
+       固定表として持つ。 */
+    static const unsigned short KITA[] = {0x304D, 0x305F};                 /* きた */
+    static const unsigned short WANT[] = {0x304D, 0x305F, ' ', 0x304D, 0x305F,
+                                          ' ', 0x2026, 0x2026};            /* きた きた …… */
+    tr_set_echo16(KITA, 2);
+    unsigned short eo[64];
+    int er = tr_line("north north ...", eo, 64);
+    int eok = er == (int)(sizeof WANT / sizeof *WANT) && !memcmp(eo, WANT, sizeof WANT);
+    printf("%s 反響: north north ... → きた きた ……\n", eok ? "✓" : "✗");
+    if (!eok) {
+        printf("  実際:");
+        if (er < 0) printf(" (素通し)");
+        for (int t = 0; t < er; t++) printf(" %04X", eo[t]);
+        printf("\n");
+        return 1;
+    }
     return 0;
 }

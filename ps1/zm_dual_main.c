@@ -821,10 +821,20 @@ static int options_step(int p, int edge)
     if (opt_mode == OPTM_PAGE) {
         const int maxtop = page_count > PAGE_ROWS ? page_count - PAGE_ROWS : 0;
         int moved = 0;
-        if ((edge & BTN_UP) && page_top > 0) { page_top--; moved = 1; }
-        if ((edge & BTN_DOWN) && page_top < maxtop) { page_top++; moved = 1; }
-        if (edge & BTN_L1) { page_top -= PAGE_ROWS; if (page_top < 0) page_top = 0; moved = 1; }
-        if (edge & BTN_R1) { page_top += PAGE_ROWS; if (page_top > maxtop) page_top = maxtop; moved = 1; }
+        /* ★上下も**頁送り**にする。1 行ずつ送っても読み進まない
+           （ライセンスを腰を据えて読む人はいない、という実機の判断） */
+        if ((edge & (BTN_UP | BTN_L1)) && page_top > 0) {
+            page_top -= PAGE_ROWS;
+            if (page_top < 0)
+                page_top = 0;
+            moved = 1;
+        }
+        if ((edge & (BTN_DOWN | BTN_R1)) && page_top < maxtop) {
+            page_top += PAGE_ROWS;
+            if (page_top > maxtop)
+                page_top = maxtop;
+            moved = 1;
+        }
         if (moved)
             page_draw();
         if (edge & BTN_START)            /* ★頁からは一足で本文へ戻る */
