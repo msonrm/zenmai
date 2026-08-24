@@ -124,12 +124,15 @@
 cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
 python3 sim.py zenmai-zork.psexe --expect golden.png   # R3000 シミュレータで画素照合
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
-sh test-options.sh                              # オプション画面(打っていないときの Start)
+sh test-options.sh                              # オプション(打っていないときの Start)
 ```
 
 **キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
 （計画 = `docs/ps1-port-plan.md`、作って分かったこと = `docs/ps1-implementation-notes.md`）。
-残件はメモリーカードのセーブ。
+
+セーブ（メモリーカード）とオプションまで入って**一区切り**（2026-08-24）。オプションには
+**もじの うちかた**（押したボタンがそのまま図に出て、その場で試し打ちできる）・
+**つかえる ことば**・**ライセンス全文**が入る。配布は GitHub Releases（`ps1-v*`）。
 
 差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
 描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・
