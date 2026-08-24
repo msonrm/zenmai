@@ -531,7 +531,12 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
             default: PUSH_S("from"); break;
             }
         } else {
-            if (has_tok(vv, CMT_IN)) PUSH_S("in"); else PUSH_S("to");
+            /* ★「に」(CMR_TO) を持たない動詞では、同じ「に」が指しうる役から選ぶ。
+               AT が先（`throw bag at troll`。in だと原作が「場所がない。」と断る） */
+            if (has_tok(vv, CMT_AT)) PUSH_S("at");
+            else if (has_tok(vv, CMT_IN)) PUSH_S("in");
+            else if (has_tok(vv, CMT_ON)) PUSH_S("on");
+            else PUSH_S("to");
         }
         dest_at = now_;
         PUSH_W(dest->wo, dest->wl);
