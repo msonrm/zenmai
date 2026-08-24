@@ -13,14 +13,25 @@ PS1 版は `.psexe` 1 本で配るので**外部ファイルが置けない**。
 
 使い方: python3 gen_ui.py
 """
+import re
 from pathlib import Path
 
 HERE = Path(__file__).parent
 ROOT = HERE.parent
 
 JA, EN, BOTH = 1, 2, 0
+# ★同梱フォントに入っている字。**ここに無い字は空白で描かれる**ので、
+#   一覧に出す表記はこれで濾す（glyphs.h は「使う字だけ」を焼いてある）
+FONT = set(int(m, 16) for m in
+           re.findall(r'\{0x([0-9A-Fa-f]{4}),', (Path(__file__).parent / 'glyphs.h').read_text()))
 # ★本文幅。zm_dual_main.c の PAGE_X と**必ず同じ余白**にすること(縁取りの内側)
 TEXT_W = 640 - 2 * 48
+
+
+def width(t):
+    return sum(12 if ord(c) < 0x80 else 24 for c in t)
+
+
 P_TYPING, P_CMDS, P_LICENSE = 0, 1, 2
 PAGE_N = 3
 
@@ -54,17 +65,77 @@ def rule():
 # ★本文は持たない。**コントローラの図**そのものが説明になる（web 版と同じ考え方）。
 #   図の札は入力表 GP_KANA / GP_ENG から引くので、ここには**固定の札だけ**を置く。
 # ---- 頁 2: つかえる ことば ----
-# ★★ 仮の中身。本番は cmd_data から作る(手で書き写すと本体とずれる)。
+# ★ここは**システムの言葉**（進行そのものへの指示）。物を取る・扉を開けるといった
+#   ゲームの中の行動は含めない —— web 版の設定ダイアログ「システムの言葉」と同じ範囲。
+# ★一覧は**書き写さない**。役目の並びは web/main.js の SYS を読み、打つ言葉は
+#   asset（zork1-cmd.json）と gen_cmd.py の PARSER_WORDS から引く。
+#   写すと語彙を足し引きしたときに手引きだけ古くなり、**打てない言葉を案内する**
+#   （web 版が一度そうなった、とコメントに残っている）。
+import json as _json
+import re as _re
+import gen_cmd as _gc                      # PARSER_WORDS（PS1 側の写しはこの 1 本だけ）
+
+_asset = _json.loads((ROOT / 'assets' / 'zork1-cmd.json').read_text())
+_web = (ROOT / 'web' / 'main.js').read_text()
+_blk = _web[_web.index('const SYS = ['):]
+_blk = _blk[:_blk.index('\n  ]')]
+SYS = _re.findall(r"\['([^']+)', '([^']+)'\]", _blk)
+assert SYS, '★web/main.js の SYS を読めなかった（形が変わった？）'
+
+# ★同梱フォントに無い字を含む役目名の言い換え。web 版の言い方をそのまま出したいが、
+#   PS1 のフォントは「使う字だけ」なので、無い字は**空白で描かれてしまう**。
+#   （「描写」の「写」が入っていなかった。下の照合が拾う）
+RELABEL = {
+    'VERBOSE': '部屋の説明を長く',
+    'BRIEF': '部屋の説明を短く',
+    'SUPER': '部屋の説明をごく短く',
+}
+
+# 英語の言い添え。★これはこちらの文（原作にも web にも無い）
+EN_NOTE = {
+    'SCORE': 'your points so far', 'SAVE': 'store the game',
+    'RESTORE': 'continue a stored game', 'RESTART': 'start over',
+    'QUIT': 'stop playing', 'VERSION': 'which release this is',
+    'DIAGNOSE': 'how badly you are hurt', 'VERBOSE': 'full room descriptions',
+    'BRIEF': 'short descriptions', 'SUPER': 'shortest descriptions',
+    '@again': 'repeat the last command',
+}
+
+
+def _kana(words, n=2):
+    """打つのはかなだけなので、かなの形を出す（web 版の pickKana と同じ）"""
+    hira = [w for w in words if _re.fullmatch(r'[ぁ-んー]+', w)]
+    kata = [w for w in words if _re.fullmatch(r'[ァ-ヶー]+', w)]
+    return (hira or kata)[:n]
+
+
 page(P_CMDS)
-put('（ここは かりの ないよう）', JA, 1)
-put('(placeholder text)', EN, 1)
+put('ゲームの中の行動ではなく、', JA, 1)
+put('進行そのものへの指示。ひらがなで打つ。', JA, 1)
+put('Not actions in the world --', EN, 1)
+put('instructions to the game itself.', EN, 1)
 put('')
-put('みる  とる  おく  あける  よむ', JA)
-put('きた  みなみ  ひがし  にし', JA)
-put('ほぞんする  さいかいする', JA)
-put('look  take  drop  open  read', EN)
-put('north  south  east  west', EN)
-put('save  restore', EN)
+
+_rows = []
+for _label, _key in SYS:
+    _w = _kana(list(_gc.PARSER_WORDS)) if _key == '@again' \
+        else _kana(_asset['verbs'].get(_key, {}).get('ja', []))
+    assert _w, '★打つ言葉が引けなかった: ' + _key
+    _rows.append((RELABEL.get(_key, _label), _w, _key))
+
+_lw = max(width(r[0]) for r in _rows)      # 役目の欄はいちばん長いものに揃える
+for _label, _w, _key in _rows:
+    _pad = ' ' * ((_lw - width(_label)) // 12 + 2)
+    _line = _label + _pad + ' / '.join(_w)
+    if width(_line) > TEXT_W and len(_w) > 1:   # 入らなければ別の言い方は落とす
+        _line = _label + _pad + _w[0]
+    put(_line, JA)
+
+put('', JA)
+_ew = max(len(k.lower().lstrip('@')) for _, k in SYS)
+for _label, _key in SYS:
+    _cmd = _key.lower().lstrip('@')
+    put(_cmd + ' ' * (_ew - len(_cmd) + 2) + EN_NOTE[_key], EN)
 
 # ---- 頁 3: ライセンス ----
 page(P_LICENSE)
@@ -150,10 +221,6 @@ HELP = [
 # ★専用画面で描くので、**折り返しはここで済ませておく**(C 側は行を y に並べるだけ)。
 #   半角 12px / 全角 24px。★左右の余白は**縁取りの内側**にとるので、
 #   zm_dual_main.c の PAGE_X と**必ず同じ値**にすること。
-
-
-def width(t):
-    return sum(12 if ord(c) < 0x80 else 24 for c in t)
 
 
 def wrap(t):
@@ -261,6 +328,13 @@ for ja, en in ITEM + HELP + [BOOT]:
     used.update(ja)
     used.update(en)
 (HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')
+
+# ★**出す字は全部フォントに入っていなければならない**。glyphs.h は「使う字だけ」を
+#   焼いてあり、無い字は**黙って空白で描かれる**。ここで止める（実際に「写」で踏んだ）。
+_missing = sorted(c for c in used if ord(c) not in FONT)
+if _missing:
+    raise SystemExit('★同梱フォントに無い字を出そうとしている: ' + ''.join(_missing)
+                     + '\n  言い換えるか、フォントのある環境で glyphs.h を作り直すこと')
 
 per = [sum(1 for r in recs if r[4] == p) for p in range(PAGE_N)]
 print('ui_data.h: %d 行 (頁ごと %s) / %d 字' % (len(recs), per, len(pool)))
