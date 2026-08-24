@@ -481,6 +481,16 @@ function createCommander(asset) {
     const ask = cut > 0 && cut < typed.length - 1
       ? `何の${typed.slice(0, cut)}を${typed.slice(cut + 1)}？`
       : `何を${verb.disp.includes('を') ? verb.disp.split('を').pop() : verb.disp}？`
+    // ★「およぐ」だけは**目的語を添えて送る**。原作の V-SWIM は目的語なしのとき
+    //   空の物に `D ,PRSO` を呼び、**文字化けを印字する**（原作の不具合。峡谷の底で
+    //   `Swimming isn't usually allowed in the o xufpIt's.` が出た。2026-08-24 の報告）。
+    //   `swim in water` なら原作自身の分岐が `dungeon.` を選ぶので、訳が引ける。
+    //   水の無い場所では外れるので、素の `swim` を別案に添える（空振りは手数を消費しない）。
+    if (verb.key === 'SWIM' && out.length === 1) {
+      return { command: out[0] + ' in water', trace: '動詞+役', unknown, echo: echo.join(''),
+        alts: [out[0]], objDisp: '', echoWord: verb.ja || '', verbKey: verb.key,
+        hasObject: false, needsObject: false, ask }
+    }
     return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp,
       // ★轟音の部屋の反響に使う「**打った呼び名**」。原作は `P-INBUF`（プレイヤーが打った
       //   生の入力）から語を切り出して返すので、訳語や代表形では意味が変わる ——

@@ -20,6 +20,7 @@ enum { VK_DISEMBARK = 23 };
 enum { VK_ENTER = 30 };
 enum { VK_EXIT = 32 };
 enum { VK_LEAVE = 52 };
+enum { VK_SWIM = 103 };
 extern const unsigned short cm_jpool[];
 extern const char cm_apool[];
 extern const CmLex cm_lex[CM_LEX_N];

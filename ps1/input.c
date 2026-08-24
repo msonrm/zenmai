@@ -28,6 +28,13 @@ void gp_break_rt_cycle(GpMachine *s) { s->rtCycleStep = 0; }
 unsigned short gp_row_char(int row) { return (row >= 0 && row < 10) ? GP_KANA[row][0] : 0x3042; }
 unsigned short gp_row_char_en(int row) { return (row >= 0 && row < 10) ? GP_ENG[row][0] : '1'; }
 
+unsigned short gp_cell(int english, int row, int vowel)
+{
+    if (row < 0 || row >= 10 || vowel < 0 || vowel >= 5)
+        return 0;
+    return english ? GP_ENG[row][vowel] : GP_KANA[row][vowel];
+}
+
 static void push_kana1(GpAction *a, unsigned short c, int replace)
 {
     a->type = GPA_KANA;

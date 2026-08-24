@@ -259,7 +259,7 @@ if __name__ == '__main__':
         f.write(f'enum {{ CM_LEX_N = {len(lrows)}, CM_VERB_N = {len(vrows)}, CM_PART_N = {len(prows)},'
                 f' CM_PW_N = {len(pw_rows)}, CM_YN_N = {len(yn_rows)}, CM_GUIDE_N = {len(grows)},'
                 f' CM_FRAG_N = {len(frows)}, CM_ROLE_N = {len(ROLES)} }};\n')
-        for k in ['VK_WALK', 'VK_CLIMB', 'VK_DISEMBARK', 'VK_ENTER', 'VK_EXIT', 'VK_LEAVE']:
+        for k in ['VK_WALK', 'VK_CLIMB', 'VK_DISEMBARK', 'VK_ENTER', 'VK_EXIT', 'VK_LEAVE', 'VK_SWIM']:
             name = k[3:]
             f.write(f'enum {{ {k} = {vkeys.index(name) if name in vkeys else -1} }};\n')
         f.write('extern const unsigned short cm_jpool[];\nextern const char cm_apool[];\n')

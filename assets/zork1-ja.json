@@ -21,6 +21,11 @@
    "ja": "トロルは驚くほど器用に{PRSO}を受け止めたが、今は腹が満ちているのか、それを投げ返してきた。幸い狙いは正確でなく、{PRSO}は床に落ちた。トロルは不満そうだ。"
   },
   {
+   "en": "The troll, who is remarkably coordinated, catches the {PRSO} and not having the most discriminating tastes, gleefully eats it.",
+   "id": "A-26",
+   "ja": "トロルは驚くほど器用に{PRSO}を受け止めると、味の好みもうるさくないので、嬉々としてそれを食べた。"
+  },
+  {
    "en": "A terrific throw! The {PRSO} hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.",
    "id": "A-5",
    "ja": "見事な投げだ。{PRSO}はきみの頭にまともに命中した。ふだんなら大した傷にもならないが、あいにく、身をかがめようとして後ろへ倒れ、首の骨を折ってしまった。大地下帝国の裁きは迅速かつ慈悲深い。"

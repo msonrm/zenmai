@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""オプション画面の文言と、同梱物のライセンス全文を ui_data.h に出す。
+"""オプションの読み物 3 頁と画面の文言を ui_data.h に出す。
 
-★画面に書き写さず、**実ファイルを読む**。ブラウザ版(web/index.html の #license)と
-同じ理由 —— 書き写すと LICENSE を直したときにここだけ古くなる。
+★ライセンスは画面に書き写さず、**実ファイルを読む**。ブラウザ版(web/index.html の
+  #license)と同じ理由 —— 書き写すと LICENSE を直したときにここだけ古くなる。
 
 PS1 版は `.psexe` 1 本で配るので**外部ファイルが置けない**。MIT も zlib も
 「複製物に著作権表示とライセンス本文を含める」ことを条件にしているから、
 全文を焼き込むのが唯一の道になる。
+
+★頁は 3 つ(もじの うちかた / つかえる ことば / ライセンス)。**器は 1 つ**で、
+  C 側は「行の並びを縦に送る」だけ。中身はここのデータでしかない。
 
 使い方: python3 gen_ui.py
 """
@@ -16,13 +19,22 @@ HERE = Path(__file__).parent
 ROOT = HERE.parent
 
 JA, EN, BOTH = 1, 2, 0
+# ★本文幅。zm_dual_main.c の PAGE_X と**必ず同じ余白**にすること(縁取りの内側)
+TEXT_W = 640 - 2 * 48
+P_TYPING, P_CMDS, P_LICENSE = 0, 1, 2
+PAGE_N = 3
 
-# (lang, dim, 本文) の並び。dim = 控えめの色(ライセンス全文)
-lines = []
+lines = []          # (page, lang, dim, 本文)。dim = 控えめの色
+cur = P_TYPING
+
+
+def page(n):
+    global cur
+    cur = n
 
 
 def put(text, lang=BOTH, dim=0):
-    lines.append((lang, dim, text))
+    lines.append((cur, lang, dim, text))
 
 
 def put_file(path):
@@ -33,12 +45,29 @@ def put_file(path):
 def rule():
     # ★罫線は ASCII で引く。同梱フォントは「使う字だけ」なので、
     #   訳文に出てこない記号(─ など)は**入っていない**(照合して分かった)
-    put('-' * 48, BOTH, 1)
+    # ★長さは本文幅から決める。固定の 48 本だと余白を変えた途端に**折り返して
+    #   「---」が次行にこぼれる**(実際にこぼした)
+    put('-' * (TEXT_W // 12), BOTH, 1)
 
 
-put('ライセンスと出どころ', JA)
-put('LICENSE & CREDITS', EN)
+# ---- 頁 1: もじの うちかた ----
+# ★本文は持たない。**コントローラの図**そのものが説明になる（web 版と同じ考え方）。
+#   図の札は入力表 GP_KANA / GP_ENG から引くので、ここには**固定の札だけ**を置く。
+# ---- 頁 2: つかえる ことば ----
+# ★★ 仮の中身。本番は cmd_data から作る(手で書き写すと本体とずれる)。
+page(P_CMDS)
+put('（ここは かりの ないよう）', JA, 1)
+put('(placeholder text)', EN, 1)
 put('')
+put('みる  とる  おく  あける  よむ', JA)
+put('きた  みなみ  ひがし  にし', JA)
+put('ほぞんする  さいかいする', JA)
+put('look  take  drop  open  read', EN)
+put('north  south  east  west', EN)
+put('save  restore', EN)
+
+# ---- 頁 3: ライセンス ----
+page(P_LICENSE)
 put('このソフトは自由に使えるものだけで組み立ててある。', JA)
 put('Built only from freely licensed parts.', EN)
 put('')
@@ -81,22 +110,46 @@ put('ここでは名前・ロゴに作品名を使わない。', JA)
 put('Game titles are trademarks and are not covered above;', EN)
 put('this project does not use them in its name or logo.', EN)
 
-# ---- オプション画面の文言 ----
+# ---- 画面の文言 ----
 # ★ここに出る文字列は全部「こちらのもの」。原作の文は 1 つも出ないので、
 #   訳の表は通さず完成行として持つ(「その文字列は誰のものか」)。
-UI = [
-    ('TITLE',   'せってい',   'OPTIONS'),
-    ('LICENSE', 'ライセンス', 'LICENSE'),
-    ('CLOSE',   'とじる',     'CLOSE'),
-    ('HINT',    'O きめる   X とじる', 'O SELECT   X CLOSE'),
-    # ★矢印(↑↓)も同梱フォントに無い。ひらがなで書く
-    ('SCROLL',  'じょうげで おくる   X もどる', 'UP/DOWN SCROLL   X BACK'),
+# ★項目名はそのまま頁の見出しになる(並びは P_* と同じ)。
+ITEM = [
+    ('もじの うちかた', 'HOW TO TYPE'),
+    ('つかえる ことば', 'COMMANDS'),
+    ('ライセンス',      'LICENSE'),
+]
+# ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
+#   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
+#   いちいち書くと**画面がその分だけ狭くなるだけ**になる。
+#   (だから決定を ○/× で入れ替える必要も無くなった = **どのフェイスボタンでも決まる**)
+# ★起動の言語メニューに出す一行だけは残す。**メニューがあること**は作法ではないし、
+#   物語の紙面にシステムの字は混ぜないので、全員が通るここでしか知らせられない。
+BOOT = ('ゲームちゅう START で メニュー', 'PRESS START IN GAME FOR THE MENU')
+# ★「もじの うちかた」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
+#   ここには無い —— 図に出ている字と実際に入る字が違う、が最悪の事故（web 版の教訓）。
+# ★英語面は**かなの行/段ではない** —— プッシュホン式(T9)で、十字がキー・面ボタンが
+#   そのキーの何文字目か、を選ぶ。だから ROW / VOWEL は直訳の誤りになる。
+# ★SELECT は**言語で役が違う**（日本語 = 濁点/半濁点のトグル、英語 = 空白）。
+#   札は実際の役をそのまま名指しする（「くうはく」と書いていたのは誤り）。
+HELP = [
+    ('L1 はまやらわ',    'L1 KEYS 6-0'),
+    ('L2 ようおん',      'L2 SHIFT'),
+    ('R2 ん を',         'R2 0'),
+    ('SELECT てん まる', 'SELECT SPACE'),
+    # ★START だけは「字の打ち方」ではないので括弧に入れて、別の種類だと示す
+    ('（START かくてい）', '(START SEND)'),
+    # ★この一行が**左右の役をすでに言っている**ので、群の見出しは持たない。
+    #   ひらがなだけだと入りきらないので漢字を交ぜる
+    ('左手で行をえらび 右手で文字をうつ', 'LEFT HAND PICKS THE KEY, RIGHT HAND TYPES'),
+    # ★っ は日本語だけ（英語面の L2 はシフト）
+    ('R2 ながおしでけす   L2 と R2 で っ', 'HOLD R2 TO DELETE'),
 ]
 
 # ---- 画面幅で折り返す ----
 # ★専用画面で描くので、**折り返しはここで済ませておく**(C 側は行を y に並べるだけ)。
-#   半角 12px / 全角 24px、本文幅は W - 2*MARGIN = 576px。
-TEXT_W = 640 - 2 * 32
+#   半角 12px / 全角 24px。★左右の余白は**縁取りの内側**にとるので、
+#   zm_dual_main.c の PAGE_X と**必ず同じ値**にすること。
 
 
 def width(t):
@@ -108,78 +161,106 @@ def wrap(t):
         return [t]
     out = []
     if ' ' in t.strip():                      # 英文は語で折る
-        cur = ''
+        cur_ = ''
         for w in t.split(' '):
-            cand = (cur + ' ' + w) if cur else w
-            if width(cand) > TEXT_W and cur:
-                out.append(cur)
-                cur = w
+            cand = (cur_ + ' ' + w) if cur_ else w
+            if width(cand) > TEXT_W and cur_:
+                out.append(cur_)
+                cur_ = w
             else:
-                cur = cand
-        if cur:
-            out.append(cur)
+                cur_ = cand
+        if cur_:
+            out.append(cur_)
         return out
-    cur = ''                                  # 日本語は字で折る
+    cur_ = ''                                 # 日本語は字で折る
     for c in t:
-        if width(cur + c) > TEXT_W:
-            out.append(cur)
-            cur = c
+        if width(cur_ + c) > TEXT_W:
+            out.append(cur_)
+            cur_ = c
         else:
-            cur += c
-    if cur:
-        out.append(cur)
+            cur_ += c
+    if cur_:
+        out.append(cur_)
     return out
 
 
 wrapped = []
-for lang, dim, text in lines:
+for pg, lang, dim, text in lines:
     for part in wrap(text):
-        wrapped.append((lang, dim, part))
+        wrapped.append((pg, lang, dim, part))
 lines = wrapped
 
 pool = []
 recs = []
-for lang, dim, text in lines:
+for pg, lang, dim, text in lines:
     off = len(pool)
     pool.extend(ord(c) for c in text)
-    recs.append((off, len(text), dim, lang))
+    recs.append((off, len(text), dim, lang, pg))
 
 out = ['/* gen_ui.py が生成。手で編集しない */',
-       '/* 同梱物のライセンス全文と出典。★実ファイルから作っている(書き写していない) */',
+       '/* オプションの読み物 3 頁 + 画面の文言。',
+       '   ★ライセンス全文は実ファイルから作っている(書き写していない) */',
        '',
-       'typedef struct { unsigned int off; unsigned short len;',
-       '                 unsigned char dim; unsigned char lang; } LicLine;',
+       'typedef struct { unsigned int off; unsigned short len; unsigned char dim;',
+       '                 unsigned char lang; unsigned char page; } UiLine;',
+       'typedef struct { const unsigned short *s; unsigned short n; } UiStr;',
        '',
-       'static const unsigned short LIC_POOL[%d] = {' % max(len(pool), 1)]
+       'static const unsigned short UI_POOL[%d] = {' % max(len(pool), 1)]
 for i in range(0, len(pool), 16):
     out.append('    ' + ', '.join('0x%04X' % c for c in pool[i:i + 16]) + ',')
 if not pool:
     out.append('    0,')
 out.append('};')
 out.append('')
-out.append('static const LicLine LIC_LINES[%d] = {' % len(recs))
-for off, ln, dim, lang in recs:
-    out.append('    { %d, %d, %d, %d },' % (off, ln, dim, lang))
+out.append('static const UiLine UI_LINES[%d] = {' % len(recs))
+for off, ln, dim, lang, pg in recs:
+    out.append('    { %d, %d, %d, %d, %d },' % (off, ln, dim, lang, pg))
 out.append('};')
 out.append('')
-out.append('#define LIC_N %d' % len(recs))
+out.append('#define UI_LINE_N %d' % len(recs))
+out.append('#define UI_PAGE_N %d' % PAGE_N)
 out.append('')
-out.append('/* ---- オプション画面の文言(日本語 / 英語) ---- */')
-for name, ja, en in UI:
-    for suf, text in (('JA', ja), ('EN', en)):
-        out.append('static const unsigned short UI_%s_%s[%d] = { %s };'
-                   % (name, suf, len(text), ', '.join('0x%04X' % ord(c) for c in text)))
-        out.append('#define UI_%s_%s_N %d' % (name, suf, len(text)))
+out.append('/* ---- 画面の文言(添字 = lang_en) ---- */')
+
+strs = []
+
+
+def sref(text):
+    """文字列を UI_Sn として吐き、UiStr の初期化子を返す"""
+    i = len(strs)
+    strs.append((i, text))
+    return '{ UI_S%d, %d }' % (i, len(text))
+
+
+items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
+helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
+boots = [sref(BOOT[0]), sref(BOOT[1])]
+
+for i, text in strs:
+    out.append('static const unsigned short UI_S%d[%d] = { %s };'
+               % (i, len(text), ', '.join('0x%04X' % ord(c) for c in text)))
+out.append('')
+out.append('static const UiStr UI_ITEM[2][UI_PAGE_N] = {')
+for row in items:
+    out.append('    { ' + ', '.join(row) + ' },')
+out.append('};')
+out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
+out.append('/* 図の固定札: L1 / L2 / R2 / SELECT / START */')
+out.append('#define UI_HELP_N %d' % len(HELP))
+out.append('static const UiStr UI_HELP[2][UI_HELP_N] = {')
+for row in helps:
+    out.append('    { ' + ', '.join(row) + ' },')
+out.append('};')
 out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
 
 used = set()
-for _, _, t in lines:
+for _, _, _, t in lines:
     used.update(t)
-for _, ja, en in UI:
+for ja, en in ITEM + HELP + [BOOT]:
     used.update(ja)
     used.update(en)
 (HERE / 'ui_chars.txt').write_text(''.join(sorted(used)), encoding='utf-8')
 
-longest = max((len(t) for _, _, t in lines), default=0)
-print('ui_data.h: ライセンス %d 行 / %d 字 / 最長 %d 字' % (len(recs), len(pool), longest))
+per = [sum(1 for r in recs if r[4] == p) for p in range(PAGE_N)]
+print('ui_data.h: %d 行 (頁ごと %s) / %d 字' % (len(recs), per, len(pool)))

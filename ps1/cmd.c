@@ -625,6 +625,19 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
             r->command[r->command_len++] = ow[t][q];
     }
     r->command[r->command_len] = 0;
+    /* ★「およぐ」だけは目的語を添えて送る（JS の command.js と同じ手当て）。
+       原作の V-SWIM は目的語なしのとき空の物に D ,PRSO を呼び、**文字化けを印字する**。
+       水の無い場所では外れるので、素の swim を別案に添える。 */
+    if (vidx == VK_SWIM && !prso && !tool && !dest && !nbd) {
+        for (int t = 0; t < r->command_len && t < 95; t++)
+            r->alts[r->alts_n][t] = r->command[t];
+        r->alts_lens[r->alts_n] = r->command_len < 95 ? r->command_len : 95;
+        r->alts_n++;
+        static const char tail[] = " in water";
+        for (int t = 0; tail[t] && r->command_len < 159; t++)
+            r->command[r->command_len++] = tail[t];
+        r->command[r->command_len] = 0;
+    }
     r->has_command = 1;
     r->trace = CMD_TR_OK;
 

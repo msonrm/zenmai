@@ -83,6 +83,9 @@ void draw_jp(const uint16_t *s, int n, uint16_t color);
 void draw_plain(const uint16_t *s, int n, uint16_t color);
 void draw_echo(const uint16_t *s, int n);
 void draw_strip(const uint16_t *cmd, int len, int caret, const uint16_t *ind, int ilen);
+/* コマンド欄を strip[][] に組むだけ(地色を選べる)。送るのは呼んだ側 */
+void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
+                 const uint16_t *ind, int ilen);
 void pad_try_analog(void);
 void jp_text_init(void);   /* JA ビルド: ルビ付き描画器を登録 */
 int pad_read_ex(uint8_t axes[4]);

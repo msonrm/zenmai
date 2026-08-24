@@ -368,8 +368,14 @@ def main():
 
     if not (args.png or args.expect):
         return
-    from PIL import Image
     vram = vram_from_gp0(gp0)
+    if args.png and not args.expect:
+        # ★PIL が無い環境でも画面を見たいので、PNG は自前で書ける道を用意する
+        #   (Pillow は入っていないことがある。ここで詰まると寸法が目で確かめられない)
+        write_png(args.png, vram)
+        print('VRAM →', args.png)
+        return
+    from PIL import Image
     img = Image.new('RGB', (640, 480))
     img.putdata([((p & 31) << 3, (p >> 5 & 31) << 3, (p >> 10 & 31) << 3)
                  for row in vram[:480] for p in row[:640]])
@@ -382,6 +388,28 @@ def main():
         b_ = [(r >> 3, g >> 3, b >> 3) for r, g, b in ref.getdata()]
         assert a == b_, '画素が一致しない'
         print('OK: 画素 307,200 点一致')
+
+
+def write_png(path, vram):
+    """RGB555 の VRAM を 640x480 の PNG に落とす(zlib だけで書く)"""
+    import struct, zlib
+    raw = bytearray()
+    for y in range(480):
+        raw.append(0)                       # フィルタ = None
+        row = vram[y]
+        for x in range(640):
+            p = row[x]
+            raw += bytes(((p & 31) << 3, (p >> 5 & 31) << 3, (p >> 10 & 31) << 3))
+
+    def chunk(tag, data):
+        return (struct.pack('>I', len(data)) + tag + data
+                + struct.pack('>I', zlib.crc32(tag + data) & 0xFFFFFFFF))
+
+    Path(path).write_bytes(
+        b'\x89PNG\r\n\x1a\n'
+        + chunk(b'IHDR', struct.pack('>IIBBBBB', 640, 480, 8, 2, 0, 0, 0))
+        + chunk(b'IDAT', zlib.compress(bytes(raw), 6))
+        + chunk(b'IEND', b''))
 
 
 if __name__ == '__main__':
