@@ -1,198 +1,91 @@
 # 🌀 Zenmai
 
-**公開中: https://zenmai.pages.dev/** —— キーボード / ゲームパッド / スマホのフリック。
+**Zork I on the original PlayStation — read in Japanese, typed with a game controller.**
 
-**日本語で読み、日本語で打つテキストアドベンチャー。** 1979 年の仮想機械をブラウザに載せ替え、
-出力を日本語に、入力を日本語から。**ゲームコントローラだけで遊べる。**
+**初代 PlayStation で動く Zork I —— 日本語で読み、ゲームコントローラで打つ。**
 
-> **Zenmai** (ぜんまい) is Japanese for *mainspring* — the coiled spring that drives a clockwork,
-> named after the fern whose curled shoot it resembles. Here it drives a **Z-machine**, in Japanese.
+[**Download / ダウンロード**](https://github.com/msonrm/zenmai/releases) → `zenmai-zork.psexe`
 
-> 名前の由来: 「ぜんまい（発条）」は時計を駆動する渦巻きばね。その名は植物のゼンマイ（薇）の
-> 巻いた新芽から借りたもの —— **植物が先で、機械があとから名を借りた**。
-> 駆動するのは **Z-machine**（Infocom が 1979 年に作った仮想機械）。
-> 飛ばし読みすると仕込みが出る: `ZENMAchIne`
-> （表記を **Zenmai** に揃えているのは、**Z-machine と字面が似る**ため）
+---
 
-## なぜ作るのか
+## What it is / これは何か
 
-**堀井雄二がコマンド選択式アドベンチャーで解いた問題への、別解の提示。**
+A port of the **Z-machine** — Infocom's 1979 virtual machine, the thing that runs *Zork* —
+to the original PlayStation, with a Japanese layer over it. No keyboard required.
 
-1985 年のファミコン版『ポートピア連続殺人事件』がコマンド選択式を採ったのは、
-①**家庭用機にキーボードが無い**（物理）②**プレイヤーが作者の語彙を当てるまで進めない**
-（認知 —— 英語圏で "guess the verb" と呼ばれてきた問題）の 2 つを同時に解くためだった。
+**Z-machine の PS1 移植。** Z-machine は Infocom が 1979 年に作った仮想機械で、『Zork』を
+動かしていたもの。それを初代 PlayStation に載せ、日本語の層をかぶせてある。
+**キーボードは要らない。**
 
-こちらは**制約そのものを外す側から**同じ問題に答える:
+## Typing without a keyboard / キーボード無しで文字を打つ
 
-- ① → **ゲームコントローラで日本語を打てる**ようにする
-- ② → **自然文をゲームの語彙へ写像する**
+Text adventures need free text. Consoles have no keyboard. Zenmai's answer is not a
+menu of commands but **a way to actually type**, using nothing but a D-pad and four buttons.
 
-★向きが逆になっている。選択式は「入力を諦めて**候補を見せた**」。こちらは
-「入力できるようにして**候補を見なくする**」。
+テキストアドベンチャーには自由な文章が要る。家庭用機にはキーボードが無い。
+Zenmai の答えは**コマンドの一覧を出すこと**ではなく、**本当に打てるようにすること**。
+使うのは十字キーと 4 つのボタンだけ。
 
-そして**日本語の自由入力アドベンチャーは 40 年ほぼ存在しない**（1980 年代前半で系譜が途切れ、
-日本では「テキストアドベンチャー = 選択式」が定着した）。多くの日本語話者にとって未経験の体験。
+### English — the telephone keypad / 英語 —— プッシュホン
 
-## しくみ
+The D-pad picks a key, a face button picks which letter on that key.
+**The assignment is the one from a telephone keypad** (`2 = ABC`, `7 = PQRS`) —
+the same one that phones used for text before smartphones.
 
-```
-コントローラ ──> 日本語のかな漢字入力 ──> ゲームの語彙へ写像 ──> Z-machine（英語のまま動く）
-                                                                    │
-        画面 <── 日本語の完成文を引く <── 出力を行単位で貯めて照合 <──┘
-```
+十字キーでキーを選び、フェイスボタンでそのキーの何文字目かを選ぶ。
+割り当ては**プッシュホンのそれ**（`2 = ABC`, `7 = PQRS`）——
+スマートフォン以前の携帯電話が文字入力に使っていたものと同じ。
 
-- **Z-machine は英語のまま動かす。** パーサの辞書は英語で焼き込まれているので、
-  入力側で英語コマンドに落とすのは避けられない
-- **出力の翻訳に実行時の機械翻訳は使わない。** 事前に訳した完成文を**辞書引き**する。
-  だから毎回同じ訳が出る（安定・オフライン・軽い）
-- ★**照合は行単位。** 1 行の出力が複数の印字呼び出しに割れているため、
-  改行まで貯めてから「英語の完成行」をキーに日本語を引く
-- ★**曖昧解消・複数対象・代名詞・聞き返しは原作が持っている。** こちらは
-  日本語からその語（`all` / `except` / `and` / `it`）へ届く道を作るだけでよい
+### Japanese — flick input, unfolded / 日本語 —— フリック入力を開く
 
-### 語彙の構造（1 語 = 表記 + 読み、上位語は宣言）
+The left hand picks the consonant row, the right hand picks the vowel — the same
+five-way arrangement as **flick input** on a Japanese phone keyboard. The flick directions
+land on the face buttons **in the positions they already point to**: □ (left) = い,
+△ (up) = う, ○ (right) = え, ✕ (down) = お, R1 (no flick) = あ.
+If you can type on a phone, you already know this.
 
-日本語語彙（`notes/sources/zork1-cmd-ja.md` が原簿）は **1 語 = `表記(よみ)`**。
-読みが複数なら `・` で並べ（`球(たま・きゅう)`）、**第一読みがふりがな**になる。
-`×` を後置した読みは**ルビ専用**（`戸(と×)` —— 1 モーラの「と」を入力語彙に入れると
-「そっと**と**びら」の と を食う。実測で `open front door and advertisement` が出た）。
+左手で行を選び、右手で段を選ぶ。並びはスマートフォンの**フリック入力**そのまま。
+フリックの向きは、**そのまま指している位置のフェイスボタン**に来る ——
+□（左）= い / △（上）= う / ○（右）= え / ✕（下）= お / R1（フリック無し）= あ。
+**スマートフォンで打てる人は、もう覚えている。**
 
-★**上位語（扉・箱・舟…）は物の欄に書かず、専用の表で宣言する**。原作は上位語を
-**共有シノニム**として持っている（`TREASURE` は 21 個の物の名詞）ので、`名詞` がある
-宣言は**その語を渡すだけ** —— どれを指すかは原作のスコープと聞き返しが決める
-（ランタン → `lamp`。形容詞を先回りで足すと、その場に無い物を名指しして外れる）。
-原作に共通の名詞が無い日本語だけの上位語（箱 = mailbox / case / chest / trunk）は
-候補を宣言の**対象順**に試す。以前は各物の別名リストから実行時に逆算していた ——
-逆算は編集のたびに揺れるので、宣言に置き換えた。
+## Why it might matter / この先
 
-この構造化で、**訳文に出る物の名前でふりがなが振れないものは 0 になった**
-（読みの割り付けは推測ではなく宣言。`zork1_yomi_check.py` が「読みの無い漢字形」を
-機械的に落とす）。
+The scheme needs only a directional input and four buttons — no pointer, no virtual keyboard,
+no line of sight to a rendered key. That is also the shape of a **VR controller**, where
+poking at a floating keyboard is still the state of the art. The same layout transfers.
 
-### 複数対象（ぜんぶ／以外／と）
+要るのは方向入力と 4 ボタンだけ。ポインタも仮想キーボードも、キーを見て狙う動作も要らない。
+これは **VR コントローラ**の形でもある —— 宙に浮いたキーボードを突く方式がいまだに主流の場所だ。
+**この割り当てはそのまま持っていける。**
 
-「ぜんぶとる」「らんたんいがいをぜんぶとる」「びんとふくろをとる」が打てる。
-渡す先は原作のパーサで、`all` / `but` / `except` / `and` は **z3 の辞書に最初から入っている**
-（684 語を直接読んで確かめた）。
+## Also / そのほか
 
-★**訳の側に穴が開く**のがここの肝。複数対象になると原作は対象ごとに `<名前>: <文>` の形で
-1 行を出すので、**行単位で引く設計では名前が頭に付いた瞬間に在庫から外れる**
-（`Dropped.` は持っているのに `brown sack: Dropped.` が引けない）。組み合わせは
-（対象 × 応答文）だけあって在庫に足しても追いつかないので、**剥がして両方引いて組み直す**
-規則を 1 本置いた。名前と本文の**両方が引けたときだけ**成立させる —— 片方でも欠けたら
-未訳のまま出す（`:` を含むだけの行を、それらしい顔にして隠さないため）。
+The same game runs in a browser at **https://zenmai.pages.dev/**
+(keyboard, gamepad, or flick input on a phone).
 
-### 訳の作り方（要点）
+同じものはブラウザでも動く —— **https://zenmai.pages.dev/**
+（キーボード / ゲームパッド / スマホのフリック入力）。
 
-原文は**必ず ZIL ソースから抽出**し、人間が触るのは訳文だけ。接合点は ID
-（正規化した原文のハッシュ）。★**原文を手で書き写す経路を作らない** —— 転記ミスがそのまま
-「訳が出ない」欠損になるため。
+Design notes, how the translation layer works, the vocabulary structure, and the test suite:
+**[`docs/overview.md`](docs/overview.md)**.
+PlayStation build and implementation notes: **[`docs/ps1-implementation-notes.md`](docs/ps1-implementation-notes.md)**.
 
-## 状態
+設計・訳の層のしくみ・語彙の構造・検査は **[`docs/overview.md`](docs/overview.md)**、
+PS1 のビルドと実装ノートは **[`docs/ps1-implementation-notes.md`](docs/ps1-implementation-notes.md)**。
 
-**公開して遊べる**（2026-08-15）。日本語で打って日本語で返るところまで通っている。
-端末でも同じものが動く —— `node test/run-full-ja.js "ゆうびんばこをあける" "にしへいく"`:
+## License / ライセンス
 
-```
-家の西
-白い家の西、開けた野原に立っている。家の正面の扉には板が打ちつけられている。
-ここに小さな郵便箱がある。
+MIT for the code in this repository. *Zork I* comes from the
+[ZIL sources released under MIT](https://github.com/historicalsource/zork1) (Microsoft, 2025);
+the Z-machine implementations are [ZVM](https://github.com/curiousdannii/ifvms.js) (web)
+and [MojoZork](https://github.com/icculus/mojozork) (PlayStation).
+Zork is a trademark of Infocom; the rights are now held by Microsoft.
+**This project is not affiliated with either, and does not use the title as its own name or brand.**
 
-> ゆうびんばこをあける   → open mailbox
-小さな郵便箱を開けると、ちらしが出てきた。
-
-> にしへいく   → west
-森
-森だ。四方が木に囲まれている。東の方に日の光があるようだ。
-```
-
-| | いま |
-|---|---|
-| 訳文 | 完全一致 1,109 / テンプレート 147 / 完成行 170 / 名前 336 / 語訳 444 / ふりがな 387 |
-| 在庫 | 1,803 件 = 訳あり 1,592 / 完成行に吸収 166 / 訳さない 45 —— ★**未解決 0** |
-| 入力 | 前置詞 18 / 動詞 126 / 物 134 / 上位語 31 —— 日本語の言い方は延べ **1,092** |
-| 打ち方 | キーボード / ゲームパッド / スマホのフリック（★**op の語彙が同じなので配線は 1 本**） |
-| 検査 | **7 本**（`test/run-*.js`）—— 入力の固定表 56 件・通しの日本語・walkthrough の未訳ログ・Glk シム・セーブ復帰・ブラウザホストの配線・ZVM ハーネス |
-
-### PlayStation 版（`ps1/`）
-
-★**同じものが初代 PlayStation でも動く**（2026-08-21）。`zenmai-zork.psexe` 1 本で、
-起動時に 日本語 / ENGLISH を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
-自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
-
-```bash
-cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
-./build.sh && python3 sim.py zenmai-scroll.psexe --expect golden.png --max 400000000
-                                                # ↑ R3000 シミュレータで画素照合(要 Pillow)
-sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
-sh test-options.sh                              # オプション(打っていないときの Start)
-sh test-quit.sh                                 # quit の行き先(起動メニューへ戻る)
-```
-
-**キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
-（計画 = `docs/ps1-port-plan.md`、作って分かったこと = `docs/ps1-implementation-notes.md`）。
-
-セーブ（メモリーカード）とオプションまで入って**一区切り**（2026-08-24）。オプションには
-**ひらがな入力方法**（押したボタンがそのまま図に出て、その場で試し打ちできる）・
-**システムコマンド**・**ライセンス全文**が入る。配布は GitHub Releases（`ps1-v*`）。
-
-差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
-描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・
-ふりがな・コントローラ入力を自分の手に置ける。
-
-### 動かす
-
-```bash
-node test/run-full-ja.js "ゆうびんばこをあける" "にしへいく"   # 端末で遊ぶ（日本語で打つ）
-node test/run-walkthrough.js test/walkthrough.txt              # 全経路を流して未訳ログを取る
-node build.mjs && npx wrangler pages deploy dist --project-name zenmai   # 公開
-```
-
-`build.mjs` は `web/` を 1 階層に畳んで参照を書き換える（`web/` は `../assets` を見ているので
-そのまま root にできない）。検査は `ZENMAI_ROOT=dist` で**畳んだ後の形**にも通せる。
-
-★**wrangler は git のブランチ名を見る。** main 以外に居ると**プレビューに出る**のに
-「Deployment complete!」と言う（本番は旧版のまま）。作業ブランチから本番へ出したいなら
-`--branch main` を付けること。★確かめ方は**中身の照合**:
-
-```bash
-curl -sSL https://zenmai.pages.dev/ | md5sum ; md5sum < dist/index.html   # 一致するか
-```
-
-（`/index.html` はリダイレクトするので `-L` を付けるか `/` で取る。付けないと空が返り、
-**md5 が「空文字列のハッシュ」で揃って一致に見える**。）
-
-### 残っている穴
-
-- ★**「未解決 0」は「抽出器が見た範囲での 0」** —— 監査の分母は抽出器が決めるので、
-  実プレイで新しい行が出る可能性は残る（過去 3 回とも、静的な監査ではなく**実機が**見つけている）。
-  だから未訳ログの仕組みは残してある
-- **スロットに英語が残るもの** —— walkthrough 全域で 1 種（`You can't see any of boat here!`）。
-  行としては引けているので未訳には出ない
-- **英語モード**（本文もコマンドも英語）は未着手。土台はある（訳を引かず素通し・`toCommand` を
-  通さない）が、ゲームパッドの英語 T9 が足りない
-- UI の詰め —— 実機で 4 巡して毎回何か出ている（寸法と配置。★**ロジックではなくここが本体**）
-
-## ライセンスと出典
-
-- 本リポジトリの自作部分: **MIT**
-- **Z-machine 実装**: [ifvms.js](https://github.com/curiousdannii/ifvms.js) (ZVM) — MIT
-- **作品のソース**: [historicalsource](https://github.com/historicalsource) の ZIL ソース公開分 — **MIT**
-  （2025-11-20、Microsoft Open Source Programs Office / Team Xbox / Activision による公開）
-- ⚠ **商標は上記の公開に含まれていない。** 本プロジェクトは作品名を名称・ブランドに用いない。
-  作中に現れる商標表示は原文のまま保持する
-
-★**MIT が求めているのは「複製物に著作権表示と許諾文を含めること」**で、画面に出すことではない。
-だから本体は**配布物にファイルが在ること**（`build.mjs` が 3 本とも `dist/` へ運ぶ）:
-
-| | 配布先 |
-|---|---|
-| 自作部分 | `/LICENSE` |
-| ifvms.js (ZVM) | `/vendor/LICENSE.ifvms` |
-| 作品のソース | `/vendor/zork1/LICENSE`（出どころは `/vendor/zork1/README.md`） |
-
-そのうえで、**設定と手引き（歯車）の「ライセンスと出典」から全文を読める**ようにしてある
-（入口の案内からも行ける。押しても案内は閉じない ＝ まだ始まらない）。
-★画面には**書き写さない** —— 実ファイルを fetch して出す。書き写すと `LICENSE` を直したとき
-画面だけが古くなる。★Pages は**無いパスにも index.html を 200 で返す**ので、`ok` ではなく
-**中身**を見て弾いている（`/LICENSE` は実際、この対応まで 404 で index.html が返っていた）。
+本リポジトリのコードは MIT。『Zork I』は
+[MIT で公開された ZIL ソース](https://github.com/historicalsource/zork1)（Microsoft・2025）由来。
+Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と
+[MojoZork](https://github.com/icculus/mojozork)（PS1）。
+Zork は Infocom の商標で、現在の権利者は Microsoft。
+**このプロジェクトはどちらとも関係が無く、作品名を自分の名称やブランドには用いない。**
