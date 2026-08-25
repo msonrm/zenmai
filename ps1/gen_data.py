@@ -171,6 +171,22 @@ if _bad:
 # ---- 出力 ----
 with open(HERE / 'glyphs.h', 'w') as f:
     f.write('/* gen_data.py が生成。手で編集しない */\n')
+    # ★**このファイルだけはリポジトリの MIT ではなく OFL 1.1 の下にある。**
+    #   字形は KH ドットフォントの埋め込みビットマップと**バイト単位で同一**なので、
+    #   「レンダリング結果」ではなく font software の抽出。OFL の条件 2（複製物に
+    #   著作権表示とライセンス本文）と条件 5（一部であれ全体であれ OFL で頒布）が掛かる。
+    #   出どころと判断は ps1/vendor/kh-dotfont/README.md。
+    f.write('/*\n'
+            ' * 字形の出どころ: KH ドットフォント (khdotfont-20150527)\n'
+            ' *   KH-Dot-Hibiya-24 (本文) / KH-Dot-Kagurazaka-12 (ふりがな)\n'
+            ' *   http://jikasei.me/font/kh-dotfont/\n'
+            ' *\n'
+            ' * Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015\n'
+            ' *\n'
+            ' * This Font Software is licensed under the SIL Open Font License,\n'
+            ' * Version 1.1. 全文 = ps1/vendor/kh-dotfont/LICENSE\n'
+            ' * ★このファイルは OFL 1.1 の下にある(リポジトリの MIT ではない)。\n'
+            ' */\n')
     f.write('typedef struct { unsigned short code; unsigned char width; } GInfo;\n')
     f.write(f'enum {{ BASE_N = {len(base)}, RUBY_N = {len(rubyg)} }};\n')
     f.write('static const GInfo base_info[BASE_N] = {\n')

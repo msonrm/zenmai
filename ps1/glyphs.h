@@ -1,4 +1,15 @@
 /* gen_data.py が生成。手で編集しない */
+/*
+ * 字形の出どころ: KH ドットフォント (khdotfont-20150527)
+ *   KH-Dot-Hibiya-24 (本文) / KH-Dot-Kagurazaka-12 (ふりがな)
+ *   http://jikasei.me/font/kh-dotfont/
+ *
+ * Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015
+ *
+ * This Font Software is licensed under the SIL Open Font License,
+ * Version 1.1. 全文 = ps1/vendor/kh-dotfont/LICENSE
+ * ★このファイルは OFL 1.1 の下にある(リポジトリの MIT ではない)。
+ */
 typedef struct { unsigned short code; unsigned char width; } GInfo;
 enum { BASE_N = 1389, RUBY_N = 71 };
 static const GInfo base_info[BASE_N] = {
