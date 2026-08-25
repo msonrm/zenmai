@@ -98,6 +98,14 @@ PlayStation build and implementation notes: **[`docs/ps1-implementation-notes.md
 設計・訳の層のしくみ・語彙の構造・検査は **[`docs/overview.md`](docs/overview.md)**、
 PS1 のビルドと実装ノートは **[`docs/ps1-implementation-notes.md`](docs/ps1-implementation-notes.md)**。
 
+## Support / 応援
+
+If this was fun to read about or to play, you can buy me a coffee.
+
+読んで、あるいは遊んで面白かったら、コーヒーをおごってもらえると励みになります。
+
+[<img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="36" alt="Buy Me a Coffee at ko-fi.com">](https://ko-fi.com/msonrm)
+
 ## License / ライセンス
 
 MIT for the code in this repository — **except `ps1/glyphs.h`**, which holds glyph bitmaps
