@@ -6,6 +6,14 @@
 
 [**Download / ダウンロード**](https://github.com/msonrm/zenmai/releases) → `zenmai-zork.psexe`
 
+## See it running / 動いているところ
+
+[<img src="https://img.youtube.com/vi/rmKmOpTu2to/hqdefault.jpg" width="380" alt="I ported Zork to the PlayStation 1">](https://youtu.be/rmKmOpTu2to)
+[<img src="https://img.youtube.com/vi/08_QX_4cLYY/hqdefault.jpg" width="380" alt="テキストアドベンチャーの代表作Zorkをプレステ1で動くようにした">](https://youtu.be/08_QX_4cLYY)
+
+**[I ported Zork to the PlayStation 1](https://youtu.be/rmKmOpTu2to)** (English) ·
+**[テキストアドベンチャーの代表作Zorkをプレステ1で動くようにした](https://youtu.be/08_QX_4cLYY)**（日本語）
+
 ---
 
 ## What it is / これは何か
@@ -49,6 +57,22 @@ If you can type on a phone, you already know this.
 □（左）= い / △（上）= う / ○（右）= え / ✕（下）= お / R1（フリック無し）= あ。
 **スマートフォンで打てる人は、もう覚えている。**
 
+### Where it comes from / 出どころ
+
+The scheme is not new to this port. It comes from
+**[GIME](https://github.com/msonrm/GIME)** — a gamepad text-entry app that types Japanese,
+Korean, English (T9), Chinese and Devanagari from a controller. The full button mapping,
+including the analog sticks, is
+**[`docs/gamepad-mapping.md`](https://github.com/msonrm/GIME/blob/main/docs/gamepad-mapping.md)**.
+Zenmai ports that state machine to C and to the browser.
+
+この方式はこの移植のために作ったものではなく、
+**[GIME](https://github.com/msonrm/GIME)** —— ゲームパッドで日本語・韓国語・英語（T9）・
+中国語・デーヴァナーガリーを打つアプリ —— から来ている。
+アナログスティックまで含めたボタン割り当ての全体は
+**[`docs/gamepad-mapping.md`](https://github.com/msonrm/GIME/blob/main/docs/gamepad-mapping.md)**。
+Zenmai はその状態機械を C とブラウザへ移植している。
+
 ## Why it might matter / この先
 
 The scheme needs only a directional input and four buttons — no pointer, no virtual keyboard,
@@ -76,16 +100,27 @@ PS1 のビルドと実装ノートは **[`docs/ps1-implementation-notes.md`](doc
 
 ## License / ライセンス
 
-MIT for the code in this repository. *Zork I* comes from the
-[ZIL sources released under MIT](https://github.com/historicalsource/zork1) (Microsoft, 2025);
-the Z-machine implementations are [ZVM](https://github.com/curiousdannii/ifvms.js) (web)
-and [MojoZork](https://github.com/icculus/mojozork) (PlayStation).
+MIT for the code in this repository — **except `ps1/glyphs.h`**, which holds glyph bitmaps
+extracted from the **KH Dot Font** and is therefore under the
+**[SIL Open Font License 1.1](ps1/vendor/kh-dotfont/LICENSE)**
+(Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015 — see
+[`ps1/vendor/kh-dotfont/`](ps1/vendor/kh-dotfont/README.md)).
+
+*Zork I* comes from the [ZIL sources released under MIT](https://github.com/historicalsource/zork1)
+(Microsoft, 2025); the Z-machine implementations are
+[ZVM](https://github.com/curiousdannii/ifvms.js) (web) and
+[MojoZork](https://github.com/icculus/mojozork) (PlayStation, zlib).
 Zork is a trademark of Infocom; the rights are now held by Microsoft.
 **This project is not affiliated with either, and does not use the title as its own name or brand.**
 
-本リポジトリのコードは MIT。『Zork I』は
-[MIT で公開された ZIL ソース](https://github.com/historicalsource/zork1)（Microsoft・2025）由来。
-Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と
-[MojoZork](https://github.com/icculus/mojozork)（PS1）。
+本リポジトリのコードは MIT —— ただし ★**`ps1/glyphs.h` だけは例外**。
+**KH ドットフォント**から抜いた字形のビットマップなので
+**[SIL Open Font License 1.1](ps1/vendor/kh-dotfont/LICENSE)** の下にある
+（Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015 —— 出どころと判断は
+[`ps1/vendor/kh-dotfont/`](ps1/vendor/kh-dotfont/README.md)）。
+
+『Zork I』は [MIT で公開された ZIL ソース](https://github.com/historicalsource/zork1)
+（Microsoft・2025）由来。Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と
+[MojoZork](https://github.com/icculus/mojozork)（PS1・zlib）。
 Zork は Infocom の商標で、現在の権利者は Microsoft。
 **このプロジェクトはどちらとも関係が無く、作品名を自分の名称やブランドには用いない。**

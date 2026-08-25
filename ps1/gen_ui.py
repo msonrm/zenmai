@@ -160,11 +160,19 @@ rule()
 #   以前は小さい「ォ」が同梱フォントに無くて「KH Dot Font —— 使用書体」と出していた。
 put('KHドットフォント —— 使用フォント', JA)
 put('KH Dot Font -- the font used', EN)
-rule()
-put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
-put('Copyright (c) 1990-2015 Keitarou Hiraki and Font Silo', BOTH, 1)
-put('SIL Open Font License 1.1', BOTH, 1)
 put('http://jikasei.me/font/kh-dotfont/', BOTH, 1)
+rule()
+# ★著作権表示は**フォント自身が名乗る文字列**をそのまま出す（name table の nameID 0）。
+#   OFL 条件 2 が言う「上記の著作権表示」はこれのこと。語順を整えたりしない。
+put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
+put('Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015', BOTH, 1)
+put('')
+# ★**OFL も全文を焼く。** MIT と zlib と同じ理屈 —— OFL 1.1 の条件 2 も
+#   「各複製物に著作権表示と**このライセンス**を含めること」を求めている。
+#   ★`glyphs.h` はフォントの埋め込みビットマップと**バイト単位で同一**（全数照合済み）で、
+#   「レンダリング結果」ではなく font software の抽出なので、条件 5 も掛かる。
+#   出どころと判断は ps1/vendor/kh-dotfont/README.md。
+put_file(HERE / 'vendor/kh-dotfont/LICENSE')
 put('')
 
 # ★事実関係: Infocom の登録(Reg. 1,227,668 / 1983)は **2003-11-22 に取り消されている**
