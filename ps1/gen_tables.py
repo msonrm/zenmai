@@ -54,6 +54,13 @@ eng = table10x5('ENGLISH_TABLE')
 youon = pairs('YOUON_POSTSHIFT_MAP')
 daku = pairs('DAKUTEN_MAP')
 handaku = pairs('HANDAKUTEN_MAP')
+# ★PS1 適応: う→ゔ を落とす。**KH ドットフォントに ゔ(U+3094) が無い**ので、
+#   打てても黒い四角(.notdef)が出るだけだった(2026-08-25 に実測して発覚)。
+#   訳文にも語彙にも ゔ / ヴ は 1 件も出てこないので、打てなくても失うものは無い。
+#   ★合成(う + 濁点)も試したが駄目 —— この明朝は濁点を足すとき**清音の側も描き直す**
+#     ので、「が − か」で濁点だけを取り出すことができない。
+assert ('う', 'ゔ') in daku
+daku = [p for p in daku if p != ('う', 'ゔ')]
 
 
 def u(c):

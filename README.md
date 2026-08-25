@@ -117,22 +117,24 @@
 ### PlayStation 版（`ps1/`）
 
 ★**同じものが初代 PlayStation でも動く**（2026-08-21）。`zenmai-zork.psexe` 1 本で、
-起動時に にほんご / ENGLISH を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
+起動時に 日本語 / ENGLISH を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
 自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
 
 ```bash
 cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
-python3 sim.py zenmai-zork.psexe --expect golden.png   # R3000 シミュレータで画素照合
+./build.sh && python3 sim.py zenmai-scroll.psexe --expect golden.png --max 400000000
+                                                # ↑ R3000 シミュレータで画素照合(要 Pillow)
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
 sh test-options.sh                              # オプション(打っていないときの Start)
+sh test-quit.sh                                 # quit の行き先(起動メニューへ戻る)
 ```
 
 **キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
 （計画 = `docs/ps1-port-plan.md`、作って分かったこと = `docs/ps1-implementation-notes.md`）。
 
 セーブ（メモリーカード）とオプションまで入って**一区切り**（2026-08-24）。オプションには
-**もじの うちかた**（押したボタンがそのまま図に出て、その場で試し打ちできる）・
-**つかえる ことば**・**ライセンス全文**が入る。配布は GitHub Releases（`ps1-v*`）。
+**ひらがな入力方法**（押したボタンがそのまま図に出て、その場で試し打ちできる）・
+**システムコマンド**・**ライセンス全文**が入る。配布は GitHub Releases（`ps1-v*`）。
 
 差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
 描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・

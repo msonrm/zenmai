@@ -8,7 +8,7 @@ PS1 版は `.psexe` 1 本で配るので**外部ファイルが置けない**。
 「複製物に著作権表示とライセンス本文を含める」ことを条件にしているから、
 全文を焼き込むのが唯一の道になる。
 
-★頁は 3 つ(もじの うちかた / つかえる ことば / ライセンス)。**器は 1 つ**で、
+★頁は 3 つ(ひらがな入力方法 / システムコマンド / ライセンス)。**器は 1 つ**で、
   C 側は「行の並びを縦に送る」だけ。中身はここのデータでしかない。
 
 使い方: python3 gen_ui.py
@@ -54,17 +54,18 @@ def put_file(path):
 
 
 def rule():
-    # ★罫線は ASCII で引く。同梱フォントは「使う字だけ」なので、
-    #   訳文に出てこない記号(─ など)は**入っていない**(照合して分かった)
-    # ★長さは本文幅から決める。固定の 48 本だと余白を変えた途端に**折り返して
-    #   「---」が次行にこぼれる**(実際にこぼした)
-    put('-' * (TEXT_W // 12), BOTH, 1)
+    # ★実線 ─(U+2500)で引く。以前は ASCII の `-` を並べていたが、それは
+    #   「同梱フォントに ─ が入っていない」という制約への迂回で、
+    #   2026-08-25 にフォントを取り直したので**制約ごと消えた**
+    # ★長さは本文幅から決める。固定の本数だと余白を変えた途端に**折り返して
+    #   罫線が次行にこぼれる**(実際にこぼした)
+    put('─' * (TEXT_W // 24), BOTH, 1)
 
 
-# ---- 頁 1: もじの うちかた ----
+# ---- 頁 1: ひらがな入力方法 ----
 # ★本文は持たない。**コントローラの図**そのものが説明になる（web 版と同じ考え方）。
 #   図の札は入力表 GP_KANA / GP_ENG から引くので、ここには**固定の札だけ**を置く。
-# ---- 頁 2: つかえる ことば ----
+# ---- 頁 2: システムコマンド ----
 # ★ここは**システムの言葉**（進行そのものへの指示）。物を取る・扉を開けるといった
 #   ゲームの中の行動は含めない —— web 版の設定ダイアログ「システムの言葉」と同じ範囲。
 # ★一覧は**書き写さない**。役目の並びは web/main.js の SYS を読み、打つ言葉は
@@ -82,14 +83,10 @@ _blk = _blk[:_blk.index('\n  ]')]
 SYS = _re.findall(r"\['([^']+)', '([^']+)'\]", _blk)
 assert SYS, '★web/main.js の SYS を読めなかった（形が変わった？）'
 
-# ★同梱フォントに無い字を含む役目名の言い換え。web 版の言い方をそのまま出したいが、
-#   PS1 のフォントは「使う字だけ」なので、無い字は**空白で描かれてしまう**。
-#   （「描写」の「写」が入っていなかった。下の照合が拾う）
-RELABEL = {
-    'VERBOSE': '部屋の説明を長く',
-    'BRIEF': '部屋の説明を短く',
-    'SUPER': '部屋の説明をごく短く',
-}
+# ★役目名は web 版（`SYS`）の言い方をそのまま出す。**言い換えは持たない**。
+#   以前は「描写」の「写」が同梱フォントに無くて「部屋の説明を長く」等に言い換えて
+#   いたが、glyphs.h を焼き直して字が入ったので畳んだ。
+#   （それでも足りない字が出たら、下の照合が生成を止める）
 
 # 英語の言い添え。★これはこちらの文（原作にも web にも無い）
 EN_NOTE = {
@@ -110,18 +107,14 @@ def _kana(words, n=2):
 
 
 page(P_CMDS)
-put('ゲームの中の行動ではなく、', JA, 1)
-put('進行そのものへの指示。', JA, 1)
-put('Not actions in the world --', EN, 1)
-put('instructions to the game itself.', EN, 1)
-put('')
-
+# ★前置きは書かない。見出しが「システムコマンド」なら、それが**進行への指示**で
+#   あって物語の中の行動ではないことは通じる（書くと画面がその分だけ狭くなる）。
 _rows = []
 for _label, _key in SYS:
     _w = _kana(list(_gc.PARSER_WORDS)) if _key == '@again' \
         else _kana(_asset['verbs'].get(_key, {}).get('ja', []))
     assert _w, '★打つ言葉が引けなかった: ' + _key
-    _rows.append((RELABEL.get(_key, _label), _w, _key))
+    _rows.append((_label, _w, _key))
 
 _lw = max(width(r[0]) for r in _rows)      # 役目の欄はいちばん長いものに揃える
 for _label, _w, _key in _rows:
@@ -163,10 +156,9 @@ put_file(HERE / 'vendor/LICENSE.txt')
 put('')
 
 rule()
-# ★正式名称は「KH ドットフォント」だが、**小さい「ォ」が同梱フォントに無い**。
-#   「使用フォント」も同じ理由で書けないので、いまは「使用書体」と出す。
-#   （下の WANT に ォ を入れてあるので、glyphs.h を作り直せば両方書き換えられる）
-put('KH Dot Font —— 使用書体', JA)
+# ★正式名称は「KHドットフォント」（頒布元 http://jikasei.me/font/kh-dotfont/ の表記）。
+#   以前は小さい「ォ」が同梱フォントに無くて「KH Dot Font —— 使用書体」と出していた。
+put('KHドットフォント —— 使用フォント', JA)
 put('KH Dot Font -- the font used', EN)
 rule()
 put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
@@ -175,17 +167,26 @@ put('SIL Open Font License 1.1', BOTH, 1)
 put('http://jikasei.me/font/kh-dotfont/', BOTH, 1)
 put('')
 
-put('Zork という名称は商標です。', JA)
-put('Zork is a trademark.', EN)
+# ★事実関係: Infocom の登録(Reg. 1,227,668 / 1983)は **2003-11-22 に取り消されている**
+#   (Activision が更新しなかった)。だから「登録商標」とは書けない。
+#   Activision は 2023 年に Microsoft へ、原作は 2025 年に MIT で公開された。
+#   ★ゲームの banner が出す `ZORK is a registered trademark of Infocom, Inc.` は
+#   **原作の文なのでそのまま**。ここはこちらの文なので、いまの姿を書く。
+put('Zork は Infocom の商標です。', JA)
+put('現在の権利者は Microsoft です。', JA)
+put('このソフトは、どちらとも関係がありません。', JA)
+put('Zork is a trademark of Infocom.', EN)
+put('The rights are now held by Microsoft.', EN)
+put('This software is not affiliated with either.', EN)
 
 # ---- 画面の文言 ----
 # ★ここに出る文字列は全部「こちらのもの」。原作の文は 1 つも出ないので、
 #   訳の表は通さず完成行として持つ(「その文字列は誰のものか」)。
 # ★項目名はそのまま頁の見出しになる(並びは P_* と同じ)。
 ITEM = [
-    ('もじの うちかた', 'HOW TO TYPE'),
-    ('つかえる ことば', 'COMMANDS'),
-    ('ライセンス',      'LICENSE'),
+    ('ひらがな入力方法', 'HOW TO TYPE'),
+    ('システムコマンド', 'SYSTEM COMMANDS'),
+    ('ライセンス',       'LICENSE'),
 ]
 # ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
 #   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
@@ -193,25 +194,43 @@ ITEM = [
 #   (だから決定を ○/× で入れ替える必要も無くなった = **どのフェイスボタンでも決まる**)
 # ★起動の言語メニューに出す一行だけは残す。**メニューがあること**は作法ではないし、
 #   物語の紙面にシステムの字は混ぜないので、全員が通るここでしか知らせられない。
-BOOT = ('ゲームちゅう START で メニュー', 'PRESS START IN GAME FOR THE MENU')
-# ★「もじの うちかた」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
+BOOT = ('ゲーム中 START で メニュー', 'PRESS START IN GAME FOR THE MENU')
+# ★起動メニューの題と選択肢。**C 側に直書きしない** —— ここに置けば
+#   「出す字がフォントにあるか」の照合（このファイルの末尾）を一緒に通せる。
+# ★綴りは他の画面と揃える（Zenmai / Zork。総大文字の ZENMAI ZORK I をやめた）。
+# ★★**題は 2 段に分ける**。`Zenmai` は道具の名で、`Zork I` はその上で動く作品の名 ——
+#   一行に並べると、説明文がどちらに掛かるのか読めない（実際そうなっていた）。
+#   上段 = 名前 + 説明 + 罫線で閉じる / 下段 = 遊ぶ作品 + 言語、という積み方にする。
+TITLE = 'Zenmai'
+# ★一行の説明。**Zenmai だけの説明**であって Zork の説明ではない。
+#   **言語を選ぶ前**の画面なので、どちらの人も読める側に倒して英語 1 本。
+SUB = 'a Z-machine for Japanese and a game controller'
+# ★罫線の長さは**説明の幅から決める**。本数を直に書くと、説明を書き換えた途端に
+#   線だけ長さが合わなくなる（ライセンス頁の rule() と同じ考え方）
+TITLE_RULE = '─' * (width(SUB) // 24)
+GAME = 'Zork I'
+LANG = ('日本語', 'ENGLISH')
+# ★「ひらがな入力方法」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
 #   ここには無い —— 図に出ている字と実際に入る字が違う、が最悪の事故（web 版の教訓）。
 # ★英語面は**かなの行/段ではない** —— プッシュホン式(T9)で、十字がキー・面ボタンが
 #   そのキーの何文字目か、を選ぶ。だから ROW / VOWEL は直訳の誤りになる。
 # ★SELECT は**言語で役が違う**（日本語 = 濁点/半濁点のトグル、英語 = 空白）。
 #   札は実際の役をそのまま名指しする（「くうはく」と書いていたのは誤り）。
+# ★かなのままにしてあるものは**そのボタンで出る字そのもの**（は/ま/や/ら/わ の行頭、
+#   ん・を、っ）。字を名指ししている札なので、漢字に直すと別のものを指してしまう。
 HELP = [
-    ('L1 はまやらわ',    'L1 KEYS 6-0'),
-    ('L2 ようおん',      'L2 SHIFT'),
-    ('R2 ん を',         'R2 0'),
-    ('SELECT てん まる', 'SELECT SPACE'),
-    # ★START だけは「字の打ち方」ではないので括弧に入れて、別の種類だと示す
-    ('（START かくてい）', '(START SEND)'),
-    # ★この一行が**左右の役をすでに言っている**ので、群の見出しは持たない。
-    #   ひらがなだけだと入りきらないので漢字を交ぜる
-    ('左手で行をえらび 右手で文字をうつ', 'LEFT HAND PICKS THE KEY, RIGHT HAND TYPES'),
-    # ★っ は日本語だけ（英語面の L2 はシフト）
-    ('R2 ながおしでけす   L2 と R2 で っ', 'HOLD R2 TO DELETE'),
+    ('L1 はまやらわ',       'L1 KEYS 6-0'),
+    ('L2 拗音',             'L2 SHIFT'),
+    ('R2 ん を',            'R2 0'),
+    ('SELECT 濁点 半濁点',  'SELECT SPACE'),
+    # ★START だけは「ひらがな入力方法」ではないので括弧に入れて、別の種類だと示す
+    ('（START 確定）',      '(START SEND)'),
+    # ★この一行が**左右の役をすでに言っている**ので、群の見出しは持たない
+    ('左手側で行を選び、右手側で文字を入力', 'LEFT HAND PICKS THE KEY, RIGHT HAND TYPES'),
+    # ★っ は日本語だけ（英語面の L2 はシフト）。
+    # ★この行だけ**半角空白を使わない** —— 全角の字が続くところに半角の隙間が混ざると
+    #   切れ目が読み取りにくい。区切りは全角空白 1 つで足りる
+    ('R2長押しで1文字消す　L2とR2同時押しで「っ」を入力', 'HOLD R2 TO DELETE'),
 ]
 
 # ---- 画面幅で折り返す ----
@@ -313,6 +332,9 @@ def sref(text):
 items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
 helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
+langs = [sref(LANG[0]), sref(LANG[1])]
+title_, sub_ = sref(TITLE), sref(SUB)
+rule_, game_ = sref(TITLE_RULE), sref(GAME)
 
 for i, text in strs:
     out.append('static const unsigned short UI_S%d[%d] = { %s };'
@@ -323,6 +345,12 @@ for row in items:
     out.append('    { ' + ', '.join(row) + ' },')
 out.append('};')
 out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
+out.append('/* 起動メニュー: 名前 / 説明 / 罫線 / 作品名 / 選択肢(添字 = lang_en) */')
+out.append('static const UiStr UI_TITLE = %s;' % title_)
+out.append('static const UiStr UI_SUB = %s;' % sub_)
+out.append('static const UiStr UI_RULE = %s;' % rule_)
+out.append('static const UiStr UI_GAME = %s;' % game_)
+out.append('static const UiStr UI_LANG[2] = { %s, %s };' % (langs[0], langs[1]))
 out.append('/* 図の固定札: L1 / L2 / R2 / SELECT / START */')
 out.append('#define UI_HELP_N %d' % len(HELP))
 out.append('static const UiStr UI_HELP[2][UI_HELP_N] = {')
@@ -335,13 +363,17 @@ out.append('')
 used = set()
 for _, _, _, t in lines:
     used.update(t)
-for ja, en in ITEM + HELP + [BOOT]:
+for ja, en in ITEM + HELP + [BOOT, LANG]:
     used.update(ja)
     used.update(en)
-# ★いまは出せないが**次に glyphs.h を作り直すときは入れておきたい字**。
-#   ここに書いておけば gen_data.py が拾う（フォントのある環境で作り直したら、
-#   「KH ドットフォント」と正式名称で書けるようになる）
-WANT = 'ォ'
+used.update(TITLE)
+used.update(SUB)
+used.update(TITLE_RULE)
+used.update(GAME)
+# ★いまは出せないが**次に glyphs.h を作り直すときは入れておきたい字**を書く場所。
+#   ここに書いておけば gen_data.py が拾う。2026-08-25 に KH ドットフォントを取り直して
+#   焼き直したので、いまは**言い換えている字が 1 つも無い**（だから空）。
+WANT = ''
 (HERE / 'ui_chars.txt').write_text(''.join(sorted(set(used) | set(WANT))), encoding='utf-8')
 
 # ★**出す字は全部フォントに入っていなければならない**。glyphs.h は「使う字だけ」を

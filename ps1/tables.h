@@ -24,7 +24,7 @@ static const unsigned short GP_ENG[10][5] = {
   {0x0030,0x0040,0x0023,0x002D,0x005F},
 };
 typedef struct { unsigned short from; unsigned short to[2]; } GpYouon;
-enum { GP_YOUON_N = 45, GP_DAKU_N = 21, GP_HANDAKU_N = 5 };
+enum { GP_YOUON_N = 45, GP_DAKU_N = 20, GP_HANDAKU_N = 5 };
 static const GpYouon GP_YOUON[GP_YOUON_N] = {
   {0x3042, {0x3041,0}},
   {0x3044, {0x3043,0}},
@@ -94,7 +94,6 @@ static const GpAB GP_DAKU[GP_DAKU_N] = {
   {0x3075, 0x3076},
   {0x3078, 0x3079},
   {0x307B, 0x307C},
-  {0x3046, 0x3094},
 };
 static const GpAB GP_HANDAKU[GP_HANDAKU_N] = {
   {0x306F, 0x3071},
