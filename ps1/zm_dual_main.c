@@ -27,11 +27,15 @@ extern char __bss_start[], __bss_end[];
 static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
 static ZMachineState zm;
 static char statusbuf[49];
-static int lang_en;                    /* 1 = ENGLISH / 0 = にほんご */
+static int lang_en;                    /* 1 = ENGLISH / 0 = 日本語 */
 
 /* ---- ステータス行(日本語では部屋名を訳す) ---- */
 enum { STATUS_Y = 24, STATUS_H = 24 };
-#define PANEL 0x0863
+/* ★状態行の地色。本文(BG = 16,16,8)より**3 段ぶん**持ち上げて 40,40,32 にしてある。
+   1 段(24,24,16)では実機でまず見分けが付かず、2 段でもまだ足りなかった ——
+   RGB555 の 1 段は 8/255 しかないので、この暗さの帯では 3 段でようやく帯に見える。
+   ★本文より**明るい**側で差を付ける（暗い側だと窓の縁と見分けが付かない）。 */
+#define PANEL 0x10A5
 /* ★本文の外側（言語メニュー・オプション）はこの藍で塗る。
    **地色だけで本文と区別が付く**ので、枠線は引かない（実機の判断） */
 #define OPT_BG   0x1C62                /* 濃い藍(RGB555 の 1 本だけ持つ) */
@@ -435,37 +439,52 @@ static int pad_vowel(int p)
 
 /* ---- 言語選択メニュー ---- */
 
-/* selected = 1 で ＞ 付きの強調、dim = 1 で控えめ(選べる項目と見間違えないように) */
-static void menu_line(int y, const uint16_t *s, int n, int selected, int dim)
+/* 中央揃えの 1 行。mark = 1 で ＞ を付ける。
+   ★**色と印を別々に受ける**。以前は selected が両方を兼ねていたので、
+   「印は無いが強調したい」(= 起動メニューの `Zenmai`)が書けなかった。 */
+static void menu_line(int y, const uint16_t *s, int n, uint16_t color, int mark)
 {
     fill_rows(sbar, 0, STATUS_H, OPT_BG);   /* ★本文の外側は藍 */
     int w = 0;
     for (int i = 0; i < n; i++) w += glyph_w(s[i]);
     int x = (W - w) / 2;
-    if (selected)
+    if (mark)
         draw24(sbar, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], selected ? ACCENT : dim ? DIM : INK);
+        draw24(sbar, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
 }
 
-static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
+static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
 {
-    static const uint16_t title[] = {'Z','E','N','M','A','I',' ',' ','Z','O','R','K',' ','I'};
-    static const uint16_t o_ja[] = {0x306B, 0x307B, 0x3093, 0x3054};   /* にほんご */
-    static const uint16_t o_en[] = {'E','N','G','L','I','S','H'};
-    enum { Y_TITLE = 168, Y_JA = 240, Y_EN = 280, Y_HINT = 360 };
+    /* ★題・説明・選択肢はすべて gen_ui.py から引く。直書きすると「出す字がフォントに
+       あるか」の照合(gen_ui.py の末尾)を通らない —— 無い字は**黙って空白で描かれる** */
+    const UiStr *o_ja = &UI_LANG[0], *o_en = &UI_LANG[1];
+    /* ★上段(名前 + 説明)を罫線で閉じ、その下に作品名 → 言語、と積む。
+       説明は Zenmai に掛かるので**罫線の上**にいなければならない。
+       説明と案内は控えめの色にして、選べる項目と見間違えさせない。 */
+    enum { Y_TITLE = 112, Y_SUB = 148, Y_RULE = 180, Y_GAME = 212,
+           Y_JA = 272, Y_EN = 312, Y_HINT = 384 };
     int sel = 0;
-    menu_line(Y_TITLE, title, 14, 0, 0);
-    menu_line(Y_JA, o_ja, 4, sel == 0, 0);
-    menu_line(Y_EN, o_en, 7, sel == 1, 0);
+    menu_line(Y_TITLE, UI_TITLE.s, UI_TITLE.n, ACCENT, 0);
+    menu_line(Y_SUB, UI_SUB.s, UI_SUB.n, DIM, 0);
+    menu_line(Y_RULE, UI_RULE.s, UI_RULE.n, DIM, 0);
+    menu_line(Y_GAME, UI_GAME.s, UI_GAME.n, INK, 0);
+    menu_line(Y_JA, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
+    menu_line(Y_EN, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
     /* ★メニューの入口を知らせるのはここだけ。本文にシステムの字は混ぜないし、
        いちばん助けが要る人ほど Start を試しに押さない(だから全員が通るここに置く) */
-    menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, 0, 1);
+    menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
     GP1 = 0x03000000;                  /* 表示オン(メニューが最初の画面) */
-    int prev = 0;
+    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、
+       **「やめる」→「はい」を決めた Start がそのまま最初のエッジになり、
+       起動メニューが出た瞬間に言語が決まってしまう**（interactive_en の
+       pad_prev と同じ話。押しているものはエッジではない）。 */
+    int prev = pad_read();
+    if (prev < 0)
+        prev = 0;
     for (;;) {
         wait_fields(1);
         int p = pad_read();
@@ -474,9 +493,9 @@ static int lang_menu(void)             /* 0 = にほんご / 1 = ENGLISH */
         prev = p;
         if (edge & (BTN_UP | BTN_DOWN)) {
             sel ^= 1;
-            menu_line(Y_JA, o_ja, 4, sel == 0, 0);
-            menu_line(Y_EN, o_en, 7, sel == 1, 0);
-            menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, 0, 1);
+            menu_line(Y_JA, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
+            menu_line(Y_EN, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
+            menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
         }
         if (edge & (BTN_START | BTN_FACE))   /* どのフェイスボタンでも決まる */
             return sel;
@@ -508,7 +527,13 @@ enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
 enum { RULE_X = 96, RULE_W = 448 };
 /* ★左右の余白は縁取りより内側にとる(MARGIN=32 だと枠に字が触る)。
    折り返し幅は gen_ui.py の TEXT_W と**必ず同じ値**にすること */
-enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 24, PAGE_ROWS = 14 };
+/* ★行間は**本文と同じ**にする。本文は BASE(24) + LEAD(8) = 32 の送りなので、
+   ここも 32 —— 頁だけ 24(＝行間ゼロ)だと、漢字が続く行が上下でくっついて見えた。
+   ★★行数は**画面に入るか**ではなく**実機で切れないか**で決める。12 行だと最下行が
+   y=464 まで届き、CRT では下端に貼り付いて見えた（実機の指摘）。11 行なら 432 で終わり、
+   下の余白 48px は「ひらがな入力方法」の欄の下端(HY_STRIP + CMD_H = 432)とも揃う。
+   上 40px / 下 48px = ブラウン管のオーバースキャンの内側。 */
+enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 32, PAGE_ROWS = 11 };
 
 static int opt_open, opt_sel, opt_mode, opt_page, page_top, page_count;
 static short page_idx[UI_LINE_N];
@@ -589,7 +614,7 @@ static void page_index(void)
             page_idx[page_count++] = (short)i;
 }
 
-/* ---- 「もじの うちかた」= コントローラの図 ----
+/* ---- 「ひらがな入力方法」= コントローラの図 ----
  *
  * ★本文を持たない。**押している状態がそのまま図に出る**のが説明になる(web 版と同じ)。
  * ★札は入力表から引く(`gp_cell`)。写さないので、表を直せば図も直る ——
@@ -889,9 +914,12 @@ static void options_close(void)
     opt_mode = OPTM_MENU;
 }
 
-/* ---- 対話ループ(英語 = zm_main.c と同じ) ---- */
+/* ---- 対話ループ(英語 = zm_main.c と同じ) ----
+ * ★**quit で戻る**。以前は抜けた先で空回りしていて、「やめる」→「はい」が
+ *   そのままフリーズに見えた（実機の指摘）。戻り先は _start の外側のループ = 起動メニュー。
+ */
 
-__attribute__((noreturn)) static void interactive_en(void)
+static void interactive_en(void)
 {
     int fields = 0, rt_hold = 0, dirty = 1, prev_row = -1;
     int ls_prev = 0, ls_rep = 0;
@@ -1032,12 +1060,11 @@ __attribute__((noreturn)) static void interactive_en(void)
             dirty = 0;
         }
     }
-    for (;;) { }
 }
 
-/* ---- 対話ループ(日本語 = zm_ja_main.c と同じ) ---- */
+/* ---- 対話ループ(日本語 = zm_ja_main.c と同じ。quit で戻るのは英語面と同じ) ---- */
 
-__attribute__((noreturn)) static void interactive_ja(void)
+static void interactive_ja(void)
 {
     int fields = 0, rt_hold = 0, dirty = 1;
     int ls_prev = 0, ls_rep = 0;
@@ -1263,37 +1290,48 @@ after_msg:
             dirty = 0;
         }
     }
-    for (;;) { }
 }
 
+/* ★**quit は「起動しなおす」**。対話ループが戻ってきたら、そのまま頭から回る。
+ *
+ * ★戻るときに **.bss をもう一度潰す**のが要点。「何を消すか」を数え上げる形にすると
+ *   **いずれ数え漏らす** —— 本文の履歴・入力欄・オプションの開閉・ゲームパッドの
+ *   状態機械に加えて、`lib.c` の LIFO アリーナ(`heap_top`)まで巻き戻す必要がある。
+ *   .bss を潰せば「初期化されるもの」の定義がリンカ側と一致するので、漏れようがない。
+ *   ★スタックは 0x801FFF00（.bss の遥か上）にあり、ここでは巻き込まない。
+ * ★対話ループは**普通に return する**ので、スタックも一緒に巻き戻る。
+ */
 __attribute__((section(".text.start"), noreturn)) void _start(void)
 {
-    for (char *p = __bss_start; p < __bss_end; p++)
-        *p = 0;
-    gpu_init();
-    paint_screen(OPT_BG);              /* ★言語メニューも本文の外側 = 藍 */
-    render_init();
-    jp_text_init();                    /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
-    body_top = STATUS_Y + STATUS_H + 8;
-    body_h = CMD_Y - 8 - body_top;
+    for (;;) {
+        for (char *p = __bss_start; p < __bss_end; p++)
+            *p = 0;
+        gpu_init();
+        paint_screen(OPT_BG);          /* ★言語メニューも本文の外側 = 藍 */
+        render_init();
+        jp_text_init();                /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
+        body_top = STATUS_Y + STATUS_H + 8;
+        body_h = CMD_Y - 8 - body_top;
 
-    pad_try_analog();
-    lang_en = lang_menu();
-    paint_screen(BG);                  /* メニューを消す */
+        pad_try_analog();
+        lang_en = lang_menu();
+        paint_screen(BG);              /* メニューを消す */
 
-    vm_init();
-    run_until_read();
-    render_output();
-    view_bottom();
-    render_window();
-    draw_status();
-    if (lang_en) {
-        uint16_t ind[4];
-        int in_;
-        row_label(0, ind, &in_);
-        draw_strip(0, 0, 0, ind, in_);
-        interactive_en();
+        vm_init();
+        run_until_read();
+        render_output();
+        view_bottom();
+        render_window();
+        draw_status();
+        if (lang_en) {
+            uint16_t ind[4];
+            int in_;
+            row_label(0, ind, &in_);
+            draw_strip(0, 0, 0, ind, in_);
+            interactive_en();
+        } else {
+            draw_strip(0, 0, 0, 0, 0);
+            interactive_ja();
+        }
     }
-    draw_strip(0, 0, 0, 0, 0);
-    interactive_ja();
 }

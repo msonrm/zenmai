@@ -34,7 +34,9 @@ base_chars, ruby_chars = set('＞あ'), set()
 # 入力エンジンが出力しうる全字種(何を打っても描けること)+ 行インジケータ
 INPUT_CHARS = ('あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ'
                'まみむめもやゆよらりるれろわゐゑをん'
-               'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽゔ'
+               # ★ゔ は無い —— KH ドットフォントに字面が無いので、gen_tables.py の
+               #   PS1 適応で う→ゔ の濁点を落としてある（打てないから描けなくてよい）
+               'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ'
                'ぁぃぅぇぉゃゅょゎっー、。？「」　')
 # 手順外のコマンドを確定したときの案内(かなだけで書く —— ルビ無しでも読めるように)
 NOTICE = '（このためしばんは、きまったてじゅんだけすすむ）'
@@ -45,6 +47,9 @@ ui_txt = HERE / 'ui_chars.txt'
 if ui_txt.exists():
     base_chars.update(ui_txt.read_text(encoding='utf-8'))
 base_chars.update(chr(c) for c in range(0x20, 0x7F))   # 英語版(T9 入力・VM 出力)用に ASCII 全部
+# ★`~` は KH ドットフォントに無い。Z-machine v3 のアルファベット表にも無く、
+#   `feed_cmd` も入力から弾くので**画面に出ようがない**。焼くと .notdef になるだけ。
+base_chars.discard('~')
 
 # 日本語版: 訳アセットに出うる全字種(訳文・語・ルビの親字と読み)
 base_chars.add('　')
@@ -126,8 +131,16 @@ for t in turns:
 
 # ---- グリフ描画 ----
 
+# ★KH ドットフォントは U+2014(—) を**中央の小さな四角**で描く（15 書体すべてで同じ。
+#   実測した）。訳文も画面の文言も**ダッシュのつもりで — を使っている**ので、
+#   そのままだと「Zenmai ‥ このソフト」のような点 2 つに見える。
+#   同じ全角の横棒 U+2015(―) の字面を借りて描く —— ★**符号位置は変えない**ので、
+#   訳の原簿にも gen_ui.py にも手を入れずに済む（ここは PS1 の適応層）。
+GLYPH_ALIAS = {'—': '―'}
+
 
 def render24(ch):
+    ch = GLYPH_ALIAS.get(ch, ch)
     w = int(f24.getlength(ch))
     img = Image.new('1', (24, 24), 0)
     ImageDraw.Draw(img).text((0, 0), ch, font=f24, fill=1, anchor='la')
@@ -135,6 +148,7 @@ def render24(ch):
 
 
 def render12(ch):
+    ch = GLYPH_ALIAS.get(ch, ch)
     img = Image.new('1', (12, 14), 0)
     ImageDraw.Draw(img).text((0, 0), ch, font=f12, fill=1, anchor='la')
     return [sum(1 << x for x in range(12) if img.getpixel((x, y))) for y in range(1, 13)]
@@ -142,6 +156,17 @@ def render12(ch):
 
 base = sorted((ord(c), *render24(c)) for c in base_chars)
 rubyg = sorted((ord(c), render12(c)) for c in ruby_chars)
+
+# ★**フォントに無い字は「空白」ではなく .notdef（黒い四角）になる**。
+#   gen_ui.py の照合は「glyphs.h に載っているか」しか見ないので、**ここは素通りする**
+#   —— 載ってはいるのだ、.notdef として。実際 `ゔ` が黒い四角のまま配布されていた。
+#   フォントに確実に無い符号位置を 1 つ選んでその字面を採り、同じものを弾く。
+_notdef = render24('\uE000')[1]        # 私用領域 = どのフォントにも無い
+_bad = [chr(c) for c, w, rows in base if rows == _notdef]
+if _bad:
+    raise SystemExit('★フォントに無い字を焼こうとしている（黒い四角になる）: '
+                     + ''.join(_bad)
+                     + '\n  その字を使わないようにするか、字面を持っている書体を探すこと')
 
 # ---- 出力 ----
 with open(HERE / 'glyphs.h', 'w') as f:

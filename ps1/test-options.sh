@@ -6,7 +6,7 @@
 #     ・板とメニューの状態が動くか
 #     ・頁から Start で**一足で**本文へ戻るか(× は一段だけ)
 #     ・★**どのフェイスボタンでも決まる**か(案内を画面に書かないので、作法に乗る)
-#     ・★**「もじの うちかた」だけは面ボタンで戻らない**か(面ボタンは字を出す側)
+#     ・★**「ひらがな入力方法」だけは面ボタンで戻らない**か(面ボタンは字を出す側)
 #     ・★**本文が汚れていないこと**(一度はライセンスを本文へ流す形で作り、
 #       実機の指摘で作り直した。その名残を履歴の伸びで見張る)
 set -e
@@ -61,10 +61,10 @@ check "↓ で選択が動く"                  "$(state opt_move.script 800)"  
 check "○ で 1 つめの頁へ"               "$(state opt_page0.script 800)"    "top=0 page=0 mode=1 sel=0 open=1"
 check "★△でも決まる(面ボタンはどれでも)" "$(state opt_face_tri.script 800)" "top=0 page=0 mode=1 sel=0 open=1"
 check "↓↓ ○ でライセンスの頁へ"         "$(state opt_page2.script 900)"    "top=0 page=2 mode=1 sel=2 open=1"
-check "★頁の中は ↓ 1 回で 1 頁送る"      "$(state opt_scroll.script 950)"   "top=14 page=2 mode=1 sel=2 open=1"
+check "★頁の中は ↓ 1 回で 1 頁送る"      "$(state opt_scroll.script 950)"   "top=11 page=2 mode=1 sel=2 open=1"
 check "面ボタンで一段もどる(メニューは開いたまま)" "$(state opt_back.script 950)" "top=0 page=2 mode=0 sel=2 open=1"
-check "★うちかたの頁は面ボタンで戻らない" "$(state help_face.script 800)"  "top=0 page=0 mode=1 sel=0 open=1"
-check "★うちかたの頁は Start で本文へ"   "$(state help_start.script 800)" "top=0 page=0 mode=0 sel=0 open=0"
+check "★ひらがな入力方法の頁は面ボタンで戻らない" "$(state help_face.script 800)"  "top=0 page=0 mode=1 sel=0 open=1"
+check "★ひらがな入力方法の頁は Start で本文へ"   "$(state help_start.script 800)" "top=0 page=0 mode=0 sel=0 open=0"
 check "★頁の Start は一足で本文へ"      "$(state opt_startout.script 900)" "top=0 page=0 mode=0 sel=0 open=0"
 check "★Start で開いたら Start で閉じる" "$(state opt_close.script 800)"   "top=0 page=0 mode=0 sel=0 open=0"
 check "★ENGLISH でも作法は同じ(× で頁へ)" "$(state opt_en.script 800)"     "top=0 page=0 mode=1 sel=0 open=1"
