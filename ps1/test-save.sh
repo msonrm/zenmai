@@ -41,7 +41,7 @@ case "$S" in
 esac
 
 echo "--- 3. 実ゲームで「ほぞんする」→ カードに書かれるか ---"
-[ -f zenmai-zork.psexe ] || ./build-zork.sh >/dev/null 2>&1
+[ -f zenmai-zork.psexe ] || ./build.sh >/dev/null 2>&1
 STATUS=$(sym out-zork.elf statusbuf)
 "$PY" gen_card.py "$TMP/zm-card2.mcd" >/dev/null
 BEFORE=$("$PY" sim.py zenmai-zork.psexe --script save_move_ja.script --polls --stop 1700 \

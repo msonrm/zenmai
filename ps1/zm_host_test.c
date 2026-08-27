@@ -1,6 +1,12 @@
 /* MojoZork 埋め込みのホスト検証ハーネス。
  *
- *   gcc -std=c11 -O1 -o zm_host_test zm_host_test.c && ./zm_host_test <zork1.z3> [cmd...]
+ *   gcc -std=gnu11 -O1 -w -I. -Ivendor -o zm_host_test zm_host_test.c
+ *   ./zm_host_test ../vendor/zork1/zork1.z3 "open mailbox" "read leaflet"
+ *
+ * ★フラグは 3 つとも要る。`-Ivendor` が無いと `#include "mojozork.c"` を見つけられず、
+ *   `-std=c11` だと strdup が宣言されず(新しい gcc は警告でなくエラー)、`-w` が無いと
+ *   vendor 側の警告で埋まる。★**PS1 を焼かずに Zork の実挙動を数十秒で確かめられる**ので、
+ *   「この語は打てるのか」「この書き方は通るのか」はここで当たるのが速い。
  *
  * multizorkd と同じ埋め込みの型:
  *   - main を改名して mojozork.c を include(素の getObjectPtr 等をそのまま使う)

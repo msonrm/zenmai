@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 PY="${PY:-python3}"
 ng=0
 
-[ -f zenmai-zork.psexe ] || ./build-zork.sh >/dev/null 2>&1
+[ -f zenmai-zork.psexe ] || ./build.sh >/dev/null 2>&1
 TOTAL=$(mipsel-linux-gnu-nm out-zork.elf | grep -i " total_h\$" | cut -d' ' -f1)
 
 # 本文の履歴の高さ(px)を読む

@@ -131,8 +131,8 @@
 自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
 
 ```bash
-cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
-./build.sh && python3 sim.py zenmai-scroll.psexe --expect golden.png --max 400000000
+cd ps1 && ./build.sh                            # → zenmai-zork.psexe
+./build-demo.sh && python3 sim.py zenmai-demo.psexe --expect golden.png --max 400000000
                                                 # ↑ R3000 シミュレータで画素照合(要 Pillow)
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
 sh test-options.sh                              # オプション(打っていないときの Start)
@@ -180,7 +180,11 @@ curl -sSL https://zenmai.pages.dev/ | md5sum ; md5sum < dist/index.html   # 一�
 - **スロットに英語が残るもの** —— walkthrough 全域で 1 種（`You can't see any of boat here!`）。
   行としては引けているので未訳には出ない
 - **英語モード**（本文もコマンドも英語）は未着手。土台はある（訳を引かず素通し・`toCommand` を
-  通さない）が、ゲームパッドの英語 T9 が足りない
+  通さない）が、ゲームパッドの英語 T9 が足りない。★**何が足りないかは PS1 側で判明した**
+  （2026-08-28）—— 汎用の T9 は `( ? ) ! @ # - _` を載せていて **Zork に要る `.` `,` を
+  1 つも持たない**。空白も SELECT にしか無く、打鍵の流れから外れる。答えは
+  `ps1/main.c` の `zork_sym()` と row 0（方向キーなし = 記号の面）にある。
+  web へ持ってくるならこれをそのまま写せばよい（詳細 = `ps1-implementation-notes.md`）
 - UI の詰め —— 実機で 4 巡して毎回何か出ている（寸法と配置。★**ロジックではなくここが本体**）
 
 ## ライセンスと出典

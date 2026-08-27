@@ -1,4 +1,4 @@
-/* Zenmai PS1 描画層 + パッド(main.c の JP デモと zm_main.c の EN 版で共有)。
+/* Zenmai PS1 描画層 + パッド(本体 main.c と demo_main.c のデモで共有)。
  * 規則の正典は gen_mock.py(Python ゴールデン)。挙動を変えるときは両方を見ること。 */
 #ifndef RENDER_H
 #define RENDER_H
