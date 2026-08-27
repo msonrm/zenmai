@@ -20,10 +20,10 @@ PS2 で PS1 のソフトを動かす道は 2 本ある:
 
 ```bash
 cd ps1
-./build-zork.sh                       # .psexe（既存）
+./build.sh                            # .psexe（既存）
 MKPSXISO=…/mkpsxiso ./build-iso.sh    # → zenmai-zork.bin / .cue
 python3 verify_iso.py zenmai-zork.bin zenmai-zork.psexe   # 中身の照合
-CUE2POPS=…/cue2pops ./build-vcd.sh    # → zenmai-zork.vcd
+CUE2POPS=…/cue2pops ./build-vcd.sh    # → ZENMAI.VCD（大文字・短い名前）
 ```
 
 道具は 2 つとも野良ビルド（Debian のパッケージには無い）:

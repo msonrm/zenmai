@@ -52,7 +52,7 @@ check() {
     else echo "✗ $1"; echo "    実際: $2"; echo "    期待: $3"; ng=$((ng + 1)); fi
 }
 
-[ -f zenmai-zork.psexe ] || ./build-zork.sh >/dev/null 2>&1
+[ -f zenmai-zork.psexe ] || ./build.sh >/dev/null 2>&1
 STATE=$(sym page_top)
 TOTAL=$(sym total_h)
 

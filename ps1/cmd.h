@@ -2,7 +2,7 @@
  * 語彙はビルド時に構築済み(cmd_data)。挙動の正典は JS —— 変更は両方を見ること。 */
 /* ★インクルードガードは CMD_H にしない —— render.h の `enum { CMD_H = 24 }`
    (コマンド欄の高さ)と衝突し、**この名前が黙って空マクロになる**。
-   実際に踏んだ: zm_dual_main.c で CMD_H を書いたら「式が無い」と言われた。 */
+   実際に踏んだ: main.c で CMD_H を書いたら「式が無い」と言われた。 */
 #ifndef ZENMAI_CMD_H
 #define ZENMAI_CMD_H
 

@@ -131,8 +131,8 @@
 自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
 
 ```bash
-cd ps1 && ./build-zork.sh                       # → zenmai-zork.psexe
-./build.sh && python3 sim.py zenmai-scroll.psexe --expect golden.png --max 400000000
+cd ps1 && ./build.sh                            # → zenmai-zork.psexe
+./build-demo.sh && python3 sim.py zenmai-demo.psexe --expect golden.png --max 400000000
                                                 # ↑ R3000 シミュレータで画素照合(要 Pillow)
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
 sh test-options.sh                              # オプション(打っていないときの Start)
