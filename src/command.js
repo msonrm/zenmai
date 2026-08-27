@@ -136,6 +136,14 @@ function createCommander(asset) {
   for (const [key, o] of Object.entries(objOf)) {
     const noun = (o.nouns[0] || '').toLowerCase()
     const adj = (o.adjs[0] || '').toLowerCase()
+    // ★**打った語そのものの表示形**（`べん` → `弁`）。`ja` は form と yomi を並べた互換配列なので、
+    //   構造を持っている `words` から引き直す。★`disp`（代表名）とは別物 ——
+    //   disp は「この物を何と呼ぶか」、form は「**打った人が何と打ったか**」
+    const formOf = {}
+    for (const w of o.words || []) {
+      formOf[w.form] = w.form
+      for (const y of w.yomi || []) formOf[y] = w.form
+    }
     for (const [rank, ja] of o.ja.entries()) {
       const k = kana(ja)
       const own = owners[k] || [key]
@@ -145,6 +153,7 @@ function createCommander(asset) {
       if (shared) seen.add(k)
       lex.push({
         ja,
+        form: formOf[ja] || ja,
         //   曖昧なら**打った言葉**で見せる（漢字形があればそれ、無ければそのまま）
         disp: shared ? (sharedDisp[noun] || ja)
           : own.length > 1 ? (ambigDisp[own.slice().sort().join('|')] || ja) : o.ja[0],
@@ -176,7 +185,7 @@ function createCommander(asset) {
   // ★`all` は物ではないが、**目的語の位置に立つ**ので物として積むのがいちばん素直
   //   （役の割り当ても、動詞が裸の目的語を取れるかの検査も、そのまま効く）
   for (const ja of ALL_WORDS) {
-    lex.push({ ja, disp: ALL_WORDS[0], kana: kana(ja), kind: 'obj', key: '*ALL*', word: 'all', rank: 0, others: [], vehicle: false })
+    lex.push({ ja, form: ALL_WORDS[0], disp: ALL_WORDS[0], kana: kana(ja), kind: 'obj', key: '*ALL*', word: 'all', rank: 0, others: [], vehicle: false })
   }
   // ★上位語は**宣言から**積む（asset.hypernyms。原簿の「上位語」表がそのまま来る）。
   //   原作は上位語を共有シノニムとして持っている（TREASURE は 21 個の物の名詞）ので、
@@ -197,7 +206,7 @@ function createCommander(asset) {
     const word = h.noun ? h.noun.toLowerCase() : wordOf(targets[0])
     const others = h.noun ? [] : targets.slice(1).map(wordOf)
     for (const ja of [h.form, ...(h.yomi || [])]) {
-      lex.push({ ja, disp: h.form, kana: kana(ja), kind: 'obj', key: '*H*', rank: 0, word, others, vehicle })
+      lex.push({ ja, form: h.form, disp: h.form, kana: kana(ja), kind: 'obj', key: '*H*', rank: 0, word, others, vehicle })
     }
   }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
@@ -330,6 +339,7 @@ function createCommander(asset) {
           echo: echo.join(''),
           alts: (objs[0].others || []).slice(),
           objDisp: objs[0].disp,
+          said: objs[0].form || '',
         }
       }
       return { command: null, trace: '動詞が見つからない', unknown, echo: echo.join('') }
@@ -495,10 +505,16 @@ function createCommander(asset) {
     //   水の無い場所では外れるので、素の `swim` を別案に添える（空振りは手数を消費しない）。
     if (verb.key === 'SWIM' && out.length === 1) {
       return { command: out[0] + ' in water', trace: '動詞+役', unknown, echo: echo.join(''),
-        alts: [out[0]], objDisp: '', echoWord: verb.ja || '', verbKey: verb.key,
+        alts: [out[0]], objDisp: '', said: '', echoWord: verb.ja || '', verbKey: verb.key,
         hasObject: false, needsObject: false, ask }
     }
     return { command: out.join(' '), trace: '動詞+役', unknown, echo: echo.join(''), alts, objDisp,
+      // ★原作が**入力バッファをそのまま印字する**行（`You can't see any X here!` /
+      //   目的語の聞き返し）に差し込む「打った物の**表示形**」。原作の呼び名を訳すと、
+      //   3 つの舟のように**語を共有する物**では別の物の名前が出る（実プレイ: 「ビニールの塊」を
+      //   指したのに「穴の空いた舟など、ここには見当たらない」）。★原作にも一意な指し方は無い
+      //   ので、送る英語を工夫しても直らない —— **その文字列の持ち主が打った人**だから返す
+      said: (prso && prso.form) || '',
       // ★轟音の部屋の反響に使う「**打った呼び名**」。原作は `P-INBUF`（プレイヤーが打った
       //   生の入力）から語を切り出して返すので、訳語や代表形では意味が変わる ——
       //   「のべぼう」と打った人には「のべぼう」が返らなければならない

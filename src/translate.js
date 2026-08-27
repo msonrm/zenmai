@@ -88,6 +88,14 @@ class Translator {
   setEcho(word) { this.echoWord = word || null }
 
   /**
+   * ★`{SAID}` に使う「打った物の**表示形**」（`べん` と打ったら `弁`）。1 手ごとに更新する。
+   *
+   * `{ECHO}` との違いは**かなか漢字か**だけではない。ECHO は轟音の部屋が返す「音」なので
+   * 打鍵そのもの、SAID は画面の文なので本文と同じ漢字＋ふりがなにする。
+   */
+  setSaid(word) { this.saidWord = word || null }
+
+  /**
    * ★英語モード: 訳さず**原文のまま**返す。
    *
    * 行を貯める・プロンプトを剥がす・段落を組む、はそのまま使いたいので、
@@ -163,7 +171,11 @@ class Translator {
         //   ★ただし `{VERB}` は別 —— 引用符の中に居るが、打った語ではなく
         //   **こちらが送った英語の動詞**。「ぜんぶあける」と打った人の画面に
         //   `「open」に複数の目的語は使えない。` と出た（複数対象を入れて踏んだ）
+        // ★`{SAID}` は**原作が入力バッファを印字している**スロット（`NOT-HERE-PRINT` /
+        //   `THING-PRINT`）。原作の呼び名ではないので訳語辞書を引いてはいけない ——
+        //   語を共有する物（舟が 3 つ）では**別の物の名前**が出る。打った語が無いときだけ辞書に落とす
         const v = name === 'ECHO' && this.echoWord ? this.echoWord
+          : name === 'SAID' && this.saidWord ? this.saidWord
           : p.quotes[idx] && name !== 'VERB' ? m[idx + 1] : this.word(m[idx + 1])
         out = out.replace('{' + name + '}', v)
       })

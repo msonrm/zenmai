@@ -238,11 +238,40 @@ for (const [ja, want] of CASES) {
   for (const [ja, want] of [['のべぼうをとる', 'のべぼう のべぼう ……'], ['はんきょう', 'はんきょう はんきょう ……']]) {
     const r = cm.toCommand(ja)
     tr.setEcho(r.echoWord || ja)
+    tr.setSaid(r.said || '')
     const last = String(r.command).split(' ').pop()
     const got = tr.line(`${last} ${last} ...`)
     const ok = got === want
     if (!ok) ng++
     console.log(`${ok ? '✓' : '✗'} 反響 ${ja.padEnd(10, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+  }
+  // ★「見当たらない」と目的語の聞き返しは、原作が**入力バッファをそのまま印字**している行
+  //   （`NOT-HERE-PRINT` / `THING-PRINT` → `BUFFER-PRINT`）。訳語辞書で引くと、
+  //   **語を共有する物**では別の物の名前が出る（実プレイ 2026-08-27: 「ビニールの塊」を
+  //   指したのに「穴の空いた舟など、ここには見当たらない」と返った）。
+  //   ★原作にも一意な指し方は無い —— 3 つの舟が plastic / boat / pile を共有していて、
+  //   **同時に 1 つしか存在しない**ことで解決している。送る英語を変えても直らない
+  for (const [ja, en, want] of [
+    ['べんをあける', "You can't see any plastic boat here!", '弁など、ここには見当たらない。'],
+    ['びにーるのかたまりをあける', "You can't see any plastic boat here!", 'ビニールの塊など、ここには見当たらない。'],
+    ['くうきいれでべんをふくらませる', 'What do you want to inflat the plastic boat with?', '何で弁を膨らませる？'],
+  ]) {
+    const r = cm.toCommand(ja)
+    tr.setEcho(r.echoWord || ja)
+    tr.setSaid(r.said || '')
+    const got = tr.line(en)
+    const ok = got === want
+    if (!ok) ng++
+    console.log(`${ok ? '✓' : '✗'} 打った語 ${ja.padEnd(16, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+  }
+  // ★打った語が無いときは訳語辞書へ落とす（ホストが setSaid を呼ばない器でも壊れない）
+  {
+    tr.setSaid('')
+    const want = '穴の空いた舟など、ここには見当たらない。'
+    const got = tr.line("You can't see any plastic boat here!")
+    const ok = got === want
+    if (!ok) ng++
+    console.log(`${ok ? '✓' : '✗'} 打った語なし（辞書へ落とす） → ${got}`)
   }
 }
 // ★問い返しは**打った言い方を映す**こと。
