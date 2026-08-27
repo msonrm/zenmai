@@ -148,7 +148,7 @@ words_rows = pair_table(words)
 segs_out = []                          # (off, len, kind, slot)
 pats_out = []                          # (seg_off, en_n, ja_n, has_echo)
 K_LIT, K_HOLE, K_QHOLE, K_JLIT, K_JREF = 0, 1, 2, 3, 4
-F_ECHO, F_VERB = 1, 2
+F_ECHO, F_VERB, F_SAID = 1, 2, 4
 for en, plen, segs, ja, names, quotes in patterns:
     seg_off = len(segs_out)
     en_n = 0
@@ -161,7 +161,8 @@ for en, plen, segs, ja, names, quotes in patterns:
                 en_n += 1
         else:
             flags = (F_ECHO if names[hidx] == 'ECHO' else 0) | \
-                    (F_VERB if names[hidx] == 'VERB' else 0)
+                    (F_VERB if names[hidx] == 'VERB' else 0) | \
+                    (F_SAID if names[hidx] == 'SAID' else 0)
             segs_out.append((0, 0, K_QHOLE if v else K_HOLE, flags))
             en_n += 1
             hidx += 1
@@ -189,7 +190,7 @@ with open(HERE / 'translate_data.h', 'w') as f:
     f.write('typedef struct { unsigned int off; unsigned short len; unsigned char kind; unsigned char slot; } TrSeg;\n')
     f.write('typedef struct { unsigned short seg_off, en_n, ja_n, has_echo; } TrPat;\n')
     f.write('enum { TRK_LIT, TRK_HOLE, TRK_QHOLE, TRK_JLIT, TRK_JREF };\n')
-    f.write('enum { TRF_ECHO = 1, TRF_VERB = 2 };\n')
+    f.write('enum { TRF_ECHO = 1, TRF_VERB = 2, TRF_SAID = 4 };\n')
     f.write(f'enum {{ TR_EXACT_N = {len(exact_rows)}, TR_PROPS_N = {len(props_rows)}, '
             f'TR_WORDS_N = {len(words_rows)}, TR_PATS_N = {len(pats_out)}, TR_NT_N = {len(nt_rows)} }};\n')
     f.write('extern const char tr_en_pool[];\n')

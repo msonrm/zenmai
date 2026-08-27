@@ -393,6 +393,9 @@ after_msg:
                 tr_set_echo16(cr.echo_word, cr.echo_word_len);
             else
                 tr_set_echo16(typed, typed_n);
+            /* ★{SAID} は打った物の表示形。物を打っていないときは空を渡して訳語辞書へ落とす
+               (echo のように打鍵で埋めてはいけない —— 字として画面に出る穴なので) */
+            tr_set_said16(cr.said, cr.said_len);
             feed_cmd(cr.command);
             int ai = 0;
             for (;;) {

@@ -374,7 +374,7 @@ function createCommander(asset) {
     const excepts = objs.filter((o) => o.role === 'EXCEPT')
     // ★「ランタン以外をとる」—— 除くものだけ言われたら、残り全部を指している
     if (!prso && excepts.length) {
-      prso = { word: 'all', disp: ALL_WORDS[0], ja: ALL_WORDS[0], kind: 'obj', key: '*ALL*', others: [], vehicle: false }
+      prso = { word: 'all', form: ALL_WORDS[0], disp: ALL_WORDS[0], ja: ALL_WORDS[0], kind: 'obj', key: '*ALL*', others: [], vehicle: false }
     }
 
     // ★同じ日本語の動詞でも、**対象が英語の動詞を決める**。

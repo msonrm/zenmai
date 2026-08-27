@@ -117,6 +117,13 @@ if __name__ == '__main__':
     for key, o in objOf.items():
         noun = (o['nouns'][0] if o['nouns'] else '').lower()
         adj = (o['adjs'][0] if o.get('adjs') else '').lower()
+        # ★打った語そのものの表示形(べん → 弁)。ja は form と yomi を並べた互換配列なので
+        #   words から引き直す。disp は「何と呼ぶか」、form は「何と打ったか」で別物
+        formOf = {}
+        for w in o.get('words', []):
+            formOf[w['form']] = w['form']
+            for y in w.get('yomi', []):
+                formOf[y] = w['form']
         for rank, ja in enumerate(o['ja']):
             k = kana(ja)
             own = owners.get(k, [key])
@@ -135,11 +142,12 @@ if __name__ == '__main__':
             vehicle = any(objOf[x].get('vehicle') for x in own) if shared else bool(o.get('vehicle'))
             others = [word_of(x) for x in own
                       if x != key and (objOf[x]['nouns'][0] if objOf[x]['nouns'] else '').lower() != noun]
-            lex.append({'ja': ja, 'disp': disp, 'kana': k, 'kind': 'obj', 'key': key,
+            lex.append({'ja': ja, 'form': formOf.get(ja, ja), 'disp': disp, 'kana': k,
+                        'kind': 'obj', 'key': key,
                         'rank': rank, 'word': word, 'vehicle': vehicle, 'others': others})
 
     for ja in ALL_WORDS:
-        lex.append({'ja': ja, 'disp': ALL_WORDS[0], 'kana': kana(ja), 'kind': 'obj', 'key': '*ALL*',
+        lex.append({'ja': ja, 'form': ALL_WORDS[0], 'disp': ALL_WORDS[0], 'kana': kana(ja), 'kind': 'obj', 'key': '*ALL*',
                     'word': 'all', 'rank': 0, 'others': [], 'vehicle': False})
 
     for h in asset.get('hypernyms', []):
@@ -150,7 +158,7 @@ if __name__ == '__main__':
         word = h['noun'].lower() if h.get('noun') else word_of(targets[0])
         others = [] if h.get('noun') else [word_of(t) for t in targets[1:]]
         for ja in [h['form']] + h.get('yomi', []):
-            lex.append({'ja': ja, 'disp': h['form'], 'kana': kana(ja), 'kind': 'obj', 'key': '*H*',
+            lex.append({'ja': ja, 'form': h['form'], 'disp': h['form'], 'kana': kana(ja), 'kind': 'obj', 'key': '*H*',
                         'rank': 0, 'word': word, 'others': others, 'vehicle': vehicle})
 
     for ja, en in DIRS.items():
@@ -197,6 +205,7 @@ if __name__ == '__main__':
         kn, knl = jput(e['kana'])
         dp, dpl = jput(e['disp'])
         jo, jl = jput(e['ja'])
+        fo, fl = jput(e.get('form', e['ja']))
         if e['kind'] == 'verb':
             wo, wl = 0, 0
             vidx = vkeys.index(e['key'])
@@ -208,7 +217,7 @@ if __name__ == '__main__':
             others_pool.append(aput(w))
         lrows.append((kn, knl, dp, dpl, jo, jl, wo, wl, KIND[e['kind']], vidx,
                       1 if e.get('vehicle') else 0, ooff, len(e.get('others', [])),
-                      1 if e.get('key') == '*ALL*' else 0))
+                      1 if e.get('key') == '*ALL*' else 0, fo, fl))
 
     prows = []
     ROLES = ['O', 'WITH', 'TO', 'IN', 'ON', 'UNDER', 'BEHIND', 'FROM', 'AND', 'EXCEPT', 'MOD']
@@ -241,7 +250,8 @@ if __name__ == '__main__':
     with open(HERE / 'cmd_data.h', 'w') as f:
         f.write('/* gen_cmd.py が生成。手で編集しない */\n#ifndef CMD_DATA_H\n#define CMD_DATA_H\n')
         f.write('typedef struct { unsigned int kn; unsigned short knl; unsigned int dp; unsigned short dpl;\n'
-                '  unsigned int jo; unsigned short jl; unsigned int wo; unsigned short wl;\n'
+                '  unsigned int jo; unsigned short jl; unsigned int fo; unsigned short fl;\n'
+                '  unsigned int wo; unsigned short wl;\n'
                 '  unsigned char kind, vehicle, is_all; unsigned short ooff, on_; short vidx; } CmLex;\n')
         f.write('typedef struct { unsigned int ko; unsigned short kl; unsigned int jo; unsigned short jl;\n'
                 '  unsigned short mask; unsigned char bare_ok, bare_ok2; } CmVerb;\n')
@@ -276,11 +286,12 @@ if __name__ == '__main__':
         f.write('const unsigned short cm_jpool[] = {\n  ' + ','.join(f'0x{c:04X}' for c in jpool) + '\n};\n')
         f.write('const char cm_apool[] = {\n  ' + ','.join(str(b) for b in apool) + '\n};\n')
         f.write('const CmLex cm_lex[] = {\n' + ''.join(
-            f'  {{{a},{b},{c},{d},{e},{g},{h},{i},{j},{k},{m},{n},{o},{p}}},\n'
-            for a, b, c, d, e, g, h, i, j, k, m, n, o, p in
-            [(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[10], r[13], r[11], r[12], r[9])
+            f'  {{{a},{b},{c},{d},{e},{g},{h},{i},{j},{k},{m},{n},{o},{p},{q},{t}}},\n'
+            for a, b, c, d, e, g, h, i, j, k, m, n, o, p, q, t in
+            [(r[0], r[1], r[2], r[3], r[4], r[5], r[14], r[15], r[6], r[7], r[8], r[10], r[13],
+              r[11], r[12], r[9])
              for r in lrows]) + '};\n')
-        # ↑ 並び: kn,knl,dp,dpl,jo,jl,wo,wl,kind,vehicle,is_all,ooff,on_,vidx
+        # ↑ 並び: kn,knl,dp,dpl,jo,jl,fo,fl,wo,wl,kind,vehicle,is_all,ooff,on_,vidx
         f.write('const CmVerb cm_verbs[] = {\n' + ''.join(
             f'  {{{a},{b},{c},{d},{e},{g},{h}}},\n' for a, b, c, d, e, g, h in vrows) + '};\n')
         f.write('const CmPart cm_parts[] = {\n' + ''.join(

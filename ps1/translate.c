@@ -14,6 +14,9 @@ enum { KEY_MAX = 1024, CAP_MAX = 4, OUT_MAX = 2048 };
 
 static u16 echo_word[32];
 static int echo_len;
+/* ★{SAID}: 打った物の表示形。原作が入力バッファを印字する行に差し込む(echo とは別物) */
+static u16 said_word[32];
+static int said_len;
 
 void tr_set_echo(const char *word)
 {
@@ -34,6 +37,17 @@ void tr_set_echo16(const unsigned short *word, int n)
     while (echo_len < n && echo_len < 31) {
         echo_word[echo_len] = word[echo_len];
         echo_len++;
+    }
+}
+
+void tr_set_said16(const unsigned short *word, int n)
+{
+    said_len = 0;
+    if (!word)
+        return;
+    while (said_len < n && said_len < 31) {
+        said_word[said_len] = word[said_len];
+        said_len++;
     }
 }
 
@@ -320,6 +334,12 @@ static int subst_ja(const TrPat *pat, const char *key,
             if (force_echo || ((hflags[ci] & TRF_ECHO) && echo_len)) {
                 for (int i = 0; i < echo_len && o < outmax; i++)
                     out[o++] = echo_word[i];
+            }
+            /* ★原作の呼び名ではなく打った語を返す穴。打っていなければ訳語辞書へ落とす
+               (語を共有する物では辞書が別の物の名前を返す —— 舟が 3 つある) */
+            else if ((hflags[ci] & TRF_SAID) && said_len) {
+                for (int i = 0; i < said_len && o < outmax; i++)
+                    out[o++] = said_word[i];
             }
             else if (hquoted[ci] && !(hflags[ci] & TRF_VERB))
                 o = put_ascii(out, o, outmax, key + cap_off[ci], cap_len[ci]);

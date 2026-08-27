@@ -75,6 +75,8 @@ int main(void)
         printf(",\"echoWord\":");
         if (r.needs_object) printf("\"\"");
         else jstr16(r.echo_word, r.echo_word_len);
+        printf(",\"said\":");
+        jstr16(r.said, r.said_len);
         printf(",\"needsObject\":%s", r.needs_object ? "true" : "false");
         printf(",\"ask\":");
         if (r.needs_object) jstr16(r.ask, r.ask_len); else printf("\"\"");
