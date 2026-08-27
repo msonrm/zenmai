@@ -194,7 +194,7 @@ to reservoir south,
 until you see a buoy
 ,
 to the beach
-get out of boat
+disembark boat
 get shovel
 ne
 dig with shovel
