@@ -412,7 +412,10 @@ GitHub Releases にタグを切って `.psexe` を添付する（`ps1-v1.0.0` �
 ## 9. 残件
 
 - **実機 CRT**（段階 6）。R36H + DuckStation では確認済み
-- **CD イメージ**。`ps1-mock/` に生成器があるが、配布は `.psexe` で足りている
+- **PS2（FreeMcBoot）で動かす**。CD イメージ（`build-iso.sh`）と POPS の VCD（`build-vcd.sh`）
+  までは焼けた（`verify_iso.py` で中身も照合済み）。★**起動は未検証** —— `sim.py` は
+  PS1 の R3000 を手書きしたもので PS2 も POPS も模せないので、実機でしか分からない。
+  試す順序と切り分けは `docs/ps1-ps2-pops.md`（怪しい順に 640×480i → メモリーカード直叩き）
 - MojoZork の非アラインロードを upstream へ報告
 - **英語面で別の z3 を動かす**。英語面は訳の層も命令層も通らない素の z3 プレイヤーなので、
   `story.bin` を差し替えれば原理的には動く（★**未検証**。MojoZork は v3 のみ・

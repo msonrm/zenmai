@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PS1 のブータブル CD イメージ定義(mkpsxiso 用)。焼き方は build-iso.sh。
+
+     ★Sony のライセンスデータ(LICENSEA.DAT 等)は**同梱しない**。同梱すれば未改造の
+     実機でも起動するが、Sony の著作物なので配布物には入れられない(ps1-mock/iso.xml
+     から引き継いだ権利方針)。無くても次では起動する:
+       ・エミュレータ(DuckStation 等)・OpenBIOS
+       ・改造済み実機 / modchip
+       ・★PS2 の POPS(POPStarter)——**物理ディスクではなく VCD を読むので、
+         ディスク由来のプロテクトは効きようがない。ただし未検証**
+     手元で焼いて遊ぶぶんには、各自が自分の PS1 から吸ったライセンスデータを
+     <license file="..."/> で足せばよい。 -->
+<iso_project image_name="zenmai-zork.bin" cue_sheet="zenmai-zork.cue">
+  <track type="data">
+    <identifiers system="PLAYSTATION" application="PLAYSTATION"
+                 volume="ZENMAI" volume_set="ZENMAI"
+                 publisher="MSONRM" data_preparer="MKPSXISO"/>
+    <directory_tree>
+      <file name="SYSTEM.CNF" type="data" source="SYSTEM.CNF"/>
+      <file name="ZENMAI.EXE" type="data" source="zenmai-zork.psexe"/>
+    </directory_tree>
+  </track>
+</iso_project>

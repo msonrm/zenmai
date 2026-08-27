@@ -10,3 +10,10 @@ dist/
 *.z8
 *.zblorb
 dist/
+
+# PS1 の配布物とその材料（Releases 側に置く。ライセンスデータを足した版を
+# 手元で焼くこともあるので、そもそも追跡しない）
+*.psexe
+ps1/zenmai-zork.bin
+ps1/zenmai-zork.cue
+ps1/zenmai-zork.vcd
