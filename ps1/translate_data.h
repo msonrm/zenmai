@@ -5,7 +5,7 @@ typedef struct { unsigned int eo; unsigned short el; unsigned int jo; unsigned s
 typedef struct { unsigned int off; unsigned short len; unsigned char kind; unsigned char slot; } TrSeg;
 typedef struct { unsigned short seg_off, en_n, ja_n, has_echo; } TrPat;
 enum { TRK_LIT, TRK_HOLE, TRK_QHOLE, TRK_JLIT, TRK_JREF };
-enum { TRF_ECHO = 1, TRF_VERB = 2 };
+enum { TRF_ECHO = 1, TRF_VERB = 2, TRF_SAID = 4 };
 enum { TR_EXACT_N = 1220, TR_PROPS_N = 336, TR_WORDS_N = 444, TR_PATS_N = 253, TR_NT_N = 30 };
 extern const char tr_en_pool[];
 extern const unsigned short tr_ja_pool[];

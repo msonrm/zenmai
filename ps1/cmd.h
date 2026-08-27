@@ -24,8 +24,13 @@ typedef struct {
     int alts_n;
     unsigned short obj_disp[24];       /* 別案の元になった打った言い方 */
     int obj_disp_len;
-    unsigned short echo_word[24];      /* 轟音の部屋用: 打った呼び名 */
+    unsigned short echo_word[24];      /* 轟音の部屋用: 打った呼び名(かな) */
     int echo_word_len;
+    /* ★{SAID} 用: 打った物の表示形(漢字)。原作が入力バッファをそのまま印字する行
+       (You can't see any X here! / 目的語の聞き返し)に差し込む。
+       echo_word との違いは「音として返すか、字として見せるか」 */
+    unsigned short said[24];
+    int said_len;
     int needs_object;
     int verb_idx;                      /* 聞き返し中の動詞(次回の pending に渡す) */
     int trace;                         /* CMD_TR_*(検証用) */

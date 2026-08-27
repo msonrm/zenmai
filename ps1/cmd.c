@@ -124,6 +124,7 @@ typedef struct {
     const CmLex *e;
     int role;                          /* CMR_* / CMR_NONE */
     unsigned int jo; int jl;           /* 打った形(ja) */
+    unsigned int fo; int fl;           /* 打った形の表示形(form)。{SAID} に差す */
     unsigned int dp; int dpl;          /* 代表形(disp) */
     unsigned int wo; int wl;           /* 英単語 */
     int vehicle, is_all;
@@ -278,6 +279,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                 t->e = hit;
                 t->role = role;
                 t->jo = hit->jo; t->jl = hit->jl;
+                t->fo = hit->fo; t->fl = hit->fl;
                 t->dp = hit->dp; t->dpl = hit->dpl;
                 t->wo = hit->wo; t->wl = hit->wl;
                 t->vehicle = hit->vehicle;
@@ -319,6 +321,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         pverb.e = 0;
         pverb.role = CMR_NONE;
         pverb.jo = v->jo; pverb.jl = v->jl;
+        pverb.fo = 0; pverb.fl = 0;        /* 動詞は物ではないので {SAID} には出さない */
         pverb.dp = v->jo; pverb.dpl = v->jl;
         pverb.wo = v->ko; pverb.wl = v->kl;
         pverb.vehicle = 0; pverb.is_all = 0; pverb.ooff = 0; pverb.on = 0;
@@ -378,6 +381,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                 r->alts_n++;
             }
             put_pool(r->obj_disp, &r->obj_disp_len, 24, objs[0]->dp, objs[0]->dpl);
+            put_pool(r->said, &r->said_len, 24, objs[0]->fo, objs[0]->fl);
             return;
         }
         r->trace = CMD_TR_NOVERB;
@@ -427,6 +431,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         all_tok.e = alx;
         all_tok.role = CMR_NONE;
         all_tok.jo = alx->jo; all_tok.jl = alx->jl;
+        all_tok.fo = alx->fo; all_tok.fl = alx->fl;
         all_tok.dp = alx->dp; all_tok.dpl = alx->dpl;
         all_tok.wo = alx->wo; all_tok.wl = alx->wl;
         all_tok.vehicle = 0; all_tok.is_all = 1; all_tok.ooff = 0; all_tok.on = 0;
@@ -651,5 +656,8 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         put_pool(r->echo_word, &r->echo_word_len, 24, prso->jo, prso->jl);
     else
         put_pool(r->echo_word, &r->echo_word_len, 24, verb->jo, verb->jl);
+    /* ★{SAID}: 打った物の表示形。物を打っていないなら空のままにして、訳語辞書へ落とす */
+    if (prso && prso->fl)
+        put_pool(r->said, &r->said_len, 24, prso->fo, prso->fl);
     r->verb_idx = vidx;
 }

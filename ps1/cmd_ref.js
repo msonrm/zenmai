@@ -19,6 +19,7 @@ for (const input of lines) {
     alts: r.alts || [],
     objDisp: r.objDisp || '',
     echoWord: r.needsObject ? '' : (r.echoWord || ''),
+    said: r.said || '',
     needsObject: !!r.needsObject,
     ask: r.needsObject ? (r.ask || '') : '',
   }))

@@ -57,5 +57,37 @@ int main(void)
         printf("\n");
         return 1;
     }
+
+    /* ★{SAID}: 原作が**入力バッファをそのまま印字**する行(You can't see any X here! など)は、
+       訳語辞書ではなく**打った語**を返す。語を共有する物では辞書が別の物の名前を返すため
+       (実プレイ 2026-08-27: 「ビニールの塊」を指したのに「穴の空いた舟」が出た)。
+       ★原作にも一意な指し方が無い(舟が 3 つ)ので、送る英語を変えても直らない。 */
+    tr_set_echo16(0, 0);
+    static const unsigned short BEN[] = {0x5F01};   /* 弁 */
+    static const unsigned short SW1[] = {0x5F01, 0x306A, 0x3069, 0x3001, 0x3053, 0x3053, 0x306B, 0x306F, 0x898B, 0x5F53, 0x305F, 0x3089, 0x306A, 0x3044, 0x3002};   /* 弁など、ここには見当たらない。 */
+    static const unsigned short SW0[] = {0x7A74, 0x306E, 0x7A7A, 0x3044, 0x305F, 0x821F, 0x306A, 0x3069, 0x3001, 0x3053, 0x3053, 0x306B, 0x306F, 0x898B, 0x5F53, 0x305F, 0x3089, 0x306A, 0x3044, 0x3002};   /* 穴の空いた舟など、ここには見当たらない。 */
+    static const char NOT_HERE[] = "You can't see any plastic boat here!";
+    unsigned short so[64];
+    tr_set_said16(BEN, 1);
+    int sr = tr_line(NOT_HERE, so, 64);
+    int sok = sr == (int)(sizeof SW1 / sizeof *SW1) && !memcmp(so, SW1, sizeof SW1);
+    printf("%s 打った語: %s → 弁など、ここには見当たらない。\n", sok ? "✓" : "✗", NOT_HERE);
+    if (!sok) {
+        printf("  実際:");
+        for (int t = 0; t < sr; t++) printf(" %04X", so[t]);
+        printf("\n");
+        return 1;
+    }
+    /* 打った語が無ければ訳語辞書へ落とす(setSaid を呼ばない器でも壊れない) */
+    tr_set_said16(0, 0);
+    sr = tr_line(NOT_HERE, so, 64);
+    sok = sr == (int)(sizeof SW0 / sizeof *SW0) && !memcmp(so, SW0, sizeof SW0);
+    printf("%s 打った語なし(辞書へ落とす) → 穴の空いた舟など、ここには見当たらない。\n", sok ? "✓" : "✗");
+    if (!sok) {
+        printf("  実際:");
+        for (int t = 0; t < sr; t++) printf(" %04X", so[t]);
+        printf("\n");
+        return 1;
+    }
     return 0;
 }

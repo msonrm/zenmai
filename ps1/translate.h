@@ -7,6 +7,10 @@
 void tr_set_echo(const char *word);
 void tr_set_echo16(const unsigned short *word, int n);   /* 打った語がかなのとき */
 
+/* {SAID}に使う「打った物の表示形」(漢字)。原作が入力バッファをそのまま印字する行
+ * (You can't see any X here! / 目的語の聞き返し)に差し込む。NULL・長さ 0 で訳語辞書へ落とす */
+void tr_set_said16(const unsigned short *word, int n);
+
 /* 1 語(名詞句)を訳す(ステータス行の部屋名用)。引けなければ原文を写す。戻り値 = 長さ */
 int tr_word_str(const char *en, int len, unsigned short *out, int outmax);
 
