@@ -332,6 +332,7 @@
     // ★轟音の部屋は**打った語を返す**部屋。原作へ渡すのは英語だが、返すべきは
     //   こちらのプレイヤーが打った呼び名なので、訳す側に教えておく
     tr.setEcho(r.echoWord || text)
+    tr.setSaid(r.said || '')
     if (r.trace !== '英語のまま') sent(r.command, r.unknown.length ? '　※残: ' + r.unknown.join(' ') : '')
     trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
     // 送ったのが**動詞だけ**なら、次の入力は聞き返しへの答えとみなす

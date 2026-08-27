@@ -76,6 +76,7 @@ const Glk = createGlk({
     // ★ブラウザ側（web/main.js）と**同じ手当て**を通す。片方だけが呼ぶ値は、
     //   もう片方で必ず落ちる（反響が訳語に化けるのを、この器でも捕まえられるように）
     tr.setEcho(r.echoWord || ja)
+    tr.setSaid(r.said || '')
     trial = r.alts && r.alts.length ? { alts: r.alts.slice(), buf: '', first: null, disp: r.objDisp } : null
     pendingVerb = null
     rawSince = ''

@@ -51,9 +51,9 @@
    "ja": "{PRSO}の中身が地面にこぼれ落ちた。"
   },
   {
-   "en": "The {WINNER} seems confused. \"I don't see any {OBJ} here!\"",
+   "en": "The {WINNER} seems confused. \"I don't see any {SAID} here!\"",
    "id": "A-10",
-   "ja": "{WINNER}は戸惑っている。「{OBJ}など、ここには見当たらないが」"
+   "ja": "{WINNER}は戸惑っている。「{SAID}など、ここには見当たらないが」"
   },
   {
    "en": "The {OBJ} doesn't lead upward.",
@@ -146,9 +146,9 @@
    "ja": "きみが言ったもう一方のものは、ここにない。"
   },
   {
-   "en": "You can't see any {OBJ} here!",
+   "en": "You can't see any {SAID} here!",
    "id": "S-2",
-   "ja": "{OBJ}など、ここには見当たらない。"
+   "ja": "{SAID}など、ここには見当たらない。"
   },
   {
    "en": "Oh, no! A lurking grue slithered into the room and devoured you!",
@@ -591,14 +591,14 @@
    "ja": "（{OBJ}）"
   },
   {
-   "en": "What do you want to {VERB} the {OBJ} {PREP}?",
+   "en": "What do you want to {VERB} the {SAID} {PREP}?",
    "id": "P-9",
-   "ja": "何{PREP}{OBJ}を{VERB}？"
+   "ja": "何{PREP}{SAID}を{VERB}？"
   },
   {
-   "en": "What do you want to {VERB} the {OBJ}?",
+   "en": "What do you want to {VERB} the {SAID}?",
    "id": "P-10",
-   "ja": "{OBJ}に何を{VERB}？"
+   "ja": "{SAID}に何を{VERB}？"
   },
   {
    "en": "What do you want to {VERB} {PREP}?",
