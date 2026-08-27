@@ -9,5 +9,9 @@ set -e
 cd "$(dirname "$0")"
 : "${CUE2POPS:=cue2pops}"
 [ -f zenmai-zork.cue ] || ./build-iso.sh
-"$CUE2POPS" zenmai-zork.cue zenmai-zork.vcd
-ls -l zenmai-zork.vcd
+
+# ★名前は ZENMAI.VCD ——「.VCD は大文字」(POPS は case sensitive)、かつ短く
+#   (POPStarter は ELF のパスが長いと切り詰める)。ここを外すと POPStarter が
+#   VCD を開けず「No Disk!」で FMCB へ戻る。
+"$CUE2POPS" zenmai-zork.cue ZENMAI.VCD
+ls -l ZENMAI.VCD
