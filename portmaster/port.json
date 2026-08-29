@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "zenmai.zip",
+  "items": [
+    "Zenmai.sh",
+    "zenmai"
+  ],
+  "items_opt": null,
+  "attr": {
+    "title": "Zenmai",
+    "desc": "Zork I (1979), read and typed in Japanese - with a Japanese input method driven entirely by the gamepad. No keyboard, no system IME: hold a consonant row with the left hand, tap a vowel with the right, and the kana appears. English play is also included, typed with T9. Originally written for the PlayStation; this is the same C, with only the nine functions that touch the machine swapped out.",
+    "inst": "Extract to your ports folder. Nothing else is needed - the story file and the font are already inside.",
+    "genres": [
+      "adventure"
+    ],
+    "porter": [
+      "msonrm"
+    ],
+    "image": {
+      "screenshot": "screenshot.png"
+    },
+    "rtr": true,
+    "runtime": null,
+    "reqs": [],
+    "arch": [
+      "aarch64"
+    ]
+  }
+}
