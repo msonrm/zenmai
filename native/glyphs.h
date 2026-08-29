@@ -7,7 +7,7 @@
  * Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015
  *
  * This Font Software is licensed under the SIL Open Font License,
- * Version 1.1. 全文 = ps1/vendor/kh-dotfont/LICENSE
+ * Version 1.1. 全文 = native/vendor/kh-dotfont/LICENSE
  * ★このファイルは OFL 1.1 の下にある(リポジトリの MIT ではない)。
  */
 typedef struct { unsigned short code; unsigned char width; } GInfo;

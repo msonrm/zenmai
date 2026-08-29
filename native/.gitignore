@@ -36,3 +36,6 @@ __pycache__/
 # ★生成ヘッダ(glyphs.h / *_data.* / tables.h / pairs.h / golden_cases.h)は追跡する。
 #   glyphs.h は KH ドットフォント(リポジトリに同梱していない)が無いと作れないので、
 #   無視すると clone しただけではビルドできなくなる。
+
+# ★同梱フォントは生成物（make_font.sh で作る）。出自は vendor/noto-cjk/README.md
+zenmai.otf

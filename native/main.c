@@ -1,4 +1,8 @@
-/* Zenmai PS1 — 統合版 Zork(英語 / 日本語)。起動時に言語を選ぶ。
+/* Zenmai — 統合版 Zork(英語 / 日本語)。起動時に言語を選ぶ。
+ *
+ * ★PS1（build.sh）と SDL2 = PortMaster / デスクトップ（build-sdl.sh）で
+ *   **このファイルごと共有する**。分かれるのは入口だけ（末尾の #ifdef ZM_SDL）で、
+ *   機械に触る部分は plat.h の後ろにある。
  *
  * Z-machine(MojoZork)・story・入出力バッファは 1 つを共有し、
  * ステータス行・出力描画・入力ループだけを言語で分岐する。
@@ -22,7 +26,9 @@
 
 extern const uint8_t _binary_story_bin_start[];
 extern const uint8_t _binary_story_bin_end[];
-extern char __bss_start[], __bss_end[];
+#ifndef ZM_SDL
+extern char __bss_start[], __bss_end[];   /* link.ld が置く。SDL 版には無い */
+#endif
 
 static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
 static ZMachineState zm;
@@ -480,6 +486,42 @@ static int pad_vowel(int p)
          : (p & BTN_CIR) ? 3 : (p & BTN_X) ? 4 : -1;
 }
 
+/* いま押されているパッドの状態を、入力の状態機械が食べる 1 フレームに写す。
+ *
+ * ★lt（L2 = 拗音シフト）は**呼ぶ側が決める**。英語面では渡さない —— 渡すと
+ *   シフト系が生きて、500ms 以上握ると CapsLock が勝手にトグルし、短く押して離すと
+ *   次の 1 文字だけ大文字になる。しかも L2 は履歴スクロールの修飾キーを兼ねているので
+ *   遡るたびに踏む。Zork の辞書は全部小文字で、read が入力を小文字化するため用が無い。
+ *   ★止めるのは呼び出し側。input.c は machine.ts と同一に保つ。 */
+static GpFrame frame_of(int p, int ms, int lt)
+{
+    const int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
+                 + !!(p & BTN_DOWN) + !!(p & BTN_L1);
+    const int vowel = pad_vowel(p);
+    GpFrame f = { ms, pad_row(p), vowel, vowel >= 0,
+                  lt ? !!(p & BTN_L2) : 0, !!(p & BTN_R2), cc };
+    return f;
+}
+
+/* ★対話ループに入るときの引き継ぎ。**押されたままのものを「もう見た」ことにする**。
+ *
+ *   pad_prev … エッジ（Start / Select）用。0 で始めると、言語メニューを抜けた Start が
+ *              そのまま最初のエッジになり、オプション画面が勝手に開く（実測）
+ *   gp_sync_prev … ★**状態機械用**。こちらを忘れると、言語を**面ボタンで**選んだとき、
+ *              その面ボタンが押されたままなので `!prevVowelPressed` が成立し、
+ *              **選んだボタンに応じた字がコマンド欄に入った状態でゲームが始まる**
+ *              （✕ なら「お」）。2026-08-29 に実機（R36H）で発覚。
+ *              ★台本が**全部 Start で言語を選んでいた**ので、検査を素通りしていた。
+ */
+static void carry_over_pad(int lt)
+{
+    pad_prev = pad_read();
+    if (pad_prev < 0)
+        pad_prev = 0;
+    GpFrame f = frame_of(pad_prev, 0, lt);
+    gp_sync_prev(&gm, &f);
+}
+
 /* ★どのフェイスボタンでも決まる。「Start で開いて Start で閉じる」「開いた先で
    フェイスボタンを押せば決まる」は当時からの作法なので、画面に書かない */
 #define BTN_FACE (BTN_CIR | BTN_X | BTN_TRI | BTN_SQ)
@@ -524,7 +566,7 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
     /* ★メニューの入口を知らせるのはここだけ。本文にシステムの字は混ぜないし、
        いちばん助けが要る人ほど Start を試しに押さない(だから全員が通るここに置く) */
     menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
-    GP1 = 0x03000000;                  /* 表示オン(メニューが最初の画面) */
+    gpu_display_on();                  /* 表示オン(メニューが最初の画面) */
     /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、
        **「やめる」→「はい」を決めた Start がそのまま最初のエッジになり、
        起動メニューが出た瞬間に言語が決まってしまう**（interactive_en の
@@ -975,12 +1017,7 @@ static void interactive_en(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
-       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
-       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
-    pad_prev = pad_read();
-    if (pad_prev < 0)
-        pad_prev = 0;
+    carry_over_pad(0 /* 英語面は L2 を渡さない */);
     for (;;) {
         wait_fields(1);
         fields++;
@@ -1003,17 +1040,8 @@ static void interactive_en(void)
                 continue;
         }
 
-        int row = pad_row(p);
-        int vowel = pad_vowel(p);
-        int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
-               + !!(p & BTN_DOWN) + !!(p & BTN_L1);
-        /* ★L2 は**渡さない**。渡すとシフト系が生きる: 500ms 以上握ると CapsLock が
-           勝手にトグルし、短く押して離すと次の 1 文字だけ大文字になる。しかも L2 は
-           履歴スクロールの修飾キーを兼ねているので、遡るたびに踏む。Zork の辞書は
-           全部小文字で、read が入力バッファを小文字化するため大文字に用が無い。
-           ★止めるのは**呼び出し側**。input.c は machine.ts と同一に保つ。 */
-        GpFrame f = { fields * 17, row, vowel, vowel >= 0,
-                      0 /* ltNow: シフト無効 */, !!(p & BTN_R2), cc };
+        GpFrame f = frame_of(p, fields * 17, 0 /* 英語面は L2 を渡さない */);
+        const int row = f.row;
         GpAction a[4];
         int an = gp_step(&gm, 1 /* english */, &f, a);
         for (int i = 0; i < an; i++) {
@@ -1137,12 +1165,7 @@ static void interactive_ja(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
-       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
-       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
-    pad_prev = pad_read();
-    if (pad_prev < 0)
-        pad_prev = 0;
+    carry_over_pad(1);
     for (;;) {
         wait_fields(1);
         fields++;
@@ -1165,12 +1188,8 @@ static void interactive_ja(void)
                 continue;
         }
 
-        int row = pad_row(p);
-        int vowel = pad_vowel(p);
-        int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
-               + !!(p & BTN_DOWN) + !!(p & BTN_L1);
-        GpFrame f = { fields * 17, row, vowel, vowel >= 0,
-                      !!(p & BTN_L2), !!(p & BTN_R2), cc };
+        GpFrame f = frame_of(p, fields * 17, 1);
+        const int row = f.row;
         GpAction a[4];
         int an = gp_step(&gm, 0 /* japanese */, &f, a);
         for (int i = 0; i < an; i++) {
@@ -1359,6 +1378,55 @@ after_msg:
     }
 }
 
+/* 1 周ぶん —— 言語を選び、ゲームを起こし、対話ループへ入る。
+ * 対話ループは quit で**普通に return する**ので、ここも普通に返ってくる。 */
+static void boot_once(void)
+{
+    gpu_init();
+    paint_screen(OPT_BG);              /* ★言語メニューも本文の外側 = 藍 */
+    render_init();
+    jp_text_init();                    /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
+    body_top = STATUS_Y + STATUS_H + 8;
+    body_h = CMD_Y - 8 - body_top;
+
+    pad_try_analog();
+    lang_en = lang_menu();
+    paint_screen(BG);                  /* メニューを消す */
+
+    vm_init();
+    run_until_read();
+    render_output();
+    view_bottom();
+    render_window();
+    draw_status();
+    if (lang_en) {
+        uint16_t ind[4];
+        int in_;
+        row_label(0, ind, &in_);
+        draw_strip(0, 0, 0, ind, in_);
+        interactive_en();
+    } else {
+        draw_strip(0, 0, 0, 0, 0);
+        interactive_ja();
+    }
+}
+
+#ifdef ZM_SDL
+
+/* ★SDL 版の「やめる」は**プロセスを終える**。PS1 と違って .bss を潰す道が使えない
+ *   （glibc と SDL の状態まで消えてしまう）。PortMaster ではポートを抜けると
+ *   ランチャのメニューへ戻るので、作法としてもこちらが正しい。
+ *   ★言語の選び直しは「もう一度起動する」で足りる。 */
+int main(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    boot_once();
+    return 0;
+}
+
+#else
+
 /* ★**quit は「起動しなおす」**。対話ループが戻ってきたら、そのまま頭から回る。
  *
  * ★戻るときに **.bss をもう一度潰す**のが要点。「何を消すか」を数え上げる形にすると
@@ -1373,32 +1441,8 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
     for (;;) {
         for (char *p = __bss_start; p < __bss_end; p++)
             *p = 0;
-        gpu_init();
-        paint_screen(OPT_BG);          /* ★言語メニューも本文の外側 = 藍 */
-        render_init();
-        jp_text_init();                /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
-        body_top = STATUS_Y + STATUS_H + 8;
-        body_h = CMD_Y - 8 - body_top;
-
-        pad_try_analog();
-        lang_en = lang_menu();
-        paint_screen(BG);              /* メニューを消す */
-
-        vm_init();
-        run_until_read();
-        render_output();
-        view_bottom();
-        render_window();
-        draw_status();
-        if (lang_en) {
-            uint16_t ind[4];
-            int in_;
-            row_label(0, ind, &in_);
-            draw_strip(0, 0, 0, ind, in_);
-            interactive_en();
-        } else {
-            draw_strip(0, 0, 0, 0, 0);
-            interactive_ja();
-        }
+        boot_once();
     }
 }
+
+#endif

@@ -1,4 +1,7 @@
-/* Zenmai PS1 描画層 + パッド(実装)。
+/* Zenmai 描画層 —— 組版・グリフ・履歴・表示窓。
+ *
+ * ★機械に触る部分（GPU / パッド）は 2026-08-29 に plat.h の後ろへ出した。
+ *   このファイルは PS1 と SDL2 の両方でそのままリンクされる。
  *
  * 2026-08-20 全面改修: 履歴を「描画済みピクセルの巻物」から「テキスト行の環」へ。
  *   - 本文はテキスト(hpool/hline)で保持し、表示のたびに窓(canvas バンド)へ描き直す
@@ -8,7 +11,7 @@
  * 日本語ビルドは jp_text.c が実行時ルビ付き描画を登録する。
  */
 #include "render.h"
-#include "glyphs.h"
+#include "glyph.h"
 
 uint16_t canvas[WIN_H][W];             /* 表示窓の描画バンド */
 uint16_t strip[CMD_H][W];
@@ -17,124 +20,6 @@ int body_top, body_h;
 int view_px;
 int first_line;
 int cursor;                            /* 描画バンド内の行位置(採寸時は仮想) */
-
-/* ---- GPU ---- */
-
-void gpu_init(void)
-{
-    GP1 = 0x00000000;
-    GP1 = 0x08000027;                  /* 640×480i NTSC 15bpp */
-    GP1 = 0x06C60260;
-    GP1 = 0x07042010;
-    GP1 = 0x05000000;
-}
-
-/* GPU がコマンド語を受け付けられるまで待つ(GPUSTAT bit26)。
- * 待たずに連発すると 16 語の FIFO が溢れ、実機ではコマンドが落ちる
- * (VRAM 面内コピーの連発でスクロールに断片が残った実測あり) */
-static void gpu_sync(void)
-{
-    while (!(GPUSTAT & (1u << 26))) { }
-}
-
-void gp0_fill(int x, int y, int w, int h, uint32_t rgb24)
-{
-    gpu_sync();
-    GP0 = 0x02000000 | rgb24;
-    GP0 = (uint32_t)(y << 16) | (uint32_t)x;
-    GP0 = (uint32_t)(h << 16) | (uint32_t)w;
-}
-
-void gp0_upload(int x, int y, int w, int h, const uint16_t *src)
-{
-    gpu_sync();
-    GP0 = 0xA0000000;
-    GP0 = (uint32_t)(y << 16) | (uint32_t)x;
-    GP0 = (uint32_t)(h << 16) | (uint32_t)w;
-    const uint32_t *p = (const uint32_t *)src;
-    for (int i = 0; i < w * h / 2; i++)
-        GP0 = p[i];
-}
-
-void wait_fields(int n)
-{
-    uint32_t last = GPUSTAT >> 31;
-    while (n > 0) {
-        uint32_t b = GPUSTAT >> 31;
-        if (b != last) { last = b; n--; }
-    }
-}
-
-/* ---- パッド ---- */
-
-#define JOY_DATA (*(volatile uint8_t *)0x1F801040)
-#define JOY_STAT (*(volatile uint32_t *)0x1F801044)
-#define JOY_MODE (*(volatile uint16_t *)0x1F801048)
-#define JOY_CTRL (*(volatile uint16_t *)0x1F80104A)
-#define JOY_BAUD (*(volatile uint16_t *)0x1F80104E)
-
-static int pad_exchange(const uint8_t *tx, int txn, uint8_t *rx)
-{
-    JOY_CTRL = 0x1003;
-    JOY_MODE = 0x000D;
-    JOY_BAUD = 0x88;
-    int total = txn;
-    int n = 0;
-    for (int i = 0; i < total; i++) {
-        int t = 2000;
-        while (!(JOY_STAT & 0x1) && --t) { }
-        if (!t) break;
-        JOY_DATA = i < txn ? tx[i] : 0;
-        t = 2000;
-        while (!(JOY_STAT & 0x2) && --t) { }
-        if (!t) break;
-        rx[n++] = JOY_DATA;
-        for (volatile int d = 0; d < 60; d++) { }
-        if (i == 1) {
-            int want = 3 + (rx[1] & 0x0F) * 2;
-            if (want > total) total = want > 9 ? 9 : want;
-        }
-    }
-    JOY_CTRL = 0;
-    return n;
-}
-
-void pad_try_analog(void)
-{
-    static const uint8_t enter[9] = {0x01, 0x43, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
-    static const uint8_t setan[9] = {0x01, 0x44, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00};
-    static const uint8_t exitc[9] = {0x01, 0x43, 0x00, 0x00, 0x5A, 0x5A, 0x5A, 0x5A, 0x5A};
-    uint8_t rx[9];
-    pad_exchange(enter, 5, rx);
-    for (volatile int d = 0; d < 300; d++) { }
-    pad_exchange(setan, 9, rx);
-    for (volatile int d = 0; d < 300; d++) { }
-    pad_exchange(exitc, 9, rx);
-}
-
-int pad_read_ex(uint8_t axes[4])
-{
-    static const uint8_t tx[5] = {0x01, 0x42, 0, 0, 0};
-    uint8_t rx[9];
-    axes[0] = axes[1] = axes[2] = axes[3] = 0x80;
-    int n = pad_exchange(tx, 5, rx);
-    if (n >= 9 && rx[1] == 0x73) {
-        axes[0] = rx[5];
-        axes[1] = rx[6];
-        axes[2] = rx[7];
-        axes[3] = rx[8];
-        return ~(rx[3] | (rx[4] << 8)) & 0xFFFF;
-    }
-    if (n >= 5 && rx[1] == 0x41)
-        return ~(rx[3] | (rx[4] << 8)) & 0xFFFF;
-    return -1;
-}
-
-int pad_read(void)
-{
-    uint8_t axes[4];
-    return pad_read_ex(axes);
-}
 
 static int rs_held;                    /* フリック検出の倒し込み状態(render_init で零化) */
 
@@ -152,53 +37,9 @@ int pad_rstick_flick(const uint8_t axes[4])
     return fire ? dir : 0;
 }
 
-/* ---- グリフ(クリップつき描画) ---- */
+/* ★字は glyph.h の後ろ（glyph_baked.c / glyph_ft.c）。ここは幅を訊いて描けと言うだけ。 */
 
-static int clip_y0, clip_y1;
 static int render_dry;                 /* 1 = 採寸のみ(描かない) */
-
-static int find_glyph(const GInfo *info, int n, uint16_t code)
-{
-    int lo = 0, hi = n - 1;
-    while (lo <= hi) {
-        int mid = (lo + hi) / 2;
-        if (info[mid].code == code) return mid;
-        if (info[mid].code < code) lo = mid + 1; else hi = mid - 1;
-    }
-    return -1;
-}
-
-int glyph_w(uint16_t code)
-{
-    int i = find_glyph(base_info, BASE_N, code);
-    return i < 0 ? 24 : base_info[i].width;
-}
-
-void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
-{
-    int i = find_glyph(base_info, BASE_N, code);
-    if (i < 0) return;
-    for (int r = 0; r < 24; r++) {
-        int ry = y + r;
-        if (ry < clip_y0 || ry >= clip_y1) continue;
-        unsigned bits = base_rows[i][r];
-        for (int c = 0; bits; c++, bits >>= 1)
-            if (bits & 1) buf[ry][x + c] = color;
-    }
-}
-
-void draw12(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
-{
-    int i = find_glyph(ruby_info, RUBY_N, code);
-    if (i < 0) return;
-    for (int r = 0; r < 12; r++) {
-        int ry = y + r;
-        if (ry < clip_y0 || ry >= clip_y1) continue;
-        unsigned bits = ruby_rows[i][r];
-        for (int c = 0; bits; c++, bits >>= 1)
-            if (bits & 1) buf[ry][x + c] = color;
-    }
-}
 
 /* ---- 割り付け(gen_mock.py の移植) ---- */
 
@@ -402,8 +243,7 @@ void render_window(void)
     view_clamp();
     stale_y = -1;                      /* 全面を描き直すので追記漏れは消える */
     fill_rows(canvas, 0, body_h, BG);
-    clip_y0 = 0;
-    clip_y1 = body_h;
+    glyph_clip(0, body_h);
     for (int i = 0; i < hcount; i++) {
         HLine *h = hl(i);
         uint32_t hh = (i + 1 < hcount ? hl(i + 1)->y : total_h) - h->y;
@@ -416,8 +256,7 @@ void render_window(void)
         fw = 0;
         line_render(hpool + h->off, h->len, h->color);
     }
-    clip_y0 = 0;
-    clip_y1 = WIN_H;
+    glyph_clip(0, WIN_H);
     gp0_upload(0, body_top, W, body_h, canvas[0]);
 }
 
@@ -427,20 +266,10 @@ void view_bottom(void)
     view_clamp();
 }
 
-static void gp0_copy(int sx, int sy, int dx, int dy, int w, int h)
-{
-    gpu_sync();
-    GP0 = 0x80000000;                  /* VRAM 面内コピー */
-    GP0 = (uint32_t)(sy << 16) | (uint32_t)sx;
-    GP0 = (uint32_t)(dy << 16) | (uint32_t)dx;
-    GP0 = (uint32_t)(h << 16) | (uint32_t)w;
-}
-
 /* band 行範囲 [y0,y1) に、そこへかかる履歴行だけを描く(bg 済み前提) */
 static void render_lines_range(int y0, int y1)
 {
-    clip_y0 = y0;
-    clip_y1 = y1;
+    glyph_clip(y0, y1);
     for (int i = 0; i < hcount; i++) {
         HLine *h = hl(i);
         uint32_t hh = (i + 1 < hcount ? hl(i + 1)->y : total_h) - h->y;
@@ -453,8 +282,7 @@ static void render_lines_range(int y0, int y1)
         fw = 0;
         line_render(hpool + h->off, h->len, h->color);
     }
-    clip_y0 = 0;
-    clip_y1 = WIN_H;
+    glyph_clip(0, WIN_H);
 }
 
 /* 窓内に食い込んだ未描画の追記を描き足す(view_px を動かす前に呼ぶ) */
@@ -541,11 +369,11 @@ void scroll_new(void)
 
 void render_init(void)
 {
+    glyph_init();                      /* ★字の実装を起こす（焼いた版は何もしない） */
     nfrag = 0;
     fw = 0;
     render_dry = 0;
-    clip_y0 = 0;
-    clip_y1 = WIN_H;
+    glyph_clip(0, WIN_H);
     body_top = TOP;
     body_h = BODY_H;
     stale_y = -1;

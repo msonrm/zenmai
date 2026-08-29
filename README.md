@@ -108,11 +108,11 @@ If this was fun to read about or to play, you can buy me a coffee.
 
 ## License / ライセンス
 
-MIT for the code in this repository — **except `ps1/glyphs.h`**, which holds glyph bitmaps
+MIT for the code in this repository — **except `native/glyphs.h`**, which holds glyph bitmaps
 extracted from the **KH Dot Font** and is therefore under the
-**[SIL Open Font License 1.1](ps1/vendor/kh-dotfont/LICENSE)**
+**[SIL Open Font License 1.1](native/vendor/kh-dotfont/LICENSE)**
 (Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015 — see
-[`ps1/vendor/kh-dotfont/`](ps1/vendor/kh-dotfont/README.md)).
+[`native/vendor/kh-dotfont/`](native/vendor/kh-dotfont/README.md)).
 
 *Zork I* comes from the [ZIL sources released under MIT](https://github.com/historicalsource/zork1)
 (Microsoft, 2025); the Z-machine implementations are
@@ -121,11 +121,11 @@ extracted from the **KH Dot Font** and is therefore under the
 Zork is a trademark of Infocom; the rights are now held by Microsoft.
 **This project is not affiliated with either, and does not use the title as its own name or brand.**
 
-本リポジトリのコードは MIT —— ただし ★**`ps1/glyphs.h` だけは例外**。
+本リポジトリのコードは MIT —— ただし ★**`native/glyphs.h` だけは例外**。
 **KH ドットフォント**から抜いた字形のビットマップなので
-**[SIL Open Font License 1.1](ps1/vendor/kh-dotfont/LICENSE)** の下にある
+**[SIL Open Font License 1.1](native/vendor/kh-dotfont/LICENSE)** の下にある
 （Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015 —— 出どころと判断は
-[`ps1/vendor/kh-dotfont/`](ps1/vendor/kh-dotfont/README.md)）。
+[`native/vendor/kh-dotfont/`](native/vendor/kh-dotfont/README.md)）。
 
 『Zork I』は [MIT で公開された ZIL ソース](https://github.com/historicalsource/zork1)
 （Microsoft・2025）由来。Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と

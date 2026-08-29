@@ -171,7 +171,7 @@ put('')
 #   「各複製物に著作権表示と**このライセンス**を含めること」を求めている。
 #   ★`glyphs.h` はフォントの埋め込みビットマップと**バイト単位で同一**（全数照合済み）で、
 #   「レンダリング結果」ではなく font software の抽出なので、条件 5 も掛かる。
-#   出どころと判断は ps1/vendor/kh-dotfont/README.md。
+#   出どころと判断は native/vendor/kh-dotfont/README.md。
 put_file(HERE / 'vendor/kh-dotfont/LICENSE')
 put('')
 

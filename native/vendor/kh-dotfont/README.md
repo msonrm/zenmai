@@ -1,12 +1,14 @@
 # 使用フォントの出どころ
 
-`ps1/glyphs.h` の字形は **KH ドットフォント**から採ったもの。
+`native/glyphs.h` の字形は **KH ドットフォント**から採ったもの。
 
 | | |
 |---|---|
 | 本文 24×24 / 12×24 | `KH-Dot-Hibiya-24.ttf`（日比谷24・明朝体） |
 | ふりがな 12×12 | `KH-Dot-Kagurazaka-12.ttf`（神楽坂12・明朝体） |
 | 版 | `khdotfont-20150527`（http://jikasei.me/font/kh-dotfont/） |
+| 配布物 | `khdotfont-20150527.zip` — md5 `02a87bf08fae579bacfe27cdb1371b1c`（11MB）<br>ミラー: `https://ftp.iij.ad.jp/pub/osdn.jp/users/8/8546/khdotfont-20150527.zip` |
+| 被覆 | 日比谷24 = cmap **7,623 字** / 埋め込み 24×24 ビットマップ **8,048 グリフ**<br>神楽坂12 = cmap 7,199 字 / 12×12 **7,592 グリフ**（JIS X 0208 の 6,879 字を含む） |
 | 著作権 | `Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015`（フォント自身が名乗る文字列） |
 | ライセンス | **SIL Open Font License 1.1**（全文 = このディレクトリの `LICENSE`） |
 
@@ -24,7 +26,7 @@ font software の抽出であって「レンダリング結果」ではない。
 
 - **条件 2** —— 複製物には上記の著作権表示とライセンス本文を含めること。
   → このディレクトリの `LICENSE` と、`glyphs.h` 冒頭のヘッダ、
-  そして **`.psexe` のライセンス頁に焼き込んだ全文**（`ps1/gen_ui.py`）
+  そして **`.psexe` のライセンス頁に焼き込んだ全文**（`native/gen_ui.py`）
 - **条件 5** —— font software は一部であれ全体であれ OFL の下で頒布すること。
   → ★**`glyphs.h` だけはリポジトリの MIT ではなく OFL 1.1**（README のライセンス節に明記）
 - 条件 3（予約フォント名）は宣言が無いので該当しない
@@ -37,8 +39,10 @@ font software の抽出であって「レンダリング結果」ではない。
 フォントは同梱していないので、`glyphs.h` を作り直すには上記の版を落としてくること。
 
 ```sh
-cd ps1 && python3 gen_ui.py && python3 gen_data.py <フォントを展開した dir>
+cd native && python3 gen_ui.py && python3 gen_data.py <フォントを展開した dir>
 python3 gen_ui.py            # ★2 度回す（1 度目が ui_chars.txt を書き、2 度目で照合が通る）
 ```
 
 ★**焼き直しは再現する** —— 頒布元から取り直して回しても、既存の字は 1 字も動かない。
+2026-08-30 に上記 md5 の配布物から実際に焼き直し、`glyphs.h` / `content.h` /
+`content_data.c` の 3 本ともバイト一致することを確かめた。

@@ -229,7 +229,7 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
     view_bottom();
     render_window();
     draw_strip(0, 0, 0, IND_A, 1);
-    GP1 = 0x03000000;
+    gpu_display_on();
     pad_prev = 0;
     pad_seen = 0;
     pad_try_analog();

@@ -1,12 +1,13 @@
-/* Zenmai PS1 描画層 + パッド(本体 main.c と demo_main.c のデモで共有)。
+/* Zenmai 描画層（本体 main.c と demo_main.c のデモで共有）。機械に触る部分は plat.h。
  * 規則の正典は gen_mock.py(Python ゴールデン)。挙動を変えるときは両方を見ること。 */
 #ifndef RENDER_H
 #define RENDER_H
 #include <stdint.h>
+#include "plat.h"          /* ★機械に触る 9 本（画面 / パッド）と W・H・BTN_* はここ */
 #include "content.h"
 
 enum {
-    W = 640, H = 480, MARGIN = 32, TEXT_W = W - 2 * MARGIN,
+    MARGIN = 32, TEXT_W = W - 2 * MARGIN,
     TOP = 24, BODY_H = 400,            /* 本文窓 y=24..424 */
     CMD_Y = 432, CMD_H = 24,           /* コマンド欄(下セーフ 24px) */
     RUBY_ZONE = 14, BASE = 24, LEAD = 8, BLANK = 24,
@@ -19,27 +20,6 @@ enum {
 #define INK    0x6B9D
 #define ACCENT 0x36B9
 #define DIM    0x31CF
-
-#define GP0 (*(volatile uint32_t *)0x1F801810)
-#define GP1 (*(volatile uint32_t *)0x1F801814)
-#define GPUSTAT (*(volatile uint32_t *)0x1F801814)
-
-#define BTN_SELECT (1 << 0)
-#define BTN_L3     (1 << 1)
-#define BTN_R3     (1 << 2)
-#define BTN_START  (1 << 3)
-#define BTN_UP     (1 << 4)
-#define BTN_RIGHT  (1 << 5)
-#define BTN_DOWN   (1 << 6)
-#define BTN_LEFT   (1 << 7)
-#define BTN_L2     (1 << 8)
-#define BTN_R2     (1 << 9)
-#define BTN_L1     (1 << 10)
-#define BTN_R1     (1 << 11)
-#define BTN_TRI    (1 << 12)
-#define BTN_CIR    (1 << 13)
-#define BTN_X      (1 << 14)
-#define BTN_SQ     (1 << 15)
 
 extern uint16_t canvas[WIN_H][W];
 extern uint16_t strip[CMD_H][W];
@@ -62,11 +42,6 @@ void scroll_new(void);                 /* 新しい内容を半行送りで見�
 extern void (*line_render)(const uint16_t *s, int n, uint16_t color);
 
 void render_init(void);                /* 内部状態のゼロ化(.bss は非ゼロで来る) */
-void gpu_init(void);
-void gp0_fill(int x, int y, int w, int h, uint32_t rgb24);
-void gp0_upload(int x, int y, int w, int h, const uint16_t *src);
-void wait_fields(int n);
-int pad_read(void);
 
 int glyph_w(uint16_t code);
 void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color);
@@ -86,9 +61,7 @@ void draw_strip(const uint16_t *cmd, int len, int caret, const uint16_t *ind, in
 /* コマンド欄を strip[][] に組むだけ(地色を選べる)。送るのは呼んだ側 */
 void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
                  const uint16_t *ind, int ilen);
-void pad_try_analog(void);
 void jp_text_init(void);   /* JA ビルド: ルビ付き描画器を登録 */
-int pad_read_ex(uint8_t axes[4]);
 /* 右スティックのフリック検出: 倒し込みで 1=左 2=上 3=右 4=下 を 1 回だけ返す */
 int pad_rstick_flick(const uint8_t axes[4]);
 
