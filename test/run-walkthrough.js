@@ -54,5 +54,5 @@ vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', 'zork1', 'zork1.
 Glk.init({ vm })
 // ★乱数を固定して回帰を安定させる（`Glk.init` が 0 で初期化するのでその後）。
 //   固定しないと「引けた行数」が実行ごとに 274〜278 と揺れ、**退行と乱数の区別がつかない**。
-//   詳しくは ps1/capture_pairs.js
+//   詳しくは native/capture_pairs.js
 vm.xorshift_seed = 0x5EED5EED
