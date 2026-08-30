@@ -3,6 +3,13 @@
 # ★出力名 zenmai-zork.psexe は Releases の配布名。README がこの名前を指している。
 set -e
 cd "$(dirname "$0")"
+
+# ★検査が走っている最中に焼き直さない（共有の psexe / elf の足元が入れ替わる）。
+#   検査自身が呼ぶときは ZM_IN_TEST=1 が立っているので通す。
+if [ -z "${ZM_IN_TEST:-}" ] && [ -d .test-lock ]; then
+    echo "★検査が走っています（.test-lock）。焼き直すと検査の足元が入れ替わります。" >&2
+    exit 1
+fi
 OUT="${1:-zenmai-zork.psexe}"
 PY="${PY:-python3}"
 

@@ -61,30 +61,42 @@ static void paint_screen(uint16_t color)
         gp0_upload(0, y, W, STATUS_H, sbar[0]);
 }
 
+/* 状態行。左＝部屋名 / 右＝スコア。
+ *
+ * ★**空白詰めに頼らない。** Z-machine は 49 字の桁を空白で埋めて右端を作るので、
+ *   等幅フォントならそのまま流すだけで揃う。★ところがプロポーショナルにすると
+ *   空白も字も細くなり、**スコアが中央寄りへ流れる**（2026-08-30・実機の指摘。
+ *   英語面だけ「そのまま流す」経路だったので、英語だけ崩れていた）。
+ *   だから左右とも**自分で測って置く**。日本語面は元からこの形だった ——
+ *   ★片方だけの経路を残すと、片方だけ壊れる。
+ */
 static void draw_status(void)
 {
     fill_rows(sbar, 0, STATUS_H, PANEL);
-    if (lang_en) {
-        int x = MARGIN;
-        for (int i = 0; i < 48 && statusbuf[i]; i++) {
-            uint16_t ch = (uint16_t)(unsigned char)statusbuf[i];
-            draw24(sbar, STATUS_H, x, 0, ch, INK);
-            x += glyph_w(ch);
-        }
-        gp0_upload(0, STATUS_Y, W, STATUS_H, sbar[0]);
-        return;
-    }
+
+    /* 部屋名とスコアの境目は**空白 2 つ**（Z-machine の桁埋め） */
     int name_end = 0;
     while (statusbuf[name_end] &&
            !(statusbuf[name_end] == ' ' && statusbuf[name_end + 1] == ' '))
         name_end++;
-    uint16_t jname[64];
-    int jn = tr_word_str(statusbuf, name_end, jname, 64);
-    int x = MARGIN;
-    for (int i = 0; i < jn; i++) {
-        draw24(sbar, STATUS_H, x, 0, jname[i], INK);
-        x += glyph_w(jname[i]);
+
+    /* 左: 部屋名（日本語面は訳す） */
+    uint16_t name[64];
+    int nn;
+    if (lang_en) {
+        nn = name_end < 64 ? name_end : 64;
+        for (int i = 0; i < nn; i++)
+            name[i] = (uint16_t)(unsigned char)statusbuf[i];
+    } else {
+        nn = tr_word_str(statusbuf, name_end, name, 64);
     }
+    int x = MARGIN;
+    for (int i = 0; i < nn; i++) {
+        draw24(sbar, STATUS_H, x, 0, name[i], INK);
+        x += glyph_w(name[i]);
+    }
+
+    /* 右: スコア（前後の空白を落として右寄せ） */
     int re = name_end;
     while (statusbuf[re] == ' ') re++;
     int rl = 0;
@@ -93,6 +105,8 @@ static void draw_status(void)
     int rw = 0;
     for (int i = 0; i < rl; i++) rw += glyph_w((uint16_t)(unsigned char)statusbuf[re + i]);
     int rx = W - MARGIN - rw;
+    if (rx < x + 24)                   /* 名前と重なるなら諦めて右へ寄せきらない */
+        rx = x + 24;
     for (int i = 0; i < rl; i++) {
         uint16_t ch = (uint16_t)(unsigned char)statusbuf[re + i];
         draw24(sbar, STATUS_H, rx, 0, ch, INK);
@@ -696,10 +710,13 @@ static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center
 static void page_index(void)
 {
     const int want = lang_en ? 2 : 1;
+    /* ★フォントの帰属は使っている実装のものだけを出す（lang とまったく同じ絞り方）。 */
+    const int font = glyph_font_kind();
     page_count = 0;
     for (int i = 0; i < UI_LINE_N; i++)
         if (UI_LINES[i].page == opt_page &&
-            (!UI_LINES[i].lang || UI_LINES[i].lang == want))
+            (!UI_LINES[i].lang || UI_LINES[i].lang == want) &&
+            (!UI_LINES[i].font || UI_LINES[i].font == font))
             page_idx[page_count++] = (short)i;
 }
 

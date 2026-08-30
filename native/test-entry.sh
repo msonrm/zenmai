@@ -15,6 +15,20 @@
 # 使い方: sh test-entry.sh
 set -e
 cd "$(dirname "$0")"
+
+# ★検査どうし・検査とビルドの**並行実行を止める**。
+#   このディレクトリの zenmai-zork.psexe と out-zork.elf は共有物なので、
+#   走っている最中に別のビルドが入ると**足元が入れ替わり、シンボル表と中身が
+#   食い違う**（2026-08-30 に踏んだ。ライセンス頁の検査が偽の赤を出した）。
+#   ★今日 4 回踏んだ「古い成果物」の罠の並行実行版。
+if ! mkdir .test-lock 2>/dev/null; then
+    echo "★別の検査かビルドが走っています（.test-lock）。終わってからにしてください。" >&2
+    echo "  （異常終了で残ったなら: rmdir native/.test-lock）" >&2
+    exit 1
+fi
+trap 'rmdir .test-lock 2>/dev/null' EXIT INT TERM
+ZM_IN_TEST=1
+export ZM_IN_TEST
 PY="${PY:-python3}"
 ng=0
 

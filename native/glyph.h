@@ -22,6 +22,11 @@
 #include "plat.h"
 
 void glyph_init(void);                 /* 焼いた版は何もしない。FreeType 版は面を開く */
+/* ★この実装がどのフォントで描いているか。ライセンス頁の帰属をここで切り替える ——
+   ★**使っていないフォントの名を出すのは嘘**なので、字の出どころを知っている
+   この層が名乗るのが正しい（実機の指摘・2026-08-30）。
+   1 = 焼いたビットマップ（KH ドットフォント） / 2 = FreeType（同梱の Noto） */
+int  glyph_font_kind(void);
 void glyph_clip(int y0, int y1);       /* 描く行の範囲 [y0,y1)。外は捨てる */
 int  glyph_w(uint16_t code);           /* 送り幅（px） */
 /* ★rows = 描画先の**行数**。省略できない引数にしてある ——

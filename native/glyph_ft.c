@@ -246,6 +246,8 @@ void glyph_init(void)
     fprintf(stderr, "font: %s (本文 %dpx / ふりがな %dpx)\n", path, size24, size12);
 }
 
+int glyph_font_kind(void) { return 2; }   /* 同梱のアウトラインフォント（Noto） */
+
 void glyph_clip(int y0, int y1)
 {
     clip_y0 = y0;

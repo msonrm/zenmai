@@ -35,7 +35,11 @@ def width(t):
 P_TYPING, P_CMDS, P_LICENSE = 0, 1, 2
 PAGE_N = 3
 
-lines = []          # (page, lang, dim, 本文)。dim = 控えめの色
+# ★どのフォントのビルドで出すか。lang とまったく同じ仕組みの出し分け。
+#   0 = 常に出す / 1 = 焼いたビットマップ版（PS1）だけ / 2 = FreeType 版（PortMaster）だけ
+F_ANY, F_BAKED, F_FT = 0, 1, 2
+
+lines = []          # (page, lang, font, dim, 本文)。dim = 控えめの色
 cur = P_TYPING
 
 
@@ -44,13 +48,14 @@ def page(n):
     cur = n
 
 
-def put(text, lang=BOTH, dim=0):
-    lines.append((cur, lang, dim, text))
+def put(text, lang=BOTH, dim=0, font=F_ANY):
+    lines.append((cur, lang, font, dim, text))
 
 
-def put_file(path):
-    for ln in Path(path).read_text(encoding='utf-8').rstrip().splitlines():
-        put(ln.rstrip(), BOTH, 1)
+def put_file(path, font=F_ANY, skip=0):
+    ls = Path(path).read_text(encoding='utf-8').rstrip().splitlines()
+    for ln in ls[skip:]:
+        put(ln.rstrip(), BOTH, 1, font)
 
 
 def rule():
@@ -156,22 +161,38 @@ put_file(HERE / 'vendor/LICENSE.txt')
 put('')
 
 rule()
+# ★**どのフォントを使っているかはビルドで違う**ので、頭の帰属だけを出し分ける。
+#   焼いたビットマップ版（PS1）= KH ドットフォント / FreeType 版（PortMaster）= Noto。
+#   ★使っていないフォントの名を出すのは嘘なので、両方は出さない（実機の指摘・2026-08-30）。
+#   OFL 1.1 の本文はどちらも同じなので、そこは共有する。
+#
 # ★正式名称は「KHドットフォント」（頒布元 http://jikasei.me/font/kh-dotfont/ の表記）。
-#   以前は小さい「ォ」が同梱フォントに無くて「KH Dot Font —— 使用書体」と出していた。
-put('KHドットフォント —— 使用フォント', JA)
-put('KH Dot Font -- the font used', EN)
-put('http://jikasei.me/font/kh-dotfont/', BOTH, 1)
+put('KHドットフォント —— 使用フォント', JA, 0, F_BAKED)
+put('KH Dot Font -- the font used', EN, 0, F_BAKED)
+put('http://jikasei.me/font/kh-dotfont/', BOTH, 1, F_BAKED)
+
+put('Noto Sans CJK JP —— 使用フォント', JA, 0, F_FT)
+put('Noto Sans CJK JP -- the font used', EN, 0, F_FT)
+put('https://github.com/notofonts/noto-cjk', BOTH, 1, F_FT)
 rule()
-# ★著作権表示は**フォント自身が名乗る文字列**をそのまま出す（name table の nameID 0）。
+# ★著作権表示は**フォント自身が名乗る文字列**をそのまま出す（name table の nameID 0 / 7）。
 #   OFL 条件 2 が言う「上記の著作権表示」はこれのこと。語順を整えたりしない。
-put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1)
-put('Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015', BOTH, 1)
+put('KH-Dot-Hibiya-24 / KH-Dot-Kagurazaka-12', BOTH, 1, F_BAKED)
+put('Copyright (c) Keitarou Hiraki, Font Silo. 1990-2015', BOTH, 1, F_BAKED)
+
+put('Noto Sans CJK JP (subset)', BOTH, 1, F_FT)
+put('Copyright 2014-2021 Adobe (http://www.adobe.com/).', BOTH, 1, F_FT)
+put('Noto is a trademark of Google Inc.', BOTH, 1, F_FT)
 put('')
 # ★**OFL も全文を焼く。** MIT と zlib と同じ理屈 —— OFL 1.1 の条件 2 も
 #   「各複製物に著作権表示と**このライセンス**を含めること」を求めている。
 #   ★`glyphs.h` はフォントの埋め込みビットマップと**バイト単位で同一**（全数照合済み）で、
 #   「レンダリング結果」ではなく font software の抽出なので、条件 5 も掛かる。
-#   出どころと判断は native/vendor/kh-dotfont/README.md。
+#   FreeType 版が同梱する zenmai.otf も Noto の部分集合＝ font software なので同じ。
+#   出どころと判断は native/vendor/kh-dotfont/README.md と vendor/noto-cjk/README.md。
+#
+# ★本文は両者で同一（OFL 1.1 そのもの）なので 1 回だけ焼く。
+#   KH 側のファイルは 1 行目から OFL の本文なので、そちらを使う。
 put_file(HERE / 'vendor/kh-dotfont/LICENSE')
 put('')
 
@@ -280,34 +301,40 @@ def wrap(t):
 # ★落とす判定は**頁 × 言語ごと**にやる —— 画面に出るのはその組み合わせで濾したあとの
 #   並びなので、「全体の末尾」だけ見ても足りない（日本語の表と英語の表の境目に置いた
 #   空行が、日本語から見ると末尾になっていた）。
-_drop = set()
+# ★**フォントごとにも**濾すようになったので、末尾の判定も (頁 × 言語 × フォント) で見る
+#   —— 焼いた版と FreeType 版で「最後の行」が違うため。
+_keep = set()
 for _pg in range(PAGE_N):
     for _view in (JA, EN):
-        _idx = [i for i, ln in enumerate(lines)
-                if ln[0] == _pg and ln[1] in (BOTH, _view)]
-        while _idx and not lines[_idx[-1]][3]:
-            _drop.add(_idx.pop())
-lines = [ln for i, ln in enumerate(lines) if i not in _drop]
+        for _fv in (F_BAKED, F_FT):
+            _idx = [i for i, ln in enumerate(lines)
+                    if ln[0] == _pg and ln[1] in (BOTH, _view)
+                    and ln[2] in (F_ANY, _fv)]
+            while _idx and not lines[_idx[-1]][4]:   # [4] = 本文
+                _idx.pop()
+            _keep.update(_idx)
+lines = [ln for i, ln in enumerate(lines) if i in _keep]
 
 wrapped = []
-for pg, lang, dim, text in lines:
+for pg, lang, font, dim, text in lines:
     for part in wrap(text):
-        wrapped.append((pg, lang, dim, part))
+        wrapped.append((pg, lang, font, dim, part))
 lines = wrapped
 
 pool = []
 recs = []
-for pg, lang, dim, text in lines:
+for pg, lang, font, dim, text in lines:
     off = len(pool)
     pool.extend(ord(c) for c in text)
-    recs.append((off, len(text), dim, lang, pg))
+    recs.append((off, len(text), dim, lang, pg, font))
 
 out = ['/* gen_ui.py が生成。手で編集しない */',
        '/* オプションの読み物 3 頁 + 画面の文言。',
        '   ★ライセンス全文は実ファイルから作っている(書き写していない) */',
        '',
        'typedef struct { unsigned int off; unsigned short len; unsigned char dim;',
-       '                 unsigned char lang; unsigned char page; } UiLine;',
+       '                 unsigned char lang; unsigned char page;',
+       '                 unsigned char font; } UiLine;   /* font: 0=常に 1=焼いた版 2=FreeType */',
        'typedef struct { const unsigned short *s; unsigned short n; } UiStr;',
        '',
        'static const unsigned short UI_POOL[%d] = {' % max(len(pool), 1)]
@@ -318,8 +345,8 @@ if not pool:
 out.append('};')
 out.append('')
 out.append('static const UiLine UI_LINES[%d] = {' % len(recs))
-for off, ln, dim, lang, pg in recs:
-    out.append('    { %d, %d, %d, %d, %d },' % (off, ln, dim, lang, pg))
+for off, ln, dim, lang, pg, fnt in recs:
+    out.append('    { %d, %d, %d, %d, %d, %d },' % (off, ln, dim, lang, pg, fnt))
 out.append('};')
 out.append('')
 out.append('#define UI_LINE_N %d' % len(recs))
@@ -369,7 +396,7 @@ out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
 
 used = set()
-for _, _, _, t in lines:
+for _, _, _, _, t in lines:
     used.update(t)
 for ja, en in ITEM + HELP + [BOOT, LANG]:
     used.update(ja)

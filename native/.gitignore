@@ -39,3 +39,4 @@ __pycache__/
 
 # ★同梱フォントは生成物（make_font.sh で作る）。出自は vendor/noto-cjk/README.md
 zenmai.otf
+.test-lock/
