@@ -4,6 +4,7 @@
 #define RENDER_H
 #include <stdint.h>
 #include "plat.h"          /* ★機械に触る 9 本（画面 / パッド）と W・H・BTN_* はここ */
+#include "glyph.h"         /* ★字の 5 本（幅と描画）はここ */
 #include "content.h"
 
 enum {
@@ -43,9 +44,6 @@ extern void (*line_render)(const uint16_t *s, int n, uint16_t color);
 
 void render_init(void);                /* 内部状態のゼロ化(.bss は非ゼロで来る) */
 
-int glyph_w(uint16_t code);
-void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color);
-void draw12(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color);
 
 void draw_logical(const Line *ln, uint16_t color);
 /* 低水準の押し込み(draw_jp = jp_text.c が使う) */

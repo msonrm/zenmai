@@ -18,6 +18,10 @@ static int clip_y0, clip_y1;
 
 void glyph_init(void) { }              /* 焼いてあるので開くものが無い */
 
+/* ★rows で止めるのは**焼いた版では実質何もしない**（字は必ず 24 行に収まるので、
+   呼ぶ側が y を正しく渡していれば器から出ない）。それでも書いてあるのは、
+   2 つの実装が**同じ契約**を守っていることを形で示すため。 */
+
 void glyph_clip(int y0, int y1)
 {
     clip_y0 = y0;
@@ -41,26 +45,26 @@ int glyph_w(uint16_t code)
     return i < 0 ? 24 : base_info[i].width;
 }
 
-void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
+void draw24(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
     int i = find_glyph(base_info, BASE_N, code);
     if (i < 0) return;
     for (int r = 0; r < 24; r++) {
         int ry = y + r;
-        if (ry < clip_y0 || ry >= clip_y1) continue;
+        if (ry < clip_y0 || ry >= clip_y1 || ry < 0 || ry >= rows) continue;
         unsigned bits = base_rows[i][r];
         for (int c = 0; bits; c++, bits >>= 1)
             if (bits & 1) buf[ry][x + c] = color;
     }
 }
 
-void draw12(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
+void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
     int i = find_glyph(ruby_info, RUBY_N, code);
     if (i < 0) return;
     for (int r = 0; r < 12; r++) {
         int ry = y + r;
-        if (ry < clip_y0 || ry >= clip_y1) continue;
+        if (ry < clip_y0 || ry >= clip_y1 || ry < 0 || ry >= rows) continue;
         unsigned bits = ruby_rows[i][r];
         for (int c = 0; bits; c++, bits >>= 1)
             if (bits & 1) buf[ry][x + c] = color;

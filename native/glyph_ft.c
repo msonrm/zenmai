@@ -149,6 +149,61 @@ static Cell *lookup(uint16_t code, int px)
     return NULL;                       /* 8 連続で埋まっていたら諦める（描かない） */
 }
 
+/* ---- 寸法をフォント自身に測らせる ----
+ *
+ * ★**推定しない。** どれだけ上下へ出るかはフォント次第で、Higgins が別のフォント
+ *   （ハングル・デーヴァナーガリー込み）を積めば当然変わる。代表的な字を実際に
+ *   焼いて ink の上下を測り、大きさごとに覚える。
+ *
+ * ★これで**ベースラインも決まる** —— 一番高く出る字の頭が器の上端に来る位置に置けば、
+ *   上も下も切れない。24px の実測は 上 21 / 下 -6 = 高さ 27 で、
+ *   ★**24 行の器（状態行 sbar / コマンド欄 strip）には入らない**。22px なら 24 で入る。
+ */
+enum { MAX_PX = 64 };
+typedef struct { short top, bot; char probed; } Metrics;
+static Metrics met[MAX_PX + 1];
+
+static const Metrics *metrics(int px)
+{
+    if (px < 1 || px > MAX_PX)
+        px = 24;
+    Metrics *m = &met[px];
+    if (!m->probed) {
+        /* 上へ一番出る字（CJK・l）と、下へ一番出る字（g j p q y 、）を混ぜる */
+        static const uint16_t PROBE[] = {
+            'g', 'j', 'p', 'q', 'y', ',', 'l', 'M',
+            0x6F22 /* 漢 */, 0x3042 /* あ */, 0x3001 /* 、 */, 0xFF2D /* Ｍ */,
+        };
+        int top = 1, bot = 0;
+        if (FT_Set_Pixel_Sizes(face, 0, (FT_UInt)px) == 0) {
+            for (unsigned i = 0; i < sizeof PROBE / sizeof *PROBE; i++) {
+                if (FT_Load_Char(face, PROBE[i], FT_LOAD_RENDER) != 0)
+                    continue;
+                int t = face->glyph->bitmap_top;
+                int b = t - (int)face->glyph->bitmap.rows;
+                if (t > top) top = t;
+                if (b < bot) bot = b;
+            }
+        }
+        m->top = (short)top;
+        m->bot = (short)bot;
+        m->probed = 1;
+    }
+    return m;
+}
+
+/* 高さ avail の器に収まる、px 以下で一番大きい大きさ。 */
+static int fit_px(int px, int avail)
+{
+    while (px > 8) {
+        const Metrics *m = metrics(px);
+        if (m->top - m->bot <= avail)
+            break;
+        px--;
+    }
+    return px;
+}
+
 /* ---- 境界の 5 本 ---- */
 
 void glyph_init(void)
@@ -199,22 +254,34 @@ static uint16_t blend555(uint16_t dst, uint16_t src, unsigned a)
     return (uint16_t)(r | (g << 5) | (b << 10));
 }
 
-/* ★ベースラインの置き方。呼ぶ側は「高さ px の枠の上端 y」を渡してくるので、
-   その枠の中に**表意文字の em 枠**が収まるようにする。CJK は em の 88% ほどを
-   占めるのが慣例なので、ベースラインは上端から px*7/8 のあたりに置く。
-   （フォントの ascender をそのまま使うと、CJK は asc-desc が em を超えるので
-     枠から溢れる） */
-static void draw_at(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color, int px)
+/* ★器に入る大きさを選び、測った ink の上端にベースラインを合わせる。
+ *
+ *   avail = rows - y ＝ この器で y から下に使える行数。
+ *   本文（canvas は 448 行・行送り 32）では 24px がそのまま通る。
+ *   ★24 行しかない器（状態行 sbar / コマンド欄 strip）では 22px へ落ちる ——
+ *     落とさないと descender が器から出て、**.bss の隣を踏み潰していた**。
+ *
+ * ★送り幅（glyph_w）は 24px のまま返す。器の中で字が 8% 細くなるだけで、
+ *   ★**字の開始位置はずれない**（累積誤差にならない）ので、キャレットも合う。
+ */
+static void draw_at(uint16_t (*buf)[W], int rows, int x, int y,
+                    uint16_t code, uint16_t color, int px)
 {
+    int avail = rows - y;
+    if (avail <= 0)
+        return;
+    px = fit_px(px, avail);
     Cell *c = lookup(code, px);
     if (!c || !c->bm)
         return;
-    int baseline = y + (px * 7 + 4) / 8;
+    int baseline = y + metrics(px)->top;
     int gx = x + c->left;
     int gy = baseline - c->top;
     for (int r = 0; r < c->h; r++) {
         int py = gy + r;
-        if (py < clip_y0 || py >= clip_y1 || py < 0 || py >= H)
+        /* ★rows で止める。ここを H（480）で見ていたのが、24 行の器
+           （strip / sbar）に descender を書き込んで .bss を壊していた原因。 */
+        if (py < clip_y0 || py >= clip_y1 || py < 0 || py >= rows)
             continue;
         const uint8_t *row = c->bm + (size_t)r * c->w;
         for (int col = 0; col < c->w; col++) {
@@ -228,12 +295,12 @@ static void draw_at(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t co
     }
 }
 
-void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
+void draw24(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
-    draw_at(buf, x, y, code, color, 24);
+    draw_at(buf, rows, x, y, code, color, 24);
 }
 
-void draw12(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color)
+void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
-    draw_at(buf, x, y, code, color, 12);
+    draw_at(buf, rows, x, y, code, color, 12);
 }

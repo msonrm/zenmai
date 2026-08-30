@@ -68,7 +68,7 @@ static void draw_status(void)
         int x = MARGIN;
         for (int i = 0; i < 48 && statusbuf[i]; i++) {
             uint16_t ch = (uint16_t)(unsigned char)statusbuf[i];
-            draw24(sbar, x, 0, ch, INK);
+            draw24(sbar, STATUS_H, x, 0, ch, INK);
             x += glyph_w(ch);
         }
         gp0_upload(0, STATUS_Y, W, STATUS_H, sbar[0]);
@@ -82,7 +82,7 @@ static void draw_status(void)
     int jn = tr_word_str(statusbuf, name_end, jname, 64);
     int x = MARGIN;
     for (int i = 0; i < jn; i++) {
-        draw24(sbar, x, 0, jname[i], INK);
+        draw24(sbar, STATUS_H, x, 0, jname[i], INK);
         x += glyph_w(jname[i]);
     }
     int re = name_end;
@@ -95,7 +95,7 @@ static void draw_status(void)
     int rx = W - MARGIN - rw;
     for (int i = 0; i < rl; i++) {
         uint16_t ch = (uint16_t)(unsigned char)statusbuf[re + i];
-        draw24(sbar, rx, 0, ch, INK);
+        draw24(sbar, STATUS_H, rx, 0, ch, INK);
         rx += glyph_w(ch);
     }
     gp0_upload(0, STATUS_Y, W, STATUS_H, sbar[0]);
@@ -538,9 +538,9 @@ static void menu_line(int y, const uint16_t *s, int n, uint16_t color, int mark)
     for (int i = 0; i < n; i++) w += glyph_w(s[i]);
     int x = (W - w) / 2;
     if (mark)
-        draw24(sbar, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
+        draw24(sbar, STATUS_H, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
@@ -654,12 +654,12 @@ static void ovl_row(int y, const UiStr *s, uint16_t color, int mark)
 {
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     if (mark)
-        draw24(sbar, OVL_X + 16, 0, 0xFF1E, ACCENT);   /* ＞ */
+        draw24(sbar, STATUS_H, OVL_X + 16, 0, 0xFF1E, ACCENT);   /* ＞ */
     int x = OVL_X + 48;
     for (int i = 0; i < s->n; i++) {
         if (x + glyph_w(s->s[i]) > OVL_X + OVL_W - 16)
             break;
-        draw24(sbar, x, 0, s->s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s->s[i], color);
         x += glyph_w(s->s[i]);
     }
     ovl_band(y, STATUS_H, 1, 0, 0);
@@ -686,7 +686,7 @@ static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center
     for (int i = 0; i < n; i++) {
         if (x + glyph_w(s[i]) > W - PAGE_X)
             break;
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
@@ -740,7 +740,7 @@ static void help_put(int cx, const uint16_t *s, int n, uint16_t color, int on)
         color = OPT_BG;                  /* 面の上は地色で抜く */
     }
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
 }
@@ -769,11 +769,11 @@ static void help_put_r1(int cx, uint16_t ch, int on)
                 sbar[r][c] = OPT_EDGE;
     }
     for (int i = 0; i < 3; i++) {
-        draw24(sbar, x, 0, pre[i], on ? OPT_BG : OPT_TEXT);
+        draw24(sbar, STATUS_H, x, 0, pre[i], on ? OPT_BG : OPT_TEXT);
         x += glyph_w(pre[i]);
     }
     if (ch)
-        draw24(sbar, x, 0, ch, on ? OPT_BG : INK);
+        draw24(sbar, STATUS_H, x, 0, ch, on ? OPT_BG : INK);
 }
 
 /* 帯を**縦の仕切りごと**送る。★仕切りを毎回引き直すと、ボタンを押すたびにちらつく

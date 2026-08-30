@@ -24,7 +24,16 @@
 void glyph_init(void);                 /* 焼いた版は何もしない。FreeType 版は面を開く */
 void glyph_clip(int y0, int y1);       /* 描く行の範囲 [y0,y1)。外は捨てる */
 int  glyph_w(uint16_t code);           /* 送り幅（px） */
-void draw24(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color);
-void draw12(uint16_t (*buf)[W], int x, int y, uint16_t code, uint16_t color);
+/* ★rows = 描画先の**行数**。省略できない引数にしてある ——
+   焼いたビットマップは必ず 24 行に収まるので要らなかったが、FreeType の
+   descender（g / j / p / 読点）は**ベースラインより下**へ出るので、
+   24 行の器（コマンド欄 strip[24] / 状態行 sbar[24]）に描くと
+   ★**.bss の隣の変数を踏み潰す**。2026-08-30 に実機で発覚した——
+   症状は「打った覚えのない字がコマンドに混じる」「フリーズ」「強制終了」で、
+   メモリ破壊なので出方がランダムだった。
+   ★build_strip には横方向の門（「draw24 は範囲を見ない」）が既にあったが、
+   縦方向には無かった。**器の高さを渡さないと描けない形**にして塞ぐ。 */
+void draw24(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color);
+void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color);
 
 #endif

@@ -70,11 +70,11 @@ void flush_vline(uint16_t color)
                 int bw = 24 * f->blen, rw = 12 * f->rlen;
                 int bx = x + (f->w - bw) / 2, rx = x + (f->w - rw) / 2;
                 for (int k = 0; k < f->blen; k++)
-                    draw24(canvas, bx + 24 * k, cursor, f->base[k], color);
+                    draw24(canvas, WIN_H, bx + 24 * k, cursor, f->base[k], color);
                 for (int k = 0; k < f->rlen; k++)
-                    draw12(canvas, rx + 12 * k, cursor - 13, f->ruby[k], color);
+                    draw12(canvas, WIN_H, rx + 12 * k, cursor - 13, f->ruby[k], color);
             } else {
-                draw24(canvas, x, cursor, f->ch, color);
+                draw24(canvas, WIN_H, x, cursor, f->ch, color);
             }
             x += f->w;
         }
@@ -430,7 +430,7 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
                  const uint16_t *ind, int ilen)
 {
     fill_rows(strip, 0, CMD_H, bg);
-    draw24(strip, MARGIN, 0, 0xFF1E, ACCENT);
+    draw24(strip, CMD_H, MARGIN, 0, 0xFF1E, ACCENT);
     int x = MARGIN + 24;
     int caret_x = x;
     for (int i = 0; i < len; i++) {
@@ -439,7 +439,7 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
            strip[] の外へ書く（入力側でも幅で止めているが、ここでも止める） */
         if (x + glyph_w(cmd[i]) > W - MARGIN - 24)
             break;
-        draw24(strip, x, 0, cmd[i], INK);
+        draw24(strip, CMD_H, x, 0, cmd[i], INK);
         x += glyph_w(cmd[i]);
     }
     if (caret >= len) {
@@ -458,7 +458,7 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
     for (int c = kx - 3; c <= kx + iw + 2; c++) strip[0][c] = strip[CMD_H - 1][c] = DIM;
     for (int r = 0; r < CMD_H; r++) strip[r][kx - 3] = strip[r][kx + iw + 2] = DIM;
     for (int i = 0, ix = kx; i < ilen; i++) {
-        draw24(strip, ix, 0, ind[i], ACCENT);
+        draw24(strip, CMD_H, ix, 0, ind[i], ACCENT);
         ix += glyph_w(ind[i]);
     }
 }
