@@ -39,6 +39,14 @@ for pat in PATTERNS:
     for _ in range(120):
         cases.append(pat.format(o=O(), v=V(), p=O()))
 
+# ★コマンド不適語（本文に出るが原作の語彙に無い語）。**読みも表記も両方**通す ——
+#   ここが黙って別の物に化けていた（`てんじょう` → `じょう` = 錠）ので、
+#   JS と C が同じ答えを返すことをコーパスで見張る。
+for nc in asset.get('nocmd', []):
+    for w in [nc['form']] + list(nc.get('yomi') or []):
+        cases.append(f'{w}をみる')
+        cases.append(f'{w}をとる')
+
 # 方角・パーサ語・ALL・否定・未知語
 cases += ['きた', '北', 'みなみへいく', 'うえにのぼる', 'したへおりる', 'なかにはいる', 'そとへでる',
           'ぜんぶとる', 'ぜんぶをとる', 'すべてをおく', 'もういちど', 'はい', 'いいえ',

@@ -161,6 +161,14 @@ if __name__ == '__main__':
             lex.append({'ja': ja, 'form': h['form'], 'disp': h['form'], 'kana': kana(ja), 'kind': 'obj', 'key': '*H*',
                         'rank': 0, 'word': word, 'others': others, 'vehicle': vehicle})
 
+    # ★本文に出るが原作の語彙に無い語（原簿の `## コマンド不適語`）。
+    #   ★**同じ表に載せる**のが要点 —— lex は読みの長い順なので `てんじょう` が
+    #   位置 0 で先に当たり、中の `じょう`（錠）には届かない。
+    for nc in asset.get('nocmd', []):
+        for ja in [nc['form']] + nc.get('yomi', []):
+            lex.append({'ja': ja, 'form': nc['form'], 'disp': nc['form'], 'kana': kana(ja),
+                        'kind': 'nocmd', 'rank': 0, 'word': '', 'others': [], 'vehicle': False})
+
     for ja, en in DIRS.items():
         lex.append({'ja': ja, 'disp': ja, 'kana': kana(ja), 'kind': 'dir', 'word': en, 'rank': 0})
 
@@ -198,7 +206,7 @@ if __name__ == '__main__':
         do_, dl = jput(d)
         vrows.append((ko, kl, do_, dl, mask, 1 if bare_ok else 0, 1 if bare_ok2 else 0))
 
-    KIND = {'verb': 0, 'obj': 1, 'dir': 2}
+    KIND = {'verb': 0, 'obj': 1, 'dir': 2, 'nocmd': 3}
     lrows = []
     others_pool = []    # (off,len) 列。lex は others の先頭 index + 個数
     for e in lex:
@@ -259,7 +267,7 @@ if __name__ == '__main__':
                 ' unsigned char role; } CmPart;\n')
         f.write('typedef struct { unsigned int ko; unsigned short kl; unsigned int vo; unsigned short vl; } CmMap;\n')
         f.write('typedef struct { unsigned int off; unsigned short len; } CmStr;\n')
-        f.write('enum { CMK_VERB, CMK_OBJ, CMK_DIR };\n')
+        f.write('enum { CMK_VERB, CMK_OBJ, CMK_DIR, CMK_NOCMD };\n')
         f.write('enum { CMR_O, CMR_WITH, CMR_TO, CMR_IN, CMR_ON, CMR_UNDER, CMR_BEHIND, CMR_FROM,'
                 ' CMR_AND, CMR_EXCEPT, CMR_MOD, CMR_NONE };\n')
         f.write('enum { CMT_IN = 1, CMT_ON = 2, CMT_AT = 4, CMT_TO = 8, CMT_UNDER = 16,'
