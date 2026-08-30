@@ -641,9 +641,34 @@ JS ↔ C の同値コーパス 4,010 件で守られる。
 
 ## 8. 配布
 
-GitHub Releases にタグを切って `.psexe` を添付する（`ps1-v1.0.0` 〜。最新は `ps1-v1.2.1`）。
+GitHub Releases にタグを切って `.psexe` を添付する（`ps1-v1.0.0` 〜）。
 ★ビルドは再現する（毎回タグから建て直して md5 を照合している）。版の中身を差し替えず、
 **新しいタグを切る**こと。
+
+★**ここに「最新は vX.Y.Z」と書かない。** 書いた瞬間に腐る（実際 `ps1-v1.2.1` のまま
+3 版ぶん古くなっていた）。★**版の一覧はコマンドで引く**のが正典:
+
+```sh
+gh release list --limit 5        # いま出ている版
+git tag --sort=-v:refname | head # 切ってあるタグ
+```
+
+手順（`ps1-v1.5.0` で実際に踏んだ形）:
+
+```sh
+cd native && ./build.sh                                    # main が綺麗な状態で
+git tag -a ps1-vX.Y.Z -m "…" && git push origin ps1-vX.Y.Z
+git worktree add --detach /tmp/verify ps1-vX.Y.Z           # ★タグから建て直して
+(cd /tmp/verify/native && ./build.sh) && md5sum …          #   md5 を照合する
+git worktree remove --force /tmp/verify
+gh release create ps1-vX.Y.Z native/zenmai-zork.psexe --title "PS1 版 vX.Y.Z" --notes-file …
+```
+
+★リリースノートは**プレイヤー向け**に書く（打った字と返る字を並べる）。
+★**前の版で「未修正」と書いたものを片付けたら、そう名指しして回収する** ——
+v1.4.0 が「打てるのに別の物を指すものが 15 件・未修正」と書いていたので、
+v1.5.0 はそこから始めた。★**直りだけでなく「打てるようになった語」も併記する**
+（片方だけだと修正が損失に見える）。
 
 ★**リポジトリは 2026-08-26 に public にした。** 公開前に監査して手当てしたのが以下。
 判断の詳細は `native/vendor/kh-dotfont/README.md` と README のライセンス節。
