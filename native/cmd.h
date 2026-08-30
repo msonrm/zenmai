@@ -36,8 +36,13 @@ typedef struct {
     int trace;                         /* CMD_TR_*(検証用) */
 } CmdRes;
 
+/* ★CMD_TR_NOCMD は CMD_TR_UNKNOWN と**分けてある**。どちらも「知らない言葉」だが、
+   ★UNKNOWN は**走査で余った断片**（1 字なら雑音なので名指ししない）、
+   NOCMD は**原簿が宣言した語**（1 字でも必ず名指しする。`滝` がこれ）。
+   一緒にすると `たきをみる` が「（読み取れなかった）」になる（実機で踏んだ）。 */
 enum { CMD_TR_EMPTY, CMD_TR_ENGLISH, CMD_TR_PARSER, CMD_TR_YESNO, CMD_TR_NEG,
-       CMD_TR_UNKNOWN, CMD_TR_NOUN, CMD_TR_NOVERB, CMD_TR_NOSHAPE, CMD_TR_DIR, CMD_TR_OK };
+       CMD_TR_UNKNOWN, CMD_TR_NOUN, CMD_TR_NOVERB, CMD_TR_NOSHAPE, CMD_TR_DIR, CMD_TR_OK,
+       CMD_TR_NOCMD };
 
 /* pending_verb = 聞き返し中の動詞 index(無ければ -1) */
 void cmd_run(const unsigned short *in, int inlen, int pending_verb, CmdRes *r);

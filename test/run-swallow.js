@@ -35,8 +35,8 @@ const path = require('path')
 const { createCommander } = require('../src/command.js')
 
 const A = (f) => path.join(__dirname, '..', 'assets', f)
-const asset = JSON.parse(fs.readFileSync(A('zork1-cmd.json'), 'utf8'))
-const cm = createCommander(asset)
+const cmdAsset = JSON.parse(fs.readFileSync(A('zork1-cmd.json'), 'utf8'))
+const cm = createCommander(cmdAsset)
 const ruby = JSON.parse(fs.readFileSync(A('zork1-ja.json'), 'utf8')).ruby
 
 // ★表記が違うだけで**同じ読み**なら食い違いではない（`燐寸(まっち)` → マッチ /
@@ -44,8 +44,8 @@ const ruby = JSON.parse(fs.readFileSync(A('zork1-ja.json'), 'utf8')).ruby
 const hira = (s) => s.replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
 const yomiOf = {}
 const put = (form, yomi) => (yomiOf[form] ||= []).push(hira(form), ...(yomi || []))
-for (const o of Object.values(asset.objects)) for (const w of o.words || []) put(w.form, w.yomi)
-for (const h of asset.hypernyms || []) put(h.form, h.yomi)   // 舟・箱・扉…は上位語の側にある
+for (const o of Object.values(cmdAsset.objects)) for (const w of o.words || []) put(w.form, w.yomi)
+for (const h of cmdAsset.hypernyms || []) put(h.form, h.yomi)   // 舟・箱・扉…は上位語の側にある
 
 // ★空。**1 件でも出たら赤**（2026-08-31 に 15 件すべて片付いた）。
 //   ここに足すのは「直せないと分かっているもの」だけにすること。
@@ -80,6 +80,31 @@ for (const [w, yomi] of cands) {
   found.push([w, yomi, r.command, said])
 }
 
+// ★宣言した語は**画面で名指しできなければ意味がない**。
+//   両方の実装（web/main.js と native/main.c）は「1 字の断片は名指ししない」
+//   という濾過を持っている —— 走査で余った「ゅう」を「知らない言葉」と言わないため。
+//   ★その濾過が**宣言した語まで落としていた**: `滝` は 1 字なので消え、
+//   実機で `たきをみる` が「（読み取れなかった）」になった（2026-08-31・実機の指摘）。
+//   両実装とも「コマンド不適語のときは濾過しない」で直したので、その旗を見張る。
+let flagNg = 0
+for (const n of cmdAsset.nocmd || []) {
+  for (const y of n.yomi || []) {
+    const r = cm.toCommand(y + 'をみる')
+    if (r.trace !== 'コマンド不適語' || !(r.unknown || []).includes(n.form)) {
+      console.log(`✗ ${n.form}(${y}): 名指しできない（trace=${r.trace} unknown=${r.unknown}）`)
+      flagNg++
+    }
+  }
+}
+// ★カナリア: 1 字の語が実際に載っていること。無いとこの見張りは**素通り**する
+const oneChar = (cmdAsset.nocmd || []).filter((n) => n.form.length === 1).map((n) => n.form)
+if (!oneChar.length) {
+  console.log('✗ ★カナリア: 1 字の不適語が 1 つも無い = この見張りは効いていない')
+  flagNg++
+} else {
+  console.log(`✓ 不適語 ${(cmdAsset.nocmd || []).length} 語はすべて名指しできる（1 字の語: ${oneChar.join(' ')}）`)
+}
+
 const now = new Set(found.map((f) => f[0]))
 const added = [...now].filter((w) => !KNOWN.has(w))
 const fixed = [...KNOWN].filter((w) => !now.has(w))
@@ -90,6 +115,7 @@ for (const [w, y, c, s] of found) {
 }
 console.log(`--- 語の中を食われた: ${found.length} 件（既知 ${KNOWN.size}）---`)
 if (fixed.length) console.log(`✓ 直った: ${fixed.join(' ')}　← KNOWN から外すこと`)
+if (flagNg) process.exitCode = 1
 if (added.length) {
   console.log(`★増えた: ${added.join(' ')}`)
   process.exit(1)

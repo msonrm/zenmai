@@ -54,7 +54,15 @@ int main(void)
         int inn = u8_decode((unsigned char *)line, n, in);
         static CmdRes r;
         cmd_run(in, inn, -1, &r);
-        printf("{\"command\":");
+        /* ★trace も突き合わせる。同じ「送らない」でも**理由が違えば画面の文言が違う**
+           —— 実際、宣言した語（NOCMD）を断片（UNKNOWN）と同じ扱いにしていたせいで
+           `たきをみる` が「（読み取れなかった）」になった（2026-08-31・実機の指摘）。 */
+        static const char *const TR[] = {
+            "EMPTY", "ENGLISH", "PARSER", "YESNO", "NEG", "UNKNOWN",
+            "NOUN", "NOVERB", "NOSHAPE", "DIR", "OK", "NOCMD",
+        };
+        printf("{\"trace\":\"%s\",\"command\":",
+               (r.trace >= 0 && r.trace < (int)(sizeof TR / sizeof *TR)) ? TR[r.trace] : "?");
         if (r.has_command) jstr8(r.command, r.command_len); else printf("null");
         printf(",\"note\":");
         jstr16(r.note, r.note_len);

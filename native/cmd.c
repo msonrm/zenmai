@@ -261,7 +261,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
             unknown_push(r, cm_jpool + hit->dp, hit->dpl);
             put_pool(r->echo, &r->echo_len, 96, hit->dp, hit->dpl);
             note_guide(r);
-            r->trace = CMD_TR_UNKNOWN;
+            r->trace = CMD_TR_NOCMD;   /* ★断片ではなく「宣言された語」。1 字でも名指しする */
             return;
         }
         if (hit) {
