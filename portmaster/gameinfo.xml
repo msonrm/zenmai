@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Zenmai.sh</path>
+    <name>Zenmai</name>
+    <desc>Zork I (1979), read and typed in Japanese, with a gamepad-driven Japanese input method. English play with T9 is included too.</desc>
+    <releasedate>20260829T000000</releasedate>
+    <developer>msonrm</developer>
+    <publisher>msonrm</publisher>
+    <genre>Adventure</genre>
+    <image>./zenmai/screenshot.png</image>
+  </game>
+</gameList>

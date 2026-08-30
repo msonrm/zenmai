@@ -1,4 +1,8 @@
-/* Zenmai PS1 — 統合版 Zork(英語 / 日本語)。起動時に言語を選ぶ。
+/* Zenmai — 統合版 Zork(英語 / 日本語)。起動時に言語を選ぶ。
+ *
+ * ★PS1（build.sh）と SDL2 = PortMaster / デスクトップ（build-sdl.sh）で
+ *   **このファイルごと共有する**。分かれるのは入口だけ（末尾の #ifdef ZM_SDL）で、
+ *   機械に触る部分は plat.h の後ろにある。
  *
  * Z-machine(MojoZork)・story・入出力バッファは 1 つを共有し、
  * ステータス行・出力描画・入力ループだけを言語で分岐する。
@@ -22,7 +26,9 @@
 
 extern const uint8_t _binary_story_bin_start[];
 extern const uint8_t _binary_story_bin_end[];
-extern char __bss_start[], __bss_end[];
+#ifndef ZM_SDL
+extern char __bss_start[], __bss_end[];   /* link.ld が置く。SDL 版には無い */
+#endif
 
 static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
 static ZMachineState zm;
@@ -55,30 +61,42 @@ static void paint_screen(uint16_t color)
         gp0_upload(0, y, W, STATUS_H, sbar[0]);
 }
 
+/* 状態行。左＝部屋名 / 右＝スコア。
+ *
+ * ★**空白詰めに頼らない。** Z-machine は 49 字の桁を空白で埋めて右端を作るので、
+ *   等幅フォントならそのまま流すだけで揃う。★ところがプロポーショナルにすると
+ *   空白も字も細くなり、**スコアが中央寄りへ流れる**（2026-08-30・実機の指摘。
+ *   英語面だけ「そのまま流す」経路だったので、英語だけ崩れていた）。
+ *   だから左右とも**自分で測って置く**。日本語面は元からこの形だった ——
+ *   ★片方だけの経路を残すと、片方だけ壊れる。
+ */
 static void draw_status(void)
 {
     fill_rows(sbar, 0, STATUS_H, PANEL);
-    if (lang_en) {
-        int x = MARGIN;
-        for (int i = 0; i < 48 && statusbuf[i]; i++) {
-            uint16_t ch = (uint16_t)(unsigned char)statusbuf[i];
-            draw24(sbar, x, 0, ch, INK);
-            x += glyph_w(ch);
-        }
-        gp0_upload(0, STATUS_Y, W, STATUS_H, sbar[0]);
-        return;
-    }
+
+    /* 部屋名とスコアの境目は**空白 2 つ**（Z-machine の桁埋め） */
     int name_end = 0;
     while (statusbuf[name_end] &&
            !(statusbuf[name_end] == ' ' && statusbuf[name_end + 1] == ' '))
         name_end++;
-    uint16_t jname[64];
-    int jn = tr_word_str(statusbuf, name_end, jname, 64);
-    int x = MARGIN;
-    for (int i = 0; i < jn; i++) {
-        draw24(sbar, x, 0, jname[i], INK);
-        x += glyph_w(jname[i]);
+
+    /* 左: 部屋名（日本語面は訳す） */
+    uint16_t name[64];
+    int nn;
+    if (lang_en) {
+        nn = name_end < 64 ? name_end : 64;
+        for (int i = 0; i < nn; i++)
+            name[i] = (uint16_t)(unsigned char)statusbuf[i];
+    } else {
+        nn = tr_word_str(statusbuf, name_end, name, 64);
     }
+    int x = MARGIN;
+    for (int i = 0; i < nn; i++) {
+        draw24(sbar, STATUS_H, x, 0, name[i], INK);
+        x += glyph_w(name[i]);
+    }
+
+    /* 右: スコア（前後の空白を落として右寄せ） */
     int re = name_end;
     while (statusbuf[re] == ' ') re++;
     int rl = 0;
@@ -87,9 +105,11 @@ static void draw_status(void)
     int rw = 0;
     for (int i = 0; i < rl; i++) rw += glyph_w((uint16_t)(unsigned char)statusbuf[re + i]);
     int rx = W - MARGIN - rw;
+    if (rx < x + 24)                   /* 名前と重なるなら諦めて右へ寄せきらない */
+        rx = x + 24;
     for (int i = 0; i < rl; i++) {
         uint16_t ch = (uint16_t)(unsigned char)statusbuf[re + i];
-        draw24(sbar, rx, 0, ch, INK);
+        draw24(sbar, STATUS_H, rx, 0, ch, INK);
         rx += glyph_w(ch);
     }
     gp0_upload(0, STATUS_Y, W, STATUS_H, sbar[0]);
@@ -480,6 +500,42 @@ static int pad_vowel(int p)
          : (p & BTN_CIR) ? 3 : (p & BTN_X) ? 4 : -1;
 }
 
+/* いま押されているパッドの状態を、入力の状態機械が食べる 1 フレームに写す。
+ *
+ * ★lt（L2 = 拗音シフト）は**呼ぶ側が決める**。英語面では渡さない —— 渡すと
+ *   シフト系が生きて、500ms 以上握ると CapsLock が勝手にトグルし、短く押して離すと
+ *   次の 1 文字だけ大文字になる。しかも L2 は履歴スクロールの修飾キーを兼ねているので
+ *   遡るたびに踏む。Zork の辞書は全部小文字で、read が入力を小文字化するため用が無い。
+ *   ★止めるのは呼び出し側。input.c は machine.ts と同一に保つ。 */
+static GpFrame frame_of(int p, int ms, int lt)
+{
+    const int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
+                 + !!(p & BTN_DOWN) + !!(p & BTN_L1);
+    const int vowel = pad_vowel(p);
+    GpFrame f = { ms, pad_row(p), vowel, vowel >= 0,
+                  lt ? !!(p & BTN_L2) : 0, !!(p & BTN_R2), cc };
+    return f;
+}
+
+/* ★対話ループに入るときの引き継ぎ。**押されたままのものを「もう見た」ことにする**。
+ *
+ *   pad_prev … エッジ（Start / Select）用。0 で始めると、言語メニューを抜けた Start が
+ *              そのまま最初のエッジになり、オプション画面が勝手に開く（実測）
+ *   gp_sync_prev … ★**状態機械用**。こちらを忘れると、言語を**面ボタンで**選んだとき、
+ *              その面ボタンが押されたままなので `!prevVowelPressed` が成立し、
+ *              **選んだボタンに応じた字がコマンド欄に入った状態でゲームが始まる**
+ *              （✕ なら「お」）。2026-08-29 に実機（R36H）で発覚。
+ *              ★台本が**全部 Start で言語を選んでいた**ので、検査を素通りしていた。
+ */
+static void carry_over_pad(int lt)
+{
+    pad_prev = pad_read();
+    if (pad_prev < 0)
+        pad_prev = 0;
+    GpFrame f = frame_of(pad_prev, 0, lt);
+    gp_sync_prev(&gm, &f);
+}
+
 /* ★どのフェイスボタンでも決まる。「Start で開いて Start で閉じる」「開いた先で
    フェイスボタンを押せば決まる」は当時からの作法なので、画面に書かない */
 #define BTN_FACE (BTN_CIR | BTN_X | BTN_TRI | BTN_SQ)
@@ -496,9 +552,9 @@ static void menu_line(int y, const uint16_t *s, int n, uint16_t color, int mark)
     for (int i = 0; i < n; i++) w += glyph_w(s[i]);
     int x = (W - w) / 2;
     if (mark)
-        draw24(sbar, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
+        draw24(sbar, STATUS_H, x - 40, 0, 0xFF1E, ACCENT);   /* ＞ */
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
@@ -524,7 +580,7 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
     /* ★メニューの入口を知らせるのはここだけ。本文にシステムの字は混ぜないし、
        いちばん助けが要る人ほど Start を試しに押さない(だから全員が通るここに置く) */
     menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
-    GP1 = 0x03000000;                  /* 表示オン(メニューが最初の画面) */
+    gpu_display_on();                  /* 表示オン(メニューが最初の画面) */
     /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、
        **「やめる」→「はい」を決めた Start がそのまま最初のエッジになり、
        起動メニューが出た瞬間に言語が決まってしまう**（interactive_en の
@@ -612,12 +668,12 @@ static void ovl_row(int y, const UiStr *s, uint16_t color, int mark)
 {
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     if (mark)
-        draw24(sbar, OVL_X + 16, 0, 0xFF1E, ACCENT);   /* ＞ */
+        draw24(sbar, STATUS_H, OVL_X + 16, 0, 0xFF1E, ACCENT);   /* ＞ */
     int x = OVL_X + 48;
     for (int i = 0; i < s->n; i++) {
         if (x + glyph_w(s->s[i]) > OVL_X + OVL_W - 16)
             break;
-        draw24(sbar, x, 0, s->s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s->s[i], color);
         x += glyph_w(s->s[i]);
     }
     ovl_band(y, STATUS_H, 1, 0, 0);
@@ -644,7 +700,7 @@ static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center
     for (int i = 0; i < n; i++) {
         if (x + glyph_w(s[i]) > W - PAGE_X)
             break;
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
     gp0_upload(0, y, W, STATUS_H, sbar[0]);
@@ -654,10 +710,13 @@ static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center
 static void page_index(void)
 {
     const int want = lang_en ? 2 : 1;
+    /* ★フォントの帰属は使っている実装のものだけを出す（lang とまったく同じ絞り方）。 */
+    const int font = glyph_font_kind();
     page_count = 0;
     for (int i = 0; i < UI_LINE_N; i++)
         if (UI_LINES[i].page == opt_page &&
-            (!UI_LINES[i].lang || UI_LINES[i].lang == want))
+            (!UI_LINES[i].lang || UI_LINES[i].lang == want) &&
+            (!UI_LINES[i].font || UI_LINES[i].font == font))
             page_idx[page_count++] = (short)i;
 }
 
@@ -698,7 +757,7 @@ static void help_put(int cx, const uint16_t *s, int n, uint16_t color, int on)
         color = OPT_BG;                  /* 面の上は地色で抜く */
     }
     for (int i = 0; i < n; i++) {
-        draw24(sbar, x, 0, s[i], color);
+        draw24(sbar, STATUS_H, x, 0, s[i], color);
         x += glyph_w(s[i]);
     }
 }
@@ -727,11 +786,11 @@ static void help_put_r1(int cx, uint16_t ch, int on)
                 sbar[r][c] = OPT_EDGE;
     }
     for (int i = 0; i < 3; i++) {
-        draw24(sbar, x, 0, pre[i], on ? OPT_BG : OPT_TEXT);
+        draw24(sbar, STATUS_H, x, 0, pre[i], on ? OPT_BG : OPT_TEXT);
         x += glyph_w(pre[i]);
     }
     if (ch)
-        draw24(sbar, x, 0, ch, on ? OPT_BG : INK);
+        draw24(sbar, STATUS_H, x, 0, ch, on ? OPT_BG : INK);
 }
 
 /* 帯を**縦の仕切りごと**送る。★仕切りを毎回引き直すと、ボタンを押すたびにちらつく
@@ -975,12 +1034,7 @@ static void interactive_en(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
-       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
-       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
-    pad_prev = pad_read();
-    if (pad_prev < 0)
-        pad_prev = 0;
+    carry_over_pad(0 /* 英語面は L2 を渡さない */);
     for (;;) {
         wait_fields(1);
         fields++;
@@ -1003,17 +1057,8 @@ static void interactive_en(void)
                 continue;
         }
 
-        int row = pad_row(p);
-        int vowel = pad_vowel(p);
-        int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
-               + !!(p & BTN_DOWN) + !!(p & BTN_L1);
-        /* ★L2 は**渡さない**。渡すとシフト系が生きる: 500ms 以上握ると CapsLock が
-           勝手にトグルし、短く押して離すと次の 1 文字だけ大文字になる。しかも L2 は
-           履歴スクロールの修飾キーを兼ねているので、遡るたびに踏む。Zork の辞書は
-           全部小文字で、read が入力バッファを小文字化するため大文字に用が無い。
-           ★止めるのは**呼び出し側**。input.c は machine.ts と同一に保つ。 */
-        GpFrame f = { fields * 17, row, vowel, vowel >= 0,
-                      0 /* ltNow: シフト無効 */, !!(p & BTN_R2), cc };
+        GpFrame f = frame_of(p, fields * 17, 0 /* 英語面は L2 を渡さない */);
+        const int row = f.row;
         GpAction a[4];
         int an = gp_step(&gm, 1 /* english */, &f, a);
         for (int i = 0; i < an; i++) {
@@ -1137,12 +1182,7 @@ static void interactive_ja(void)
     gp_init(&gm);
     clen = 0;
     caret = 0;
-    /* ★いま押されているものを「押下済み」として引き継ぐ。0 で始めると、**言語メニューを
-       抜けた Start がそのまま最初のエッジになり、オプション画面が勝手に開く**
-       (実測。開いたまま入力を横取りするので、以降どのボタンも効かなくなっていた)。 */
-    pad_prev = pad_read();
-    if (pad_prev < 0)
-        pad_prev = 0;
+    carry_over_pad(1);
     for (;;) {
         wait_fields(1);
         fields++;
@@ -1165,12 +1205,8 @@ static void interactive_ja(void)
                 continue;
         }
 
-        int row = pad_row(p);
-        int vowel = pad_vowel(p);
-        int cc = !!(p & BTN_LEFT) + !!(p & BTN_UP) + !!(p & BTN_RIGHT)
-               + !!(p & BTN_DOWN) + !!(p & BTN_L1);
-        GpFrame f = { fields * 17, row, vowel, vowel >= 0,
-                      !!(p & BTN_L2), !!(p & BTN_R2), cc };
+        GpFrame f = frame_of(p, fields * 17, 1);
+        const int row = f.row;
         GpAction a[4];
         int an = gp_step(&gm, 0 /* japanese */, &f, a);
         for (int i = 0; i < an; i++) {
@@ -1359,6 +1395,55 @@ after_msg:
     }
 }
 
+/* 1 周ぶん —— 言語を選び、ゲームを起こし、対話ループへ入る。
+ * 対話ループは quit で**普通に return する**ので、ここも普通に返ってくる。 */
+static void boot_once(void)
+{
+    gpu_init();
+    paint_screen(OPT_BG);              /* ★言語メニューも本文の外側 = 藍 */
+    render_init();
+    jp_text_init();                    /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
+    body_top = STATUS_Y + STATUS_H + 8;
+    body_h = CMD_Y - 8 - body_top;
+
+    pad_try_analog();
+    lang_en = lang_menu();
+    paint_screen(BG);                  /* メニューを消す */
+
+    vm_init();
+    run_until_read();
+    render_output();
+    view_bottom();
+    render_window();
+    draw_status();
+    if (lang_en) {
+        uint16_t ind[4];
+        int in_;
+        row_label(0, ind, &in_);
+        draw_strip(0, 0, 0, ind, in_);
+        interactive_en();
+    } else {
+        draw_strip(0, 0, 0, 0, 0);
+        interactive_ja();
+    }
+}
+
+#ifdef ZM_SDL
+
+/* ★SDL 版の「やめる」は**プロセスを終える**。PS1 と違って .bss を潰す道が使えない
+ *   （glibc と SDL の状態まで消えてしまう）。PortMaster ではポートを抜けると
+ *   ランチャのメニューへ戻るので、作法としてもこちらが正しい。
+ *   ★言語の選び直しは「もう一度起動する」で足りる。 */
+int main(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    boot_once();
+    return 0;
+}
+
+#else
+
 /* ★**quit は「起動しなおす」**。対話ループが戻ってきたら、そのまま頭から回る。
  *
  * ★戻るときに **.bss をもう一度潰す**のが要点。「何を消すか」を数え上げる形にすると
@@ -1373,32 +1458,8 @@ __attribute__((section(".text.start"), noreturn)) void _start(void)
     for (;;) {
         for (char *p = __bss_start; p < __bss_end; p++)
             *p = 0;
-        gpu_init();
-        paint_screen(OPT_BG);          /* ★言語メニューも本文の外側 = 藍 */
-        render_init();
-        jp_text_init();                /* 描画器は共通(ASCII 行にはルビ帯が付かない) */
-        body_top = STATUS_Y + STATUS_H + 8;
-        body_h = CMD_Y - 8 - body_top;
-
-        pad_try_analog();
-        lang_en = lang_menu();
-        paint_screen(BG);              /* メニューを消す */
-
-        vm_init();
-        run_until_read();
-        render_output();
-        view_bottom();
-        render_window();
-        draw_status();
-        if (lang_en) {
-            uint16_t ind[4];
-            int in_;
-            row_label(0, ind, &in_);
-            draw_strip(0, 0, 0, ind, in_);
-            interactive_en();
-        } else {
-            draw_strip(0, 0, 0, 0, 0);
-            interactive_ja();
-        }
+        boot_once();
     }
 }
+
+#endif

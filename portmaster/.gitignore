@@ -1,0 +1,11 @@
+# ★ここは「配布物の組み立て方」を置く場所で、組み立てた物は置かない。
+#   build-port.sh がすべて作り直す（本体・フォント・ライセンスの写し・zip）。
+#   ★焼くたびに新しい blob が増えるので、追跡するとリポジトリが毎回太る。
+zenmai.zip
+zenmai/zenmai-zork.*
+zenmai/zenmai.otf
+zenmai/screenshot.png
+zenmai/licenses/
+zenmai/conf/
+zenmai/log.txt
+zenmai/zenmai.sav
