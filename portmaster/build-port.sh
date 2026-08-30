@@ -63,14 +63,20 @@ cp ../native/vendor/VENDOR.md              zenmai/licenses/VENDOR.md
 #
 # ★**実機で撮る必要はない**。PS1 版と SDL 版が画素一致し、その一致が R36H の実機でも
 #   確かめてあるので、headless で出した画面が実機の画面そのものになる:
-#     cd ../native
-#     ZENMAI_SCRIPT=dual_ja.script ZENMAI_STOP=1620 ZENMAI_RAW=/tmp/s.raw ./zenmai-zork
+#     cd ../native && GLYPH=glyph_ft.c sh build-sdl.sh zenmai-zork-ft
+#     ZENMAI_SCRIPT=dual_ja.script ZENMAI_STOP=1620 ZENMAI_RAW=/tmp/s.raw ./zenmai-zork-ft
 #     python3 raw2png.py /tmp/s.raw ../portmaster/screenshot.png
+#   ★**配る方（FreeType 版）で撮る**。焼いたビットマップ版は字形も割り付けも違うので、
+#   ★スクショだけ別のビルドで撮ると、**遊んだ画面と店先の画面が違う**ことになる。
 #   ★stop の値で場面が決まる。1620 は「本文の上端が切れていない」点を選んである
 #   （途中の値だと行が半分だけ見えた状態で写る）。
 # ★先に消してから複製する。残しておくと、スクショを差し替え忘れた（あるいは消した）
 #   ときに**前の版が黙って zip に入り続ける** —— このセッションで 3 回踏んだ
 #   「古い成果物が残る」型（test-save.sh のシンボル / test-entry.sh の番地）。
+# ★★**それでも `portmaster/screenshot.png` 自身は古くなる。** 2026-08-30 に、
+#   字の大きさを 22px に固定した回（罫線が破線になった件）より**前**に撮ったものが
+#   残っているのを見つけた —— 英語のバナーの折り返しが 1 行ずれていた。
+#   ★**画面を変える直しをしたら、スクショも撮り直す**（この節の手順で 10 秒）。
 rm -f zenmai/screenshot.png
 if [ -f screenshot.png ]; then cp screenshot.png zenmai/screenshot.png; fi
 

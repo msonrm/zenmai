@@ -131,12 +131,15 @@
 自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
 
 ```bash
-cd ps1 && ./build.sh                            # → zenmai-zork.psexe
+cd native && ./build.sh                         # → zenmai-zork.psexe
 ./build-demo.sh && python3 sim.py zenmai-demo.psexe --expect golden.png --max 400000000
                                                 # ↑ R3000 シミュレータで画素照合(要 Pillow)
 sh test-save.sh                                 # セーブ / 復帰の往復(メモリーカードを模す)
 sh test-options.sh                              # オプション(打っていないときの Start)
 sh test-quit.sh                                 # quit の行き先(起動メニューへ戻る)
+sh test-wrap.sh                                 # 割り付け(禁則処理)。フォントも実機も要らない
+sh test-glyph.sh                                # 字の境界(器から出ない / 焼いた字が全部出る)
+sh test-sdl.sh                                  # ★PS1 版と SDL 版が同じ画面を出すか(画素照合)
 ```
 
 **キーボードの無い家庭用機で、コマンド選択式ではない別解を実演する**のが移植の意味
