@@ -1346,9 +1346,13 @@ static void interactive_ja(void)
                     ml = 0;
                     put_frag16(msg, &ml, 256, 10);       /* （打ち消し…） */
                 } else {
+                    /* ★1 字の断片は名指ししない（走査で余った「ゅう」のような雑音）。
+                       ただし**原簿が宣言した語は 1 字でも名指しする** ——
+                       `滝` を落として「（読み取れなかった）」になっていた（実機の指摘）。 */
+                    const int decl = cr.trace == CMD_TR_NOCMD;
                     int anyw = 0;
                     for (int i = 0; i < cr.unknown_n; i++) {
-                        if (cr.unknown_lens[i] <= 1) continue;
+                        if (!decl && cr.unknown_lens[i] <= 1) continue;
                         if (anyw) put_frag16(msg, &ml, 256, 15);   /* ・ */
                         put_frag16(msg, &ml, 256, 0);              /* 「 */
                         for (int t = 0; t < cr.unknown_lens[i] && ml < 250; t++)

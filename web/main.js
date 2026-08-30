@@ -316,7 +316,11 @@
     const r = cm.toCommand(text, { verb: pendingVerb })
     show(text || ' ', 'cmd')
     if (!r.command) {
-      const w = r.unknown.filter((x) => x.length > 1).map((x) => '「' + x + '」').join('・')
+      // ★1 字の断片は名指ししない（走査で余った「ゅう」のような雑音）。ただし
+      //   **原簿が宣言した語（コマンド不適語）は 1 字でも名指しする** ——
+      //   `滝` を落として「（読み取れなかった）」になっていた（実機の指摘）。
+      const decl = r.trace === 'コマンド不適語'
+      const w = r.unknown.filter((x) => decl || x.length > 1).map((x) => '「' + x + '」').join('・')
       show(r.note ? `（${r.note}）`
         : r.trace === '否定は扱えない' ? '（打ち消しの言い方はまだ扱えない）'
         : w ? `（${w} は知らない言葉。別の言い方を試してほしい）`

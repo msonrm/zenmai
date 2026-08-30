@@ -209,6 +209,16 @@ function createCommander(asset) {
       lex.push({ ja, form: h.form, disp: h.form, kana: kana(ja), kind: 'obj', key: '*H*', rank: 0, word, others, vehicle })
     }
   }
+  // ★本文に出るが、原作の語彙に無い語。**同じ表に載せる**のが要点 ——
+  //   lex は読みの長い順なので、`てんじょう` は位置 0 で先に当たり、
+  //   中の `じょう`（錠）には届かない。あとから濾すのでは間に合わない。
+  //   ★これに当たったら「その語は知らない」と返す（＝原作と同じ答え。
+  //   原作に `look at ceiling` と打つと「`ceiling` という言葉は知らない」）。
+  for (const n of asset.nocmd || []) {
+    for (const ja of [n.form, ...(n.yomi || [])]) {
+      lex.push({ ja, form: n.form, disp: n.form, kana: kana(ja), kind: 'nocmd' })
+    }
+  }
   for (const [ja, en] of Object.entries(DIRS)) lex.push({ ja, disp: ja, kana: kana(ja), kind: 'dir', word: en })
   lex.sort((a, b) => b.kana.length - a.kana.length || (a.rank || 0) - (b.rank || 0))
 
@@ -251,6 +261,14 @@ function createCommander(asset) {
     let i = 0
     while (i < s.length) {
       const hit = wordAt(s, i)
+      // ★コマンドにならない語に当たったら、そこで止めて「知らない」と言う。
+      //   ★**黙って読み飛ばしてはいけない** —— 飛ばすと中の短い語が拾われ、
+      //   `てんじょうをみる` が `look at grate`（錠）になる。打った本人には
+      //   何が起きたか分からないまま、別の命令が実行される。
+      if (hit && hit.kind === 'nocmd') {
+        return { command: null, trace: 'コマンド不適語', note: '',
+                 unknown: [hit.disp], echo: echo.join('') + hit.disp }
+      }
       if (hit) {
         i += hit.kana.length
         echo.push(hit.disp)

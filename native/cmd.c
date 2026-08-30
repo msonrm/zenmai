@@ -251,6 +251,19 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     int i = 0;
     while (i < n) {
         const CmLex *hit = word_at(s, n, i);
+        /* ★コマンドにならない語（原簿の「コマンド不適語」）。ここで止めて「知らない」と言う。
+           ★**黙って読み飛ばしてはいけない** —— 飛ばすと読みの中の短い語が拾われ、
+           「てんじょうをみる」が `look at grate`（錠）になる。打った本人には何が
+           起きたか分からないまま、別の命令が実行される（打てないより悪い）。
+           ★これは原作と同じ答え（原作に `look at ceiling` と打つと
+           「`ceiling` という言葉は知らない」と返る）。 */
+        if (hit && hit->kind == CMK_NOCMD) {
+            unknown_push(r, cm_jpool + hit->dp, hit->dpl);
+            put_pool(r->echo, &r->echo_len, 96, hit->dp, hit->dpl);
+            note_guide(r);
+            r->trace = CMD_TR_NOCMD;   /* ★断片ではなく「宣言された語」。1 字でも名指しする */
+            return;
+        }
         if (hit) {
             i += hit->knl;
             put_pool(r->echo, &r->echo_len, 96, hit->dp, hit->dpl);
