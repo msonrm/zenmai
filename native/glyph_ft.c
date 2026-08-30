@@ -204,6 +204,21 @@ static int fit_px(int px, int avail)
     return px;
 }
 
+/* ★実際に使う大きさ。**起動時に 1 度だけ決めて、以後どこでも同じ**。
+ *
+ * ★これを呼ぶたびに器の高さから決める作りにしたら壊れた（2026-08-30・実機）——
+ *   送り幅（glyph_w）は 24px のままなのに、24 行の器では 22px で描かれるので、
+ *   **`─`（U+2500）を並べた罫線が破線になり**、字間も広がって見えた。
+ *   ★**送り幅と描く大きさは常に一致していなければならない。**
+ *   だから「器ごとに縮める」のではなく「一番きつい器に全部を合わせる」。
+ *
+ *   一番きつい器 = 24 行（状態行 sbar / コマンド欄 strip）。Noto は 24px だと
+ *   ink が 27 行あるので入らず、22px で 24 行にちょうど収まる。
+ *   ★焼いたビットマップ版（PS1）は 24 行に収まる字形なので影響を受けない。 */
+/* ルビ帯は canvas（448 行）の中なので窮屈ではない。RUBY_ZONE = 14（空き 1 + ルビ 12 + 空き 1）*/
+enum { BOX24 = 24, BOX12 = 14 };
+static int size24, size12;
+
 /* ---- 境界の 5 本 ---- */
 
 void glyph_init(void)
@@ -222,10 +237,13 @@ void glyph_init(void)
         fprintf(stderr, "フォントを開けない: %s\n", path);
         exit(1);
     }
+    size24 = fit_px(24, BOX24);
+    size12 = fit_px(12, BOX12);
+
     /* ★どれを開いたかを 1 行残す。同梱したものではなくシステムのものを拾っていると、
        ★開発機では動くのに**別の機種で豆腐だらけになる**（そして原因が見えない）。
        PortMaster では Zenmai.sh が log.txt に流すので、ここに出れば追える。 */
-    fprintf(stderr, "font: %s\n", path);
+    fprintf(stderr, "font: %s (本文 %dpx / ふりがな %dpx)\n", path, size24, size12);
 }
 
 void glyph_clip(int y0, int y1)
@@ -236,7 +254,8 @@ void glyph_clip(int y0, int y1)
 
 int glyph_w(uint16_t code)
 {
-    Cell *c = lookup(code, 24);
+    Cell *c = lookup(code, size24);
+    /* ★描くときと**同じ大きさ**の送りを返す。ここがずれると罫線が破線になる。 */
     return c ? c->adv : 24;
 }
 
@@ -267,10 +286,8 @@ static uint16_t blend555(uint16_t dst, uint16_t src, unsigned a)
 static void draw_at(uint16_t (*buf)[W], int rows, int x, int y,
                     uint16_t code, uint16_t color, int px)
 {
-    int avail = rows - y;
-    if (avail <= 0)
+    if (rows - y <= 0)
         return;
-    px = fit_px(px, avail);
     Cell *c = lookup(code, px);
     if (!c || !c->bm)
         return;
@@ -297,10 +314,10 @@ static void draw_at(uint16_t (*buf)[W], int rows, int x, int y,
 
 void draw24(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
-    draw_at(buf, rows, x, y, code, color, 24);
+    draw_at(buf, rows, x, y, code, color, size24);
 }
 
 void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t color)
 {
-    draw_at(buf, rows, x, y, code, color, 12);
+    draw_at(buf, rows, x, y, code, color, size12);
 }
