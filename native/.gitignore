@@ -5,6 +5,12 @@ out*.bin
 *.psexe
 story.bin
 
+# ★SDL ビルドの実行ファイル（拡張子が無いので *.psexe の網に掛からない）。
+#   build-sdl.sh で作り直せる。★焼くたびに新しい blob（600〜750KB）が増えるので、
+#   追跡するとリポジトリが毎回太る。
+zenmai-zork
+zenmai-zork-ft
+
 # ホスト側の検証バイナリ(*_test.c 等から都度ビルドする)
 cmd_test_host
 test_input
