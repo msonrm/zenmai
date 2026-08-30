@@ -79,18 +79,45 @@ def char_w(f24, ch):
     return int(f24.getlength(ch))
 
 
+# ---- 禁則処理（render.c の no_head / no_tail と同一。★正典はこちら側） ----
+# ★行頭に来てはいけない字 → その 1 字だけ右の余白へ**ぶら下げる**
+NO_HEAD = set('、。，．・：；？！）〕］｝〉》」』】’”ー々ゝゞ゛゜'
+               'ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶ')
+# ★行末に来てはいけない字 → 次の行へ**道連れ**にする
+NO_TAIL = set('（〔［｛〈《「『【‘“')
+
+
 def wrap(units, f24):
-    """ピクセル幅で貪欲に詰める。ルビ単位は原子(行またぎで割らない)。禁則はしない。
-    ★ASCII の語(空白以外の連続)は単語単位で折り返す(2026-08-19。render.c と同一規則)。"""
+    """ピクセル幅で貪欲に詰める。ルビ単位は原子(行またぎで割らない)。
+    ★ASCII の語(空白以外の連続)は単語単位で折り返す(2026-08-19。render.c と同一規則)。
+    ★禁則処理を入れた(2026-08-30。ぶら下げ + 道連れの 2 つだけ。render.c と同一規則)。"""
     lines = [[]]
     x = 0
+
+    def line_break():
+        """行を送る。★行末禁則の字が末尾に残るなら道連れにする"""
+        nonlocal x
+        carry = None
+        if len(lines[-1]) > 1:
+            seg, yomi, w = lines[-1][-1]
+            if not yomi and seg in NO_TAIL:
+                carry = lines[-1].pop()
+                x -= w
+        lines.append([])
+        x = 0
+        if carry:
+            lines[-1].append(carry)
+            x += carry[2]
 
     def push_ch(ch):
         nonlocal x
         w = char_w(f24, ch)
         if x + w > TEXT_W and x > 0:
-            lines.append([])
-            x = 0
+            if ch in NO_HEAD and x + w <= TEXT_W + MARGIN:   # ぶら下げ
+                lines[-1].append((ch, None, w))
+                x += w
+                return
+            line_break()
             if ch == ' ':              # 折り返し直後の空白は捨てる
                 return
         lines[-1].append((ch, None, w))
@@ -100,8 +127,7 @@ def wrap(units, f24):
         if yomi:
             w = max(char_w(f24, seg[0]) * len(seg), 12 * len(yomi))
             if x + w > TEXT_W and x > 0:
-                lines.append([])
-                x = 0
+                line_break()
             lines[-1].append((seg, yomi, w))
             x += w
         else:
@@ -118,8 +144,7 @@ def wrap(units, f24):
                     w += char_w(f24, seg[j])
                     j += 1
                 if w <= TEXT_W and x + w > TEXT_W and x > 0:
-                    lines.append([])
-                    x = 0
+                    line_break()
                 while i < j:
                     push_ch(seg[i])
                     i += 1

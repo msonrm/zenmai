@@ -542,6 +542,25 @@ static void carry_over_pad(int lt)
 
 /* ---- 言語選択メニュー ---- */
 
+/* ---- 横罫線 ----
+ *
+ * ★**字を並べて引かない。** 以前は ─(U+2500) を「本文幅 ÷ 24」本だけ並べていたが、
+ *   本数を決めた 24 は**焼いたビットマップの送り幅**であって、FreeType 版では 22px
+ *   —— 22 本 × 22px = 484px で、本文幅 544px に**60px 届かなかった**（実機の指摘・
+ *   2026-08-30）。★本数を直しても直らない：掛ける相手がフォントで変わるので、
+ *   字で引く限りどのビルドでも端は揃わない。**長さを指定して画素で引く**のが唯一。
+ * ★長さは**呼ぶ側が測って渡す**（読み物の頁 = 本文幅 / 起動メニュー = 説明の幅）。
+ * ★太さと帯の中の位置は、これまで ─ が出ていた通り（帯の 11 行目・1px）。 */
+enum { RULE_ROW = 11 };
+
+static void rule_band(int y, int x0, int x1, uint16_t color)
+{
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    for (int x = x0; x < x1; x++)
+        sbar[RULE_ROW][x] = color;
+    gp0_upload(0, y, W, STATUS_H, sbar[0]);
+}
+
 /* 中央揃えの 1 行。mark = 1 で ＞ を付ける。
    ★**色と印を別々に受ける**。以前は selected が両方を兼ねていたので、
    「印は無いが強調したい」(= 起動メニューの `Zenmai`)が書けなかった。 */
@@ -573,7 +592,13 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
     int sel = 0;
     menu_line(Y_TITLE, UI_TITLE.s, UI_TITLE.n, ACCENT, 0);
     menu_line(Y_SUB, UI_SUB.s, UI_SUB.n, DIM, 0);
-    menu_line(Y_RULE, UI_RULE.s, UI_RULE.n, DIM, 0);
+    /* ★罫線は説明（UI_SUB）の幅に合わせて画素で引く。字を並べていたときは
+       本数が「説明の幅 ÷ 24」で、掛ける相手（送り幅）はビルドで変わっていた
+       —— 焼いた版で 12px 足りず、FreeType 版はたまたま合っていただけ。 */
+    int sub_w = 0;
+    for (int i = 0; i < UI_SUB.n; i++)
+        sub_w += glyph_w(UI_SUB.s[i]);
+    rule_band(Y_RULE, (W - sub_w) / 2, (W + sub_w) / 2, DIM);
     menu_line(Y_GAME, UI_GAME.s, UI_GAME.n, INK, 0);
     menu_line(Y_JA, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
     menu_line(Y_EN, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
@@ -639,6 +664,7 @@ enum { RULE_X = 96, RULE_W = 448 };
 enum { PAGE_X = 48, PAGE_Y_TITLE = 40, PAGE_Y_TOP = 88, PAGE_ROW_H = 32, PAGE_ROWS = 11 };
 
 static int opt_open, opt_sel, opt_mode, opt_page, page_top, page_count;
+static int page_col;                   /* 二段組の右の欄の x（PAGE_X からの差） */
 static short page_idx[UI_LINE_N];
 static uint16_t ovl[OVL_ROW][OVL_W];   /* 板の転送用に詰め直す小バッファ */
 static uint16_t frbuf[RULE_W * 2];     /* 仕切り線(横 448x2。縦の 2x192 も収まる) */
@@ -689,15 +715,23 @@ static void menu_draw(void)
     }
 }
 
-/* 読み物の 1 行(全画面)。center=0 で左揃え(本文)、1 で中央(見出し・案内)。 */
+/* 読み物の 1 行(全画面)。center=0 で左揃え(本文)、1 で中央(見出し・案内)。
+ * ★欄の境 TAB(0x09) は**描かず、右の欄の桁へ飛ぶ**。桁は page_columns() が
+ *   glyph_w で実測して決めてある —— 空白を並べて揃えると、送り幅が字ごとに違う
+ *   FreeType 版で必ずばらける（実機の指摘・2026-08-30）。 */
 static void page_row(int y, const uint16_t *s, int n, uint16_t color, int center)
 {
     fill_rows(sbar, 0, STATUS_H, OPT_BG);
     int w = 0;
     for (int i = 0; i < n; i++)
-        w += glyph_w(s[i]);
+        w += s[i] == '\t' ? 0 : glyph_w(s[i]);
     int x = center ? (W - w) / 2 : PAGE_X;
     for (int i = 0; i < n; i++) {
+        if (s[i] == '\t') {
+            if (PAGE_X + page_col > x)
+                x = PAGE_X + page_col;
+            continue;
+        }
         if (x + glyph_w(s[i]) > W - PAGE_X)
             break;
         draw24(sbar, STATUS_H, x, 0, s[i], color);
@@ -718,6 +752,28 @@ static void page_index(void)
             (!UI_LINES[i].lang || UI_LINES[i].lang == want) &&
             (!UI_LINES[i].font || UI_LINES[i].font == font))
             page_idx[page_count++] = (short)i;
+
+    /* ★二段組の桁を**実測で**決める。この頁に出る行のうち欄の境を持つものを全部
+       measure し、いちばん長い左の欄に全角 1 つ分の隙間を足したところが右の欄の頭。
+       ★gen_ui.py 側では決められない —— 送り幅を知っているのは glyph.h の後ろだけで、
+       焼いた版と FreeType 版で違う（そして FreeType 版は字ごとに違う）。 */
+    page_col = 0;
+    for (int i = 0; i < page_count; i++) {
+        const UiLine *l = &UI_LINES[page_idx[i]];
+        const uint16_t *s = UI_POOL + l->off;
+        int k = 0;
+        while (k < l->len && s[k] != '\t')
+            k++;
+        if (k == l->len)
+            continue;                      /* 欄の境が無い行（＝二段組でない）は測らない */
+        int w = 0;
+        for (int t = 0; t < k; t++)
+            w += glyph_w(s[t]);
+        if (w > page_col)
+            page_col = w;
+    }
+    if (page_col)
+        page_col += glyph_w(0x3000);       /* 欄の間 = 全角 1 つ分 */
 }
 
 /* ---- 「ひらがな入力方法」= コントローラの図 ----
@@ -913,8 +969,11 @@ static void page_draw(void)
         if (i >= page_count)
             break;
         const UiLine *l = &UI_LINES[page_idx[i]];
-        page_row(PAGE_Y_TOP + r * PAGE_ROW_H, UI_POOL + l->off, l->len,
-                 l->dim ? OPT_TEXT : INK, 0);
+        const int y = PAGE_Y_TOP + r * PAGE_ROW_H;
+        if (l->rule)                       /* ★罫線は本文幅いっぱいに画素で引く */
+            rule_band(y, PAGE_X, W - PAGE_X, OPT_TEXT);
+        else
+            page_row(y, UI_POOL + l->off, l->len, l->dim ? OPT_TEXT : INK, 0);
     }
 }
 

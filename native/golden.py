@@ -64,10 +64,29 @@ def flush(color):
     state['fw'] = 0
 
 
+def line_break(color):
+    """行を送る。★行末禁則の字が末尾に残るなら道連れにする（render.c line_break と同一）"""
+    carry = None
+    if len(state['frags']) > 1:
+        seg, yomi, w = state['frags'][-1]
+        if not yomi and seg in gen_mock.NO_TAIL:
+            carry = state['frags'].pop()
+            state['fw'] -= w
+    flush(color)
+    if carry:
+        state['frags'].append(carry)
+        state['fw'] += carry[2]
+
+
 def push_char(ch, color):
     w = gw(ch)
     if state['fw'] + w > TEXT_W and state['fw'] > 0:
-        flush(color)
+        # ★行頭禁則: 1 字だけ右の余白へぶら下げる（render.c push_char と同一）
+        if ch in gen_mock.NO_HEAD and state['fw'] + w <= TEXT_W + MARGIN:
+            state['frags'].append((ch, None, w))
+            state['fw'] += w
+            return
+        line_break(color)
         if ch == ' ':
             return
     state['frags'].append((ch, None, w))
@@ -89,7 +108,7 @@ def push_text(s, color):
             w += gw(s[j])
             j += 1
         if w <= TEXT_W and state['fw'] + w > TEXT_W and state['fw'] > 0:
-            flush(color)
+            line_break(color)
         for k in range(i, j):
             push_char(s[k], color)
         i = j
@@ -104,7 +123,7 @@ def draw_logical(line, color):
         if yomi:
             w = max(24 * len(seg), 12 * len(yomi))
             if state['fw'] + w > TEXT_W and state['fw'] > 0:
-                flush(color)
+                line_break(color)
             state['frags'].append((seg, yomi, w))
             state['fw'] += w
         else:

@@ -18,8 +18,10 @@ HERE = Path(__file__).parent
 src = (HERE / 'ui_data.h').read_text(encoding='utf-8')
 pool = [int(x, 16) for x in
         re.findall(r'0x([0-9A-F]{4})', src.split('UI_POOL')[1].split('};')[0])]
+# ★UiLine は (off, len, dim, lang, page, font, rule) の 7 つ。
+#   ★列が増えたら**読めなくなって止まる**のが正しい（黙って 0 件にしない）。
 recs = [tuple(int(v) for v in m) for m in
-        re.findall(r'\{ (\d+), (\d+), (\d+), (\d+), (\d+), (\d+) \},', src)]
+        re.findall(r'\{ (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+) \},', src)]
 if not recs:
     sys.exit('★UI_LINES を読めない（gen_ui.py の出力形式が変わった？）')
 
@@ -27,7 +29,7 @@ if not recs:
 def shown(kind):
     """font=kind のビルドがライセンス頁に出す全文（言語は問わない）"""
     return ' '.join(''.join(chr(c) for c in pool[o:o + l])
-                    for o, l, dim, lang, pg, f in recs
+                    for o, l, dim, lang, pg, f, rl in recs
                     if pg == 2 and f in (0, kind))
 
 

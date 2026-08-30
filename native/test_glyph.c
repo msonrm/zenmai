@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "glyph.h"
+/* ★焼いた版の「出せる字」の一覧をそのまま持ち込む（照合の相手）。
+   字形（base_rows / ruby_rows）は使わないが、同じ表の中にある。 */
+#include "glyphs.h"
 
 enum { ROWS = 24, GUARD = 8, MAGIC = 0x5A5A };
 
@@ -129,6 +132,52 @@ int main(void)
     else {
         puts("✗ ★器の外へ書いた");
         ng++;
+    }
+
+    puts("");
+    puts("--- ★焼いた版で出せる字は、この実装でも全部出せるか ---");
+    /* ★make_font.sh が守っている約束の実測。ここが赤なら、同梱フォントの
+       部分集合が足りていない = その字は**黙って空白で描かれる**。
+       （2026-08-30 に U+2014 `—` で実際に踏んだ。ライセンス頁の
+       「Zenmai —— このソフト」が「Zenmai　　このソフト」に見えていた） */
+    {
+        int blank = 0, first = 0;
+        for (int i = 0; i < BASE_N; i++) {
+            uint16_t code = base_info[i].code;
+            if (code == 0x0020 || code == 0x3000)
+                continue;              /* 空白は白いのが正しい */
+            reset();
+            glyph_clip(0, ROWS);
+            draw24(buf, ROWS, 40, 0, code, 0x7FFF);
+            int lo, hi;
+            ink_rows(&lo, &hi);
+            if (hi < lo) {
+                if (!blank++)
+                    first = code;
+            }
+        }
+        if (blank) {
+            printf("✗ ★%d 字が空白で描かれる（最初 = U+%04X）"
+                   " —— sh make_font.sh で焼き直すこと\n", blank, first);
+            ng++;
+        } else {
+            printf("✓ 焼いた %d 字は全部この実装でも出る\n", BASE_N);
+        }
+    }
+    /* ★カナリア: 上の検査が「空白」を見分けられているか（見分けられないなら
+       **何も描かない実装が満点を取る**）。フォントに絶対に無い私用領域で試す。 */
+    reset();
+    glyph_clip(0, ROWS);
+    draw24(buf, ROWS, 40, 0, 0xE000, 0x7FFF);
+    {
+        int lo, hi;
+        ink_rows(&lo, &hi);
+        if (hi < lo)
+            puts("✓ ★カナリア: 無い字（U+E000）はちゃんと空白と分かる");
+        else {
+            puts("✗ ★カナリア: 無い字にも ink がある = 空白の見分けが効いていない");
+            ng++;
+        }
     }
 
     puts("");

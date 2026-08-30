@@ -47,6 +47,84 @@ typedef struct { uint16_t ch; uint8_t blen, rlen; const uint16_t *base, *ruby; u
 static Frag frags[96];
 static int nfrag, fw;
 
+/* ★ふりがなの送り。**こちらは直に書いてよい** —— ふりがなは必ず全角のかなで、
+   12px の全角は焼いた版でも FreeType 版でも 12px（`glyph.h` に 12px 用の幅を訊く
+   口が無いのは、訊くまでもないから）。★親字の方は違う（下の base_w を見ること）。 */
+enum { RUBY_W = 12 };
+
+/* ルビの付いた一かたまりの、親字の幅。
+ * ★**24 と書いてはいけない。** 24 は焼いたビットマップの送り幅であって、
+ *   FreeType 版は 22px —— 直に書くと **ルビの付いた字だけ 2px ずつ間延びし**、
+ *   箱の中の中央寄せも 1px ずつずれる（2026-08-30 に実測。素の字は 22px 間隔なのに
+ *   ルビ付きは 24px 間隔になっていた）。★これは同じ日に 3 か所で直したのと同じ形で、
+ *   **ここだけ `glyph_w` を通っていなかった**ので残っていた。
+ *
+ * ★**余った幅を「親字のあいだ」に配らないこと。** ここは 1 つのルビ文字列が
+ *   親字の並び全体に掛かる形＝**グループルビ**なので、親字は詰めたまま、
+ *   ルビがはみ出す分は**語の外**へ出す（＝中付きの見え方）。
+ *   ★親字のあいだに配る「均等割り」も試作して実機で並べたが、**語が 1 かたまりに
+ *   見えなくなる**ぶん違和感が大きかった（実機の判断・2026-08-30）。
+ *   なお均等割りはモノルビの作法ではない —— モノルビは親字 1 字ごとにルビが付く形で、
+ *   この実装が持っているデータの形（`push_ruby(base, blen, ruby, rlen)`）とは別物。 */
+static int base_w(const uint16_t *base, int blen)
+{
+    int w = 0;
+    for (int k = 0; k < blen; k++)
+        w += glyph_w(base[k]);
+    return w;
+}
+
+/* ---- 禁則処理 ----
+ *
+ * ★入れるのは 2 つだけ。**行頭に来てはいけない字**（句読点・閉じ括弧・小書きかな・
+ *   長音・繰り返し記号）と、**行末に来てはいけない字**（開き括弧）。
+ *
+ * ★直し方も 2 通りに絞る:
+ *   - 行頭禁則 → その 1 字を**右の余白へぶら下げる**（ぶら下げ組）。
+ *     ★追い出し（直前の字ごと次行へ送る）は採らない —— 直前の字が動くと、
+ *     ルビの箱や既に決まった位置まで動いて**行が跳ねて見える**。余白は
+ *     MARGIN = 32px あるので、全角 1 字（24px / FreeType 版は 22px）は必ず入る。
+ *     ★2 字目は入らないので、そこは普通に折る（`。」` が続く稀な場合だけ譲る）。
+ *   - 行末禁則 → 開き括弧を**次の行へ道連れ**にする（こちらはぶら下げようがない）。
+ *
+ * ★ASCII の記号（. , ) など）は入れていない —— 英文は語単位で折るので、
+ *   記号は必ず語にくっついたまま動く（行頭に単独で落ちる道が無い）。
+ */
+static int no_head(uint16_t c)         /* 行頭に置かない */
+{
+    switch (c) {
+    case 0x3001: case 0x3002:                              /* 、。 */
+    case 0xFF0C: case 0xFF0E: case 0x30FB:                 /* ，．・ */
+    case 0xFF1A: case 0xFF1B: case 0xFF1F: case 0xFF01:    /* ：；？！ */
+    case 0xFF09: case 0x3015: case 0xFF3D: case 0xFF5D:    /* ）〕］｝ */
+    case 0x3009: case 0x300B: case 0x300D: case 0x300F:    /* 〉》」』 */
+    case 0x3011: case 0x2019: case 0x201D:                 /* 】’” */
+    case 0x30FC: case 0x3005: case 0x309D: case 0x309E:    /* ー々ゝゞ */
+    case 0x309B: case 0x309C:                              /* ゛゜ */
+    case 0x3041: case 0x3043: case 0x3045: case 0x3047:    /* ぁぃぅぇ */
+    case 0x3049: case 0x3063: case 0x3083: case 0x3085:    /* ぉっゃゅ */
+    case 0x3087: case 0x308E: case 0x3095: case 0x3096:    /* ょゎゕゖ */
+    case 0x30A1: case 0x30A3: case 0x30A5: case 0x30A7:    /* ァィゥェ */
+    case 0x30A9: case 0x30C3: case 0x30E3: case 0x30E5:    /* ォッャュ */
+    case 0x30E7: case 0x30EE: case 0x30F5: case 0x30F6:    /* ョヮヵヶ */
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static int no_tail(uint16_t c)         /* 行末に置かない */
+{
+    switch (c) {
+    case 0xFF08: case 0x3014: case 0xFF3B: case 0xFF5B:    /* （〔［｛ */
+    case 0x3008: case 0x300A: case 0x300C: case 0x300E:    /* 〈《「『 */
+    case 0x3010: case 0x2018: case 0x201C:                 /* 【‘“ */
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 void flush_vline(uint16_t color)
 {
     if (!nfrag) return;
@@ -67,12 +145,14 @@ void flush_vline(uint16_t color)
         for (int i = 0; i < nfrag; i++) {
             Frag *f = &frags[i];
             if (f->rlen) {
-                int bw = 24 * f->blen, rw = 12 * f->rlen;
+                int bw = base_w(f->base, f->blen), rw = RUBY_W * f->rlen;
                 int bx = x + (f->w - bw) / 2, rx = x + (f->w - rw) / 2;
-                for (int k = 0; k < f->blen; k++)
-                    draw24(canvas, WIN_H, bx + 24 * k, cursor, f->base[k], color);
+                for (int k = 0; k < f->blen; k++) {
+                    draw24(canvas, WIN_H, bx, cursor, f->base[k], color);
+                    bx += glyph_w(f->base[k]);
+                }
                 for (int k = 0; k < f->rlen; k++)
-                    draw12(canvas, WIN_H, rx + 12 * k, cursor - 13, f->ruby[k], color);
+                    draw12(canvas, WIN_H, rx + RUBY_W * k, cursor - 13, f->ruby[k], color);
             } else {
                 draw24(canvas, WIN_H, x, cursor, f->ch, color);
             }
@@ -84,12 +164,46 @@ void flush_vline(uint16_t color)
     fw = 0;
 }
 
+/* 折り返しのために行を送る。★行末禁則の字が末尾に残るなら道連れにする。
+   ★行の**最後の締め**は flush_vline を直に呼ぶこと（道連れの相手がいない）。 */
+static void line_break(uint16_t color)
+{
+    Frag carry;
+    int has = 0;
+    if (nfrag > 1 && !frags[nfrag - 1].rlen && no_tail(frags[nfrag - 1].ch)) {
+        carry = frags[--nfrag];
+        fw -= carry.w;
+        has = 1;
+    }
+    flush_vline(color);
+    if (has) {
+        frags[nfrag++] = carry;
+        fw += carry.w;
+    }
+}
+
+/* ★器（frags）が満ちたら折る。**入れる前に見る** —— 画素幅で折る作りなので、
+   送り幅の狭い字が続くと本数が先に尽きる（.bss の隣を踏む）。 */
+static void room_for_one(uint16_t color)
+{
+    if (nfrag >= (int)(sizeof frags / sizeof *frags))
+        flush_vline(color);
+}
+
 void push_char(uint16_t ch, uint16_t color)
 {
     int w = glyph_w(ch);
+    room_for_one(color);
     if (fw + w > TEXT_W && fw > 0) {
-        flush_vline(color);
+        /* 行頭禁則: 1 字だけ右の余白へぶら下げる */
+        if (no_head(ch) && fw + w <= TEXT_W + MARGIN) {
+            frags[nfrag++] = (Frag){ch, 1, 0, 0, 0, (uint16_t)w};
+            fw += w;
+            return;
+        }
+        line_break(color);
         if (ch == ' ') return;         /* 折り返し直後の空白は捨てる */
+        room_for_one(color);
     }
     frags[nfrag++] = (Frag){ch, 1, 0, 0, 0, (uint16_t)w};
     fw += w;
@@ -109,7 +223,7 @@ void push_text(const uint16_t *s, int n, uint16_t color)
         while (j < n && s[j] <= 0x7F && s[j] != ' ')
             w += glyph_w(s[j++]);
         if (w <= TEXT_W && fw + w > TEXT_W && fw > 0)
-            flush_vline(color);
+            line_break(color);
         for (; i < j; i++)
             push_char(s[i], color);
     }
@@ -117,10 +231,13 @@ void push_text(const uint16_t *s, int n, uint16_t color)
 
 void push_ruby(const uint16_t *base, int blen, const uint16_t *ruby, int rlen, uint16_t color)
 {
-    int bw = 24 * blen, rw = 12 * rlen;
+    int bw = base_w(base, blen), rw = RUBY_W * rlen;
     int w = bw > rw ? bw : rw;
-    if (fw + w > TEXT_W && fw > 0)
-        flush_vline(color);
+    room_for_one(color);
+    if (fw + w > TEXT_W && fw > 0) {
+        line_break(color);
+        room_for_one(color);
+    }
     frags[nfrag++] = (Frag){0, (uint8_t)blen, (uint8_t)rlen, base, ruby, (uint16_t)w};
     fw += w;
 }

@@ -28,8 +28,15 @@ FONT = set(int(m, 16) for m in
 TEXT_W = 640 - 2 * 48
 
 
+# ★二段組の欄の境。**描くものではない**（C 側がこれを見て右の桁へ飛ぶ）。
+#   空白を並べて揃えるのをやめた理由は下の `_rows` の注記を見ること。
+COL = '\t'
+
+
 def width(t):
-    return sum(12 if ord(c) < 0x80 else 24 for c in t)
+    """等幅を仮定した見積り幅。★**これは目安でしかない** —— FreeType 版の送り幅は
+    字ごとに違う。折り返すか / 別の言い方を落とすか、の判断にだけ使う。"""
+    return sum(0 if c == COL else (12 if ord(c) < 0x80 else 24) for c in t)
 
 
 P_TYPING, P_CMDS, P_LICENSE = 0, 1, 2
@@ -39,7 +46,7 @@ PAGE_N = 3
 #   0 = 常に出す / 1 = 焼いたビットマップ版（PS1）だけ / 2 = FreeType 版（PortMaster）だけ
 F_ANY, F_BAKED, F_FT = 0, 1, 2
 
-lines = []          # (page, lang, font, dim, 本文)。dim = 控えめの色
+lines = []          # (page, lang, font, dim, 本文, 罫線か)。dim = 控えめの色
 cur = P_TYPING
 
 
@@ -48,8 +55,8 @@ def page(n):
     cur = n
 
 
-def put(text, lang=BOTH, dim=0, font=F_ANY):
-    lines.append((cur, lang, font, dim, text))
+def put(text, lang=BOTH, dim=0, font=F_ANY, rule=0):
+    lines.append((cur, lang, font, dim, text, rule))
 
 
 def put_file(path, font=F_ANY, skip=0):
@@ -59,12 +66,14 @@ def put_file(path, font=F_ANY, skip=0):
 
 
 def rule():
-    # ★実線 ─(U+2500)で引く。以前は ASCII の `-` を並べていたが、それは
-    #   「同梱フォントに ─ が入っていない」という制約への迂回で、
-    #   2026-08-25 にフォントを取り直したので**制約ごと消えた**
-    # ★長さは本文幅から決める。固定の本数だと余白を変えた途端に**折り返して
-    #   罫線が次行にこぼれる**(実際にこぼした)
-    put('─' * (TEXT_W // 24), BOTH, 1)
+    # ★罫線は**字を並べない**。以前は ─(U+2500) を「本文幅 ÷ 24」本だけ並べていたが、
+    #   それは**等幅を前提にした本数**で、送り幅が字ごとに違う FreeType 版（PortMaster）
+    #   では 22px × 22 本 = 484px にしかならず、**本文幅 544px に 60px 届かなかった**
+    #   （実機の指摘・2026-08-30）。
+    # ★本数を直せば直る話ではない —— 掛ける相手がフォントで変わるので、
+    #   **字で引く限りどのビルドでも端は揃わない**。長さを指定して画素で引く。
+    # ★印だけを置き、実際の長さは C 側が本文幅（PAGE_X の内側）から決める。
+    put('─', BOTH, 1, F_ANY, 1)
 
 
 # ---- 頁 1: ひらがな入力方法 ----
@@ -121,19 +130,22 @@ for _label, _key in SYS:
     assert _w, '★打つ言葉が引けなかった: ' + _key
     _rows.append((_label, _w, _key))
 
-_lw = max(width(r[0]) for r in _rows)      # 役目の欄はいちばん長いものに揃える
+# ★桁を**空白で揃えない**。以前は「いちばん長い役目との差 ÷ 12」だけ半角空白を
+#   並べていたが、それは**半角 = 全角の半分**という等幅の仮定に立っていて、
+#   同梱フォントの実測では**全角 22px に対して半角空白は 5px**（1/4 以下）なので、
+#   右の欄が**行ごとにばらばらの位置から始まっていた**（実機の指摘・2026-08-30）。
+# ★欄の境（COL）だけを置き、桁の位置は **C 側が glyph_w で実測して決める**。
+#   ここが知っているのは「どこで欄が変わるか」だけで、幅は知らないでよい。
+_lw = max(width(r[0]) for r in _rows)      # 見積り（入るかどうかの判断にだけ使う）
 for _label, _w, _key in _rows:
-    _pad = ' ' * ((_lw - width(_label)) // 12 + 2)
-    _line = _label + _pad + ' / '.join(_w)
-    if width(_line) > TEXT_W and len(_w) > 1:   # 入らなければ別の言い方は落とす
-        _line = _label + _pad + _w[0]
-    put(_line, JA)
+    _right = ' / '.join(_w)
+    if _lw + 24 + width(_right) > TEXT_W and len(_w) > 1:   # 入らなければ別の言い方は落とす
+        _right = _w[0]
+    put(_label + COL + _right, JA)
 
 put('', JA)
-_ew = max(len(k.lower().lstrip('@')) for _, k in SYS)
 for _label, _key in SYS:
-    _cmd = _key.lower().lstrip('@')
-    put(_cmd + ' ' * (_ew - len(_cmd) + 2) + EN_NOTE[_key], EN)
+    put(_key.lower().lstrip('@') + COL + EN_NOTE[_key], EN)
 
 # ---- 頁 3: ライセンス ----
 page(P_LICENSE)
@@ -234,9 +246,8 @@ TITLE = 'Zenmai'
 # ★一行の説明。**Zenmai だけの説明**であって Zork の説明ではない。
 #   **言語を選ぶ前**の画面なので、どちらの人も読める側に倒して英語 1 本。
 SUB = 'a Z-machine for Japanese and a game controller'
-# ★罫線の長さは**説明の幅から決める**。本数を直に書くと、説明を書き換えた途端に
-#   線だけ長さが合わなくなる（ライセンス頁の rule() と同じ考え方）
-TITLE_RULE = '─' * (width(SUB) // 24)
+# ★起動画面の罫線も**字を並べない**（ライセンス頁の rule() と同じ理由）。
+#   長さは C 側が UI_SUB を実測して決めるので、ここには持たない。
 GAME = 'Zork I'
 LANG = ('日本語', 'ENGLISH')
 # ★「ひらがな入力方法」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
@@ -269,7 +280,9 @@ HELP = [
 
 
 def wrap(t):
-    if width(t) <= TEXT_W:
+    # ★二段組の行は割らない。欄の境をまたいで折ると、右の欄だけが次行の頭に落ちて
+    #   **表でなくなる**。入るかどうかは組む側（上の `_rows`）で見てある。
+    if COL in t or width(t) <= TEXT_W:
         return [t]
     out = []
     if ' ' in t.strip():                      # 英文は語で折る
@@ -316,17 +329,17 @@ for _pg in range(PAGE_N):
 lines = [ln for i, ln in enumerate(lines) if i in _keep]
 
 wrapped = []
-for pg, lang, font, dim, text in lines:
+for pg, lang, font, dim, text, rl in lines:
     for part in wrap(text):
-        wrapped.append((pg, lang, font, dim, part))
+        wrapped.append((pg, lang, font, dim, part, rl))
 lines = wrapped
 
 pool = []
 recs = []
-for pg, lang, font, dim, text in lines:
+for pg, lang, font, dim, text, rl in lines:
     off = len(pool)
     pool.extend(ord(c) for c in text)
-    recs.append((off, len(text), dim, lang, pg, font))
+    recs.append((off, len(text), dim, lang, pg, font, rl))
 
 out = ['/* gen_ui.py が生成。手で編集しない */',
        '/* オプションの読み物 3 頁 + 画面の文言。',
@@ -334,7 +347,9 @@ out = ['/* gen_ui.py が生成。手で編集しない */',
        '',
        'typedef struct { unsigned int off; unsigned short len; unsigned char dim;',
        '                 unsigned char lang; unsigned char page;',
-       '                 unsigned char font; } UiLine;   /* font: 0=常に 1=焼いた版 2=FreeType */',
+       '                 unsigned char font;',
+       '                 unsigned char rule; } UiLine;   /* font: 0=常に 1=焼いた版 2=FreeType',
+       '                                                    rule: 1 = 本文幅いっぱいの横罫線 */',
        'typedef struct { const unsigned short *s; unsigned short n; } UiStr;',
        '',
        'static const unsigned short UI_POOL[%d] = {' % max(len(pool), 1)]
@@ -345,8 +360,8 @@ if not pool:
 out.append('};')
 out.append('')
 out.append('static const UiLine UI_LINES[%d] = {' % len(recs))
-for off, ln, dim, lang, pg, fnt in recs:
-    out.append('    { %d, %d, %d, %d, %d, %d },' % (off, ln, dim, lang, pg, fnt))
+for off, ln, dim, lang, pg, fnt, rl in recs:
+    out.append('    { %d, %d, %d, %d, %d, %d, %d },' % (off, ln, dim, lang, pg, fnt, rl))
 out.append('};')
 out.append('')
 out.append('#define UI_LINE_N %d' % len(recs))
@@ -369,7 +384,7 @@ helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
 langs = [sref(LANG[0]), sref(LANG[1])]
 title_, sub_ = sref(TITLE), sref(SUB)
-rule_, game_ = sref(TITLE_RULE), sref(GAME)
+game_ = sref(GAME)
 
 for i, text in strs:
     out.append('static const unsigned short UI_S%d[%d] = { %s };'
@@ -380,10 +395,10 @@ for row in items:
     out.append('    { ' + ', '.join(row) + ' },')
 out.append('};')
 out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
-out.append('/* 起動メニュー: 名前 / 説明 / 罫線 / 作品名 / 選択肢(添字 = lang_en) */')
+out.append('/* 起動メニュー: 名前 / 説明 / 作品名 / 選択肢(添字 = lang_en)。')
+out.append('   ★罫線は持たない —— 長さは main.c が UI_SUB を実測して画素で引く */')
 out.append('static const UiStr UI_TITLE = %s;' % title_)
 out.append('static const UiStr UI_SUB = %s;' % sub_)
-out.append('static const UiStr UI_RULE = %s;' % rule_)
 out.append('static const UiStr UI_GAME = %s;' % game_)
 out.append('static const UiStr UI_LANG[2] = { %s, %s };' % (langs[0], langs[1]))
 out.append('/* 図の固定札: L1 / L2 / R2 / SELECT / START */')
@@ -396,15 +411,15 @@ out.append('')
 (HERE / 'ui_data.h').write_text('\n'.join(out))
 
 used = set()
-for _, _, _, _, t in lines:
-    used.update(t)
+for ln in lines:
+    used.update(ln[4])
 for ja, en in ITEM + HELP + [BOOT, LANG]:
     used.update(ja)
     used.update(en)
 used.update(TITLE)
 used.update(SUB)
-used.update(TITLE_RULE)
 used.update(GAME)
+used.discard(COL)      # ★欄の境は描かない（字ではない）ので照合から外す
 # ★いまは出せないが**次に glyphs.h を作り直すときは入れておきたい字**を書く場所。
 #   ここに書いておけば gen_data.py が拾う。2026-08-25 に KH ドットフォントを取り直して
 #   焼き直したので、いまは**言い換えている字が 1 つも無い**（だから空）。
