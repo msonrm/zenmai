@@ -72,3 +72,28 @@ void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t 
             if (bits & 1) buf[ry][x + c] = color;
     }
 }
+
+/* ---- 整形 —— 焼いた版は**永久に 1 対 1** ----
+ *
+ * ★PS1 に HarfBuzz は載らない（freestanding / libc 無し / 2MB RAM）ので、
+ *   ここが置き換わることは無い。★**それでも境界を持たせる**のは、上の層
+ *   （render.c）を「整形を通す形」に一本化しておかないと、FreeType 版だけが
+ *   別の道を通ることになり、**PS1 と SDL の画素一致で検査できなくなる**から。
+ */
+int shape_run(const uint16_t *s, int n, Shaped *out, int max)
+{
+    const int m = n < max ? n : max;
+    for (int i = 0; i < m; i++) {
+        out[i].gid = s[i];
+        out[i].cluster = (uint16_t)i;
+        out[i].adv = (int16_t)glyph_w(s[i]);
+        out[i].dx = 0;
+        out[i].dy = 0;
+    }
+    return m;
+}
+
+void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y, uint16_t gid, uint16_t color)
+{
+    draw24(buf, rows, x, y, gid, color);
+}

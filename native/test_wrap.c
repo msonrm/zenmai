@@ -49,6 +49,29 @@ void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t 
     (void)buf; (void)rows; (void)x; (void)y; (void)code; (void)color;
 }
 
+/* ★整形（1 対 1）—— 焼いた版と**同じ約束**で、code をそのままグリフ番号にする。
+   検査が字の実装を自前で持っている以上、境界が増えればここも増える。 */
+int shape_run(const uint16_t *s, int n, Shaped *out, int max)
+{
+    const int m = n < max ? n : max;
+    for (int i = 0; i < m; i++) {
+        out[i].gid = s[i];
+        out[i].cluster = (uint16_t)i;
+        out[i].adv = (int16_t)glyph_w(s[i]);
+        out[i].dx = 0;
+        out[i].dy = 0;
+    }
+    return m;
+}
+
+/* ★★**こちらも控えること。** 本文の描画が draw24 から draw24_gid へ移ったので、
+   ここを空実装にすると記録が丸ごと消え、**検査は何も見ないまま緑になる**
+   （lines_of が空を返し、期待した行と比べる前に一致してしまう形）。 */
+void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y, uint16_t gid, uint16_t color)
+{
+    draw24(buf, rows, x, y, gid, color);
+}
+
 /* ---- 台 ---- */
 static int ng;
 

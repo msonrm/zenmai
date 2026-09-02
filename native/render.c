@@ -43,9 +43,28 @@ static int render_dry;                 /* 1 = 採寸のみ(描かない) */
 
 /* ---- 割り付け(gen_mock.py の移植) ---- */
 
-typedef struct { uint16_t ch; uint8_t blen, rlen; const uint16_t *base, *ruby; uint16_t w; } Frag;
+/* ★**`ch` と `gid` の両方を持つ理由** —— `gid` は面の中の通し番号なので、
+   「句読点か」「日本語か」を尋ねても答えない。行末禁則の道連れ（no_tail）と
+   行送りの判定（is_jp）は**元の code で見るしかない**。整形で 1 対 1 が崩れる
+   言語では、`ch` はその塊の**先頭の code**（cluster の頭）になる。
+   ★64bit では詰め物に収まり、32bit（PS1）でも 1 語ぶんしか増えない。 */
+typedef struct {
+    uint16_t ch;                       /* 代表 code（禁則と行送りの判定に使う） */
+    uint16_t gid;                      /* 描くグリフ。★1 対 1 の実装では ch と同じ */
+    uint8_t blen, rlen;
+    const uint16_t *base, *ruby;
+    uint16_t w;
+    int8_t dx, dy;                     /* 描く位置の補正（母音記号の載せ替え） */
+} Frag;
 static Frag frags[96];
 static int nfrag, fw;
+
+/* 整形した結果の置き場。★行 1 本ぶん取る（hist_line が 1000 字でクランプするので、
+   1 対 1 の実装ではここで打ち切られることが無い ＝ **移し替えが挙動不変**になる）。
+   ★push_text と build_strip で**使い回す**。どちらも呼び出しが入れ子にならない
+   （整形 → 積む → 描く、で閉じている）ので、1 本で足りる。 */
+enum { SHAPE_N = 1024 };
+static Shaped shaped[SHAPE_N];
 
 /* ★ふりがなの送り。**こちらは直に書いてよい** —— ふりがなは必ず全角のかなで、
    12px の全角は焼いた版でも FreeType 版でも 12px（`glyph.h` に 12px 用の幅を訊く
@@ -154,7 +173,7 @@ void flush_vline(uint16_t color)
                 for (int k = 0; k < f->rlen; k++)
                     draw12(canvas, WIN_H, rx + RUBY_W * k, cursor - 13, f->ruby[k], color);
             } else {
-                draw24(canvas, WIN_H, x, cursor, f->ch, color);
+                draw24_gid(canvas, WIN_H, x + f->dx, cursor + f->dy, f->gid, color);
             }
             x += f->w;
         }
@@ -190,42 +209,63 @@ static void room_for_one(uint16_t color)
         flush_vline(color);
 }
 
-void push_char(uint16_t ch, uint16_t color)
+/* 整形済みの 1 つを積む。
+   ★**禁則の判定は head（元の code）で行う** —— グリフ番号は面ごとの通し番号なので、
+     句読点かどうかを尋ねても答えない。 */
+static void push_glyph(uint16_t head, uint16_t gid, int w, int dx, int dy, uint16_t color)
 {
-    int w = glyph_w(ch);
+    const Frag f = { head, gid, 1, 0, 0, 0, (uint16_t)w, (int8_t)dx, (int8_t)dy };
     room_for_one(color);
     if (fw + w > TEXT_W && fw > 0) {
         /* 行頭禁則: 1 字だけ右の余白へぶら下げる */
-        if (no_head(ch) && fw + w <= TEXT_W + MARGIN) {
-            frags[nfrag++] = (Frag){ch, 1, 0, 0, 0, (uint16_t)w};
+        if (no_head(head) && fw + w <= TEXT_W + MARGIN) {
+            frags[nfrag++] = f;
             fw += w;
             return;
         }
         line_break(color);
-        if (ch == ' ') return;         /* 折り返し直後の空白は捨てる */
+        if (head == ' ') return;       /* 折り返し直後の空白は捨てる */
         room_for_one(color);
     }
-    frags[nfrag++] = (Frag){ch, 1, 0, 0, 0, (uint16_t)w};
+    frags[nfrag++] = f;
     fw += w;
 }
 
+/* ★**整形の要らない 1 字**を積む口。ルビの親字と、呼ぶ側が 1 字ずつ持っている
+   ところ（jp_text.c）が使う。1 対 1 でない言語の本文は push_text を通ること。 */
+void push_char(uint16_t ch, uint16_t color)
+{
+    push_glyph(ch, ch, glyph_w(ch), 0, 0, color);
+}
+
+/* ★★**整形はここで 1 回**。行を丸ごと渡す —— 1 字ずつ整形しても合字も入れ替えも
+   起きず、★**黙って間違った絵になる**（glyph.h の注記）。
+   ★語の折返し（ASCII は語を切らない）は**元の code で判断する**ので、
+     どの塊がどの code から来たかを cluster で引き直している。 */
 void push_text(const uint16_t *s, int n, uint16_t color)
 {
+    const int m = shape_run(s, n, shaped, SHAPE_N);
     int i = 0;
-    while (i < n) {
-        uint16_t ch = s[i];
-        if (ch > 0x7F || ch == ' ') {
-            push_char(ch, color);
+    while (i < m) {
+        const uint16_t head = s[shaped[i].cluster];
+        if (head > 0x7F || head == ' ') {
+            push_glyph(head, shaped[i].gid, shaped[i].adv,
+                       shaped[i].dx, shaped[i].dy, color);
             i++;
             continue;
         }
         int j = i, w = 0;
-        while (j < n && s[j] <= 0x7F && s[j] != ' ')
-            w += glyph_w(s[j++]);
+        while (j < m) {
+            const uint16_t c = s[shaped[j].cluster];
+            if (c > 0x7F || c == ' ')
+                break;
+            w += shaped[j++].adv;
+        }
         if (w <= TEXT_W && fw + w > TEXT_W && fw > 0)
             line_break(color);
         for (; i < j; i++)
-            push_char(s[i], color);
+            push_glyph(s[shaped[i].cluster], shaped[i].gid, shaped[i].adv,
+                       shaped[i].dx, shaped[i].dy, color);
     }
 }
 
@@ -238,7 +278,7 @@ void push_ruby(const uint16_t *base, int blen, const uint16_t *ruby, int rlen, u
         line_break(color);
         room_for_one(color);
     }
-    frags[nfrag++] = (Frag){0, (uint8_t)blen, (uint8_t)rlen, base, ruby, (uint16_t)w};
+    frags[nfrag++] = (Frag){0, 0, (uint8_t)blen, (uint8_t)rlen, base, ruby, (uint16_t)w, 0, 0};
     fw += w;
 }
 
@@ -550,14 +590,23 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
     draw24(strip, CMD_H, MARGIN, 0, 0xFF1E, ACCENT);
     int x = MARGIN + 24;
     int caret_x = x;
-    for (int i = 0; i < len; i++) {
-        if (i == caret) caret_x = x;
-        /* ★欄からはみ出す字は描かない。draw24 は範囲を見ないので、放っておくと
+    /* ★**コマンド欄も整形を通す** —— 打っている最中の字がそのまま並ぶ場所なので、
+       1 対 1 でない言語では本文と同じだけ必要になる。
+       ★★**キャレットは論理の位置なので cluster で見る。** 合字と入れ替えが起きると
+         「i 番目のグリフ」と「i 番目の字」がずれ、打った所と違う場所に棒が立つ。 */
+    const int m = shape_run(cmd, len, shaped, SHAPE_N);
+    int caret_found = 0;
+    for (int i = 0; i < m; i++) {
+        if (!caret_found && (int)shaped[i].cluster >= caret) {
+            caret_x = x;
+            caret_found = 1;
+        }
+        /* ★欄からはみ出す字は描かない。draw24_gid は範囲を見ないので、放っておくと
            strip[] の外へ書く（入力側でも幅で止めているが、ここでも止める） */
-        if (x + glyph_w(cmd[i]) > W - MARGIN - 24)
+        if (x + shaped[i].adv > W - MARGIN - 24)
             break;
-        draw24(strip, CMD_H, x, 0, cmd[i], INK);
-        x += glyph_w(cmd[i]);
+        draw24_gid(strip, CMD_H, x + shaped[i].dx, shaped[i].dy, shaped[i].gid, INK);
+        x += shaped[i].adv;
     }
     if (caret >= len) {
         caret_x = x;
