@@ -60,6 +60,7 @@ int shape_run(const uint16_t *s, int n, Shaped *out, int max)
         out[i].adv = (int16_t)glyph_w(s[i]);
         out[i].dx = 0;
         out[i].dy = 0;
+        out[i].face = 0;
     }
     return m;
 }
@@ -67,8 +68,10 @@ int shape_run(const uint16_t *s, int n, Shaped *out, int max)
 /* ★★**こちらも控えること。** 本文の描画が draw24 から draw24_gid へ移ったので、
    ここを空実装にすると記録が丸ごと消え、**検査は何も見ないまま緑になる**
    （lines_of が空を返し、期待した行と比べる前に一致してしまう形）。 */
-void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y, uint16_t gid, uint16_t color)
+void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y,
+                uint16_t gid, int face, uint16_t color)
 {
+    (void)face;                        /* ★面は 1 つだけ */
     draw24(buf, rows, x, y, gid, color);
 }
 

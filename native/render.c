@@ -55,6 +55,7 @@ typedef struct {
     const uint16_t *base, *ruby;
     uint16_t w;
     int8_t dx, dy;                     /* 描く位置の補正（母音記号の載せ替え） */
+    uint8_t face;                      /* どの面の gid か。★0 = 既定 */
 } Frag;
 static Frag frags[96];
 static int nfrag, fw;
@@ -173,7 +174,7 @@ void flush_vline(uint16_t color)
                 for (int k = 0; k < f->rlen; k++)
                     draw12(canvas, WIN_H, rx + RUBY_W * k, cursor - 13, f->ruby[k], color);
             } else {
-                draw24_gid(canvas, WIN_H, x + f->dx, cursor + f->dy, f->gid, color);
+                draw24_gid(canvas, WIN_H, x + f->dx, cursor + f->dy, f->gid, f->face, color);
             }
             x += f->w;
         }
@@ -212,9 +213,11 @@ static void room_for_one(uint16_t color)
 /* 整形済みの 1 つを積む。
    ★**禁則の判定は head（元の code）で行う** —— グリフ番号は面ごとの通し番号なので、
      句読点かどうかを尋ねても答えない。 */
-static void push_glyph(uint16_t head, uint16_t gid, int w, int dx, int dy, uint16_t color)
+static void push_glyph(uint16_t head, uint16_t gid, int w, int dx, int dy,
+                       int face, uint16_t color)
 {
-    const Frag f = { head, gid, 1, 0, 0, 0, (uint16_t)w, (int8_t)dx, (int8_t)dy };
+    const Frag f = { head, gid, 1, 0, 0, 0, (uint16_t)w,
+                     (int8_t)dx, (int8_t)dy, (uint8_t)face };
     room_for_one(color);
     if (fw + w > TEXT_W && fw > 0) {
         /* 行頭禁則: 1 字だけ右の余白へぶら下げる */
@@ -235,7 +238,7 @@ static void push_glyph(uint16_t head, uint16_t gid, int w, int dx, int dy, uint1
    ところ（jp_text.c）が使う。1 対 1 でない言語の本文は push_text を通ること。 */
 void push_char(uint16_t ch, uint16_t color)
 {
-    push_glyph(ch, ch, glyph_w(ch), 0, 0, color);
+    push_glyph(ch, ch, glyph_w(ch), 0, 0, 0, color);
 }
 
 /* ★★**整形はここで 1 回**。行を丸ごと渡す —— 1 字ずつ整形しても合字も入れ替えも
@@ -250,7 +253,7 @@ void push_text(const uint16_t *s, int n, uint16_t color)
         const uint16_t head = s[shaped[i].cluster];
         if (head > 0x7F || head == ' ') {
             push_glyph(head, shaped[i].gid, shaped[i].adv,
-                       shaped[i].dx, shaped[i].dy, color);
+                       shaped[i].dx, shaped[i].dy, shaped[i].face, color);
             i++;
             continue;
         }
@@ -265,7 +268,7 @@ void push_text(const uint16_t *s, int n, uint16_t color)
             line_break(color);
         for (; i < j; i++)
             push_glyph(s[shaped[i].cluster], shaped[i].gid, shaped[i].adv,
-                       shaped[i].dx, shaped[i].dy, color);
+                       shaped[i].dx, shaped[i].dy, shaped[i].face, color);
     }
 }
 
@@ -278,7 +281,7 @@ void push_ruby(const uint16_t *base, int blen, const uint16_t *ruby, int rlen, u
         line_break(color);
         room_for_one(color);
     }
-    frags[nfrag++] = (Frag){0, 0, (uint8_t)blen, (uint8_t)rlen, base, ruby, (uint16_t)w, 0, 0};
+    frags[nfrag++] = (Frag){0, 0, (uint8_t)blen, (uint8_t)rlen, base, ruby, (uint16_t)w, 0, 0, 0};
     fw += w;
 }
 
@@ -605,7 +608,8 @@ void build_strip(uint16_t bg, const uint16_t *cmd, int len, int caret,
            strip[] の外へ書く（入力側でも幅で止めているが、ここでも止める） */
         if (x + shaped[i].adv > W - MARGIN - 24)
             break;
-        draw24_gid(strip, CMD_H, x + shaped[i].dx, shaped[i].dy, shaped[i].gid, INK);
+        draw24_gid(strip, CMD_H, x + shaped[i].dx, shaped[i].dy,
+                   shaped[i].gid, shaped[i].face, INK);
         x += shaped[i].adv;
     }
     if (caret >= len) {

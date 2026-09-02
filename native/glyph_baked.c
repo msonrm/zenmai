@@ -89,11 +89,14 @@ int shape_run(const uint16_t *s, int n, Shaped *out, int max)
         out[i].adv = (int16_t)glyph_w(s[i]);
         out[i].dx = 0;
         out[i].dy = 0;
+        out[i].face = 0;
     }
     return m;
 }
 
-void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y, uint16_t gid, uint16_t color)
+void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y,
+                uint16_t gid, int face, uint16_t color)
 {
+    (void)face;                        /* ★面は 1 つだけ */
     draw24(buf, rows, x, y, gid, color);
 }
