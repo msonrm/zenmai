@@ -323,3 +323,31 @@ void draw12(uint16_t (*buf)[W], int rows, int x, int y, uint16_t code, uint16_t 
 {
     draw_at(buf, rows, x, y, code, color, size12);
 }
+
+/* ---- 整形 —— いまは 1 対 1 ----
+ *
+ * ★★**デーヴァナーガリーを積むときに置き換わるのは、この 1 本だけ**（HarfBuzz 版）。
+ *   いまは字の並びと画の並びが一致する言語（日本語 / 韓国語 / 英語）しか載っていないので、
+ *   code をそのままグリフ番号として扱い、送りは glyph_w に訊く。
+ *
+ * ★**この既定が「挙動不変」の錨になる** —— 呼ぶ側（render.c）を先に整形の経路へ
+ *   移しても絵が 1 画素も変わらないので、**移し替えだけを画素一致で検査できる**。
+ *   置き換えと移し替えを同時にやると、赤が出たときどちらのせいか分からなくなる。
+ */
+int shape_run(const uint16_t *s, int n, Shaped *out, int max)
+{
+    const int m = n < max ? n : max;
+    for (int i = 0; i < m; i++) {
+        out[i].gid = s[i];
+        out[i].cluster = (uint16_t)i;
+        out[i].adv = (int16_t)glyph_w(s[i]);
+        out[i].dx = 0;
+        out[i].dy = 0;
+    }
+    return m;
+}
+
+void draw24_gid(uint16_t (*buf)[W], int rows, int x, int y, uint16_t gid, uint16_t color)
+{
+    draw_at(buf, rows, x, y, gid, color, size24);
+}

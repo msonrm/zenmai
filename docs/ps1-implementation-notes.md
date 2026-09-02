@@ -109,7 +109,7 @@ sim.py zenmai-zork.psexe --script dual_ja.script --polls --stop 4400 --max 40000
 
 ★**検査は「何行になったか」ではなく「どの字がどの行の頭と末に来たか」で見る**
 （`test-wrap.sh` / `test_wrap.c`。11 件）。行数だけだと**折り返しが全部壊れていても数は合う**。
-リグは `glyph.h` の 5 本を検査自身が等幅（半角 12 / 全角 24）で実装し、描く代わりに
+リグは `glyph.h` の 8 本を検査自身が等幅（半角 12 / 全角 24）で実装し、描く代わりに
 `(行, x, 字)` を控える —— **割り付けがそのまま読める**うえ、フォントも実機も要らない。
 規則は Python の参照実装（`ps1-mock/gen_mock.py` / `native/golden.py`）にも同じ形で入れてある。
 ★**2 つの言語で同じ表を持つ以上、片方だけ足す道がある**ので、`check_kinsoku.py` が
@@ -505,7 +505,19 @@ PS1 の C を **aarch64 Linux ハンドヘルド**（PortMaster）へ載せた�
 | ヘッダ | 中身 | 実装 |
 |---|---|---|
 | `plat.h` | 画面 6 + パッド 3 の**9 本** | `plat_ps1.c`（GPU/JOY）/ `plat_sdl.c`（SDL2） |
-| `glyph.h` | 字の**5 本**（init / clip / w / draw24 / draw12） | `glyph_baked.c`（`glyphs.h`）/ `glyph_ft.c`（FreeType） |
+| `glyph.h` | 字の**8 本**（init / kind / clip / w / draw24 / draw12 / **shape_run / draw24_gid**） | `glyph_baked.c`（`glyphs.h`）/ `glyph_ft.c`（FreeType） |
+
+★**整形（`shape_run` / `draw24_gid`）は 2026-09-02 に足した**（Higgins のヒンディー語
+のため）。デーヴァナーガリーは母音記号が論理の順と違う位置へ回り（`ि` は子音の前）、
+子音が縦に積んで合字になる（`क` + `्` + `ष` → `क्ष`）ので、★**字の並びと画の並びが
+1 対 1 でない** —— `draw24(code)` をどう並べても正しい絵にならない。
+- ★**PS1 は無傷**。焼いた版（`glyph_baked.c`）の `shape_run` は「code をそのまま
+  グリフ番号にして送りを glyph_w に訊く」だけで、**永久に 1 対 1 のまま**
+  （HarfBuzz は freestanding / 2MB RAM には載らない）
+- ★**それでも境界に置いたのは、上の層を一本化するため** —— FreeType 版だけが
+  別の道を通ると、**PS1 と SDL の画素一致で検査できなくなる**
+- ★`cluster`（元の列での位置）を返すのは、未確定の下線とキャレットの左右移動が
+  **論理の位置 ↔ 画の位置**の対応を要求するから。幅だけでは組めない
 
 計画時の見積り「差し替えるのは `render.c` 629 行のうち 33 行」には**漏れが 2 つ**あった:
 `gp0_copy`（スクロールの VRAM 面内コピー）と、`main.c` / `demo_main.c` が直に書いていた
