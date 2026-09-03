@@ -81,6 +81,26 @@ def char_w(f24, ch):
 
 # ---- 禁則処理（render.c の no_head / no_tail と同一。★正典はこちら側） ----
 # ★行頭に来てはいけない字 → その 1 字だけ右の余白へ**ぶら下げる**
+# ★**語を作る字の範囲**（ASCII 以外）。render.c の word_char() と**同じでなければならない**
+#   —— check_kinsoku.py が両方をその場で読んで突き合わせる。
+#   ★ハングルとデーヴァナーガリーは > 0x7F なのに空白で語を切るので、
+#     「ASCII でなければどこでも折ってよい」は成り立たない（render.c の頭書き）。
+WORD_RANGES = (
+    (0x0900, 0x097F),   # デーヴァナーガリー（danda 込み）
+    (0x1100, 0x11FF),   # ハングル字母
+    (0x3130, 0x318F),   # ハングル互換字母
+    (0xAC00, 0xD7A3),   # ハングル音節
+)
+
+
+def word_char(ch):
+    """空白で語を切る言語の字か（＝行の途中で割ってはいけない字か）。"""
+    o = ord(ch)
+    if o <= 0x7F:
+        return ch != ' '
+    return any(lo <= o <= hi for lo, hi in WORD_RANGES)
+
+
 NO_HEAD = set('、。，．・：；？！）〕］｝〉》」』】’”ー々ゝゞ゛゜'
                'ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶ')
 # ★行末に来てはいけない字 → 次の行へ**道連れ**にする
@@ -134,13 +154,13 @@ def wrap(units, f24):
             i = 0
             while i < len(seg):
                 ch = seg[i]
-                if ord(ch) > 0x7F or ch == ' ':
+                if not word_char(ch):      # ★空白もここ（word_char(' ') = False）
                     push_ch(ch)
                     i += 1
                     continue
                 j = i
                 w = 0
-                while j < len(seg) and ord(seg[j]) <= 0x7F and seg[j] != ' ':
+                while j < len(seg) and word_char(seg[j]):
                     w += char_w(f24, seg[j])
                     j += 1
                 if w <= TEXT_W and x + w > TEXT_W and x > 0:

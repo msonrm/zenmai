@@ -241,9 +241,36 @@ void push_char(uint16_t ch, uint16_t color)
     push_glyph(ch, ch, glyph_w(ch), 0, 0, 0, color);
 }
 
+/* ★**語を作る字か**（＝空白で語を切る言語の字か）。
+ *
+ * ★★**もとは「ASCII なら語 / それ以外はどこでも折ってよい」だった。** Zork
+ *   （日本語 ＋ 英語）ではそれで正しい —— 日本語は行中のどこでも折れるので、
+ *   「ASCII でない」と「どこでも折れる」が同じ意味だった。
+ * ★★**ハングルとデーヴァナーガリーは > 0x7F なのに空白で語を切る。**
+ *   そのまま載せると **単語が行の途中で割れる**（`पपपप` / `प`）——
+ *   Higgins の実機で発覚（2026-09-03）。
+ *
+ * ★★**「日本語の範囲を列挙する」形は採らなかった。** そうすると `…` `—` `─` `★`
+ *   `←` `×` のような**記号まで語の一部**になり、**Zork の割り付け（＝画素）が変わる**
+ *   （`……` や `──` が 1 かたまりとして次行へ送られる）。ここが見ているのは
+ *   「**語を作るか**」であって「日本語か」ではない。
+ * ★この表は**言語を足したときに 1 行増える**。字・入力・辞書を足す作業の一部なので
+ *   忘れる場所ではないし、忘れても**割れて見える**（黙って間違う形にならない）。
+ * ★範囲は `check_kinsoku.py` が**この場で読んで** Python の参照実装
+ *   （`gen_mock.py`）と突き合わせる。形を変えるならあちらの読み方も直すこと。 */
+static int word_char(uint16_t c)
+{
+    if (c <= 0x7F)
+        return c != ' ';               /* ASCII（空白以外）は昔から語 */
+    return (c >= 0x0900 && c <= 0x097F)    /* デーヴァナーガリー（danda 込み） */
+        || (c >= 0x1100 && c <= 0x11FF)    /* ハングル字母 */
+        || (c >= 0x3130 && c <= 0x318F)    /* ハングル互換字母 */
+        || (c >= 0xAC00 && c <= 0xD7A3);   /* ハングル音節 */
+}
+
 /* ★★**整形はここで 1 回**。行を丸ごと渡す —— 1 字ずつ整形しても合字も入れ替えも
    起きず、★**黙って間違った絵になる**（glyph.h の注記）。
-   ★語の折返し（ASCII は語を切らない）は**元の code で判断する**ので、
+   ★語の折返し（語を作る字は切らない）は**元の code で判断する**ので、
      どの塊がどの code から来たかを cluster で引き直している。 */
 void push_text(const uint16_t *s, int n, uint16_t color)
 {
@@ -251,7 +278,7 @@ void push_text(const uint16_t *s, int n, uint16_t color)
     int i = 0;
     while (i < m) {
         const uint16_t head = s[shaped[i].cluster];
-        if (head > 0x7F || head == ' ') {
+        if (!word_char(head)) {        /* ★空白もここ（word_char(' ') = 0） */
             push_glyph(head, shaped[i].gid, shaped[i].adv,
                        shaped[i].dx, shaped[i].dy, shaped[i].face, color);
             i++;
@@ -260,7 +287,7 @@ void push_text(const uint16_t *s, int n, uint16_t color)
         int j = i, w = 0;
         while (j < m) {
             const uint16_t c = s[shaped[j].cluster];
-            if (c > 0x7F || c == ' ')
+            if (!word_char(c))
                 break;
             w += shaped[j++].adv;
         }
