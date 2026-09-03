@@ -94,17 +94,21 @@ def push_char(ch, color):
 
 
 def push_text(s, color):
-    """ASCII の語は単語単位で折り返す(render.c push_text と同一規則)。"""
+    """語は単語単位で折り返す(render.c push_text と同一規則)。
+
+    ★「語を作る字」の判定は gen_mock.word_char に委ねる —— 規則を 3 か所に
+      書くと必ずずれる（ここ / gen_mock.py / render.c で 3 つ目になっていた）。
+    """
     i = 0
     while i < len(s):
         ch = s[i]
-        if ord(ch) > 0x7F or ch == ' ':
+        if not gen_mock.word_char(ch):     # ★空白もここ
             push_char(ch, color)
             i += 1
             continue
         j = i
         w = 0
-        while j < len(s) and ord(s[j]) <= 0x7F and s[j] != ' ':
+        while j < len(s) and gen_mock.word_char(s[j]):
             w += gw(s[j])
             j += 1
         if w <= TEXT_W and state['fw'] + w > TEXT_W and state['fw'] > 0:

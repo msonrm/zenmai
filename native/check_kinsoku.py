@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""禁則の字の並びが **C（render.c）と Python の参照実装（gen_mock.py）で同じ**か。
+"""割り付けの表が **C（render.c）と Python の参照実装（gen_mock.py）で同じ**か。
+
+見るのは 2 つ —— **禁則の字**（行頭 / 行末）と、**語を作る字の範囲**
+（ハングル・デーヴァナーガリー ＝ 空白で語を切る言語）。
 
 ★規則を 2 つの言語で持っている以上、片方だけ足して片方を忘れる道がある。
   そうなると `golden.py` が作るゴールデンと C の実挙動が静かにずれ、
@@ -42,6 +45,30 @@ for name, fn, pyset in (('行頭', 'no_head', gen_mock.NO_HEAD),
                  ''.join(chr(x) for x in sorted(b - a))))
         ng += 1
 
+# ★**語を作る字の範囲**（render.c の word_char / gen_mock.WORD_RANGES）。
+#   ★禁則と同じ理由でここも 2 言語に分かれている。片方だけ足すと、
+#     **ゴールデンでは語で折れているのに実機では割れる**（逆も）という形で静かにずれる。
+def c_ranges():
+    try:
+        body = src.split('static int word_char(uint16_t c)')[1].split('}\n')[0]
+    except IndexError:
+        sys.exit('★render.c の word_char() を読めない（形が変わった？）')
+    rs = set((int(a, 16), int(b, 16)) for a, b in re.findall(
+        r'c >= 0x([0-9A-Fa-f]{4}) && c <= 0x([0-9A-Fa-f]{4})', body))
+    if not rs:
+        sys.exit('★word_char() から 1 つも範囲を読めなかった（読み方が壊れている）')
+    return rs
+
+
+a, b = c_ranges(), set(gen_mock.WORD_RANGES)
+if a == b:
+    print('✓ 語を作る字: C と Python で一致（%d 範囲）' % len(a))
+else:
+    fmt = lambda rs: ' '.join('U+%04X..U+%04X' % r for r in sorted(rs))
+    print('✗ 語を作る字の範囲が食い違う —— C だけ「%s」/ Python だけ「%s」'
+          % (fmt(a - b), fmt(b - a)))
+    ng += 1
+
 # ★カナリア: 突き合わせが素通りしていないか（在るはずのない字を足して赤になること）
 if c_codes('no_head') == set(ord(c) for c in gen_mock.NO_HEAD) | {ord('A')}:
     print('✗ ★カナリア: 違う集合が一致してしまう = 突き合わせが死んでいる')
@@ -49,8 +76,14 @@ if c_codes('no_head') == set(ord(c) for c in gen_mock.NO_HEAD) | {ord('A')}:
 else:
     print('✓ ★カナリア: 違う集合はちゃんと食い違う')
 
+if c_ranges() == set(gen_mock.WORD_RANGES) | {(0x0041, 0x005A)}:
+    print('✗ ★カナリア: 違う範囲が一致してしまう = 突き合わせが死んでいる')
+    ng += 1
+else:
+    print('✓ ★カナリア: 違う範囲はちゃんと食い違う')
+
 print()
 if ng:
     print('--- ★%d 件 食い違った ---' % ng)
     sys.exit(1)
-print('--- 禁則の字は 2 つの実装で同じ ---')
+print('--- 割り付けの表は 2 つの実装で同じ ---')
