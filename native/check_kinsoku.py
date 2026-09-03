@@ -50,7 +50,7 @@ for name, fn, pyset in (('行頭', 'no_head', gen_mock.NO_HEAD),
 #     **ゴールデンでは語で折れているのに実機では割れる**（逆も）という形で静かにずれる。
 def c_ranges():
     try:
-        body = src.split('static int word_char(uint16_t c)')[1].split('}\n')[0]
+        body = src.split('\nint word_char(uint16_t c)')[1].split('}\n')[0]
     except IndexError:
         sys.exit('★render.c の word_char() を読めない（形が変わった？）')
     rs = set((int(a, 16), int(b, 16)) for a, b in re.findall(

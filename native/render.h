@@ -59,6 +59,11 @@ void render_init(void);                /* 内部状態のゼロ化(.bss は非�
 void draw_logical(const Line *ln, uint16_t color);
 /* 低水準の押し込み(draw_jp = jp_text.c が使う) */
 void push_char(uint16_t ch, uint16_t color);
+/* ★**語を作る字か**（＝空白で語を切る言語の字か。規則の正典は render.c の頭書き）。
+   ★自前で割り付ける側に**同じ規則を貸す**ための口。ハングルとデーヴァナーガリーは
+     `> 0x7F` なのに空白で語を切るので、「ASCII でなければどこでも折ってよい」は
+     成り立たない —— それを 2 か所に書くとずれる。 */
+int word_char(uint16_t c);
 void push_text(const uint16_t *s, int n, uint16_t color);
 void push_ruby(const uint16_t *base, int blen, const uint16_t *ruby, int rlen, uint16_t color);
 void flush_vline(uint16_t color);
