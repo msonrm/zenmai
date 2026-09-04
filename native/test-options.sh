@@ -87,6 +87,10 @@ check "★ひらがな入力方法の頁は Start で本文へ"   "$(state help_
 check "★頁の Start は一足で本文へ"      "$(state opt_startout.script 900)" "top=0 page=0 mode=0 sel=0 open=0"
 check "★Start で開いたら Start で閉じる" "$(state opt_close.script 800)"   "top=0 page=0 mode=0 sel=0 open=0"
 check "★ENGLISH でも作法は同じ(× で頁へ)" "$(state opt_en.script 800)"     "top=0 page=0 mode=1 sel=0 open=1"
+# ★4 つめの「やめる」は**頁ではない**（項目の数 4 と頁の数 3 が別になった）。
+#   選ぶと mode は OPTM_MENU のまま、メニューごと閉じる。
+check "★4 つめは頁ではない(選ぶとメニューごと閉じる)" "$(state opt_quit.script 760)" "top=0 page=0 mode=0 sel=3 open=0"
+check "★英語面でも 4 つめは頁ではない"          "$(state opt_quit_en.script 760)" "top=0 page=0 mode=0 sel=3 open=0"
 
 # ★カナリア: 頁を開いても**本文の履歴は 1 行も伸びない**
 BASE=$("$PY" sim.py zenmai-zork.psexe --script opt_open.script --polls --stop 800 \
@@ -102,6 +106,12 @@ check "★試し打ちで字が入る(開けたボタンは字にならない)" 
 check "★試し打ちの字を本文へ持ち出さない"       "$(typed help_leave.script 950)"  ""
 check "★わ行はフリックと同じ並び(を / ん / ー)"   "$(typed help_wa.script 950)"     "をんー"
 check "★欄は幅で止まる(かな 21 字)"              "$(typed_n help_full.script 1950)" "21"
+# ★★決めた面ボタンは**押されたまま**メニューを抜ける。carry_over_pad で「もう見た」ことに
+#   しないと、その ○ が確認の返事の欄に「え」を入れる（help_open の help_gate と同じ罠）。
+check "★決めた ○ が返事の欄に字を入れない"       "$(typed opt_quit.script 800)"    ""
+# ★★英語面は別のコード（interactive_en / step_english）を通る。★片方の経路でしか
+#   通らない値は、もう片方で必ず落ちる —— 両方見る。
+check "★英語面でも決めた × が字を入れない"      "$(typed opt_quit_en.script 800)" ""
 
 echo
-if [ "$ng" = 0 ]; then echo "--- 17 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 21 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

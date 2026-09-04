@@ -647,7 +647,11 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
  */
 
 enum { OPTM_MENU = 0, OPTM_PAGE };
-enum { P_TYPING = 0, P_CMDS, P_LICENSE };   /* gen_ui.py の並びと同じ */
+enum { P_TYPING = 0, P_CMDS, P_LICENSE, M_QUIT };   /* gen_ui.py の並びと同じ */
+/* ★★M_QUIT だけは**頁ではない** —— 選んだ場でやることなので、`opt_page` には
+   決して入らない（頁は UI_PAGE_N = 3、メニューの項目は UI_MENU_N = 4）。
+   ★気軽にやめられないゲームは良くない（実機の指摘）。コマンドで打てばやめられるが、
+   それを知らない人はメニューを探す。 */
 /* 重ねる板は**本文窓の中**(ステータス行の下)に置く。★部屋名が見えたままだと
    「まだゲームの中にいる」感が残るし、戻すのが render_window() だけで済む */
 enum { OVL_X = 32, OVL_W = 336, OVL_Y = 56, OVL_ROW = 32, OVL_GAP = 8 };
@@ -708,10 +712,10 @@ static void ovl_row(int y, const UiStr *s, uint16_t color, int mark)
 static void menu_draw(void)
 {
     ovl_band(OVL_Y, OVL_GAP, 0, 1, 0);
-    for (int i = 0; i < UI_PAGE_N; i++) {
+    for (int i = 0; i < UI_MENU_N; i++) {
         const int y = OVL_Y + OVL_GAP + i * OVL_ROW;
         ovl_row(y, &UI_ITEM[lang_en][i], i == opt_sel ? ACCENT : INK, i == opt_sel);
-        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, i == UI_PAGE_N - 1);
+        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, i == UI_MENU_N - 1);
     }
 }
 
@@ -993,7 +997,7 @@ static void restore_main(int full)
    パッドを読むのは対話ループの 1 箇所だけに保つ。
    ★**同じ入力に道が 2 本あると、片方でしか通らない値が必ず出る**（別プロジェクトで
    実際に踏んだ。半年ぶん片方の経路だけキー種別が欠けていた）。
-   戻り値 0 = オプションを閉じて本文へ戻る。 */
+   戻り値 0 = オプションを閉じて本文へ戻る / 2 = 試し打ち / 3 = ★「やめる」を打つ。 */
 static int options_step(int p, int edge)
 {
     if (opt_mode == OPTM_PAGE && opt_page == P_TYPING) {
@@ -1039,10 +1043,12 @@ static int options_step(int p, int edge)
         return 1;
     }
     if (edge & (BTN_UP | BTN_DOWN)) {
-        opt_sel = (opt_sel + (edge & BTN_UP ? UI_PAGE_N - 1 : 1)) % UI_PAGE_N;
+        opt_sel = (opt_sel + (edge & BTN_UP ? UI_MENU_N - 1 : 1)) % UI_MENU_N;
         menu_draw();
     }
     if (edge & BTN_FACE) {               /* ★どのフェイスボタンでも決まる */
+        if (opt_sel == M_QUIT)           /* ★頁ではない。打つのは呼び元(道を 1 本に保つ) */
+            return 3;
         opt_page = opt_sel;
         opt_mode = OPTM_PAGE;
         page_top = 0;
@@ -1081,11 +1087,53 @@ static void options_close(void)
     opt_mode = OPTM_MENU;
 }
 
+/* ★メニューの「やめる」= **入力欄にその語を置いて、本文と同じ道で送る**。
+ *
+ * ★★`GState->quit` を直接立てない。原作の QUIT が走って「本当にやめますか」を
+ *   訊いてくるところまでが Zork なので、そこを飛ばすと**別のゲームになる**。
+ *   ★**原作がそのまま動く**が Zenmai の主張なので、近道であって抜け道ではない。
+ * ★打つ語は語彙の原簿から引いてある（ui_data.h の UI_QUIT ← assets/zork1-cmd.json）。
+ *   書き写すと、語を足し引きしたときにここだけ古くなって**打てない言葉**を投げる。 */
+static void quit_compose(void)
+{
+    const UiStr *w = &UI_QUIT[lang_en];
+    clen = 0;
+    for (int i = 0; i < w->n && clen < CMD_MAX; i++)
+        comp[clen++] = (uint16_t)w->s[i];
+    caret = clen;
+    gm.eagerSet = 0;
+}
+
+/* ★入力欄の中身を送る。**メニューの「やめる」と同じ関数を通す**ために、対話ループから
+ *   切り出してある —— ★**同じことに道が 2 本あると、片方でしか通らない値が必ず出る**
+ *   （別プロジェクトで半年ぶん、片方の経路だけキー種別が欠けていた）。 */
+static void submit_en(void)
+{
+    /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
+    if (view_px < hist_total() - body_h) {
+        view_bottom();
+        render_window();
+        wait_fields(18);
+    }
+    char cmd[CMD_MAX + 1];
+    for (int i = 0; i < clen; i++)
+        cmd[i] = (char)comp[i];
+    cmd[clen] = '\0';
+    draw_echo(comp, clen);
+    feed_cmd(cmd);
+    run_until_read();
+    render_output();
+    draw_status();
+    clen = 0;
+    caret = 0;
+    gm.eagerSet = 0;
+    scroll_new();
+}
+
 /* ---- 対話ループ(英語) ----
  * ★**quit で戻る**。以前は抜けた先で空回りしていて、「やめる」→「はい」が
  *   そのままフリーズに見えた（実機の指摘）。戻り先は _start の外側のループ = 起動メニュー。
  */
-
 static void interactive_en(void)
 {
     int fields = 0, rt_hold = 0, dirty = 1, prev_row = -1;
@@ -1108,6 +1156,19 @@ static void interactive_en(void)
             if (!r) {
                 options_close();
                 dirty = 1;
+                continue;
+            }
+            /* ★3 = メニューの「やめる」。**本文と同じ道で打つ**（GState->quit は立てない）。
+               ★決めた面ボタンを押したままなので、carry_over_pad で「もう見た」ことにする ——
+               忘れると、押しっぱなしの × が確認の返事の欄に字を入れてしまう。 */
+            if (r == 3) {
+                options_close();
+                carry_over_pad(0 /* 英語面は L2 を渡さない */);
+                quit_compose();
+                submit_en();
+                dirty = 1;
+                if (GState->quit)
+                    break;
                 continue;
             }
             /* ★2 = 試し打ち。**横取りせず、下の入力処理をそのまま通す** ——
@@ -1171,25 +1232,7 @@ static void interactive_en(void)
             continue;
         }
         if (((edge & (BTN_START | BTN_L3)) || rs == 4) && clen && !opt_open) {
-            /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
-            if (view_px < hist_total() - body_h) {
-                view_bottom();
-                render_window();
-                wait_fields(18);
-            }
-            char cmd[CMD_MAX + 1];
-            for (int i = 0; i < clen; i++)
-                cmd[i] = (char)comp[i];
-            cmd[clen] = '\0';
-            draw_echo(comp, clen);
-            feed_cmd(cmd);
-            run_until_read();
-            render_output();
-            draw_status();
-            clen = 0;
-            caret = 0;
-            gm.eagerSet = 0;
-            scroll_new();
+            submit_en();
             dirty = 1;
             if (GState->quit)
                 break;
@@ -1230,6 +1273,114 @@ static void interactive_en(void)
     }
 }
 
+/* ★入力欄の中身を送る（日本語）。英語面の submit_en と同じ理由で切り出してある ——
+ *   ★**メニューの「やめる」と同じ関数を通す**ため。道を 2 本作ると片方が腐る。
+ * ★戻り値 1 = このフレームはここで終える（呼び元は continue）。読み取れなかったときと
+ *   「何を?」を訊き返すときは、下の描き直しを次のフレームに送る（切り出す前と同じ間合い）。 */
+static int submit_ja(int *pending_verb)
+{
+    /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
+    if (view_px < hist_total() - body_h) {
+        view_bottom();
+        render_window();
+        wait_fields(18);
+    }
+    static CmdRes cr;
+    static uint16_t typed[CMD_MAX];
+    int typed_n = clen;
+    for (int i = 0; i < clen; i++) typed[i] = comp[i];
+    cmd_run(comp, clen, *pending_verb, &cr);
+    draw_echo(typed, typed_n);           /* 打った通りを反響 */
+    clen = 0;
+    caret = 0;
+    gm.eagerSet = 0;
+    if (!cr.has_command) {
+        static uint16_t msg[256];
+        int ml = 0;
+        put_frag16(msg, &ml, 256, 13);           /* （ */
+        if (cr.note_len) {
+            for (int i = 0; i < cr.note_len && ml < 254; i++) msg[ml++] = cr.note[i];
+        } else if (cr.trace == CMD_TR_NEG) {
+            ml = 0;
+            put_frag16(msg, &ml, 256, 10);       /* （打ち消し…） */
+        } else {
+            /* ★1 字の断片は名指ししない（走査で余った「ゅう」のような雑音）。
+               ただし**原簿が宣言した語は 1 字でも名指しする** ——
+               `滝` を落として「（読み取れなかった）」になっていた（実機の指摘）。 */
+            const int decl = cr.trace == CMD_TR_NOCMD;
+            int anyw = 0;
+            for (int i = 0; i < cr.unknown_n; i++) {
+                if (!decl && cr.unknown_lens[i] <= 1) continue;
+                if (anyw) put_frag16(msg, &ml, 256, 15);   /* ・ */
+                put_frag16(msg, &ml, 256, 0);              /* 「 */
+                for (int t = 0; t < cr.unknown_lens[i] && ml < 250; t++)
+                    msg[ml++] = cr.unknown[i][t];
+                if (ml < 254) msg[ml++] = 0x300D;          /* 」 */
+                anyw = 1;
+            }
+            if (anyw) {
+                put_frag16(msg, &ml, 256, 12);   /* は知らない言葉…） */
+                draw_plain(msg, ml, INK);
+                goto after_msg;
+            }
+            ml = 0;
+            put_frag16(msg, &ml, 256, 11);       /* （読み取れなかった） */
+        }
+        if (cr.note_len)
+            put_frag16(msg, &ml, 256, 14);       /* ） */
+        draw_plain(msg, ml, INK);
+after_msg:
+        scroll_new();
+        return 1;               /* ★呼び元はこのフレームをここで終える */
+    }
+    if (cr.needs_object) {
+        *pending_verb = cr.verb_idx;
+        draw_plain(cr.ask, cr.ask_len, INK);
+        scroll_new();
+        return 1;               /* ★呼び元はこのフレームをここで終える */
+    }
+    *pending_verb = -1;
+    if (cr.echo_word_len)
+        tr_set_echo16(cr.echo_word, cr.echo_word_len);
+    else
+        tr_set_echo16(typed, typed_n);
+    /* ★{SAID} は打った物の表示形。物を打っていないときは空を渡して訳語辞書へ落とす
+       (echo のように打鍵で埋めてはいけない —— 字として画面に出る穴なので) */
+    tr_set_said16(cr.said, cr.said_len);
+    feed_cmd(cr.command);
+    int ai = 0;
+    for (;;) {
+        run_until_read();
+        if (GState->quit)
+            break;
+        if (cr.alts_n && not_here() && ai < cr.alts_n) {
+            olen = 0;                            /* 空振りは映さず次の候補 */
+            char alt[96 + 1];
+            for (int t = 0; t < cr.alts_lens[ai]; t++) alt[t] = cr.alts[ai][t];
+            alt[cr.alts_lens[ai]] = '\0';
+            ai++;
+            feed_cmd(alt);
+            continue;
+        }
+        break;
+    }
+    if (cr.alts_n && not_here()) {
+        /* 全部外れ: 打った言い方で断る */
+        olen = 0;
+        static uint16_t msg[64];
+        int ml = 0;
+        for (int i = 0; i < cr.obj_disp_len && ml < 40; i++)
+            msg[ml++] = cr.obj_disp[i];
+        put_frag16(msg, &ml, 64, 17);            /* など、ここには見当たらない。 */
+        draw_plain(msg, ml, INK);
+    } else {
+        render_output();
+    }
+    draw_status();
+    scroll_new();
+    return 0;
+}
+
 /* ---- 対話ループ(日本語。quit で戻るのは英語面と同じ) ---- */
 
 static void interactive_ja(void)
@@ -1256,6 +1407,22 @@ static void interactive_ja(void)
             if (!r) {
                 options_close();
                 dirty = 1;
+                continue;
+            }
+            /* ★3 = メニューの「やめる」。**本文と同じ道で打つ**（GState->quit は立てない）。
+               ★決めた面ボタンを押したままなので、carry_over_pad で「もう見た」ことにする ——
+               忘れると、押しっぱなしの ○ が確認の返事の欄に「え」を入れてしまう。 */
+            if (r == 3) {
+                options_close();
+                carry_over_pad(1);
+                quit_compose();
+                /* ★途中の「何を?」は捨てる —— やめるのは無条件。残すと「やめる」が
+                   直前の動詞の目的語として読まれる */
+                pending_verb = -1;
+                submit_ja(&pending_verb);
+                dirty = 1;
+                if (GState->quit)
+                    break;
                 continue;
             }
             /* ★2 = 試し打ち。**横取りせず、下の入力処理をそのまま通す** ——
@@ -1320,106 +1487,10 @@ static void interactive_ja(void)
             continue;
         }
         if (((edge & (BTN_START | BTN_L3)) || rs == 4) && clen && !opt_open) {
-            /* 遡り中の確定は、まず下端へ跳んでひと呼吸置く */
-            if (view_px < hist_total() - body_h) {
-                view_bottom();
-                render_window();
-                wait_fields(18);
-            }
-            static CmdRes cr;
-            static uint16_t typed[CMD_MAX];
-            int typed_n = clen;
-            for (int i = 0; i < clen; i++) typed[i] = comp[i];
-            cmd_run(comp, clen, pending_verb, &cr);
-            draw_echo(typed, typed_n);           /* 打った通りを反響 */
-            clen = 0;
-            caret = 0;
-            gm.eagerSet = 0;
+            const int again = submit_ja(&pending_verb);
             dirty = 1;
-            if (!cr.has_command) {
-                static uint16_t msg[256];
-                int ml = 0;
-                put_frag16(msg, &ml, 256, 13);           /* （ */
-                if (cr.note_len) {
-                    for (int i = 0; i < cr.note_len && ml < 254; i++) msg[ml++] = cr.note[i];
-                } else if (cr.trace == CMD_TR_NEG) {
-                    ml = 0;
-                    put_frag16(msg, &ml, 256, 10);       /* （打ち消し…） */
-                } else {
-                    /* ★1 字の断片は名指ししない（走査で余った「ゅう」のような雑音）。
-                       ただし**原簿が宣言した語は 1 字でも名指しする** ——
-                       `滝` を落として「（読み取れなかった）」になっていた（実機の指摘）。 */
-                    const int decl = cr.trace == CMD_TR_NOCMD;
-                    int anyw = 0;
-                    for (int i = 0; i < cr.unknown_n; i++) {
-                        if (!decl && cr.unknown_lens[i] <= 1) continue;
-                        if (anyw) put_frag16(msg, &ml, 256, 15);   /* ・ */
-                        put_frag16(msg, &ml, 256, 0);              /* 「 */
-                        for (int t = 0; t < cr.unknown_lens[i] && ml < 250; t++)
-                            msg[ml++] = cr.unknown[i][t];
-                        if (ml < 254) msg[ml++] = 0x300D;          /* 」 */
-                        anyw = 1;
-                    }
-                    if (anyw) {
-                        put_frag16(msg, &ml, 256, 12);   /* は知らない言葉…） */
-                        draw_plain(msg, ml, INK);
-                        goto after_msg;
-                    }
-                    ml = 0;
-                    put_frag16(msg, &ml, 256, 11);       /* （読み取れなかった） */
-                }
-                if (cr.note_len)
-                    put_frag16(msg, &ml, 256, 14);       /* ） */
-                draw_plain(msg, ml, INK);
-after_msg:
-                scroll_new();
+            if (again)
                 continue;
-            }
-            if (cr.needs_object) {
-                pending_verb = cr.verb_idx;
-                draw_plain(cr.ask, cr.ask_len, INK);
-                scroll_new();
-                continue;
-            }
-            pending_verb = -1;
-            if (cr.echo_word_len)
-                tr_set_echo16(cr.echo_word, cr.echo_word_len);
-            else
-                tr_set_echo16(typed, typed_n);
-            /* ★{SAID} は打った物の表示形。物を打っていないときは空を渡して訳語辞書へ落とす
-               (echo のように打鍵で埋めてはいけない —— 字として画面に出る穴なので) */
-            tr_set_said16(cr.said, cr.said_len);
-            feed_cmd(cr.command);
-            int ai = 0;
-            for (;;) {
-                run_until_read();
-                if (GState->quit)
-                    break;
-                if (cr.alts_n && not_here() && ai < cr.alts_n) {
-                    olen = 0;                            /* 空振りは映さず次の候補 */
-                    char alt[96 + 1];
-                    for (int t = 0; t < cr.alts_lens[ai]; t++) alt[t] = cr.alts[ai][t];
-                    alt[cr.alts_lens[ai]] = '\0';
-                    ai++;
-                    feed_cmd(alt);
-                    continue;
-                }
-                break;
-            }
-            if (cr.alts_n && not_here()) {
-                /* 全部外れ: 打った言い方で断る */
-                olen = 0;
-                static uint16_t msg[64];
-                int ml = 0;
-                for (int i = 0; i < cr.obj_disp_len && ml < 40; i++)
-                    msg[ml++] = cr.obj_disp[i];
-                put_frag16(msg, &ml, 64, 17);            /* など、ここには見当たらない。 */
-                draw_plain(msg, ml, INK);
-            } else {
-                render_output();
-            }
-            draw_status();
-            scroll_new();
             if (GState->quit)
                 break;
         }

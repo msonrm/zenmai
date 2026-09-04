@@ -58,5 +58,14 @@ check "★「やめる」→「はい」で起動メニューへ戻る" "$(hist 
 check "★決めた Start で言語が選ばれない（待っても始まらない）" "$(hist quit_ja.script 1300)" "0"
 check "★英語面でも同じ（quit → y）"                 "$(hist quit_en.script 1250)" "0"
 
+# ★★メニューの「やめる」も**同じ行き先**であること。メニューは打つ道の近道であって、
+#   別の道ではない —— 分かれていたら、片方でしか通らない値が必ず出る。
+MID2=$(hist menu_quit_ja_mid.script 660)
+if [ "$MID2" != "0" ]; then echo "✓ ★カナリア: メニューを開くまでに本文が積まれている（${MID2}px）"
+else echo "✗ ★カナリア: メニューを開くまでに本文が積まれている"; echo "    実際: 0px"; ng=$((ng + 1)); fi
+
+check "★メニューの「やめる」→「はい」で起動メニューへ戻る" "$(hist menu_quit_ja.script 1080)" "0"
+check "★英語面のメニューでも同じ（QUIT → y）"              "$(hist menu_quit_en.script 1060)" "0"
+
 echo
-if [ "$ng" = 0 ]; then echo "--- 4 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi
+if [ "$ng" = 0 ]; then echo "--- 7 件すべて通った ---"; else echo "--- ★$ng 件 食い違った ---"; exit 1; fi

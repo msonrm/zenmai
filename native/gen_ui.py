@@ -223,12 +223,22 @@ put('This software is not affiliated with either.', EN)
 # ---- 画面の文言 ----
 # ★ここに出る文字列は全部「こちらのもの」。原作の文は 1 つも出ないので、
 #   訳の表は通さず完成行として持つ(「その文字列は誰のものか」)。
-# ★項目名はそのまま頁の見出しになる(並びは P_* と同じ)。
+# ★項目名はそのまま頁の見出しになる(並びは P_* と同じ)。★ただし**頁を持つのは頭の 3 つだけ**。
 ITEM = [
     ('ひらがな入力方法', 'HOW TO TYPE'),
     ('システムコマンド', 'SYSTEM COMMANDS'),
     ('ライセンス',       'LICENSE'),
 ]
+# ★★4 つめは**頁ではなく、その場でやること** ——「やめる」。
+#   ★気軽にやめられないゲームは良くない（実機の指摘）。コマンドで打てばやめられるのは
+#   確かだが、それを知らない人はメニューを探す。だから**近道をメニューに置く**。
+#   ★これで**項目の数（4）と読み物の頁の数（3）が別になる**（UI_MENU_N / UI_PAGE_N）。
+# ★★出す札も投げる語も**語彙の原簿から引く**。書き写すと、語を足し引きしたときに
+#   ここだけ古くなって**押しても打てない言葉**を投げることになる（P_CMDS と同じ作法）。
+QUIT_JA = _kana(_asset['verbs']['QUIT']['ja'])[0]      # やめる
+QUIT_EN = 'quit'                                       # ★投げるのは小文字（打った通りに映る）
+ITEM.append((QUIT_JA, QUIT_EN.upper()))                # 札は他の項目と同じ総大文字
+MENU_N = len(ITEM)
 # ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
 #   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
 #   いちいち書くと**画面がその分だけ狭くなるだけ**になる。
@@ -366,6 +376,8 @@ out.append('};')
 out.append('')
 out.append('#define UI_LINE_N %d' % len(recs))
 out.append('#define UI_PAGE_N %d' % PAGE_N)
+# ★★メニューの項目数は**頁の数とは別**（4 つめ「やめる」は頁を持たない）
+out.append('#define UI_MENU_N %d' % MENU_N)
 out.append('')
 out.append('/* ---- 画面の文言(添字 = lang_en) ---- */')
 
@@ -382,6 +394,7 @@ def sref(text):
 items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
 helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
+quits = [sref(QUIT_JA), sref(QUIT_EN)]
 langs = [sref(LANG[0]), sref(LANG[1])]
 title_, sub_ = sref(TITLE), sref(SUB)
 game_ = sref(GAME)
@@ -390,11 +403,15 @@ for i, text in strs:
     out.append('static const unsigned short UI_S%d[%d] = { %s };'
                % (i, len(text), ', '.join('0x%04X' % ord(c) for c in text)))
 out.append('')
-out.append('static const UiStr UI_ITEM[2][UI_PAGE_N] = {')
+out.append('static const UiStr UI_ITEM[2][UI_MENU_N] = {')
 for row in items:
     out.append('    { ' + ', '.join(row) + ' },')
 out.append('};')
 out.append('static const UiStr UI_BOOT[2] = { %s, %s };' % (boots[0], boots[1]))
+out.append('/* ★メニューの「やめる」が**打つ**語（語彙の原簿から引いてある）。')
+out.append('   ★`GState->quit` を直接立てず、原作の QUIT を走らせて')
+out.append('   「本当にやめますか」を訊かせる —— 原作がそのまま動くのが Zenmai の主張 */')
+out.append('static const UiStr UI_QUIT[2] = { %s, %s };' % (quits[0], quits[1]))
 out.append('/* 起動メニュー: 名前 / 説明 / 作品名 / 選択肢(添字 = lang_en)。')
 out.append('   ★罫線は持たない —— 長さは main.c が UI_SUB を実測して画素で引く */')
 out.append('static const UiStr UI_TITLE = %s;' % title_)
@@ -416,6 +433,8 @@ for ln in lines:
 for ja, en in ITEM + HELP + [BOOT, LANG]:
     used.update(ja)
     used.update(en)
+used.update(QUIT_JA)                   # ★投げる語も画面に出る（打った通りが反響する）
+used.update(QUIT_EN)
 used.update(TITLE)
 used.update(SUB)
 used.update(GAME)
