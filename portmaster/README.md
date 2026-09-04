@@ -72,6 +72,8 @@ build assumes the handheld.
 | **START on an empty line** | open the options menu |
 
 In the options menu: ↑↓ to choose, **any face button** to confirm, START to close.
+It has four entries — three pages to read (how to type, system commands, licence)
+and **Quit**.
 
 ### Leaving
 
@@ -79,6 +81,10 @@ In the options menu: ↑↓ to choose, **any face button** to confirm, START to 
 launcher. (On the PlayStation build the same command drops back to the language
 menu — there is nowhere else to go on a console.) To switch language, start the
 port again.
+
+**Quit** in the options menu is a shortcut for the same thing, not a separate exit:
+it types the word for you, so the game still asks *do you really want to quit?* and
+still wants an answer. The original is what runs; the menu only saves you the typing.
 
 ### Saving
 
@@ -110,9 +116,12 @@ Everything above those — layout, wrapping, ruby, history, the input state mach
 translation — is the same code. There is a test that builds this port *with* the baked
 glyphs and checks it renders pixel-for-pixel identically to the PlayStation build.
 
-**On glibc:** the binary asks for whatever glibc it was built against. Built on
-Debian trixie it runs on dArkOS/dArkOSen and other trixie-based firmware; for
-ArkOS or AmberELEC (glibc 2.31) it has to be rebuilt in an older container.
+**On glibc:** the binary asks for whatever glibc it was built against, and a newer
+one is not there on older firmware. So `build-port.sh` builds inside a container
+([`portmaster/Containerfile`](https://github.com/msonrm/zenmai/blob/main/portmaster/Containerfile),
+Ubuntu 20.04 = glibc 2.31 — what ArkOS and AmberELEC are built on), which also runs
+on newer firmware such as dArkOS/dArkOSen. It needs `podman`; pass `ZM_HOST_BUILD=1`
+to use your own toolchain instead. `--check` fails if anything above 2.31 crept in.
 
 ## Licence
 

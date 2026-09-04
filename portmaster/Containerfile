@@ -1,0 +1,25 @@
+# ★PortMaster へ配る本体を焼くための入れ物。
+#
+# ★★**なぜ要るか**: ここで焼いたバイナリは、焼いた機械の glibc を要求する
+#   （`__libc_start_main` などのシンボルに版が付く）。開発機は Debian trixie
+#   （glibc 2.41）なので、そのまま配ると **ArkOS / AmberELEC で起動しない**。
+#   古い方に合わせて焼けば、新しい方でも動く。
+#
+# ★★入れ物は **Ubuntu 20.04（focal / glibc 2.31）**。ArkOS と AmberELEC が
+#   まさにこれを土台にしているので、「2.31 という数字を合わせる」のではなく
+#   **配る先そのもので焼く**ことになる（Debian bullseye も 2.31 だが、
+#   security の索引と pool が食い違って apt が 404 を出した ＝ 2026-09-04）。
+# ★CFW 側の土台が上がったらここを上げる。要求版は build-port.sh --check で見る。
+#
+#   podman build -t zenmai-build -f portmaster/Containerfile portmaster/
+#
+# ★開発機も aarch64 なのでクロスは要らない（違う機械で焼くなら --platform を足す）。
+FROM docker.io/arm64v8/ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential pkg-config binutils \
+        libsdl2-dev libfreetype6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
