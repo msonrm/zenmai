@@ -14,11 +14,13 @@
 #       ├── zenmai-zork.aarch64
 #       └── licenses/
 #
-# ★**glibc の版がそのまま動く範囲を決める**。ここで焼いたバイナリは
+# ★★**glibc の版がそのまま動く範囲を決める**。ここで焼いたバイナリは
 #   焼いた機械の glibc を要求する（`__libc_start_main` の版が上がるため）。
-#     - dArkOS / dArkOSen 系（Debian trixie）… 開発機と同じなのでそのまま動く
-#     - ArkOS / AmberELEC（Ubuntu 20.04 = glibc 2.31）… **動かない**。
-#       出すなら古い glibc の入れ物で焼き直すこと（`--check` で今の要求版が出る）
+#   開発機は Debian trixie（2.41）だが、ArkOS / AmberELEC は **Ubuntu 20.04 = 2.31**。
+#   ★だから既定では **podman の入れ物（Containerfile）に入って焼く** ——
+#     入れ物は配る先そのもの（focal）なので、数字を合わせるのではなく現物で焼くことになる。
+#   ★開発機の glibc でよければ `ZM_HOST_BUILD=1` を付ける（手元で試すだけのとき）。
+#   ★焼いたあとは `--check` で要求版を確かめること（2.31 を超えていたら配れない）。
 set -e
 cd "$(dirname "$0")"
 HERE=$(pwd)
@@ -30,6 +32,14 @@ if [ "$1" = "--check" ] || [ "$2" = "--check" ]; then
     [ -f "$BIN" ] || { echo "先に組んでから: sh build-port.sh" >&2; exit 1; }
     echo "要求する glibc:"
     objdump -T "$BIN" | grep -o 'GLIBC_[0-9.]*' | sort -Vu | sed 's/^/  /'
+    # ★2.31 を超えるものが 1 つでもあれば ArkOS / AmberELEC で起動しない
+    TOP=$(objdump -T "$BIN" | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -1)
+    if [ "$TOP" = "$(printf '%s\nGLIBC_2.31\n' "$TOP" | sort -Vu | tail -1)" ] \
+       && [ "$TOP" != "GLIBC_2.31" ]; then
+        echo "★$TOP を要求している —— 2.31 の入れ物で焼き直すこと" >&2
+        exit 1
+    fi
+    echo "OK: 2.31 までしか要求していない"
     exit 0
 fi
 
@@ -39,7 +49,22 @@ fi
 #   「PS1 と画素一致するか」を確かめる検査用で、配る方ではない（native/test-sdl.sh）。
 #   FreeType 版は字がフォントの被覆ぶんに増え、英字がプロポーショナルになり、
 #   アンチエイリアスが乗る（12px のふりがなだけは 1bit で焼く）。
-( cd ../native && GLYPH=glyph_ft.c sh build-sdl.sh "$HERE/zenmai/zenmai-zork.$ARCH" )
+if [ "${ZM_HOST_BUILD:-}" = 1 ]; then
+    ( cd ../native && GLYPH=glyph_ft.c sh build-sdl.sh "$HERE/zenmai/zenmai-zork.$ARCH" )
+else
+    command -v podman >/dev/null 2>&1 || {
+        echo "podman が要る（glibc 2.31 の入れ物で焼くため）。" >&2
+        echo "  手元の glibc でよければ: ZM_HOST_BUILD=1 sh build-port.sh" >&2
+        exit 1
+    }
+    # ★入れ物が無ければ作る（初回だけ数分）
+    podman image exists localhost/zenmai-build \
+        || podman build -t zenmai-build -f "$HERE/Containerfile" "$HERE"
+    # ★渡すのはリポジトリごと。build-sdl.sh は ../vendor/zork1/zork1.z3 を読むので、
+    #   native/ だけ渡すと story が無い。
+    podman run --rm -v "$(cd .. && pwd)":/src -w /src/native localhost/zenmai-build \
+        sh -c "GLYPH=glyph_ft.c sh build-sdl.sh /src/portmaster/zenmai/zenmai-zork.$ARCH"
+fi
 
 # 1b. 同梱フォント。★**システムのフォントに頼らない** —— R36H には Noto CJK が
 #     入っていたが、PortMaster の全機種にあるとは限らない（CFW によっては
