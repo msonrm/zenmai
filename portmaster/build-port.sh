@@ -80,6 +80,16 @@ cp ../native/zenmai.otf zenmai/zenmai.otf
 mkdir -p zenmai/licenses
 cp ../LICENSE                              zenmai/licenses/zenmai-MIT.txt
 cp ../native/vendor/LICENSE.txt            zenmai/licenses/mojozork-zlib.txt
+# ★story ファイルは実行ファイルに焼き込んである（ZIL を MIT で公開した Microsoft /
+#   Activision のもの）。**焼き込んでいるのに licenses/ に無かった** —— 中身は配って
+#   いるのに出自が配布物の中に無い、という穴（2026-09-05 に PortMaster 申請の
+#   要件を突き合わせて見つけた）。
+cp ../vendor/zork1/LICENSE                 zenmai/licenses/zork1-MIT.txt
+# ★どのファイルが何を覆っているか（と、**覆っていないもの**）の索引。
+#   ★kh-dotfont は**この版では字を描いていない**（部分集合の収録字を決めただけ）ことと、
+#   SDL2 / FreeType は**同梱していない**ことを、ここで名指しで書いておく ——
+#   「使っていないフォントを名乗る」の逆で、黙って並べると誤解させる。
+cp licenses-README.md                      zenmai/licenses/README.md
 cp ../native/vendor/kh-dotfont/LICENSE     zenmai/licenses/kh-dotfont-OFL.txt
 cp ../native/vendor/noto-cjk/LICENSE      zenmai/licenses/noto-cjk-OFL.txt
 cp ../native/vendor/VENDOR.md              zenmai/licenses/VENDOR.md
