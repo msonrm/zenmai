@@ -581,6 +581,10 @@ static void menu_line(int y, const uint16_t *s, int n, uint16_t color, int mark)
 
 static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
 {
+    /* ★★並びは **ENGLISH が上、日本語が下**。原典（Zork I・1979）は英語なので、
+       先に来るのは原典の言語 —— ★**既定の選択もそちらに置く**（msonrm の判断・2026-09-05）。
+       ★★返す値（lang_en）は **0 = 日本語 / 1 = ENGLISH のまま**。**並びと値は別物**で、
+       値の側を入れ替えると UI_ITEM / UI_BOOT / UI_LANG の添字が全部ずれる。 */
     /* ★題・説明・選択肢はすべて gen_ui.py から引く。直書きすると「出す字がフォントに
        あるか」の照合(gen_ui.py の末尾)を通らない —— 無い字は**黙って空白で描かれる** */
     const UiStr *o_ja = &UI_LANG[0], *o_en = &UI_LANG[1];
@@ -588,8 +592,8 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
        説明は Zenmai に掛かるので**罫線の上**にいなければならない。
        説明と案内は控えめの色にして、選べる項目と見間違えさせない。 */
     enum { Y_TITLE = 112, Y_SUB = 148, Y_RULE = 180, Y_GAME = 212,
-           Y_JA = 272, Y_EN = 312, Y_HINT = 384 };
-    int sel = 0;
+           Y_ROW1 = 272, Y_ROW2 = 312, Y_HINT = 384 };
+    int sel = 1;                       /* ★既定 = ENGLISH（原典の言語） */
     menu_line(Y_TITLE, UI_TITLE.s, UI_TITLE.n, ACCENT, 0);
     menu_line(Y_SUB, UI_SUB.s, UI_SUB.n, DIM, 0);
     /* ★罫線は説明（UI_SUB）の幅に合わせて画素で引く。字を並べていたときは
@@ -600,8 +604,8 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
         sub_w += glyph_w(UI_SUB.s[i]);
     rule_band(Y_RULE, (W - sub_w) / 2, (W + sub_w) / 2, DIM);
     menu_line(Y_GAME, UI_GAME.s, UI_GAME.n, INK, 0);
-    menu_line(Y_JA, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
-    menu_line(Y_EN, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
+    menu_line(Y_ROW1, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
+    menu_line(Y_ROW2, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
     /* ★メニューの入口を知らせるのはここだけ。本文にシステムの字は混ぜないし、
        いちばん助けが要る人ほど Start を試しに押さない(だから全員が通るここに置く) */
     menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
@@ -621,8 +625,8 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
         prev = p;
         if (edge & (BTN_UP | BTN_DOWN)) {
             sel ^= 1;
-            menu_line(Y_JA, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
-            menu_line(Y_EN, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
+            menu_line(Y_ROW1, o_en->s, o_en->n, sel == 1 ? ACCENT : INK, sel == 1);
+            menu_line(Y_ROW2, o_ja->s, o_ja->n, sel == 0 ? ACCENT : INK, sel == 0);
             menu_line(Y_HINT, UI_BOOT[sel].s, UI_BOOT[sel].n, DIM, 0);
         }
         if (edge & (BTN_START | BTN_FACE))   /* どのフェイスボタンでも決まる */

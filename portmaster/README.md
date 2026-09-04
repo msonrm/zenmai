@@ -19,6 +19,12 @@ D-pad and four face buttons.
 - **The PortMaster team**, for making "it runs on the handheld" a thing one person
   can actually finish.
 
+## Starting
+
+The first screen asks which language to play in: **ENGLISH** on top and selected —
+the original is English — with **日本語** below it. `↑↓` to move, any face button or
+START to confirm. To change your mind later, start the port again.
+
 ## Controls
 
 Every mapping below was read out of the source (`native/main.c` `pad_row` / `pad_vowel`

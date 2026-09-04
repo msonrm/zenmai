@@ -1,6 +1,5 @@
 # 統合版 EN: メニューで ↓ → Start → en_rs 本体
-60-70:DOWN
-100-130:START
+100-130:START           # ★言語メニュー: 既定が ENGLISH になったので ↓ は要らない
 400-460:L1+CIR  # 'o'
 520-580:L1+LEFT+SQ  # 'p'
 640-700:UP+TRI  # 'e'
