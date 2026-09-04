@@ -127,7 +127,7 @@
 ### PlayStation 版（`native/`）
 
 ★**同じものが初代 PlayStation でも動く**（2026-08-21）。`zenmai-zork.psexe` 1 本で、
-起動時に 日本語 / ENGLISH を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
+起動時に ENGLISH / 日本語 を選ぶ。ブラウザ版の訳・語彙・入力の状態機械を C へ移植し、
 自前の Z-machine 埋め込み（MojoZork）と 24×24 ＋ ふりがな 12×12 の描画を載せてある。
 
 ```bash

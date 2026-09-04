@@ -259,6 +259,8 @@ SUB = 'a Z-machine for Japanese and a game controller'
 # ★起動画面の罫線も**字を並べない**（ライセンス頁の rule() と同じ理由）。
 #   長さは C 側が UI_SUB を実測して決めるので、ここには持たない。
 GAME = 'Zork I'
+# ★添字は lang_en（0 = 日本語 / 1 = ENGLISH）。★**画面に出す並びとは別物** ——
+#   並べる順は main.c の lang_menu が決める（ENGLISH が上・既定も ENGLISH。原典の言語）
 LANG = ('日本語', 'ENGLISH')
 # ★「ひらがな入力方法」の図の固定札。★動く札（十字・面ボタン・R1）は**入力表から引く**ので
 #   ここには無い —— 図に出ている字と実際に入る字が違う、が最悪の事故（web 版の教訓）。
