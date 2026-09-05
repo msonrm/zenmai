@@ -1,11 +1,14 @@
 # TODO
 
 > **現在地（2026-09-05）**: 実機（R36H）で動き、PS1 版とも画素一致。
-> ★**Start メニューの「やめる」**と★**glibc 2.31 での焼き直し**は済んだ。
+> ★★**機能と UI は完成**（msonrm の判断）—— 2026-09-05 に 5 本入れて実機で確かめた:
+> 「やめる」/ glibc 2.31 / 起動画面の並び / licenses の穴 / ボタン設定。
 > ★残るは **PortMaster への公開申請**で、★**Zenmai が 1 本目**
 > （[Higgins](https://github.com/msonrm/higgins) より先 —— 依存が SDL2 + FreeType だけなので）。
 > 申請の手順を 1 本目で覚えてから Higgins に進む（msonrm さんの判断）。
 > ★★**残っている関門は 1 つだけ = テストの記録**（実機が要るので人の仕事）。
+> ★★**手順の正典は `docs/portmaster-testing.md`** —— 実機を触りながら潰す紙として
+> 書いてあるので、**次に始めるときはそこから読む**。
 
 ## ★★1. PortMaster への申請
 
@@ -45,6 +48,26 @@ Microsoft Open Source Programs Office / Team Xbox / Activision）。story ファ
 - 投げる語は語彙の原簿から（`assets/zork1-cmd.json` → `gen_ui.py` → `UI_QUIT`）
 - ★**決めた面ボタンは押されたままメニューを抜ける**（`carry_over_pad`）。
   検査 = `test-options.sh` の 2 件（日英）／`test-quit.sh` の 3 件
+
+### ★起動画面は ENGLISH → 日本語（2026-09-05・PR #44）
+
+★原典（Zork I・1979）は英語なので、先に来るのは原典の言語。既定の選択も ENGLISH。
+★**並びと値は別物** —— 返す `lang_en` は 0 = 日本語 / 1 = ENGLISH のまま。
+★台本 39 本が影響を受けた（素の Start で日本語に入っていたものに ↓ を挟む）。
+
+### ★licenses/ に Zork I の MIT が無かった（2026-09-05・PR #45）
+
+story を実行ファイルに焼き込んでいるのに、その MIT が `licenses/` に入っていなかった。
+★あわせて `licenses/README.md` で**何を覆っていないか**も書いた
+（kh-dotfont はこの版では字を描いていない / SDL2・FreeType は同梱していない）。
+
+### ★★ボタン設定 —— フェイスボタンの位置を本人に訊く（2026-09-05・PR #46）
+
+★SDL の A/B/X/Y は**札の名前**であって位置ではないので、機種ごとに割れる。
+初回起動で「右のボタンを押してください」と訊く。原則 1 回で決まり、
+★既知の 2 系統のどちらでもなければ「下」「上」「左」と訊き続ける。
+Start メニューからも入れる（上から ひらがな入力方法 / システムコマンド / ボタン設定 /
+ライセンス / やめる）。詳細 = `docs/ps1-implementation-notes.md` の 7 節。
 
 ### ★glibc 2.31 で焼き直す（2026-09-05・段 2）
 
