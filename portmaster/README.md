@@ -67,11 +67,13 @@ The right hand chooses which of the five. Press it together with the row.
 So `←` + `✕` is こ, and `L1` + `↑` + `△` is ゆ. In English, `←` + `□` is **a**, and
 `✕` on the plain row (no direction) is a **space**.
 
-**The symbols are positions, not labels.** On a handheld with Nintendo-style
-lettering that means **B = ✕ (bottom), A = ○ (right), Y = □ (left), X = △ (top)** —
-which is what nearly every PortMaster device prints. On a desktop Xbox pad the two
-pairs come out swapped; there is no way to tell the two apart at runtime, so the
-build assumes the handheld.
+**The symbols are positions, not labels.** SDL names a face button after the letter
+printed on the shell, not after where it sits, so the port asks you once which button
+is on the right and derives the rest from that (see **Starting** above). On a handheld
+with Nintendo-style lettering the answer works out to **B = ✕ (bottom), A = ○ (right),
+Y = □ (left), X = △ (top)** — which is what nearly every PortMaster device prints. On a
+desktop Xbox pad the two pairs are swapped, and the same one press sorts that out.
+**Button layout** in the options menu asks again.
 
 ### Editing and sending
 
