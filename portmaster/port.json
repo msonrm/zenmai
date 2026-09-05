@@ -8,7 +8,7 @@
   "items_opt": null,
   "attr": {
     "title": "Zenmai",
-    "desc": "Zork I (1979), read and typed in Japanese - with a Japanese input method driven entirely by the gamepad. No keyboard, no system IME: hold a consonant row with the left hand, tap a vowel with the right, and the kana appears. English play is also included, typed with T9. Originally written for the PlayStation; this is the same C, with only the nine functions that touch the machine swapped out.",
+    "desc": "Zork I (1979), playable end to end in English or Japanese and typed entirely on the gamepad - no keyboard, no system IME. What is really on offer is the input method: a direction picks a group, a face button picks the letter. Japanese follows the row-and-vowel shape of flick input, English the telephone keypad (T9). The scheme is not limited to those two - the same layout also types Korean, Chinese and Devanagari. It needs only a direction and four buttons, which is also the shape of a VR controller, where poking at a floating keyboard is still the state of the art. Zork is a trademark of Infocom, now held by Microsoft; this port is not affiliated with either.",
     "inst": "Install with PortMaster; extracting the zip by hand leaves the port out of the launcher's list. Nothing else is needed - the story file and the font are already inside.",
     "genres": [
       "adventure"
