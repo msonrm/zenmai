@@ -20,7 +20,9 @@
 - ★★**テストの記録が必須** —— AmberELEC / ArkOS / ROCKNIX / muOS で試した記録を
   Discord の #testing-n-dev に出す。**記録の無い PR は却下される**。★ここは実機が要る。
   ★**バイナリ側の心配は無くなった**（下の 2 で glibc 2.17 まで下がった）ので、
-  残っているのは**動かして記録を取ること**だけ
+  残っているのは**動かして記録を取ること**だけ。
+  ★★**手順・チェックリスト・報告文の雛形・画像の残し方は
+  `docs/portmaster-testing.md`**（実機を触りながら潰す紙として書いてある）
 - 手順: [PortMaster-New](https://github.com/PortsMaster/PortMaster-New) を fork →
   Actions を切る → `tools/prepare_repo.sh` → `ports/` に置く →
   `python3 tools/build_release.py --do-check` → PR
