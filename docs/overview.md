@@ -3,6 +3,7 @@
 > **2026-08-25 まで `README.md` だった文書。** README は短い紹介に建て直したので、
 > 設計・しくみ・語彙の構造・検査・出典の詳細はこちらに移した。
 > 実装ノートは `ps1-implementation-notes.md` / `ps1-port-plan.md`。
+> PortMaster へ出すためのテストと記録の手順は `portmaster-testing.md`。
 
 **公開中: https://zenmai.pages.dev/** —— キーボード / ゲームパッド / スマホのフリック。
 
