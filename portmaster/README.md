@@ -150,3 +150,10 @@ MIT for the code, with two exceptions, both **SIL Open Font License 1.1**:
   render identically.
 
 MojoZork is zlib. Full texts are in `zenmai/licenses/`.
+
+*Zork I* itself comes from the
+[ZIL sources released under MIT](https://github.com/historicalsource/zork1)
+(Microsoft / Activision, November 2025); the story file is compiled from those and
+baked into the binary. **Zork is a trademark of Infocom; the rights are now held by
+Microsoft. This port is not affiliated with either, and does not use the title as its
+own name or brand.**
