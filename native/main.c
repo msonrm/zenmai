@@ -28,6 +28,8 @@ extern const uint8_t _binary_story_bin_start[];
 extern const uint8_t _binary_story_bin_end[];
 #ifndef ZM_SDL
 extern char __bss_start[], __bss_end[];   /* link.ld が置く。SDL 版には無い */
+#else
+#include "conf.h"                         /* ★ボタンの並びの覚え書き（SDL 版だけ） */
 #endif
 
 static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
@@ -650,9 +652,21 @@ static int lang_menu(void)             /* 0 = 日本語 / 1 = ENGLISH */
  *   (○/× を言語で入れ替える必要も消えた。作法に乗るほうが、地域差より強い)。
  */
 
-enum { OPTM_MENU = 0, OPTM_PAGE };
-enum { P_TYPING = 0, P_CMDS, P_LICENSE, M_QUIT };   /* gen_ui.py の並びと同じ */
-/* ★★M_QUIT だけは**頁ではない** —— 選んだ場でやることなので、`opt_page` には
+enum { OPTM_MENU = 0, OPTM_PAGE, OPTM_FACE };
+enum { P_TYPING = 0, P_CMDS, P_LICENSE, M_BUTTONS, M_QUIT };   /* gen_ui.py の並びと同じ */
+/* ★★**画面に出る順は、項目の番号とは別物**。
+   ★上から ひらがな入力方法 / システムコマンド / ボタン設定 / ライセンス / やめる。
+   ★「やめる」は一番下（出口）、「ライセンス」はほぼ見ないので下の方（msonrm の判断）。
+   ★★「ボタン設定」は **SDL 版にしか出さない** —— PlayStation のパッドは △○✕□ の
+   位置が決まっていて、覚えることが何も無い。だから**項目の数がビルドで変わる**。 */
+#ifdef ZM_SDL
+static const signed char MENU_ORDER[] = { P_TYPING, P_CMDS, M_BUTTONS, P_LICENSE, M_QUIT };
+#else
+static const signed char MENU_ORDER[] = { P_TYPING, P_CMDS, P_LICENSE, M_QUIT };
+#endif
+#define MENU_N ((int)(sizeof MENU_ORDER / sizeof *MENU_ORDER))
+static int menu_item(int row) { return MENU_ORDER[row]; }
+/* ★★M_BUTTONS と M_QUIT は**頁ではない** —— 選んだ場でやることなので、`opt_page` には
    決して入らない（頁は UI_PAGE_N = 3、メニューの項目は UI_MENU_N = 4）。
    ★気軽にやめられないゲームは良くない（実機の指摘）。コマンドで打てばやめられるが、
    それを知らない人はメニューを探す。 */
@@ -716,10 +730,10 @@ static void ovl_row(int y, const UiStr *s, uint16_t color, int mark)
 static void menu_draw(void)
 {
     ovl_band(OVL_Y, OVL_GAP, 0, 1, 0);
-    for (int i = 0; i < UI_MENU_N; i++) {
+    for (int i = 0; i < MENU_N; i++) {
         const int y = OVL_Y + OVL_GAP + i * OVL_ROW;
-        ovl_row(y, &UI_ITEM[lang_en][i], i == opt_sel ? ACCENT : INK, i == opt_sel);
-        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, i == UI_MENU_N - 1);
+        ovl_row(y, &UI_ITEM[lang_en][menu_item(i)], i == opt_sel ? ACCENT : INK, i == opt_sel);
+        ovl_band(y + STATUS_H, OVL_GAP, 0, 0, i == MENU_N - 1);
     }
 }
 
@@ -997,6 +1011,169 @@ static void restore_main(int full)
     render_window();
 }
 
+/* ---- ボタンの並びを訊く画面（SDL 版だけ） ----------------------------------
+ *
+ * ★★**SDL の A/B/X/Y は「機体に印刷された札の名前」であって位置ではない。**
+ *   PortMaster の定義は札に合わせるので、同じ `a` が任天堂式の機体では右、
+ *   Xbox 式では下に来る。★SDL からは位置を復元できないので、**本人に押してもらう**。
+ *
+ * ★これで直るのは入力だけではない。「ひらがな入力方法」の図は ✕○□△ の記号を
+ *   一切描かず、**かなを菱形の位置に置いている**ので、★位置さえ正しければ
+ *   図は自動的に正しくなる（図と実際に入る字が食い違う、が最悪の事故）。
+ *
+ * ★★訊くのは原則 1 回。返ってきたのが既知の 2 系統のどちらかなら残り 3 つは決まる:
+ *      任天堂式 … 右 a / 下 b / 上 x / 左 y
+ *      Xbox 式  … 右 b / 下 a / 上 y / 左 x
+ *   ★どちらでもなければ**そのまま「下」「上」「左」と訊き続ける** ——
+ *   「2 系統しかない」という仮定こそ、この画面が剥がそうとしているものなので、
+ *   仮定が外れたときに黙って間違えない道を残しておく。
+ *
+ * ★**画面に札は出さない**（○ とも A とも書かない）。位置の名前だけを言う。
+ *   印も字ではなく**塗った四角**で描く —— 札の形を描いたら本末転倒だし、
+ *   ○△□✕ は同梱フォントに入っていない。
+ */
+#ifdef ZM_SDL
+
+/* 素の並びでの通し番号 ⇔ BTN_*（0 = ○ 1 = ✕ 2 = △ 3 = □）。
+   ★pad_face_order は**素の並びでの BTN_***を受け取る（plat.h）。 */
+static const int FACE_BIT[FACE_N] = { BTN_CIR, BTN_X, BTN_TRI, BTN_SQ };
+
+static int face_slot_of(int bits)
+{
+    for (int i = 0; i < FACE_N; i++)
+        if (bits & FACE_BIT[i])
+            return i;
+    return -1;
+}
+
+static void face_apply(const int order[FACE_N])
+{
+    pad_face_order(FACE_BIT[order[FACE_RIGHT]], FACE_BIT[order[FACE_BOTTOM]],
+                   FACE_BIT[order[FACE_TOP]],   FACE_BIT[order[FACE_LEFT]]);
+}
+
+enum { FY_TITLE = 96, FY_NOTE = 140, FY_HAND = 172,
+       FY_TOP = 236, FY_MID = 276, FY_BOT = 316, FY_DONE = 388 };
+/* ★印は**正方形**にする。平たい長方形だと「上と下」より「左と右」が強く見えて、
+   菱形として読み取りにくかった。 */
+enum { FMX = 320, FMDX = 64, FM_W = 20, FM_H = 20 };
+
+/* 位置の印を 1 つ、帯の中に塗る */
+static void face_mark(int cx, int on)
+{
+    const uint16_t c = on ? ACCENT : OPT_TEXT;
+    for (int r = (STATUS_H - FM_H) / 2; r < (STATUS_H + FM_H) / 2; r++)
+        for (int x = cx - FM_W / 2; x < cx + FM_W / 2; x++)
+            sbar[r][x] = c;
+}
+
+static void face_band(int y, int cx1, int on1, int cx2, int on2)
+{
+    fill_rows(sbar, 0, STATUS_H, OPT_BG);
+    face_mark(cx1, on1);
+    if (cx2 >= 0)
+        face_mark(cx2, on2);
+    gp0_upload(0, y, W, STATUS_H, sbar[0]);
+}
+
+/* 菱形。いま訊いている位置だけ強調する。★**押されたボタンは光らせない** ——
+   どこにあるかを知らないから訊いているので、光らせたら嘘になる。 */
+static void face_diagram(int step)
+{
+    face_band(FY_TOP, FMX, step == FACE_TOP, -1, 0);
+    face_band(FY_MID, FMX - FMDX, step == FACE_LEFT, FMX + FMDX, step == FACE_RIGHT);
+    face_band(FY_BOT, FMX, step == FACE_BOTTOM, -1, 0);
+}
+
+static int face_step, face_used, face_order[FACE_N];
+static int face_hold;                                        /* 「覚えました」の残りフレーム */
+static int face_order_now[FACE_N] = { 0, 1, 2, 3 };          /* いま効いている並び（取り消し用） */
+
+static void face_draw(int step)
+{
+    const UiStr *t = &UI_ITEM[lang_en][M_BUTTONS];
+    menu_line(FY_TITLE, t->s, t->n, ACCENT, 0);
+    menu_line(FY_NOTE, UI_FACE_NOTE[lang_en].s, UI_FACE_NOTE[lang_en].n, DIM, 0);
+    menu_line(FY_HAND, UI_FACE_HAND[lang_en].s, UI_FACE_HAND[lang_en].n, DIM, 0);
+    if (step < FACE_N) {
+        const UiStr *a = &UI_FACE_ASK[lang_en][step];
+        menu_line(FY_DONE, a->s, a->n, INK, 0);
+    } else {
+        menu_line(FY_DONE, UI_FACE_DONE[lang_en].s, UI_FACE_DONE[lang_en].n, ACCENT, 0);
+    }
+    face_diagram(step);
+}
+
+static void face_open(void)
+{
+    face_step = 0;
+    face_used = 0;
+    /* ★素の並びに戻してから訊く。そうしないと**前に覚えた並びの上に**答えが
+       積み上がって、2 回目の設定が壊れる（絶対指定で受け取る意味が消える）。 */
+    pad_face_order(BTN_CIR, BTN_X, BTN_TRI, BTN_SQ);
+    paint_screen(OPT_BG);
+    face_draw(0);
+}
+
+/* 1 フレーム分。戻り値 0 = 終わった / 1 = まだ訊いている。
+ * ★**判断はこの 1 本だけ**。初回起動（下の小さなループ）とメニューからの呼び出し
+ *   （options_step）で道が分かれると、片方でしか通らない値が必ず出る。 */
+static int face_frame(int edge)
+{
+    if (face_step >= FACE_N)
+        return 0;
+    const int slot = face_slot_of(edge & BTN_FACE);
+    if (slot < 0 || (face_used & (1 << slot)))
+        return 1;                       /* 同じボタンを 2 度は受けない */
+    face_order[face_step++] = slot;
+    face_used |= 1 << slot;
+    if (face_step == 1) {
+        /* ★既知の 2 系統ならここで決まる */
+        if (face_order[FACE_RIGHT] == 0) {          /* 任天堂式 */
+            face_order[FACE_BOTTOM] = 1;
+            face_order[FACE_TOP]    = 2;
+            face_order[FACE_LEFT]   = 3;
+            face_step = FACE_N;
+        } else if (face_order[FACE_RIGHT] == 1) {   /* Xbox 式（A↔B・X↔Y） */
+            face_order[FACE_BOTTOM] = 0;
+            face_order[FACE_TOP]    = 3;
+            face_order[FACE_LEFT]   = 2;
+            face_step = FACE_N;
+        }
+    }
+    if (face_step >= FACE_N) {
+        face_apply(face_order);
+        conf_face_save(face_order);
+        face_draw(FACE_N);              /* 「覚えました」 */
+        return 0;
+    }
+    face_draw(face_step);
+    return 1;
+}
+
+/* 初回起動のときだけの小さなループ。★lang_menu と同じ作法（本編に入る前なので、
+   ここで待つのは対話ループの「別ループを回さない」には当たらない）。 */
+static void face_first_run(void)
+{
+    face_open();
+    /* ★言語を決めたボタンは**押されたまま**ここへ来る。押しているものはエッジではない */
+    int prev = pad_read();
+    if (prev < 0)
+        prev = 0;
+    for (;;) {
+        wait_fields(1);
+        int p = pad_read();
+        if (p < 0) { prev = 0; continue; }
+        int edge = p & ~prev;
+        prev = p;
+        if (!face_frame(edge))
+            break;
+    }
+    wait_fields(45);                    /* 「覚えました」をひと呼吸見せる */
+}
+
+#endif  /* ZM_SDL */
+
 /* ★オプションは**別ループを回さない**。開いている間の 1 フレーム分をここで処理し、
    パッドを読むのは対話ループの 1 箇所だけに保つ。
    ★**同じ入力に道が 2 本あると、片方でしか通らない値が必ず出る**（別プロジェクトで
@@ -1004,6 +1181,33 @@ static void restore_main(int full)
    戻り値 0 = オプションを閉じて本文へ戻る / 2 = 試し打ち / 3 = ★「やめる」を打つ。 */
 static int options_step(int p, int edge)
 {
+#ifdef ZM_SDL
+    if (opt_mode == OPTM_FACE) {
+        /* ★決まったあとの「覚えました」をひと呼吸見せる。★別ループを回さないので
+           待ち時間もフレームを数える（対話ループはパッドを読む場所を 1 つに保つ）。 */
+        if (face_hold > 0) {
+            if (--face_hold == 0) {
+                opt_mode = OPTM_MENU;
+                restore_main(1);
+                menu_draw();
+            }
+            return 1;
+        }
+        if (edge & BTN_START) {          /* ★取り消し —— いまの並びのままメニューへ戻る */
+            face_apply(face_order_now);
+            opt_mode = OPTM_MENU;
+            restore_main(1);
+            menu_draw();
+            return 1;
+        }
+        if (!face_frame(edge)) {
+            for (int i = 0; i < FACE_N; i++)
+                face_order_now[i] = face_order[i];
+            face_hold = 45;
+        }
+        return 1;
+    }
+#endif
     if (opt_mode == OPTM_PAGE && opt_page == P_TYPING) {
         if (edge & BTN_START)            /* ★出口は Start だけ(面ボタンは字を出す側) */
             return 0;
@@ -1047,13 +1251,22 @@ static int options_step(int p, int edge)
         return 1;
     }
     if (edge & (BTN_UP | BTN_DOWN)) {
-        opt_sel = (opt_sel + (edge & BTN_UP ? UI_MENU_N - 1 : 1)) % UI_MENU_N;
+        opt_sel = (opt_sel + (edge & BTN_UP ? MENU_N - 1 : 1)) % MENU_N;
         menu_draw();
     }
     if (edge & BTN_FACE) {               /* ★どのフェイスボタンでも決まる */
-        if (opt_sel == M_QUIT)           /* ★頁ではない。打つのは呼び元(道を 1 本に保つ) */
+        const int item = menu_item(opt_sel);
+        if (item == M_QUIT)              /* ★頁ではない。打つのは呼び元(道を 1 本に保つ) */
             return 3;
-        opt_page = opt_sel;
+#ifdef ZM_SDL
+        if (item == M_BUTTONS) {         /* ★頁ではない。訊く画面へ移る */
+            opt_mode = OPTM_FACE;
+            face_hold = 0;
+            face_open();
+            return 1;
+        }
+#endif
+        opt_page = item;
         opt_mode = OPTM_PAGE;
         page_top = 0;
         if (opt_page == P_TYPING) {
@@ -1546,6 +1759,22 @@ static void boot_once(void)
 
     pad_try_analog();
     lang_en = lang_menu();
+#ifdef ZM_SDL
+    /* ★★フェイスボタンの位置は SDL からは分からない（A/B/X/Y は札の名前）。
+       覚えていれば使い、初回だけ本人に押してもらう。★言語を先に決めているので
+       **その言語で訊ける**（言語メニューはどのフェイスボタンでも決まるので、
+       位置を知らないまま通り抜けられる）。 */
+    {
+        int order[FACE_N];
+        if (conf_face_load(order)) {
+            for (int i = 0; i < FACE_N; i++)
+                face_order_now[i] = order[i];
+            face_apply(order);
+        } else {
+            face_first_run();
+        }
+    }
+#endif
     paint_screen(BG);                  /* メニューを消す */
 
     vm_init();

@@ -147,3 +147,10 @@ void gpu_display_on(void)
 {
     GP1 = 0x03000000;
 }
+
+/* ★PS1 では何もしない —— PlayStation のパッドは △○✕□ の位置が決まっていて、
+   機種ごとに入れ替わることが無い。境界（plat.h）を揃えるためだけに置いてある。 */
+void pad_face_order(int right, int bottom, int top, int left)
+{
+    (void)right; (void)bottom; (void)top; (void)left;
+}
