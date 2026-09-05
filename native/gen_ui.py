@@ -252,7 +252,7 @@ MENU_N = len(ITEM)
 
 # ★訊く画面の文言。★位置の名前（右/下/上/左）だけを言い、**札の名前は一切出さない** ——
 #   札を信じないための画面なので、○ や A と書いたら本末転倒になる。
-FACE_NOTE = ('この機体のボタンの位置を覚えます', 'WHERE THIS DEVICE PUTS ITS BUTTONS')
+FACE_NOTE = ('この機体のボタンの位置を設定します', 'SETTING UP THE BUTTON POSITIONS')
 FACE_HAND = ('右手側の4つのボタンです', 'THE FOUR ON THE RIGHT HAND SIDE')
 FACE_ASK = [
     ('右のボタンを押してください', 'PRESS THE BUTTON ON THE RIGHT'),
@@ -260,7 +260,9 @@ FACE_ASK = [
     ('上のボタンを押してください', 'PRESS THE BUTTON AT THE TOP'),
     ('左のボタンを押してください', 'PRESS THE BUTTON ON THE LEFT'),
 ]
-FACE_DONE = ('覚えました', 'SAVED')
+# ★「覚えました」ではなく「設定しました」——**設定画面の言い方**に揃える（実機の指摘）。
+#   ★英語も対にする。片方だけ直すと、次に訳を見た人が食い違いに気づく側になる。
+FACE_DONE = ('設定しました', 'DONE')
 # ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
 #   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
 #   いちいち書くと**画面がその分だけ狭くなるだけ**になる。
