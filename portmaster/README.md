@@ -25,6 +25,15 @@ The first screen asks which language to play in: **ENGLISH** on top and selected
 the original is English — with **日本語** below it. `↑↓` to move, any face button or
 START to confirm. To change your mind later, start the port again.
 
+Then, once, it asks you to **press the button on the right** of the four on the right
+hand side. SDL reports face buttons by the *label printed on the shell*, not by where
+they sit, so a port cannot tell a Nintendo-style device from an Xbox-style one — and
+this port draws its kana chart by position, so it has to know. One press is normally
+enough; if your device is laid out in some third way it simply keeps asking. The answer
+is remembered in `conf/zenmai.conf`, and **Button layout** in the options menu asks again.
+
+In the options menu: ↑↓ to choose, **any face button** to confirm, START to close.
+
 ## Controls
 
 Every mapping below was read out of the source (`native/main.c` `pad_row` / `pad_vowel`
@@ -77,9 +86,8 @@ build assumes the handheld.
 | Left stick ↑ ↓, or L2 + ↑ ↓ | scroll back through the transcript |
 | **START on an empty line** | open the options menu |
 
-In the options menu: ↑↓ to choose, **any face button** to confirm, START to close.
-It has four entries — three pages to read (how to type, system commands, licence)
-and **Quit**.
+The options menu has five entries — three pages to read (how to type, system commands,
+licence), **Button layout**, and **Quit**.
 
 ### Leaving
 

@@ -239,6 +239,36 @@ static uint8_t axis8(Sint16 v)
 
 static int script_step(int *p, uint8_t axes[4]);
 
+/* ★フェイスボタンの物理位置。添字は SDL の札（0=a 1=b 2=x 3=y）で、値はその札が
+   **どの位置に来るか**を表す BTN_*（○=右 ✕=下 △=上 □=左）。
+   ★既定は「任天堂式の札を持つ機体」——PortMaster の主流機（Anbernic / Powkiddy 系）は
+   どれもこれに当たる。★★合わない機体があるので、初回起動で本人に押してもらって
+   ここを差し替える（pad_face_order）。SDL からは位置を復元できない。 */
+static int face_bit[4] = { BTN_CIR, BTN_X, BTN_TRI, BTN_SQ };
+
+void pad_face_order(int right, int bottom, int top, int left)
+{
+    /* ★引数は**素の並びでの BTN_***。素の並び = a:○(右) b:✕(下) x:△(上) y:□(左) なので、
+       「素の並びでの BTN_*」から「SDL の札」への逆引きは下の表 1 つで足りる。 */
+    static const struct { int base, idx; } INV[4] = {
+        { BTN_CIR, 0 }, { BTN_X, 1 }, { BTN_TRI, 2 }, { BTN_SQ, 3 },
+    };
+    const int want[4] = { right, bottom, top, left };
+    const int pos[4]  = { BTN_CIR, BTN_X, BTN_TRI, BTN_SQ };   /* 右 下 上 左 */
+    int next[4] = { 0, 0, 0, 0 };
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (INV[j].base == want[i])
+                next[INV[j].idx] = pos[i];
+    /* ★全部埋まったときだけ入れ替える —— 半端な並びを入れると、押しても何も出ない
+       ボタンが生まれる（★無音は緑に見える、をここで作らない）。 */
+    for (int i = 0; i < 4; i++)
+        if (!next[i])
+            return;
+    for (int i = 0; i < 4; i++)
+        face_bit[i] = next[i];
+}
+
 int pad_read_ex(uint8_t axes[4])
 {
     pump();
@@ -274,11 +304,12 @@ int pad_read_ex(uint8_t axes[4])
            デスクトップの Xbox パッドなど**標準の並びの機体では上下逆になる** ——
            そのときは A↔B と X↔Y を入れ替えること（設定にはしていない）。
            2026-08-29 に R36H の実機で判明。 */
+        /* ★★フェイスボタンの 4 つだけは**実行時に差し替わる**（pad_face_order）。
+           face_bit[i] = 素の並びで i 番の SDL ボタンに割り当てていた BTN_*。
+           ★ここを直せば、入力も「ひらがな入力方法」の図も一緒に動く ——
+           図は ✕○□△ の記号を描かず、**かなを菱形の位置に置いている**ので、
+           位置さえ正しければ図は勝手に正しくなる。 */
         static const struct { int sdl, bit; } M[] = {
-            { SDL_CONTROLLER_BUTTON_B,             BTN_X      },   /* 下 = ✕ */
-            { SDL_CONTROLLER_BUTTON_A,             BTN_CIR    },   /* 右 = ○ */
-            { SDL_CONTROLLER_BUTTON_Y,             BTN_SQ     },   /* 左 = □ */
-            { SDL_CONTROLLER_BUTTON_X,             BTN_TRI    },   /* 上 = △ */
             { SDL_CONTROLLER_BUTTON_BACK,          BTN_SELECT },
             { SDL_CONTROLLER_BUTTON_START,         BTN_START  },
             { SDL_CONTROLLER_BUTTON_LEFTSTICK,     BTN_L3     },
@@ -293,6 +324,13 @@ int pad_read_ex(uint8_t axes[4])
         for (unsigned i = 0; i < sizeof M / sizeof *M; i++)
             if (SDL_GameControllerGetButton(pad, (SDL_GameControllerButton)M[i].sdl))
                 p |= M[i].bit;
+        static const int FACE_SDL[4] = {
+            SDL_CONTROLLER_BUTTON_A, SDL_CONTROLLER_BUTTON_B,
+            SDL_CONTROLLER_BUTTON_X, SDL_CONTROLLER_BUTTON_Y,
+        };
+        for (int i = 0; i < 4; i++)
+            if (SDL_GameControllerGetButton(pad, (SDL_GameControllerButton)FACE_SDL[i]))
+                p |= face_bit[i];
         /* ★L2 / R2 はアナログトリガ。★入力の要（子音行の L1 / BS の R2）なので
            閾値は浅め（1/4）にする —— 深いと「押したのに出ない」が入力全体に効く。 */
         if (SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERLEFT)  > 8192) p |= BTN_L2;

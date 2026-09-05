@@ -224,6 +224,8 @@ put('This software is not affiliated with either.', EN)
 # ★ここに出る文字列は全部「こちらのもの」。原作の文は 1 つも出ないので、
 #   訳の表は通さず完成行として持つ(「その文字列は誰のものか」)。
 # ★項目名はそのまま頁の見出しになる(並びは P_* と同じ)。★ただし**頁を持つのは頭の 3 つだけ**。
+# ★★**この並びは「番号」であって「画面に出る順」ではない**。画面の順は main.c の
+#   MENU_ORDER が決める（ライセンスはほぼ見ないので下、やめるは一番下）。
 ITEM = [
     ('ひらがな入力方法', 'HOW TO TYPE'),
     ('システムコマンド', 'SYSTEM COMMANDS'),
@@ -235,10 +237,30 @@ ITEM = [
 #   ★これで**項目の数（4）と読み物の頁の数（3）が別になる**（UI_MENU_N / UI_PAGE_N）。
 # ★★出す札も投げる語も**語彙の原簿から引く**。書き写すと、語を足し引きしたときに
 #   ここだけ古くなって**押しても打てない言葉**を投げることになる（P_CMDS と同じ作法）。
+# ★★4 つめは**フェイスボタンの並び**（SDL 版だけ。PS1 のパッドは位置が決まっている）。
+#   ★SDL の A/B/X/Y は**機体に印刷された札の名前**であって位置ではないので、
+#   どの機体でも図が正しくなるには**本人に押してもらう**しかない。
+#   ★名前は「ボタン設定」。★**ゲーム UI の見慣れた言い方に寄せる**（msonrm の判断）——
+#   「ボタンの並び」は言い当ててはいるが、この手の画面の名前として見かけない。
+#   十字キーまで設定できると思う人はいないので、フェイスボタンだけでも違和感は少ない。
+FACE_ITEM = ('ボタン設定', 'BUTTON SETUP')
+ITEM.append(FACE_ITEM)
 QUIT_JA = _kana(_asset['verbs']['QUIT']['ja'])[0]      # やめる
 QUIT_EN = 'quit'                                       # ★投げるのは小文字（打った通りに映る）
 ITEM.append((QUIT_JA, QUIT_EN.upper()))                # 札は他の項目と同じ総大文字
 MENU_N = len(ITEM)
+
+# ★訊く画面の文言。★位置の名前（右/下/上/左）だけを言い、**札の名前は一切出さない** ——
+#   札を信じないための画面なので、○ や A と書いたら本末転倒になる。
+FACE_NOTE = ('この機体のボタンの位置を覚えます', 'WHERE THIS DEVICE PUTS ITS BUTTONS')
+FACE_HAND = ('右手側の4つのボタンです', 'THE FOUR ON THE RIGHT HAND SIDE')
+FACE_ASK = [
+    ('右のボタンを押してください', 'PRESS THE BUTTON ON THE RIGHT'),
+    ('下のボタンを押してください', 'PRESS THE BUTTON AT THE BOTTOM'),
+    ('上のボタンを押してください', 'PRESS THE BUTTON AT THE TOP'),
+    ('左のボタンを押してください', 'PRESS THE BUTTON ON THE LEFT'),
+]
+FACE_DONE = ('覚えました', 'SAVED')
 # ★★ボタンの案内は**画面に書かない**。Start で開いたら Start で閉じる、開いた先で
 #   フェイスボタンを押せば決まる —— これは当時から今まで浸透している作法なので、
 #   いちいち書くと**画面がその分だけ狭くなるだけ**になる。
@@ -397,6 +419,10 @@ items = [[sref(ja if s == 0 else en) for ja, en in ITEM] for s in (0, 1)]
 helps = [[sref(ja if s == 0 else en) for ja, en in HELP] for s in (0, 1)]
 boots = [sref(BOOT[0]), sref(BOOT[1])]
 quits = [sref(QUIT_JA), sref(QUIT_EN)]
+face_note = [sref(FACE_NOTE[0]), sref(FACE_NOTE[1])]
+face_hand = [sref(FACE_HAND[0]), sref(FACE_HAND[1])]
+face_done = [sref(FACE_DONE[0]), sref(FACE_DONE[1])]
+face_asks = [[sref(ja if s_ == 0 else en) for ja, en in FACE_ASK] for s_ in (0, 1)]
 langs = [sref(LANG[0]), sref(LANG[1])]
 title_, sub_ = sref(TITLE), sref(SUB)
 game_ = sref(GAME)
@@ -414,6 +440,15 @@ out.append('/* ★メニューの「やめる」が**打つ**語（語彙の原�
 out.append('   ★`GState->quit` を直接立てず、原作の QUIT を走らせて')
 out.append('   「本当にやめますか」を訊かせる —— 原作がそのまま動くのが Zenmai の主張 */')
 out.append('static const UiStr UI_QUIT[2] = { %s, %s };' % (quits[0], quits[1]))
+out.append('/* ★ボタンの並びを訊く画面（SDL 版だけ）。位置の名前しか出さない —— ')
+out.append('   札を信じないための画面なので、札の形も名前も描かない */')
+out.append('static const UiStr UI_FACE_NOTE[2] = { %s, %s };' % (face_note[0], face_note[1]))
+out.append('static const UiStr UI_FACE_HAND[2] = { %s, %s };' % (face_hand[0], face_hand[1]))
+out.append('static const UiStr UI_FACE_DONE[2] = { %s, %s };' % (face_done[0], face_done[1]))
+out.append('static const UiStr UI_FACE_ASK[2][4] = {')
+for row in face_asks:
+    out.append('    { ' + ', '.join(row) + ' },')
+out.append('};')
 out.append('/* 起動メニュー: 名前 / 説明 / 作品名 / 選択肢(添字 = lang_en)。')
 out.append('   ★罫線は持たない —— 長さは main.c が UI_SUB を実測して画素で引く */')
 out.append('static const UiStr UI_TITLE = %s;' % title_)
@@ -437,6 +472,10 @@ for ja, en in ITEM + HELP + [BOOT, LANG]:
     used.update(en)
 used.update(QUIT_JA)                   # ★投げる語も画面に出る（打った通りが反響する）
 used.update(QUIT_EN)
+for _t in (FACE_NOTE, FACE_HAND, FACE_DONE):
+    used.update(_t[0]); used.update(_t[1])
+for _ja, _en in FACE_ASK:
+    used.update(_ja); used.update(_en)
 used.update(TITLE)
 used.update(SUB)
 used.update(GAME)

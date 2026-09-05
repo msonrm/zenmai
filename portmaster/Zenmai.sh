@@ -34,6 +34,12 @@ export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
 #   置き場所を決めるのは起動スクリプトの仕事で、ゲーム側は ZENMAI_SAVE を見るだけ。
 export ZENMAI_SAVE="$GAMEDIR/zenmai.sav"
 
+# ★★ボタンの並び（この機体のフェイスボタンがどの位置にあるか）は **conf の下**に置く。
+#   ★セーブとは別にする —— セーブを消したらボタンの並びまで忘れる、では困る。
+#   ★初回起動で本人に押してもらって決める（SDL の A/B/X/Y は札の名前であって
+#   位置ではないので、機体からは分からない）。
+export ZENMAI_CONF="$CONFDIR/zenmai.conf"
+
 $ESUDO chmod +x "$GAMEDIR/zenmai-zork.${DEVICE_ARCH}"
 
 # ★gptokeyb は使わない —— このポートは SDL のゲームコントローラを直接読む。
