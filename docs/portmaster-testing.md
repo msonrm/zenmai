@@ -169,6 +169,29 @@ ssh <user>@<ip> 'cd /<roms>/ports/zenmai && mv zenmai-zork.new zenmai-zork.aarch
   （2026-09-05 に踏んだ）
 - ★**`zenmai.sav` は上書きしない**
 
+### ★機体に置いたあとで踏んだもの 3 つ（2026-09-08・R36H / dArkOSen）
+
+- ★★**`$directory` を信じない。** control.txt を手で `source` すると `directory=roms`
+  を返すが、**ポートの実体は `/roms2/ports`** だった（カードが 2 枚あって別の
+  filesystem。`/roms/ports` には `autoinstall` しか入っていない）。
+  ★ES 経由の起動では正しい値が渡っているらしく `Zenmai.sh` / `Higgins.sh` は動いて
+  いるが、**`ssh` から `bash Zenmai.sh` と叩くと別の場所を見に行く**。
+  ★確実なのは **`$0` の位置から解く**形 —— どのカードに入れても正しい:
+
+  ```sh
+  PORTS="$(cd "$(dirname "$0")" && pwd)"
+  GAMEDIR="$PORTS/zenmai"
+  ```
+
+- ★**新しい `.sh` を置いても Ports 一覧にはすぐ出ない** —— `gamelist.xml` に項が
+  無いため。**EmulationStation を再起動する**。
+  ★★**起動中に `gamelist.xml` へ手で足してはいけない** —— ES は gamelist を
+  メモリに持って**後から書き出す**ので、足した項は消される。
+- ★**rpath に開発機の絶対パスが焼かれていても気づけない** —— 起動スクリプトが
+  `LD_LIBRARY_PATH` を通すので ES 経由では動き、**`ssh` から実行ファイルを直に
+  叩いたときだけ落ちる**（`cannot open shared object file`）。
+  ★**検査は起動スクリプト経由でも一度通すこと**（実行ファイル単体で緑でも足りない）。
+
 ## 7. 申請の手順
 
 テストの記録が揃ってから:
