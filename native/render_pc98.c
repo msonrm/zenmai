@@ -259,7 +259,7 @@ static void draw_row(int r, const VLine *v)
         col += txt_put(row, col, v->ch[i], v->attr);
     for (int i = 0; i < v->nr; i++) {
         const uint8_t *g = misaki(v->rc[i]);
-        if (g) gfx_glyph8(v->rx[i], y + RUBY_DY, g, RUBY_COLOR);
+        if (g) gfx_glyph8(v->rx[i] + RUBY_DX, y + RUBY_DY, g, RUBY_COLOR);
     }
 }
 

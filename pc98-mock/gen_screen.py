@@ -21,6 +21,7 @@ IN_Y = 352                    # 入力欄の枠の上端。15 行目の字 368�
 BODY_LAST = 13                # 本文の最終行 (字 320〜335)
 COLS, ROWS = 80, 17
 RUBY_DY = 1
+RUBY_DX = 1                                       # 描くときだけ 1px 右へ（漢字 ROM は左、美咲は右の 1 列が空く）
 
 # パレット (番号: G,R,B 各 0〜15)。★仮の色
 PAL = {0: (0, 0, 0),          # 背景
@@ -55,7 +56,7 @@ def ruby_at(x, y, yomi):
     for i, ch in enumerate(yomi):
         for r, bits in enumerate(L.ruby_glyph(ch)):
             for c, v in enumerate(bits):
-                if v: idx[(y + r) * 640 + x + 8 * i + c] = 8
+                if v: idx[(y + r) * 640 + x + RUBY_DX + 8 * i + c] = 8
 
 def para(row, s, a=A_WHITE):
     units = []
