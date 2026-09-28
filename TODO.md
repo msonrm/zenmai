@@ -9,6 +9,7 @@
 > ★★**残っている関門は 1 つだけ = テストの記録**（実機が要るので人の仕事）。
 > ★★**手順の正典は `docs/portmaster-testing.md`** —— 実機を触りながら潰す紙として
 > 書いてあるので、**次に始めるときはそこから読む**。
+> ★**PC-98 版は ver. 0.1.0-beta を公開**（2026-09-28・pre-release）—— 実機の報告待ち。→ 下の 3。
 
 ## ★★1. PortMaster への申請
 
@@ -48,23 +49,23 @@ Microsoft Open Source Programs Office / Team Xbox / Activision）。story ファ
 
 ## 3. PC-98 版
 
-★**画面の設計は決まった**（2026-09-28・QuuBee の上で表示して確認）。
-★**段 1（素の Zork）が QuuBee の上で動いた**（2026-09-28）—— walkthrough 211 手とかなの台本が、
-Open Watcom + DOS/4GW で建てた EXE とホストで建てた同じ芯とで 1 バイトも違わない（`sh native/test-pc98.sh`）。
-計画・段の表・未決 = **`docs/pc98-port-plan.md`**、画面の試作 = `pc98-mock/`（`sh pc98-mock/build.sh`）。
-★**段 2（境界を引く）も済んだ**（2026-09-28）—— VM とのつなぎを `native/session.c` へ抜き出し、
-PS1 / SDL / PC-98 が共有する。PS1/SDL の検査 8 本は前後とも緑。
-★**段 3（ローマ字 → かな）も済んだ**（2026-09-28）—— ローマ字（Mozc の表）・カナキー・CAPS で英字。
-★**段 4（画面の仕上げ）も済んだ**（2026-09-28）—— 24 ラスタ × 16 行・ふりがな・禁則とぶら下げ・履歴の遡り。遊べる形になった。
-禁則の表は `native/kinsoku.h` に出して PS1 / SDL と共有（8 本の検査は前後とも緑）。
-★**ver. 0.1.0-beta を配る形にした**（2026-09-28）—— 起動画面（Zenmai → Zork I → ENGLISH / 日本語）・英語モード・
-版の入った書庫（`sh native/pack-pc98.sh` → `zenmai98-0.1.0-beta.zip`）。公開版の QuuBee で遊べることを msonrm が確かめた。
-★**Release を作った**（2026-09-28・[pc98-v0.1.0-beta](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.1.0-beta)・pre-release。
-タグは `feat/pc98` の上。main にはまだ入れていない）。要件は拡張メモリ 2MB 以上（本体だけで約 920KB）。
-★次は**実機で試してもらう**こと（msonrm は実機を持っていない。いちばん確かめたいのは PL = −8 の
-ふりがなの帯）と、段 5（音楽・イラスト）。`DOS4GW.EXE` の再配布の根拠は計画書の「DOS エクステンダの配布」。
+★**ver. 0.1.0-beta を公開した**（2026-09-28・[Release `pc98-v0.1.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.1.0-beta)・
+pre-release）。★**正典は `docs/pc98-port-plan.md`**（段の表・決めたこと・末尾の「次にやること」）。
+
+- ★**次は実機の報告を待って直す**（msonrm は PC-98 の実機を持っていない。報告先 = GitHub の issues）。
+  いちばん知りたいのは**ふりがなの帯**（CRTC の PL = −8 が実機で同じに出るか）
+- **main へ入れる**: いまはブランチ `feat/pc98` だけ（push 済み・タグもその上）。main の README に PC-98 版のことは未記載
+- 拡張メモリ 1MB で動かす（いまは 2MB 以上。表 488KB を詰めないと届かない）・音楽・イラスト
+- 建てる・確かめる・配る = `sh native/build-pc98.sh` / `sh native/test-pc98.sh`（数秒）/ `sh native/pack-pc98.sh`
 
 ## 済んだこと
+
+### ★PC-98 版 ver. 0.1.0-beta（2026-09-27〜28・ブランチ `feat/pc98`）
+
+★**Zenmai は Z-machine、Zork I は同梱の見本の作品**という形で出した（商標の「ZORK」を前に出さない・msonrm の判断）。
+画面の設計（QuuBee で表示して決めた）→ 段 1 素の Zork → 段 2 `session.c` を全版で共有 → 段 3 ローマ字 / カナキー →
+段 4 24 ラスタ × 16 行・ふりがな・禁則（`kinsoku.h` を PS1 / SDL と共有）→ 段 5 起動画面・英語モード・書庫・Release。
+★共有の C を触った段 2・段 4 では、PS1/SDL の検査 8 本を前後とも回して緑。詳細 = `docs/pc98-port-plan.md`。
 
 ### ★Start メニューに「やめる」（2026-09-05・段 1）
 

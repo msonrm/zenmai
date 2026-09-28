@@ -1,7 +1,7 @@
 # Zenmai —— 作業の手引き
 
 Zork I（Z-machine）を日本語で読み、日本語で打つ。版はブラウザ（`web/` + `src/`）・PS1・SDL2（PortMaster）・
-PC-98（作業中）。
+PC-98（ver. 0.1.0-beta を pre-release で公開・ブランチ `feat/pc98`・実機の報告待ち）。
 
 ## まず読むもの
 
@@ -26,16 +26,21 @@ PC-98（作業中）。
 - ★**VM とのつなぎは `session.c` の 1 本だけ**（全版が共有）。版ごとの入口（`main.c` / `main_pc98.c`）に
   VM に触る道を書かない
 - ★PS1 と SDL は**画素一致**を検査している（`native/test-*.sh`）。共有の C を触ったら流す
+- ★**配る物・公に出す文章では「Zenmai は Z-machine、Zork I は同梱の見本の作品」と書く**（商標の「ZORK」を前に出さない。
+  書庫の名前にも入れない・msonrm の判断 2026-09-28）
 - 文書は日本語。★は要点、決めたことには**理由と日付**、踏んだ罠は症状ごと残す（既存の文書の書き方に合わせる）
 
 ## 建てる・確かめる
 
 | 版 | 建てる | 確かめる |
 |---|---|---|
-| PS1 | `sh native/build.sh` | `native/test-*.sh`（★`.test-lock` がある間は焼き直さない。★8 本で 30 分ほど、`test-options.sh` だけで 15 分を超える） |
+| PS1 | `sh native/build.sh` | `native/test-*.sh`（★`.test-lock` がある間は焼き直さない。★8 本で 30 分ほど、`test-options.sh` だけで 15 分を超える —— PS1 の模擬 `sim.py` が Python で MIPS を 1 命令ずつ解く（毎秒 約 90 万命令）ため。時間切れを短くすると後片付けで切れる） |
 | SDL2 | `sh native/build-sdl.sh` | `sh native/test-sdl.sh` |
 | 訳・語彙（C） | | `native/test_translate.c`・`native/cmd_test_host.c`（JS の記録と照合） |
-| PC-98 | `sh native/build-pc98.sh` | `sh native/test-pc98.sh`（ホストと QuuBee で台本の記録を突き合わせる） |
+| PC-98 | `sh native/build-pc98.sh` | `sh native/test-pc98.sh`（数秒。打鍵と組み方のホスト検査 + 台本をホストと QuuBee で流して記録を突き合わせる） |
+
+PC-98 版を配る = `sh native/pack-pc98.sh`（→ `native/pc98-out/zenmai98-<版>.zip`）。版は `native/pc98_version.h` の 1 か所。
+Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
 
 ### PC-98 の道具
 
@@ -47,3 +52,6 @@ PC-98（作業中）。
 - QuuBee（ブラウザの PC-98）= `~/development/qb`。headless の土台は `tools/lib/machine.js`
   （`pc98_run.js` / `pc98-mock/shot.js` が使う）
 - 字のコード（UTF-16 → 漢字 ROM）の正典は `native/pc98_jis.py`
+- 台本（`native/pc98-test/*.txt`・`ZENMAI /S 台本`）の記法: `#!english`（1 行目・英語面）/ `#!keys`（以降を打鍵として流す）/
+  `#!line 文`（文をそのまま本文に流す = 組み方を画面で見る）
+- 必要なメモリは本体だけで約 920KB（拡張 2MB 以上。1MB では DOS/4GW が not enough memory）
