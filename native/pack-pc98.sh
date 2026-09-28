@@ -43,7 +43,9 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 ■ 動かすのに要るもの（目安。実機では確かめていません）
   - 386 以上の CPU の PC-9801 / PC-9821
   - 16 色（アナログ）表示
-  - MS-DOS と拡張メモリ（HIMEM.SYS など）
+  - MS-DOS と拡張メモリ 2MB 以上（HIMEM.SYS など）
+    ★本体だけで約 920KB を使うので、640KB（本体メモリだけ）では動きません。
+      QuuBee では拡張メモリ 1MB だと DOS/4GW が「not enough memory」で止まりました
 
 ■ 起動
   ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
