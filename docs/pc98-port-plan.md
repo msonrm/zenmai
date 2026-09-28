@@ -127,7 +127,7 @@
   ★**実機で試してくださる方へ**の確かめてほしい点（とくにふりがなの帯 = PL = −8 が実機で同じに出るか）と報告先（GitHub の issues）を書いた
 - ★**書庫を作る台本 = `native/pack-pc98.sh`**（→ `pc98-out/zenmai98-<版>.zip`）。中身は `ZENMAI.BAT`（`SET DOS16M=1`）・
   `ZENMAI.EXE`・`DOS4GW.EXE`・`README.TXT`・ライセンスの全文 3 本（Zork I / MojoZork / Mozc）。文書は Shift_JIS・CRLF
-- ★**Release**: タグ `pc98-vX.Y.Z-beta`（0.1.0-beta・0.2.0-beta）は `feat/pc98` の上（main にはまだ入れていない）・pre-release（PS1 版の Latest はそのまま）。
+- ★**Release**: タグ `pc98-vX.Y.Z-beta`（0.1.0-beta・0.2.0-beta）は `feat/pc98` の上・pre-release（PS1 版の Latest はそのまま）。★`feat/pc98` は 2026-09-29 に main へ入れた（PR #50）
   ★公開の直後に説明書の「カナ錠」を「カナキーをロックする」に直し、**添付の ZIP を同じ名前で差し替えた**。
   タグはそのまま（公開したタグは動かさない）なので、タグの時点の `pack-pc98.sh` で作り直すとこの 1 行だけ古い
 
@@ -299,7 +299,7 @@ BIOS も MS-DOS も使わずに動くので、★**自作の PC-98 ソフトを�
    - いちばん知りたいのは**ふりがなの帯**（CRTC の PL = −8。QuuBee と NP2kai の模型では出る）。
      ずれていたら、PL の値か GDC の CSRFORM の書き方を実機に合わせる（設定は `native/pc98_text.c` の `rows24`）
    - 起動しないなら、まず `SET DOS16M=1` と拡張メモリ（2MB 以上）を疑う
-2. **main へ入れる**: `feat/pc98` から PR。main の README にはまだ PC-98 版のことを書いていない
+2. ~~main へ入れる~~ → ★入れた（2026-09-29・PR #50）。残り = main の README に PC-98 版のことを書く
 3. **拡張メモリ 1MB で動かす**（あれば試せる人が増える。386 の PC-98 には 640KB + 1MB の機種が多い）——
    大きいのは訳・語彙・story の表（488KB）なので、表を詰めるかファイルから読む形にしないと届かない
 4. 音楽・イラスト（段 7・上の未決 4 と 6）。★起動画面の曲は入れた（上の「段 7」）。場所ごとの曲とイラストが残り
