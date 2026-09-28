@@ -23,6 +23,8 @@ mkdir -p "$OUT"
 
 # 字の表（UTF-16 → テキスト VRAM）。訳・語彙の字が 1 つでも引けなければ止まる
 python3 pc98_jis.py
+# かな入力の表（ローマ字は Mozc の表から。vendor/mozc/）
+python3 gen_kana_input.py
 
 # ★story は C の配列にして焼き込む（PS1 / SDL 版と同じく、同梱していることを配布の形に頼らない）
 python3 - ../vendor/zork1/zork1.z3 "$OUT/story_pc98.c" <<'EOF'
@@ -37,7 +39,7 @@ with open(sys.argv[2], 'w') as f:
 EOF
 
 SRC="main_pc98.c session.c render_pc98.c save_dos.c pc98_text.c pc98_jis.c \
-     translate.c translate_data.c cmd.c cmd_data.c"
+     kana_input.c kana_input_data.c translate.c translate_data.c cmd.c cmd_data.c"
 
 # ---- PC-98（DOS/4GW）----
 CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=."

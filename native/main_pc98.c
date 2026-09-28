@@ -7,28 +7,33 @@
  * ★段 2 の画面はまだ仮（標準の 80×25・ふりがな無し）。24 ラスタ × 16 行は段 4。
  *
  * 入力は 2 通り:
- *   ZENMAI              … キーボード（まだ ASCII だけ。英語のコマンドも cmd_run が通す）。ESC でやめる
+ *   ZENMAI              … キーボード。ローマ字 / カナキーでかな、CAPS で英字（kana_input.h）。
+ *                         やめるのはゲームの「やめる」（quit）
  *   ZENMAI /S 台本.TXT  … 台本（UTF-8・1 行 1 コマンド）を流し、ZENMAI.LOG に記録する。
+ *                         `#!keys` の後の行は**打鍵として**キーボードと同じ道（ki_key）を通す
+ *                         （`#!text` で戻る。半角カナはカナキーの打鍵になる）。
  *                         ★同じものをホストでも建てて（build-pc98.sh）記録を突き合わせる（test-pc98.sh）
  */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "pc98_text.h"
 #include "render_pc98.h"
 #include "session.h"
 #include "translate.h"
+#include "kana_input.h"
 
 #ifndef PC98_HOST
 #include <conio.h>
+#include <i86.h>
 #endif
 
 extern const uint8_t zm_story[];       /* story_pc98.c（build-pc98.sh が zork1.z3 から焼く） */
 extern const uint32_t zm_story_len;
 
-enum { ROW_STATUS = 0, ROW_INPUT = 24, CMD_MAX = 36 };
-static uint16_t comp[CMD_MAX];
-static int clen;
+enum { ROW_STATUS = 0, ROW_INPUT = 24 };
+static KiLine line;                    /* 入力欄 */
 
 static void log_status(const uint16_t *s, int n)
 {
@@ -88,16 +93,20 @@ static void die(const char *msg)
 
 /* ---- 入力 ---- */
 
-/* 台本の 1 行（UTF-8）を comp へ。戻り値 0 = 台本の終わり */
+/* 台本の 1 行（UTF-8）を入力欄へ。戻り値 0 = 台本の終わり。
+   ★`#!keys` の後は 1 字ずつ打鍵として ki_key を通す（キーボードと同じ道）。半角カナはカナキーの打鍵 */
 static int script_line(FILE *f)
 {
     static char buf[512];
+    static int keys;
     for (;;) {
         if (!fgets(buf, sizeof buf, f))
             return 0;
-        clen = 0;
+        if (!strncmp(buf, "#!keys", 6)) { keys = 1; continue; }
+        if (!strncmp(buf, "#!text", 6)) { keys = 0; continue; }
+        ki_clear(&line);
         const unsigned char *p = (const unsigned char *)buf;
-        while (*p && *p != '\n' && *p != '\r' && clen < CMD_MAX) {
+        while (*p && *p != '\n' && *p != '\r') {
             unsigned u = *p++;
             if (u >= 0xE0 && p[0] && p[1]) {
                 u = (u & 0x0F) << 12 | (p[0] & 0x3F) << 6 | (p[1] & 0x3F);
@@ -106,46 +115,83 @@ static int script_line(FILE *f)
                 u = (u & 0x1F) << 6 | (p[0] & 0x3F);
                 p += 1;
             }
-            comp[clen++] = (uint16_t)u;
+            if (!keys) {
+                if (line.n < KI_MAX) line.buf[line.n++] = (uint16_t)u;
+            } else if (u >= 0xFF61 && u <= 0xFF9F) {
+                ki_key(&line, (int)(u - 0xFF61 + 0xA1), 0);   /* 半角カナ → カナキーの打鍵 */
+            } else {
+                ki_key(&line, (int)u, 0);
+            }
         }
-        if (clen && comp[0] != '#')    /* 空行と # の行は飛ばす */
+        ki_commit(&line);
+        if (line.n && line.buf[0] != '#')    /* 空行と # の行は飛ばす */
             return 1;
     }
 }
 
+#ifndef PC98_HOST
+/* CAPS が入っているか（INT 18h AH=02h のシフト状態・bit1） */
+static int kbd_caps(void)
+{
+    union REGS r;
+    memset(&r, 0, sizeof r);
+    r.h.ah = 0x02;
+    int386(0x18, &r, &r);
+    return (r.h.al >> 1) & 1;
+}
+#else
+static int kbd_caps(void) { return 0; }
+#endif
+
+/* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字。右端に打ち方（かな / 英字） */
 static void draw_input(void)
 {
+    static const uint16_t kana[] = { 0x304B, 0x306A }, eng[] = { 0x82F1, 0x5B57 };
     txt_clear(ROW_INPUT, ROW_INPUT, TA_WHITE);
+    const uint16_t *mode = kbd_caps() ? eng : kana;
+    for (int i = 0; i < 2; i++)
+        txt_put(ROW_INPUT, PC98_BODY_R - 4 + 2 * i, mode[i], TA_CYAN);
     int col = PC98_BODY_L;
     col += txt_put(ROW_INPUT, col, 0xFF1E, TA_YELLOW);   /* ＞ */
-    for (int i = 0; i < clen; i++)
-        col += txt_put(ROW_INPUT, col, comp[i], TA_WHITE);
+    for (int i = 0; i < line.n; i++)
+        col += txt_put(ROW_INPUT, col, line.buf[i], TA_WHITE);
+    for (int i = 0; i < line.np; i++)
+        col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], TA_WHITE);
     txt_cursor(ROW_INPUT, col);
 }
 
 #ifndef PC98_HOST
-/* キーボードから 1 行。戻り値 0 = ESC（やめる） */
-static int key_line(void)
+/* キーボードから 1 行（空でない行を Enter で送るまで戻らない） */
+static void key_line(void)
 {
-    clen = 0;
+    ki_clear(&line);
     draw_input();
+    int caps = kbd_caps();
     for (;;) {
+        while (!kbhit())               /* ★CAPS は字を出さないので、待つ間に見張って打ち方の表示を直す */
+            if (kbd_caps() != caps) {
+                caps = !caps;
+                draw_input();
+            }
         const int c = getch();
-        if (c == 0x1B)
-            return 0;
-        if (c == '\r' || c == '\n') {
-            if (clen) break;
+        if (c == 0x1B) {               /* ★ESC はファンクションキーなどの列の頭。続きごと読み捨てる */
+            while (kbhit()) getch();
             continue;
         }
-        if (c == 0x08) {
-            if (clen) clen--;
-        } else if (c >= 0x20 && c < 0x7F && clen < CMD_MAX) {
-            comp[clen++] = (uint16_t)c;
+        if (c == '\r' || c == '\n') {
+            ki_commit(&line);
+            if (line.n) break;
+            draw_input();
+            continue;
         }
+        if (c == 0x08)
+            ki_backspace(&line);
+        else
+            ki_key(&line, c, caps);
         draw_input();
     }
+    draw_input();
     txt_cursor(-1, 0);
-    return 1;
 }
 #endif
 
@@ -180,11 +226,11 @@ int main(int argc, char **argv)
             draw_input();
         } else {
 #ifndef PC98_HOST
-            if (!key_line()) break;
+            key_line();
 #endif
         }
-        const int no_turn = sess_submit_ja(comp, clen, &pending_verb);
-        clen = 0;
+        const int no_turn = sess_submit_ja(line.buf, line.n, &pending_verb);
+        ki_clear(&line);
         if (!no_turn)
             draw_status();
         if (sess_quit()) break;

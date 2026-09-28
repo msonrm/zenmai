@@ -15,8 +15,9 @@ PC-98（作業中）。
 - ★**訳・語彙・ルビの挙動の正典は JS**（`src/translate.js` / `src/command.js` / `src/ruby.js`）。
   `native/` の C は移植なので、**直すときは両方を見る**（各ファイルの頭書きに書いてある）
 - ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
-- ★**生成物は手で直さない**: `native/*_data.c`・`pairs.h`・`glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。
-  生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
+- ★**生成物は手で直さない**: `native/*_data.c`（`kana_input_data.c` を含む）・`pairs.h`・`glyphs.h`・
+  `ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
+- 外から採ったもの（字形・ローマ字の表）は `native/vendor/*/README.md` に出どころと許諾がある。配るときの義務もそこ
 - 境界は「リンクする実装を差し替える」形: `plat.h`（機械）・`glyph.h`（字）・`card.h`（セーブ）・
   `render.h` の文字列の口（PC-98 は `render_pc98.c` が同じ名前で実装する）。
   上の層（`session.c`・`render.c`・`input.c`・`translate.c`・`cmd.c`）は無改造で運ぶ

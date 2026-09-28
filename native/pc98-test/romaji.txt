@@ -1,0 +1,19 @@
+# kana.txt と同じコマンドを、キーボードの打鍵で打つ台本（ローマ字・カナキー）。
+# ★記録は kana.txt と 1 バイトも違わないはず（test-pc98.sh が突き合わせる）
+#!keys
+yuubinbakowoakeru
+chirashiwotoru
+chirasiwoyomu
+minamiheiku
+higasi
+madowoakeru
+ienihairu
+nisi
+ranpuwotoru
+akeru
+tobira
+hogehogewotaberu
+ﾊｺｦｱｹﾙ
+se-bu
+ﾋｶﾞｼ
+ro-do

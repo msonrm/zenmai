@@ -1,15 +1,19 @@
 #!/bin/sh
-# PC-98 版（段 1）の検査: 台本を**ホストと QuuBee の両方**で流し、記録（ZENMAI.LOG）が
+# PC-98 版の検査: 台本を**ホストと QuuBee の両方**で流し、記録（ZENMAI.LOG）が
 # 1 バイトも違わないことを確かめる。★Open Watcom + DOS/4GW で建てた芯が、開発機の gcc で
 # 建てた同じ芯と同じに動くことの証拠（訳・語彙そのものの正しさは test_translate / cmd_test_host が JS と照合済み）。
 #
 #   sh test-pc98.sh            # 建ててから流す。画面は pc98-out/<台本>-1x.png に残る
 #
-# 台本: ../test/walkthrough.txt（英語 211 手）と pc98-test/*.txt（かなで打つもの）。
+# 台本: ../test/walkthrough.txt（英語 211 手）と pc98-test/*.txt（かなで打つもの・ローマ字の打鍵で打つもの）。
+# その前に、かな入力の核を test_kana_input で確かめる。
 # 要るもの: build-pc98.sh の道具一式・node・QuuBee のリポジトリ（QB_DIR、既定 ~/development/qb）
 set -e
 cd "$(dirname "$0")"
 sh build-pc98.sh >/dev/null
+# かな入力の核（打鍵 → 入力欄の字）
+cc -std=c11 -Wall test_kana_input.c kana_input.c kana_input_data.c -o pc98-out/test_kana_input
+pc98-out/test_kana_input || exit 1
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 fail=0
@@ -27,4 +31,12 @@ for s in ../test/walkthrough.txt pc98-test/*.txt; do
         fail=1
     fi
 done
+# ★ローマ字の台本は kana.txt と同じコマンドを打鍵で打つので、記録も同じでなければならない
+if cmp -s "$TMP/kana/host/ZENMAI.LOG" "$TMP/romaji/host/ZENMAI.LOG"; then
+    echo "OK  romaji = kana: 打鍵で打っても記録が同じ"
+else
+    echo "NG  romaji と kana の記録が違う"
+    diff "$TMP/kana/host/ZENMAI.LOG" "$TMP/romaji/host/ZENMAI.LOG" | head -20
+    fail=1
+fi
 exit $fail
