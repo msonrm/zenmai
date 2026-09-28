@@ -1,8 +1,12 @@
 /* Zenmai PC-98 版の入口（計画 = docs/pc98-port-plan.md）。
  *
  * ★芯（VM・訳・語彙・セーブ）は session.c で、PS1 / SDL と共有している。
- *   ここに在るのは PC-98 の画面の外枠（上の帯・装飾・入力欄）と、入力の取り方だけ。
+ *   ここに在るのは起動画面・PC-98 の画面の外枠（上の帯・装飾・入力欄）と、入力の取り方だけ。
  *   本文は render_pc98.c（render.h の文字列の口）。
+ *
+ * ★**Zenmai は Z-machine で、Zork I はその上で動く見本の作品**という形を取る（2026-09-28・msonrm の判断。
+ *   商標の「ZORK」を前に出さない）。だから起動するとまず `Zenmai` の起動画面で、そこで作品と言語を選ぶ
+ *   —— PS1 版の起動メニューと同じ形（題 → 説明 → 罫線 → 作品名 → ENGLISH / 日本語）。
  *
  * 画面（1 行 24 ラスタ × 16 行。寸法と色は試作 pc98-mock/gen_screen.py と同じ・色は仮）:
  *   上の帯      縦 0〜31    0 行目に場所（左・黄）と得点（右）
@@ -32,6 +36,7 @@
 #include "session.h"
 #include "translate.h"
 #include "kana_input.h"
+#include "pc98_version.h"
 
 #ifndef PC98_HOST
 #include <i86.h>
@@ -42,6 +47,7 @@ extern const uint32_t zm_story_len;
 
 enum { ROW_STATUS = 0, ROW_INPUT = 15, COL_L = BODY_COL0, COL_R = BODY_COL0 + BODY_CELLS };
 static KiLine line;                    /* 入力欄 */
+static int lang_en;                    /* 1 = ENGLISH（訳さない・英字で打つ）/ 0 = 日本語 */
 
 /* ---- 画面の外枠 ---- */
 
@@ -57,6 +63,7 @@ static void draw_chrome(void)
     gfx_palette(RUBY_COLOR, 10, 10, 10);
     enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352,
            TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
+    gfx_rect(0, 0, GFX_W, GFX_H, C_BG);      /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
     gfx_rect(0, 0, GFX_W, TOP_H, C_BAND);
     gfx_rect(0, TOP_H, SIDE, IN_Y, C_DECO);
     gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, C_DECO);
@@ -93,7 +100,13 @@ static void draw_status(void)
     while (sb[name_end] && !(sb[name_end] == ' ' && sb[name_end + 1] == ' '))
         name_end++;
     uint16_t name[64];
-    const int nn = tr_word_str(sb, name_end, name, 64);
+    int nn;
+    if (lang_en) {
+        nn = name_end < 64 ? name_end : 64;
+        for (int i = 0; i < nn; i++) name[i] = (uint8_t)sb[i];
+    } else {
+        nn = tr_word_str(sb, name_end, name, 64);
+    }
     int col = COL_L;
     for (int i = 0; i < nn && col < COL_R - 24; i++)
         col += txt_put(ROW_STATUS, col, name[i], TA_YELLOW);
@@ -192,7 +205,7 @@ static void draw_input(int caret)
     static const uint16_t kana[] = { 0x304B, 0x306A }, eng[] = { 0x82F1, 0x5B57 };
     txt_clear(ROW_INPUT, ROW_INPUT, TA_WHITE);
     const uint16_t *mode = kbd_caps() ? eng : kana;
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2 && !lang_en; i++)      /* ★英語面は表を通さないので出さない */
         txt_put(ROW_INPUT, COL_R - 4 + 2 * i, mode[i], TA_CYAN);
     int col = COL_L;
     col += txt_put(ROW_INPUT, col, 0xFF1E, TA_CYAN);     /* ＞ */
@@ -233,7 +246,7 @@ static void key_line(void)
         if (c == 0x08)
             ki_backspace(&line);
         else if (c && c != 0x1B)       /* ★ESC とファンクションキー（字 0）は読み捨てる */
-            ki_key(&line, c, caps);
+            ki_key(&line, c, caps || lang_en);   /* ★英語面は表を通さない */
         draw_input(1);
     }
     draw_input(0);
@@ -241,6 +254,63 @@ static void key_line(void)
         body_show(0);
         for (int i = 0; i < 18; i++) txt_vsync();
     }
+}
+#endif
+
+#ifndef PC98_HOST
+/* ---- 起動画面（PS1 版の起動メニューと同じ形）----
+ * ★並びは **ENGLISH が上・既定の選択も ENGLISH**（原典の言語。PS1 版の判断に揃える）。 */
+
+/* 中央揃えの 1 行（UTF-8）。mark = 1 なら字の 4 桁左に ＞。戻り値 = 字の幅（桁） */
+static int center(int row, const char *s, uint8_t attr, int mark)
+{
+    uint16_t u[64];
+    int n = 0, w = 0;
+    const unsigned char *p = (const unsigned char *)s;
+    while (*p && n < 64) {             /* UTF-8 → UTF-16 */
+        unsigned c = *p++;
+        if (c >= 0xE0) { c = (c & 0x0F) << 12 | (p[0] & 0x3F) << 6 | (p[1] & 0x3F); p += 2; }
+        else if (c >= 0xC0) { c = (c & 0x1F) << 6 | (p[0] & 0x3F); p += 1; }
+        u[n++] = (uint16_t)c;
+        w += txt_cells((uint16_t)c);
+    }
+    txt_clear(row, row, TA_WHITE);
+    int col = (TXT_COLS - w) / 2;
+    if (mark)
+        txt_put(row, col - 4, 0xFF1E, TA_YELLOW);    /* ＞ */
+    for (int i = 0; i < n; i++)
+        col += txt_put(row, col, u[i], attr);
+    return w;
+}
+
+static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
+{
+    enum { R_TITLE = 3, R_SUB = 4, R_GAME = 7, R_EN = 9, R_JA = 10, R_HINT = 13, R_VER = 15 };
+    static const char *hint[2] = { "↑↓ で選び、Enter で始める", "UP / DOWN TO CHOOSE, RETURN TO START" };
+    gfx_palette(0, 0, 0, 0);
+    gfx_palette(1, 3, 2, 7);           /* 地（上の帯と同じ紺） */
+    gfx_palette(2, 7, 7, 9);           /* 罫線 */
+    gfx_rect(0, 0, GFX_W, GFX_H, 1);
+    center(R_TITLE, "Zenmai", TA_YELLOW, 0);
+    const int w = center(R_SUB, "a Z-machine for Japanese, on the PC-9801", TA_WHITE, 0);
+    /* ★罫線は説明の幅（PS1 版と同じ）。塗りは 8px 単位なので桁の境目に合う */
+    const int y = (R_SUB + 1) * TXT_RASTERS + 12;
+    gfx_rect((TXT_COLS - w) / 2 * 8, y, ((TXT_COLS - w) / 2 + w) * 8, y + 1, 2);
+    center(R_GAME, "Zork I", TA_WHITE, 0);
+    center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
+    int sel = 1;
+    for (;;) {
+        center(R_EN, "ENGLISH", sel ? TA_YELLOW : TA_WHITE, sel);
+        center(R_JA, "日本語", sel ? TA_WHITE : TA_YELLOW, !sel);
+        center(R_HINT, hint[sel], TA_CYAN, 0);
+        const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
+        if (scan == K_UP || scan == K_DOWN)
+            sel ^= 1;
+        else if (c == '\r' || c == ' ')
+            break;
+    }
+    txt_clear(0, TXT_ROWS - 1, TA_WHITE);
+    return sel;
 }
 #endif
 
@@ -261,14 +331,25 @@ int main(int argc, char **argv)
         printf("zenmai: 台本を開けない\n");
         return 1;
     }
-    if (script)
+    if (script) {
         render_log = fopen("ZENMAI.LOG", "wb");
+        /* ★台本の 1 行目が `#!english` なら英語面（起動画面は出さない） */
+        char head[16];
+        if (fgets(head, sizeof head, script) && !strncmp(head, "#!english", 9))
+            lang_en = 1;
+        else
+            rewind(script);
+    }
 
     txt_init();
     gfx_init();
+#ifndef PC98_HOST
+    if (!script)
+        lang_en = title_menu();
+#endif
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */
-    sess_start(0, zm_story, zm_story_len, die);
+    sess_start(lang_en, zm_story, zm_story_len, die);
     draw_status();
     body_show(0);
 
@@ -282,7 +363,11 @@ int main(int argc, char **argv)
             key_line();
 #endif
         }
-        const int no_turn = sess_submit_ja(line.buf, line.n, &pending_verb);
+        int no_turn = 0;
+        if (lang_en)
+            sess_submit_en(line.buf, line.n);
+        else
+            no_turn = sess_submit_ja(line.buf, line.n, &pending_verb);
         ki_clear(&line);
         if (!no_turn)
             draw_status();
