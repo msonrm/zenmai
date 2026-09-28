@@ -17,8 +17,11 @@ PC-98（作業中）。
 - ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
 - ★**生成物は手で直さない**: `native/*_data.c`・`pairs.h`・`glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。
   生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
-- 境界は「リンクする実装を差し替える」形: `plat.h`（機械）・`glyph.h`（字）・`card.h`（セーブ）。
-  上の層（`render.c`・`input.c`・`translate.c`・`cmd.c`）は無改造で運ぶ
+- 境界は「リンクする実装を差し替える」形: `plat.h`（機械）・`glyph.h`（字）・`card.h`（セーブ）・
+  `render.h` の文字列の口（PC-98 は `render_pc98.c` が同じ名前で実装する）。
+  上の層（`session.c`・`render.c`・`input.c`・`translate.c`・`cmd.c`）は無改造で運ぶ
+- ★**VM とのつなぎは `session.c` の 1 本だけ**（全版が共有）。版ごとの入口（`main.c` / `main_pc98.c`）に
+  VM に触る道を書かない
 - ★PS1 と SDL は**画素一致**を検査している（`native/test-*.sh`）。共有の C を触ったら流す
 - 文書は日本語。★は要点、決めたことには**理由と日付**、踏んだ罠は症状ごと残す（既存の文書の書き方に合わせる）
 
@@ -26,7 +29,7 @@ PC-98（作業中）。
 
 | 版 | 建てる | 確かめる |
 |---|---|---|
-| PS1 | `sh native/build.sh` | `native/test-*.sh`（★`.test-lock` がある間は焼き直さない） |
+| PS1 | `sh native/build.sh` | `native/test-*.sh`（★`.test-lock` がある間は焼き直さない。★8 本で 30 分ほど、`test-options.sh` だけで 15 分を超える） |
 | SDL2 | `sh native/build-sdl.sh` | `sh native/test-sdl.sh` |
 | 訳・語彙（C） | | `native/test_translate.c`・`native/cmd_test_host.c`（JS の記録と照合） |
 | PC-98 | `sh native/build-pc98.sh` | `sh native/test-pc98.sh`（ホストと QuuBee で台本の記録を突き合わせる） |

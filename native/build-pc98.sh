@@ -1,5 +1,5 @@
 #!/bin/sh
-# Zenmai PC-98 版（段 1）→ pc98-out/ZENMAI.EXE（Open Watcom + DOS/4GW）と、
+# Zenmai PC-98 版 → pc98-out/ZENMAI.EXE（Open Watcom + DOS/4GW）と、
 # 同じ芯をホストで建てた pc98-out/zenmai-host（記録を突き合わせる相手）。
 #
 #   sh build-pc98.sh
@@ -36,7 +36,8 @@ with open(sys.argv[2], 'w') as f:
     f.write('};\n')
 EOF
 
-SRC="main_pc98.c pc98_text.c pc98_jis.c translate.c translate_data.c cmd.c cmd_data.c"
+SRC="main_pc98.c session.c render_pc98.c save_dos.c pc98_text.c pc98_jis.c \
+     translate.c translate_data.c cmd.c cmd_data.c"
 
 # ---- PC-98（DOS/4GW）----
 CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=."
