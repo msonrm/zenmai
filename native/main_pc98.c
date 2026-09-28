@@ -31,6 +31,7 @@
 #include <string.h>
 #include "pc98_text.h"
 #include "pc98_gfx.h"
+#include "pc98_fm.h"
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
@@ -195,18 +196,13 @@ static union REGS bios18(int ah)
 static int kbd_caps(void) { return (bios18(0x02).h.al >> 1) & 1; }   /* シフト状態の bit1 */
 static int kbd_hit(void) { return bios18(0x01).h.bh != 0; }
 static int kbd_get(void) { return bios18(0x00).w.ax; }                /* 上 = キーの番号・下 = 字 */
-#else
-static int kbd_caps(void) { return 0; }
 #endif
 
-/* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。右端に打ち方（かな / 英字） */
+/* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。
+   ★右端の打ち方の表示（かな / 英字）はやめた —— 打てば分かる（msonrm の判断・2026-09-29） */
 static void draw_input(int caret)
 {
-    static const uint16_t kana[] = { 0x304B, 0x306A }, eng[] = { 0x82F1, 0x5B57 };
     txt_clear(ROW_INPUT, ROW_INPUT, TA_WHITE);
-    const uint16_t *mode = kbd_caps() ? eng : kana;
-    for (int i = 0; i < 2 && !lang_en; i++)      /* ★英語面は表を通さないので出さない */
-        txt_put(ROW_INPUT, COL_R - 4 + 2 * i, mode[i], TA_CYAN);
     int col = COL_L;
     col += txt_put(ROW_INPUT, col, 0xFF1E, TA_CYAN);     /* ＞ */
     for (int i = 0; i < line.n; i++)
@@ -225,13 +221,7 @@ static void key_line(void)
 {
     ki_clear(&line);
     draw_input(1);
-    int caps = kbd_caps();
     for (;;) {
-        while (!kbd_hit())             /* ★CAPS は字を出さないので、待つ間に見張って打ち方の表示を直す */
-            if (kbd_caps() != caps) {
-                caps = !caps;
-                draw_input(1);
-            }
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_ROLLDOWN) { body_scroll(-(BODY_ROWS - 1)); continue; }
         if (scan == K_ROLLUP)   { body_scroll(BODY_ROWS - 1); continue; }
@@ -246,7 +236,7 @@ static void key_line(void)
         if (c == 0x08)
             ki_backspace(&line);
         else if (c && c != 0x1B)       /* ★ESC とファンクションキー（字 0）は読み捨てる */
-            ki_key(&line, c, caps || lang_en);   /* ★英語面は表を通さない */
+            ki_key(&line, c, kbd_caps() || lang_en);   /* ★CAPS は打ったときに読む。英語面は表を通さない */
         draw_input(1);
     }
     draw_input(0);
@@ -259,10 +249,13 @@ static void key_line(void)
 
 #ifndef PC98_HOST
 /* ---- 起動画面（PS1 版の起動メニューと同じ形）----
- * ★並びは **ENGLISH が上・既定の選択も ENGLISH**（原典の言語。PS1 版の判断に揃える）。 */
+ * ★並びは **日本語が上・既定の選択も日本語**（PC-98 なら日本語が主。msonrm の判断・2026-09-29。
+ *   それまでは PS1 版に揃えて ENGLISH が上・既定だった）。
+ * ★2 つの項目は**左端をそろえる**（選ぶ印 ＞ が左にあるので。中央揃えだと字の幅の違いで左端がずれた）。 */
 
-/* 中央揃えの 1 行（UTF-8）。mark = 1 なら字の 4 桁左に ＞。戻り値 = 字の幅（桁） */
-static int center(int row, const char *s, uint8_t attr, int mark)
+/* 1 行（UTF-8）を置く。left < 0 なら中央揃え、そうでなければ left 桁から。
+   mark = 1 なら字の 4 桁左に ＞。戻り値 = 字の幅（桁） */
+static int put_at(int row, int left, const char *s, uint8_t attr, int mark)
 {
     uint16_t u[64];
     int n = 0, w = 0;
@@ -275,7 +268,7 @@ static int center(int row, const char *s, uint8_t attr, int mark)
         w += txt_cells((uint16_t)c);
     }
     txt_clear(row, row, TA_WHITE);
-    int col = (TXT_COLS - w) / 2;
+    int col = left < 0 ? (TXT_COLS - w) / 2 : left;
     if (mark)
         txt_put(row, col - 4, 0xFF1E, TA_YELLOW);    /* ＞ */
     for (int i = 0; i < n; i++)
@@ -283,10 +276,14 @@ static int center(int row, const char *s, uint8_t attr, int mark)
     return w;
 }
 
+static int center(int row, const char *s, uint8_t attr, int mark) { return put_at(row, -1, s, attr, mark); }
+
 static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
 {
-    enum { R_TITLE = 3, R_SUB = 4, R_GAME = 7, R_EN = 9, R_JA = 10, R_HINT = 13, R_VER = 15 };
-    static const char *hint[2] = { "↑↓ で選び、Enter で始める", "UP / DOWN TO CHOOSE, RETURN TO START" };
+    enum { R_TITLE = 3, R_SUB = 4, R_GAME = 7, R_JA = 9, R_EN = 10, R_HINT = 13, R_VER = 15 };
+    /* ★PC-98 のキーは RETURN（Enter ではない） */
+    static const char *hint[2] = { "↑↓ で選び、Return キーでゲームスタート", "UP / DOWN TO CHOOSE, RETURN TO START" };
+    const int menu_l = (TXT_COLS - 7) / 2;     /* 長いほう（ENGLISH = 7 桁）を中央に置いた左端 */
     gfx_palette(0, 0, 0, 0);
     gfx_palette(1, 3, 2, 7);           /* 地（上の帯と同じ紺） */
     gfx_palette(2, 7, 7, 9);           /* 罫線 */
@@ -298,17 +295,21 @@ static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
     gfx_rect((TXT_COLS - w) / 2 * 8, y, ((TXT_COLS - w) / 2 + w) * 8, y + 1, 2);
     center(R_GAME, "Zork I", TA_WHITE, 0);
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
-    int sel = 1;
+    int sel = 0;
+    music_start();                     /* 起動画面の曲（Bach の謎カノン）*/
     for (;;) {
-        center(R_EN, "ENGLISH", sel ? TA_YELLOW : TA_WHITE, sel);
-        center(R_JA, "日本語", sel ? TA_WHITE : TA_YELLOW, !sel);
+        put_at(R_JA, menu_l, "日本語", sel ? TA_WHITE : TA_YELLOW, !sel);
+        put_at(R_EN, menu_l, "ENGLISH", sel ? TA_YELLOW : TA_WHITE, sel);
         center(R_HINT, hint[sel], TA_CYAN, 0);
+        while (!kbd_hit())             /* ★曲は待つ間だけ進む（割り込みは使わない・pc98_fm.h） */
+            music_poll();
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_UP || scan == K_DOWN)
             sel ^= 1;
         else if (c == '\r' || c == ' ')
             break;
     }
+    music_stop();
     txt_clear(0, TXT_ROWS - 1, TA_WHITE);
     return sel;
 }
