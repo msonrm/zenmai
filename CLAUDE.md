@@ -1,7 +1,7 @@
 # Zenmai —— 作業の手引き
 
 Zork I（Z-machine）を日本語で読み、日本語で打つ。版はブラウザ（`web/` + `src/`）・PS1・SDL2（PortMaster）・
-PC-98（ver. 0.1.0-beta を pre-release で公開・ブランチ `feat/pc98`・実機の報告待ち）。
+PC-98（ver. 0.2.0-beta を pre-release で公開・ブランチ `feat/pc98`・実機の報告待ち）。
 
 ## まず読むもの
 

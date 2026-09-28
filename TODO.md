@@ -9,7 +9,7 @@
 > ★★**残っている関門は 1 つだけ = テストの記録**（実機が要るので人の仕事）。
 > ★★**手順の正典は `docs/portmaster-testing.md`** —— 実機を触りながら潰す紙として
 > 書いてあるので、**次に始めるときはそこから読む**。
-> ★**PC-98 版は ver. 0.1.0-beta を公開**（2026-09-28・pre-release）—— 実機の報告待ち。→ 下の 3。
+> ★**PC-98 版は ver. 0.2.0-beta を公開**（2026-09-29・pre-release。0.1.0-beta は 2026-09-28）—— 実機の報告待ち。→ 下の 3。
 
 ## ★★1. PortMaster への申請
 
@@ -49,11 +49,15 @@ Microsoft Open Source Programs Office / Team Xbox / Activision）。story ファ
 
 ## 3. PC-98 版
 
-★**ver. 0.1.0-beta を公開した**（2026-09-28・[Release `pc98-v0.1.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.1.0-beta)・
-pre-release）。★**正典は `docs/pc98-port-plan.md`**（段の表・決めたこと・末尾の「次にやること」）。
+★**ver. 0.2.0-beta を公開した**（2026-09-29・[Release `pc98-v0.2.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.2.0-beta)・
+pre-release。0.1.0-beta は 2026-09-28）。★**正典は `docs/pc98-port-plan.md`**（段の表・決めたこと・末尾の「次にやること」）。
 
 - ★**次は実機の報告を待って直す**（msonrm は PC-98 の実機を持っていない。報告先 = GitHub の issues）。
+  ★**実機で動いた**（2026-09-28・X の告知への報告）。DOS に戻るとファンクションキーの行が消えるのは直した
+  （起動時の画面を控えて戻す・詳細 = `docs/pc98-port-plan.md` の「段 6」）。0.2.0-beta に入れた。
   いちばん知りたいのは**ふりがなの帯**（CRTC の PL = −8 が実機で同じに出るか）
+- ★**起動画面で FM 音源の曲が鳴る**（2026-09-29・Bach の謎カノン・エレピ × シンセベース）。詳細 = 計画書の「段 7」。
+  26K で鳴るかは実機待ち。0.2.0-beta に入れた
 - **main へ入れる**: いまはブランチ `feat/pc98` だけ（push 済み・タグもその上）。main の README に PC-98 版のことは未記載
 - 拡張メモリ 1MB で動かす（いまは 2MB 以上。表 488KB を詰めないと届かない）・音楽・イラスト
 - 建てる・確かめる・配る = `sh native/build-pc98.sh` / `sh native/test-pc98.sh`（数秒）/ `sh native/pack-pc98.sh`
