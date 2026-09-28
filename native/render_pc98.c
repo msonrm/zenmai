@@ -252,7 +252,7 @@ static void draw_row(int r, const VLine *v)
 {
     const int row = BODY_ROW0 + r, y = row * TXT_RASTERS;
     txt_clear(row, row, TA_WHITE);
-    gfx_rect(RUBY_X_MIN - 8, y, RUBY_X_MAX, y + RUBY_BAND, 0);   /* ふりがなの帯を消す */
+    gfx_rect(DECO_W, y, RUBY_X_MAX, y + RUBY_BAND, 0);   /* ふりがなの帯を消す（左右の装飾の内側） */
     if (!v) return;
     int col = BODY_COL0;
     for (int i = 0; i < v->n; i++)
@@ -269,11 +269,11 @@ static void draw_window(void)
         const long i = view + r;
         draw_row(r, i >= hist_min() && i < total ? &hist[i % HIST_N] : 0);
     }
-    /* 窓の外に続きがあることの印（右の余白の端） */
+    /* 窓の外に続きがあることの印（右の装飾の上） */
     if (view > hist_min())
-        txt_put(BODY_ROW0, BODY_COL0 + BODY_CELLS + HANG_CELLS, 0x25B2, TA_CYAN);          /* ▲ */
+        txt_put(BODY_ROW0, MARK_COL, 0x25B2, TA_CYAN);                    /* ▲ */
     if (view + BODY_ROWS < total)
-        txt_put(BODY_ROW0 + BODY_ROWS - 1, BODY_COL0 + BODY_CELLS + HANG_CELLS, 0x25BC, TA_CYAN);  /* ▼ */
+        txt_put(BODY_ROW0 + BODY_ROWS - 1, MARK_COL, 0x25BC, TA_CYAN);    /* ▼ */
 }
 
 static long bottom(void)

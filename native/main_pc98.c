@@ -7,7 +7,7 @@
  * 画面（1 行 24 ラスタ × 16 行。寸法と色は試作 pc98-mock/gen_screen.py と同じ・色は仮）:
  *   上の帯      縦 0〜31    0 行目に場所（左・黄）と得点（右）
  *   本文の上    縦 32〜44   装飾と同じ色
- *   左右の装飾  幅 48
+ *   左右の装飾  幅 40（DECO_W）
  *   本文        2〜13 行目・横 64〜575（全角 32 字 × 12 行）
  *   入力欄の枠  縦 352〜399 15 行目。上に 2px の縁
  *
@@ -55,7 +55,7 @@ static void draw_chrome(void)
     gfx_palette(C_INPUT, 5, 2, 5);     /* 入力欄の枠 */
     gfx_palette(C_INPUT_EDGE, 9, 5, 9);
     gfx_palette(RUBY_COLOR, 10, 10, 10);
-    enum { TOP_H = 32, SIDE = 48, IN_Y = 352,
+    enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352,
            TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
     gfx_rect(0, 0, GFX_W, TOP_H, C_BAND);
     gfx_rect(0, TOP_H, SIDE, IN_Y, C_DECO);
