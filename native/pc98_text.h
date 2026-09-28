@@ -18,8 +18,8 @@ enum {
     TA_REV = 0x04,
 };
 
-void txt_init(void);                   /* 画面を消し、カーソルを隠し、1 行 24 ラスタにする */
-void txt_fini(void);                   /* 25 行に戻して消し、カーソルを戻す（DOS へ返る前） */
+void txt_init(void);                   /* 画面を控えて消し、カーソルを隠し、1 行 24 ラスタにする */
+void txt_fini(void);                   /* DOS の行数に戻し、控えた画面とカーソルを戻す（DOS へ返る前） */
 int  txt_cells(uint16_t u);            /* 字が占める桁（ASCII = 1 / 全角 = 2） */
 /* 1 字置く。戻り値 = 占めた桁。★全角が右端をはみ出すなら置かずに 0 */
 int  txt_put(int row, int col, uint16_t u, uint8_t attr);

@@ -57,10 +57,19 @@ static int jis_word(uint16_t u)
     return -1;
 }
 
+/* ★DOS へ返るときは、起動したときのテキスト VRAM（25 行ぶん）をそのまま戻す。
+   画面下のファンクションキーの行は DOS（CON）が一度描いたきりで、DOS は消されたことを知らないので
+   自分では描き直さない（実機の報告・2026-09-28。QuuBee の DOS は模擬でこの行を持たないので出なかった） */
+static uint16_t saved_code[25 * TXT_COLS], saved_attr[25 * TXT_COLS];
+
 void txt_init(void)
 {
     geta = (uint16_t)jis_word(0x3013);
-    txt_clear(0, 24, TA_WHITE);        /* ★VRAM は 25 行ぶん消す（DOS に返ったあとも残らないように） */
+    for (int p = 0; p < 25 * TXT_COLS; p++) {
+        saved_code[p] = VCODE[p];
+        saved_attr[p] = VATTR[p];
+    }
+    txt_clear(0, 24, TA_WHITE);        /* ★VRAM は 25 行ぶん消す（16 行目より下の残りが見えないように） */
 #ifndef PC98_HOST
     bios18(0x12, 0, 0);                /* カーソルを隠す */
     rows24();
@@ -70,11 +79,18 @@ void txt_init(void)
 void txt_fini(void)
 {
 #ifndef PC98_HOST
-    bios18(0x0A, 0x00, 0);             /* 80 桁 × 25 行に戻す */
+    /* ★行数は DOS の作業領域 0060:0113h（1 = 25 行 / 0 = 20 行）に合わせる。
+       BIOS の AL: bit0 = 1 で 20 行 */
+    const volatile uint8_t *dos = (const volatile uint8_t *)0x600;
+    bios18(0x0A, dos[0x113] ? 0x00 : 0x01, 0);
 #endif
-    txt_clear(0, 24, TA_WHITE);
+    for (int p = 0; p < 25 * TXT_COLS; p++) {
+        VCODE[p] = saved_code[p];
+        VATTR[p] = saved_attr[p];
+    }
 #ifndef PC98_HOST
-    bios18(0x13, 0, 0);                /* カーソルを左上へ戻して出す */
+    /* ★カーソルは DOS が覚えている位置（0060:0110h = 行・0060:011Ch = 桁）へ。DX = VRAM のバイト番地 */
+    bios18(0x13, 0, (dos[0x110] * TXT_COLS + dos[0x11C]) * 2);
     bios18(0x11, 0, 0);
 #endif
 }
