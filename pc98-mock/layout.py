@@ -30,25 +30,14 @@ def bmp_bit(x, y):
     b = raw[off + (bh - 1 - y) * stride + x // 8]
     return not (b >> (7 - x % 8)) & 1
 
-# makefont.cjs と同じ入れ替え表 (PC-98 の位置 → 字の JIS)。逆引きに使う
-J78 = [(0x3646, 0x7421), (0x4b6a, 0x7422), (0x4d5a, 0x7423), (0x596a, 0x7424)]
-J90 = [(0x724d, 0x3033), (0x7274, 0x3229), (0x695a, 0x3342), (0x5978, 0x3349), (0x635e, 0x3376),
-       (0x5e75, 0x3443), (0x6b5d, 0x3452), (0x7074, 0x375b), (0x6268, 0x395c), (0x6922, 0x3c49),
-       (0x7057, 0x3f59), (0x6c4d, 0x4128), (0x5464, 0x445b), (0x626a, 0x4557), (0x5b6d, 0x456e),
-       (0x5e39, 0x4573), (0x6d6e, 0x4676), (0x6a24, 0x4768), (0x5b58, 0x4930), (0x5056, 0x4b79),
-       (0x692e, 0x4c79), (0x6446, 0x4f36)]
-def swap(j, t):
-    for a, b in t:
-        if j == a: return b
-        if j == b: return a
-    return j
+# 字 → 漢字 ROM の位置は native/pc98_jis.py が正典 (本体の表もそこから作る)
+import sys
+sys.path.insert(0, os.path.join(HERE, '..', 'native'))
+import pc98_jis
 
 def kanji_glyph(ch):
     """全角 1 字 → 16x16 の真偽表。U+2014 は ― (JIS 213D) に寄せる"""
-    if ch == '—': ch = '―'
-    e = ch.encode('euc_jp')
-    j = ((e[0] & 0x7f) << 8) | (e[1] & 0x7f)
-    p = swap(swap(j, J90), J78)
+    p = pc98_jis.rom_of(ch)
     x0, y0 = ((p >> 8) - 0x20) * 16, (p & 0xff) * 16
     return [[bmp_bit(x0 + x, y0 + y) for x in range(16)] for y in range(16)]
 

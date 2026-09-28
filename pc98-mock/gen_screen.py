@@ -40,19 +40,12 @@ def rect(x0, y0, x1, y1, c):
     for y in range(y0, y1):
         idx[y * 640 + x0:y * 640 + x1] = bytes([c]) * (x1 - x0)
 
-def pc98_code(ch):
-    if ch == '—': ch = '―'
-    e = ch.encode('euc_jp')
-    j = ((e[0] & 0x7f) << 8) | (e[1] & 0x7f)
-    return L.swap(L.swap(j, L.J90), L.J78)
-
 def put(row, col, s, a=A_WHITE):
     for ch in s:
         if ord(ch) < 0x80:
             text[row][col] = ord(ch); attr[row][col] = a; col += 1
         else:
-            p = pc98_code(ch)
-            left = ((p & 0xff) << 8) | ((p >> 8) - 0x20)
+            left = L.pc98_jis.vram_word(L.pc98_jis.rom_of(ch))
             text[row][col] = left; text[row][col + 1] = left | 0x80
             attr[row][col] = attr[row][col + 1] = a
             col += 2

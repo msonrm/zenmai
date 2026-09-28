@@ -48,9 +48,11 @@ Microsoft Open Source Programs Office / Team Xbox / Activision）。story ファ
 
 ## 3. PC-98 版
 
-★**画面の設計は決まった**（2026-09-28・QuuBee の上で表示して確認）。実装は未着手。
-計画と決めたこと・未決 = **`docs/pc98-port-plan.md`**、試作の道具 = `pc98-mock/`（`sh pc98-mock/build.sh`）。
-★次に始めるときは計画の「未決」の 1（どの層で分けるか）から。
+★**画面の設計は決まった**（2026-09-28・QuuBee の上で表示して確認）。
+★**段 1（素の Zork）が QuuBee の上で動いた**（2026-09-28）—— walkthrough 211 手とかなの台本が、
+Open Watcom + DOS/4GW で建てた EXE とホストで建てた同じ芯とで 1 バイトも違わない（`sh native/test-pc98.sh`）。
+計画・段の表・未決 = **`docs/pc98-port-plan.md`**、画面の試作 = `pc98-mock/`（`sh pc98-mock/build.sh`）。
+★次に始めるときは計画の**段 2（境界を引く）**から —— `main_pc98.c` に写した VM とのつなぎを共有ファイルへ抜き出す。
 
 ## 済んだこと
 

@@ -9,7 +9,7 @@ PC-98 版（計画 = [`docs/pc98-port-plan.md`](../docs/pc98-port-plan.md)）の
 
 | ファイル | 役目 |
 |---|---|
-| `layout.py` | 共有部品: 本文の字形（QuuBee の `font.bmp`）・ふりがなの字形（美咲ゴシック）・ふりがなの割り当て（`src/ruby.js` と同じ規則） |
+| `layout.py` | 共有部品: 本文の字形（QuuBee の `font.bmp`）・ふりがなの字形（美咲ゴシック）・ふりがなの割り当て（`src/ruby.js` と同じ規則）。★字のコード（漢字 ROM の位置）は `native/pc98_jis.py` を読む（本体と同じ表） |
 | `gen_screen.py` | 画面の中身（テキスト VRAM・属性・4 プレーンの背景・パレット）を `out/` に作る。★**寸法と色はこの先頭の数値** |
 | `screen.asm` | それを表示する DOS の COM。テキスト画面を 24 ラスタ行にして、グラフィックに背景とふりがなを置く。キーで 25 行に戻る |
 | `shot.js` | QuuBee（headless）で起動して撮る |
