@@ -12,6 +12,7 @@
  */
 #include "render.h"
 #include "glyph.h"
+#include "kinsoku.h"
 
 uint16_t canvas[WIN_H][W];             /* 表示窓の描画バンド */
 uint16_t strip[CMD_H][W];
@@ -44,7 +45,7 @@ static int render_dry;                 /* 1 = 採寸のみ(描かない) */
 /* ---- 割り付け(gen_mock.py の移植) ---- */
 
 /* ★**`ch` と `gid` の両方を持つ理由** —— `gid` は面の中の通し番号なので、
-   「句読点か」「日本語か」を尋ねても答えない。行末禁則の道連れ（no_tail）と
+   「句読点か」「日本語か」を尋ねても答えない。行末禁則の道連れ（kinsoku_tail）と
    行送りの判定（is_jp）は**元の code で見るしかない**。整形で 1 対 1 が崩れる
    言語では、`ch` はその塊の**先頭の code**（cluster の頭）になる。
    ★64bit では詰め物に収まり、32bit（PS1）でも 1 語ぶんしか増えない。 */
@@ -95,55 +96,7 @@ static int base_w(const uint16_t *base, int blen)
 }
 
 /* ---- 禁則処理 ----
- *
- * ★入れるのは 2 つだけ。**行頭に来てはいけない字**（句読点・閉じ括弧・小書きかな・
- *   長音・繰り返し記号）と、**行末に来てはいけない字**（開き括弧）。
- *
- * ★直し方も 2 通りに絞る:
- *   - 行頭禁則 → その 1 字を**右の余白へぶら下げる**（ぶら下げ組）。
- *     ★追い出し（直前の字ごと次行へ送る）は採らない —— 直前の字が動くと、
- *     ルビの箱や既に決まった位置まで動いて**行が跳ねて見える**。余白は
- *     MARGIN = 32px あるので、全角 1 字（24px / FreeType 版は 22px）は必ず入る。
- *     ★2 字目は入らないので、そこは普通に折る（`。」` が続く稀な場合だけ譲る）。
- *   - 行末禁則 → 開き括弧を**次の行へ道連れ**にする（こちらはぶら下げようがない）。
- *
- * ★ASCII の記号（. , ) など）は入れていない —— 英文は語単位で折るので、
- *   記号は必ず語にくっついたまま動く（行頭に単独で落ちる道が無い）。
- */
-static int no_head(uint16_t c)         /* 行頭に置かない */
-{
-    switch (c) {
-    case 0x3001: case 0x3002:                              /* 、。 */
-    case 0xFF0C: case 0xFF0E: case 0x30FB:                 /* ，．・ */
-    case 0xFF1A: case 0xFF1B: case 0xFF1F: case 0xFF01:    /* ：；？！ */
-    case 0xFF09: case 0x3015: case 0xFF3D: case 0xFF5D:    /* ）〕］｝ */
-    case 0x3009: case 0x300B: case 0x300D: case 0x300F:    /* 〉》」』 */
-    case 0x3011: case 0x2019: case 0x201D:                 /* 】’” */
-    case 0x30FC: case 0x3005: case 0x309D: case 0x309E:    /* ー々ゝゞ */
-    case 0x309B: case 0x309C:                              /* ゛゜ */
-    case 0x3041: case 0x3043: case 0x3045: case 0x3047:    /* ぁぃぅぇ */
-    case 0x3049: case 0x3063: case 0x3083: case 0x3085:    /* ぉっゃゅ */
-    case 0x3087: case 0x308E: case 0x3095: case 0x3096:    /* ょゎゕゖ */
-    case 0x30A1: case 0x30A3: case 0x30A5: case 0x30A7:    /* ァィゥェ */
-    case 0x30A9: case 0x30C3: case 0x30E3: case 0x30E5:    /* ォッャュ */
-    case 0x30E7: case 0x30EE: case 0x30F5: case 0x30F6:    /* ョヮヵヶ */
-        return 1;
-    default:
-        return 0;
-    }
-}
-
-static int no_tail(uint16_t c)         /* 行末に置かない */
-{
-    switch (c) {
-    case 0xFF08: case 0x3014: case 0xFF3B: case 0xFF5B:    /* （〔［｛ */
-    case 0x3008: case 0x300A: case 0x300C: case 0x300E:    /* 〈《「『 */
-    case 0x3010: case 0x2018: case 0x201C:                 /* 【‘“ */
-        return 1;
-    default:
-        return 0;
-    }
-}
+ * ★規則の表（kinsoku_head / kinsoku_tail）と直し方の考えは kinsoku.h（PC-98 版と共有）。 */
 
 void flush_vline(uint16_t color)
 {
@@ -190,7 +143,7 @@ static void line_break(uint16_t color)
 {
     Frag carry;
     int has = 0;
-    if (nfrag > 1 && !frags[nfrag - 1].rlen && no_tail(frags[nfrag - 1].ch)) {
+    if (nfrag > 1 && !frags[nfrag - 1].rlen && kinsoku_tail(frags[nfrag - 1].ch)) {
         carry = frags[--nfrag];
         fw -= carry.w;
         has = 1;
@@ -221,7 +174,7 @@ static void push_glyph(uint16_t head, uint16_t gid, int w, int dx, int dy,
     room_for_one(color);
     if (fw + w > TEXT_W && fw > 0) {
         /* 行頭禁則: 1 字だけ右の余白へぶら下げる */
-        if (no_head(head) && fw + w <= TEXT_W + MARGIN) {
+        if (kinsoku_head(head) && fw + w <= TEXT_W + MARGIN) {
             frags[nfrag++] = f;
             fw += w;
             return;
@@ -241,38 +194,11 @@ void push_char(uint16_t ch, uint16_t color)
     push_glyph(ch, ch, glyph_w(ch), 0, 0, 0, color);
 }
 
-/* ★**語を作る字か**（＝空白で語を切る言語の字か）。
- *
- * ★★**もとは「ASCII なら語 / それ以外はどこでも折ってよい」だった。** Zork
- *   （日本語 ＋ 英語）ではそれで正しい —— 日本語は行中のどこでも折れるので、
- *   「ASCII でない」と「どこでも折れる」が同じ意味だった。
- * ★★**ハングルとデーヴァナーガリーは > 0x7F なのに空白で語を切る。**
- *   そのまま載せると **単語が行の途中で割れる**（`पपपप` / `प`）——
- *   Higgins の実機で発覚（2026-09-03）。
- *
- * ★★**「日本語の範囲を列挙する」形は採らなかった。** そうすると `…` `—` `─` `★`
- *   `←` `×` のような**記号まで語の一部**になり、**Zork の割り付け（＝画素）が変わる**
- *   （`……` や `──` が 1 かたまりとして次行へ送られる）。ここが見ているのは
- *   「**語を作るか**」であって「日本語か」ではない。
- * ★この表は**言語を足したときに 1 行増える**。字・入力・辞書を足す作業の一部なので
- *   忘れる場所ではないし、忘れても**割れて見える**（黙って間違う形にならない）。
- * ★範囲は `check_kinsoku.py` が**この場で読んで** Python の参照実装
- *   （`gen_mock.py`）と突き合わせる。形を変えるならあちらの読み方も直すこと。
- *
- * ★★**`render.h` から外へ出してある**（`static` ではない）。自前で欄を描く側
- *   —— Higgins は入力欄が 3 行あるので `build_strip` を使わず自分で割り付ける ——
- *   が**同じ規則で折れる**ようにするため。★貸さないと規則の 3 つ目の実装ができて、
- *   「本文では語で折れるのに欄では割れる」という形で必ずずれる。
- *   ★PS1 側の費用は out-of-line の実体 1 つぶん（同じ翻訳単位からの呼び出しは
- *     これまでどおり畳める）。 */
+/* ★**語を作る字か**。規則は kinsoku.h の kinsoku_word（PC-98 版と共有）。
+ * ★`render.h` から外へ出してあるのは、自前で欄を描く側（Higgins）が同じ規則で折れるように。 */
 int word_char(uint16_t c)
 {
-    if (c <= 0x7F)
-        return c != ' ';               /* ASCII（空白以外）は昔から語 */
-    return (c >= 0x0900 && c <= 0x097F)    /* デーヴァナーガリー（danda 込み） */
-        || (c >= 0x1100 && c <= 0x11FF)    /* ハングル字母 */
-        || (c >= 0x3130 && c <= 0x318F)    /* ハングル互換字母 */
-        || (c >= 0xAC00 && c <= 0xD7A3);   /* ハングル音節 */
+    return kinsoku_word(c);
 }
 
 /* ★★**整形はここで 1 回**。行を丸ごと渡す —— 1 字ずつ整形しても合字も入れ替えも

@@ -10,20 +10,37 @@
 #include "pc98_jis.h"
 
 #ifdef PC98_HOST
-static uint16_t host_code[TXT_ROWS * TXT_COLS], host_attr[TXT_ROWS * TXT_COLS];
+static uint16_t host_code[25 * TXT_COLS], host_attr[25 * TXT_COLS];   /* VRAM は 25 行ぶん */
 #define VCODE host_code
 #define VATTR host_attr
 #else
 #include <i86.h>
 #define VCODE ((volatile uint16_t *)0xA0000)
 #define VATTR ((volatile uint16_t *)0xA2000)
-static void bios18(int ah, int dx)
+#include <conio.h>
+static void bios18(int ah, int al, int dx)
 {
     union REGS r;
     memset(&r, 0, sizeof r);
     r.h.ah = (unsigned char)ah;
+    r.h.al = (unsigned char)al;
     r.w.dx = (unsigned short)dx;
     int386(0x18, &r, &r);
+}
+
+/* 1 行 24 ラスタ・字の上に 8 ラスタ（試作 pc98-mock/screen.asm と同じ）。
+   ★CRTC の PL = 18h は「字の上に 8 ラスタ」（−8）。実機でここまで同じに出るかは未確認 */
+static void rows24(void)
+{
+    outp(0x70, 0x18);                  /* PL */
+    outp(0x72, 0x0F);                  /* BL: 字の最後のラスタ = 15 */
+    outp(0x74, 0x10);                  /* CL: 字は 16 ラスタ */
+    outp(0x76, 0x00);                  /* SSL */
+    while (!(inp(0x60) & 4)) { }       /* GDC の FIFO が空くのを待つ */
+    outp(0x62, 0x4B);                  /* CSRFORM */
+    outp(0x60, 0x17);                  /* LR = 17h（24 ラスタ）・カーソルは出さない */
+    outp(0x60, 0x00);
+    outp(0x60, 0xBB);
 }
 #endif
 
@@ -43,16 +60,22 @@ static int jis_word(uint16_t u)
 void txt_init(void)
 {
     geta = (uint16_t)jis_word(0x3013);
-    txt_clear(0, TXT_ROWS - 1, TA_WHITE);
-    txt_cursor(-1, 0);
+    txt_clear(0, 24, TA_WHITE);        /* ★VRAM は 25 行ぶん消す（DOS に返ったあとも残らないように） */
+#ifndef PC98_HOST
+    bios18(0x12, 0, 0);                /* カーソルを隠す */
+    rows24();
+#endif
 }
 
 void txt_fini(void)
 {
-    txt_clear(0, TXT_ROWS - 1, TA_WHITE);
 #ifndef PC98_HOST
-    bios18(0x13, 0);                   /* カーソルを左上へ戻して出す */
-    bios18(0x11, 0);
+    bios18(0x0A, 0x00, 0);             /* 80 桁 × 25 行に戻す */
+#endif
+    txt_clear(0, 24, TA_WHITE);
+#ifndef PC98_HOST
+    bios18(0x13, 0, 0);                /* カーソルを左上へ戻して出す */
+    bios18(0x11, 0, 0);
 #endif
 }
 
@@ -87,25 +110,10 @@ void txt_clear(int row0, int row1, uint8_t attr)
     }
 }
 
-void txt_scroll(int row0, int row1, uint8_t attr)
+void txt_vsync(void)
 {
-    for (int p = row0 * TXT_COLS; p < row1 * TXT_COLS; p++) {
-        VCODE[p] = VCODE[p + TXT_COLS];
-        VATTR[p] = VATTR[p + TXT_COLS];
-    }
-    txt_clear(row1, row1, attr);
-}
-
-void txt_cursor(int row, int col)
-{
-#ifdef PC98_HOST
-    (void)row; (void)col;
-#else
-    if (row < 0) {
-        bios18(0x12, 0);
-        return;
-    }
-    bios18(0x13, (row * TXT_COLS + col) * 2);
-    bios18(0x11, 0);
+#ifndef PC98_HOST
+    while (inp(0x60) & 0x20) { }       /* GDC の状態: bit5 = 垂直帰線中 */
+    while (!(inp(0x60) & 0x20)) { }
 #endif
 }

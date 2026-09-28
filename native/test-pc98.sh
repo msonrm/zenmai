@@ -6,7 +6,8 @@
 #   sh test-pc98.sh            # 建ててから流す。画面は pc98-out/<台本>-1x.png に残る
 #
 # 台本: ../test/walkthrough.txt（英語 211 手）と pc98-test/*.txt（かなで打つもの・ローマ字の打鍵で打つもの）。
-# その前に、かな入力の核を test_kana_input で確かめる。
+# その前に、かな入力の核（test_kana_input）と本文の組み方（test_render_pc98）をホストで確かめる。
+# pc98-test/layout.txt は組み方を画面で見るための台本（#!line）—— 画面は pc98-out/layout-1x.png。
 # 要るもの: build-pc98.sh の道具一式・node・QuuBee のリポジトリ（QB_DIR、既定 ~/development/qb）
 set -e
 cd "$(dirname "$0")"
@@ -14,6 +15,10 @@ sh build-pc98.sh >/dev/null
 # かな入力の核（打鍵 → 入力欄の字）
 cc -std=c11 -Wall test_kana_input.c kana_input.c kana_input_data.c -o pc98-out/test_kana_input
 pc98-out/test_kana_input || exit 1
+# 本文の組み方（禁則・ぶら下げ・英字の語・ふりがなの位置）
+cc -std=gnu11 -Wall -DPC98_HOST -I. test_render_pc98.c pc98_text.c pc98_gfx.c pc98_jis.c misaki_data.c \
+    jp_text.c ruby_data.c -o pc98-out/test_render_pc98
+pc98-out/test_render_pc98 || exit 1
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 fail=0

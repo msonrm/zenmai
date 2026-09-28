@@ -15,8 +15,10 @@ PC-98（作業中）。
 - ★**訳・語彙・ルビの挙動の正典は JS**（`src/translate.js` / `src/command.js` / `src/ruby.js`）。
   `native/` の C は移植なので、**直すときは両方を見る**（各ファイルの頭書きに書いてある）
 - ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
-- ★**生成物は手で直さない**: `native/*_data.c`（`kana_input_data.c` を含む）・`pairs.h`・`glyphs.h`・
-  `ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
+- ★**生成物は手で直さない**: `native/*_data.c`（`kana_input_data.c`・`misaki_data.c` を含む）・`pairs.h`・
+  `glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
+- ★**禁則の表は `native/kinsoku.h` の 1 つだけ**（PS1 / SDL / PC-98 が共有。Python の参照実装 `ps1-mock/gen_mock.py` とは
+  `check_kinsoku.py` が突き合わせる）
 - 外から採ったもの（字形・ローマ字の表）は `native/vendor/*/README.md` に出どころと許諾がある。配るときの義務もそこ
 - 境界は「リンクする実装を差し替える」形: `plat.h`（機械）・`glyph.h`（字）・`card.h`（セーブ）・
   `render.h` の文字列の口（PC-98 は `render_pc98.c` が同じ名前で実装する）。
@@ -40,6 +42,8 @@ PC-98（作業中）。
 - 開発機は **aarch64**。Open Watcom 1.9 = `~/development/openwatcom-1.9`（ヘッダ・ライブラリ・`dos4gw.exe`）+
   `~/development/ow-bin`（この機械で動く `wcc386` / `wlink`）。`-za99` で C99
 - ★DOS/4GW は **`SET DOS16M=1`** が要る（無いと `DOS/16M error: [26] 8042 timeout`）
+- ★Watcom 1.9 は**自動変数の構造体を非定数で初期化できない**（`E1054`）。項目ごとに代入する
+- PC-98 の画面は **1 行 24 ラスタ × 16 行**（テキスト VRAM の行番号はそのまま・0〜16）。キーは BIOS（INT 18h）から読む
 - QuuBee（ブラウザの PC-98）= `~/development/qb`。headless の土台は `tools/lib/machine.js`
   （`pc98_run.js` / `pc98-mock/shot.js` が使う）
 - 字のコード（UTF-16 → 漢字 ROM）の正典は `native/pc98_jis.py`

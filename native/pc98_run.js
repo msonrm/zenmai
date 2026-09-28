@@ -21,7 +21,7 @@ const { Machine } = require(path.join(QB, 'tools/lib/machine'));
 
     const t0 = Date.now();
     const m = await Machine.boot({ dir: game, bat: 'RUN.BAT' });
-    const done = m.runUntil((mm) => mm.textVram()[24].includes('[END]'), 60000, 30);
+    const done = m.runUntil((mm) => mm.textVram(17)[15].includes('[END]'), 60000, 30);
     const info = m.info();
     console.log(`QuuBee wasm ${info.wasm.sha256} frame ${info.frame}（エミュ ${info.emuSeconds} 秒・実 ${((Date.now() - t0) / 1000).toFixed(1)} 秒）`);
     m.screenshotPng(path.join(outDir, 'screen-1x.png'));
