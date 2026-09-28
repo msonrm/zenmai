@@ -59,7 +59,9 @@ PS1 / SDL / PC-98 が共有する。PS1/SDL の検査 8 本は前後とも緑。
 禁則の表は `native/kinsoku.h` に出して PS1 / SDL と共有（8 本の検査は前後とも緑）。
 ★**ver. 0.1.0-beta を配る形にした**（2026-09-28）—— 起動画面（Zenmai → Zork I → ENGLISH / 日本語）・英語モード・
 版の入った書庫（`sh native/pack-pc98.sh` → `zenmai98-0.1.0-beta.zip`）。公開版の QuuBee で遊べることを msonrm が確かめた。
-★次は**ネットで公開して実機で試してもらう**こと（msonrm は実機を持っていない。いちばん確かめたいのは PL = −8 の
+★**Release を作った**（2026-09-28・[pc98-v0.1.0-beta](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.1.0-beta)・pre-release。
+タグは `feat/pc98` の上。main にはまだ入れていない）。要件は拡張メモリ 2MB 以上（本体だけで約 920KB）。
+★次は**実機で試してもらう**こと（msonrm は実機を持っていない。いちばん確かめたいのは PL = −8 の
 ふりがなの帯）と、段 5（音楽・イラスト）。`DOS4GW.EXE` の再配布の根拠は計画書の「DOS エクステンダの配布」。
 
 ## 済んだこと
