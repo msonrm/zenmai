@@ -1,0 +1,12 @@
+#!english
+# 英語面（起動画面で ENGLISH を選んだとき）の台本。訳さずに流し、状態も英語のまま
+open mailbox
+read leaflet
+south
+east
+open window
+enter house
+take all
+save
+west
+restore

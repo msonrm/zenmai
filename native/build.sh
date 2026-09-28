@@ -21,6 +21,7 @@ CFLAGS="-O1 -march=mips1 -mabi=32 -mfp32 -mno-abicalls -fno-pic -G0 \
 cp ../vendor/zork1/zork1.z3 story.bin
 mipsel-linux-gnu-objcopy -I binary -O elf32-tradlittlemips -B mips story.bin story.o
 mipsel-linux-gnu-gcc $CFLAGS -I. -c main.c -o main.o
+mipsel-linux-gnu-gcc $CFLAGS -I. -c session.c -o session.o
 mipsel-linux-gnu-gcc $CFLAGS -c render.c -o render.o
 mipsel-linux-gnu-gcc $CFLAGS -c plat_ps1.c -o plat_ps1.o
 mipsel-linux-gnu-gcc $CFLAGS -c glyph_baked.c -o glyph_baked.o
@@ -34,6 +35,6 @@ mipsel-linux-gnu-gcc $CFLAGS -c jp_text.c -o jp_text.o
 mipsel-linux-gnu-gcc $CFLAGS -c cmd.c -o cmd.o
 mipsel-linux-gnu-gcc $CFLAGS -c cmd_data.c -o cmd_data.o
 mipsel-linux-gnu-gcc $CFLAGS -c card.c -o card.o
-mipsel-linux-gnu-ld -T link.ld main.o render.o plat_ps1.o glyph_baked.o content_data.o input.o lib.o translate.o translate_data.o ruby_data.o jp_text.o cmd.o cmd_data.o card.o story.o -o out-zork.elf
+mipsel-linux-gnu-ld -T link.ld main.o session.o render.o plat_ps1.o glyph_baked.o content_data.o input.o lib.o translate.o translate_data.o ruby_data.o jp_text.o cmd.o cmd_data.o card.o story.o -o out-zork.elf
 mipsel-linux-gnu-objcopy -O binary out-zork.elf out-zork.bin
 "$PY" pack_exe.py out-zork.bin "$OUT"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""割り付けの表が **C（render.c）と Python の参照実装（gen_mock.py）で同じ**か。
+"""割り付けの表が **C（kinsoku.h）と Python の参照実装（gen_mock.py）で同じ**か。
 
 見るのは 2 つ —— **禁則の字**（行頭 / 行末）と、**語を作る字の範囲**
 （ハングル・デーヴァナーガリー ＝ 空白で語を切る言語）。
@@ -19,14 +19,14 @@ HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent / 'ps1-mock'))
 import gen_mock                                          # noqa: E402
 
-src = (HERE / 'render.c').read_text(encoding='utf-8')
+src = (HERE / 'kinsoku.h').read_text(encoding='utf-8')   # ★PS1/SDL と PC-98 が共有する表
 
 
 def c_codes(fn):
     try:
-        body = src.split('static int %s(uint16_t c)' % fn)[1].split('}\n')[0]
+        body = src.split('static inline int %s(uint16_t c)' % fn)[1].split('}\n')[0]
     except IndexError:
-        sys.exit('★render.c の %s() を読めない（形が変わった？）' % fn)
+        sys.exit('★kinsoku.h の %s() を読めない（形が変わった？）' % fn)
     codes = set(int(m, 16) for m in re.findall(r'case 0x([0-9A-Fa-f]{4}):', body))
     if not codes:
         sys.exit('★%s() から 1 字も読めなかった（読み方が壊れている）' % fn)
@@ -34,8 +34,8 @@ def c_codes(fn):
 
 
 ng = 0
-for name, fn, pyset in (('行頭', 'no_head', gen_mock.NO_HEAD),
-                        ('行末', 'no_tail', gen_mock.NO_TAIL)):
+for name, fn, pyset in (('行頭', 'kinsoku_head', gen_mock.NO_HEAD),
+                        ('行末', 'kinsoku_tail', gen_mock.NO_TAIL)):
     a, b = c_codes(fn), set(ord(c) for c in pyset)
     if a == b:
         print('✓ %s禁則: C と Python で一致（%d 字）' % (name, len(a)))
@@ -45,18 +45,18 @@ for name, fn, pyset in (('行頭', 'no_head', gen_mock.NO_HEAD),
                  ''.join(chr(x) for x in sorted(b - a))))
         ng += 1
 
-# ★**語を作る字の範囲**（render.c の word_char / gen_mock.WORD_RANGES）。
+# ★**語を作る字の範囲**（kinsoku.h の kinsoku_word / gen_mock.WORD_RANGES）。
 #   ★禁則と同じ理由でここも 2 言語に分かれている。片方だけ足すと、
 #     **ゴールデンでは語で折れているのに実機では割れる**（逆も）という形で静かにずれる。
 def c_ranges():
     try:
-        body = src.split('\nint word_char(uint16_t c)')[1].split('}\n')[0]
+        body = src.split('\nstatic inline int kinsoku_word(uint16_t c)')[1].split('}\n')[0]
     except IndexError:
-        sys.exit('★render.c の word_char() を読めない（形が変わった？）')
+        sys.exit('★kinsoku.h の kinsoku_word() を読めない（形が変わった？）')
     rs = set((int(a, 16), int(b, 16)) for a, b in re.findall(
         r'c >= 0x([0-9A-Fa-f]{4}) && c <= 0x([0-9A-Fa-f]{4})', body))
     if not rs:
-        sys.exit('★word_char() から 1 つも範囲を読めなかった（読み方が壊れている）')
+        sys.exit('★kinsoku_word() から 1 つも範囲を読めなかった（読み方が壊れている）')
     return rs
 
 
@@ -70,7 +70,7 @@ else:
     ng += 1
 
 # ★カナリア: 突き合わせが素通りしていないか（在るはずのない字を足して赤になること）
-if c_codes('no_head') == set(ord(c) for c in gen_mock.NO_HEAD) | {ord('A')}:
+if c_codes('kinsoku_head') == set(ord(c) for c in gen_mock.NO_HEAD) | {ord('A')}:
     print('✗ ★カナリア: 違う集合が一致してしまう = 突き合わせが死んでいる')
     ng += 1
 else:

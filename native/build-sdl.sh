@@ -6,7 +6,7 @@
 #     - plat_ps1.c → plat_sdl.c   （機械に触る 9 本。境界は plat.h）
 #     - card.c     → save_file.c  （セーブ先がメモリーカードからファイルへ）
 #     - lib.c / link.ld / pack_exe.py は **要らない**（glibc がある）
-#   ★描画の芯・組版・グリフ・履歴・窓・入力の状態機械・訳は 1 行も変えずに共有する。
+#   ★描画の芯・組版・グリフ・履歴・窓・入力の状態機械・訳・VM とのつなぎ（session.c）は 1 行も変えずに共有する。
 #
 # 前提: gen_data.py / gen_tables.py 実行済み（glyphs.h / content.h / tables.h）。
 #       libsdl2-dev（Debian/Ubuntu: apt install libsdl2-dev）。
@@ -41,7 +41,7 @@ case "$ARCH" in
 esac
 objcopy -I binary -O "$OFMT" -B "$OBIN" story.bin story-sdl.o
 
-SRC="main.c render.c plat_sdl.c $GLYPH content_data.c input.c translate.c translate_data.c \
+SRC="main.c session.c render.c plat_sdl.c $GLYPH content_data.c input.c translate.c translate_data.c \
      ruby_data.c jp_text.c cmd.c cmd_data.c save_file.c"
 
 # shellcheck disable=SC2086
