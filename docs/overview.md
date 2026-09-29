@@ -150,6 +150,24 @@ sh test-sdl.sh                                  # ★PS1 版と SDL 版が同じ
 **ひらがな入力方法**（押したボタンがそのまま図に出て、その場で試し打ちできる）・
 **システムコマンド**・**ライセンス全文**が入る。配布は GitHub Releases（`ps1-v*`）。
 
+### PC-98 版（`native/`・MS-DOS + DOS/4GW）
+
+★**「日本語のテキストアドベンチャーが生きていた機械」への里帰り**（2026-09-28〜）。本文はテキスト画面（漢字 ROM）、
+ふりがなはグラフィック画面、ローマ字 / カナキーで打つ。芯（`session.c`・訳・語彙）は PS1 / SDL と共有。
+配布は GitHub Releases（`pc98-v*`・pre-release）。計画・決めたこと・踏んだ罠 = `docs/pc98-port-plan.md`。
+
+★**作品は本体に焼き込まず、ファイルで渡す**（ver. 0.3.0-beta・2026-09-30・計画書の「段 8」）:
+
+| ファイル | 中身 |
+|---|---|
+| `ZORK1.Z3` など | story file（Z-machine のプログラム）。★パックには入れない —— 自由に配れない作品でも訳の束だけ配れる形 |
+| `ZORK1.ZMP` など | パック: 合う story の識別・作品の情報・訳 / 入力の語彙 / ふりがなの表（書式 = `native/gen_pack.py`・表の節 = `native/ctab.py`） |
+
+- 表の生成器（`gen_translate.py` / `gen_cmd.py` / `gen_ruby.py`）は `ctab.py` で書き出す。1 つの定義から
+  PS1 / SDL が焼き込む `*_data.c` と、PC-98 がパックから読むための `*_tab.c` + 節が出る
+- 起動画面で作品（パック + story・パックの無い版 3 の story）を選ぶ。Zork II / III（MIT）は訳が無いので英語だけ
+- 曲・絵はパックに入れず、外のファイル + 作品ごとの `.INI` にする予定（曲は PMD を第一候補に調べる）
+
 差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
 描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・
 ふりがな・コントローラ入力を自分の手に置ける。
