@@ -19,7 +19,7 @@ NAME=zenmai98-$VER
 OUT=pc98-out/$NAME
 rm -rf "$OUT" "pc98-out/$NAME.zip"
 mkdir -p "$OUT"
-cp pc98-out/ZENMAI.EXE pc98-out/ZORK1.ZMP pc98-out/DOS4GW.EXE "$OUT/"
+cp pc98-out/ZENMAI.EXE pc98-out/ZORK1.ZMP pc98-out/ZORK1.Z3 pc98-out/DOS4GW.EXE "$OUT/"
 
 # 文書: UTF-8 で書いて Shift_JIS・CRLF にする
 # ★— (U+2014) は Shift_JIS に無いので ― (U+2015) に寄せる（本体の字の表と同じ）
@@ -50,7 +50,11 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ 起動
   ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
-  DOS/4GW を使います）。作品は ZORK1.ZMP で、ZENMAI.EXE と同じ場所に置いてください。
+  DOS/4GW を使います）。ZENMAI.EXE と同じ場所に、作品の 2 つのファイルを置いてください:
+    ZORK1.Z3   …… Zork I の story file（Z-machine のプログラムそのもの）
+    ZORK1.ZMP  …… Zenmai の層（どの story 向けかと、作品の情報）
+  ★ZENMAI は ZORK1.ZMP を読み、それに合う story を同じ場所から探します（名前が違っても、
+    中身の版が合えば見つけます。版が違う story は使いません）。
   起動画面で ↑↓ で言語を選び、RETURN キーで始めます。
 
 ■ 起動画面の曲
@@ -70,7 +74,8 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ やめる・セーブ
   「やめる」（英語は quit）と打つ（ゲームが確かめてくる）。
-  セーブは「せーぶ」（save）、続きは「ろーど」（restore）。ファイルは ZENMAI.SAV。
+  セーブは「せーぶ」（save）、続きは「ろーど」（restore）。ファイルは ZORK1.SAV（作品ごと）。
+  ★0.2.0-beta までのセーブ ZENMAI.SAV は、名前を ZORK1.SAV に変えると続きから遊べます。
 
 ■ 実機で試してくださる方へ
   次を https://github.com/msonrm/zenmai/issues で教えてください。画面の写真があると助かります。
@@ -88,7 +93,7 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   作品の画面に出る表記（ZORK is a registered trademark of Infocom, Inc.）は原作のままです。
 
 ■ 出どころとライセンス
-  Zork I の story file  …… historicalsource/zork1（MIT License。ZORK1.ZMP の中）  → ZORK1.TXT
+  Zork I の story file  …… historicalsource/zork1（MIT License。ZORK1.Z3）       → ZORK1.TXT
   Z-machine（MojoZork） …… Copyright (c) 2015-2025 Ryan C. Gordon（zlib License）→ MOJOZORK.TXT
   ローマ字の表          …… Mozc の romanji-hiragana.tsv
                            Copyright 2010-2018, Google Inc.（BSD 3-Clause）     → MOZC.TXT
@@ -107,5 +112,5 @@ sjis < ../vendor/zork1/LICENSE > "$OUT/ZORK1.TXT"
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE ZORK1.ZMP DOS4GW.EXE README.TXT ZORK1.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE ZORK1.ZMP ZORK1.Z3 DOS4GW.EXE README.TXT ZORK1.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"

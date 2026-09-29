@@ -36,6 +36,7 @@
 #include "render_pc98.h"
 #include "session.h"
 #include "pack.h"
+#include "save_dos.h"
 #include "translate.h"
 #include "kana_input.h"
 #include "pc98_version.h"
@@ -44,7 +45,7 @@
 #include <i86.h>
 #endif
 
-/* ★作品は焼き込まず、起動時にパックから読む（pack.h）。いまは 1 作品だけ */
+/* ★作品は焼き込まず、起動時にパックから読み、合う story を横から探す（pack.h）。いまは 1 作品だけ */
 static const char PACK_PATH[] = "ZORK1.ZMP";
 static ZmPack pack;
 
@@ -295,7 +296,7 @@ static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
     /* ★罫線は説明の幅（PS1 版と同じ）。塗りは 8px 単位なので桁の境目に合う */
     const int y = (R_SUB + 1) * TXT_RASTERS + 12;
     gfx_rect((TXT_COLS - w) / 2 * 8, y, ((TXT_COLS - w) / 2 + w) * 8, y + 1, 2);
-    center(R_GAME, pack.name, TA_WHITE, 0);         /* 作品名はパックから */
+    center(R_GAME, pack.title, TA_WHITE, 0);        /* 作品名はパックの INFO から */
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
     int sel = 0;
     music_start();                     /* 起動画面の曲（Bach の謎カノン）*/
@@ -350,6 +351,7 @@ int main(int argc, char **argv)
         printf("zenmai: %s: %s\n", PACK_PATH, err);
         return 1;
     }
+    save_dos_name(pack.base);          /* ZORK1.ZMP → ZORK1.SAV */
     if (!body_init()) {
         printf("zenmai: not enough memory\n");
         return 1;

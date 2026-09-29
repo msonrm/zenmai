@@ -15,7 +15,7 @@ const { Machine } = require(path.join(QB, 'tools/lib/machine'));
     if (!script || !outDir) { console.error('使い方: node pc98_run.js 台本.txt 出力先/'); process.exit(2); }
     const game = path.join(outDir, 'game');
     fs.mkdirSync(game, { recursive: true });
-    for (const f of ['ZENMAI.EXE', 'ZORK1.ZMP', 'DOS4GW.EXE'])   // ★作品はパック（pack.h）
+    for (const f of ['ZENMAI.EXE', 'ZORK1.ZMP', 'ZORK1.Z3', 'DOS4GW.EXE'])   // ★作品 = パック + story（pack.h）
         fs.copyFileSync(path.join(__dirname, 'pc98-out', f), path.join(game, f));
     fs.copyFileSync(script, path.join(game, 'SCRIPT.TXT'));
     fs.writeFileSync(path.join(game, 'RUN.BAT'), 'SET DOS16M=1\r\nZENMAI /S SCRIPT.TXT\r\n');

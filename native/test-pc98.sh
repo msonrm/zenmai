@@ -23,10 +23,30 @@ pc98-out/test_render_pc98 || exit 1
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 fail=0
+# ★story の探し方（pack.h）: パックは識別だけを持ち、story は横に置く。識別の合わない story は使わない
+story_case() {   # 名前 期待（ok = 起動する / それ以外 = 出るはずの文言）
+    ( cd "$TMP/story" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/pc98-test/english.txt" >out.txt 2>&1 ) || true
+    if [ "$2" = ok ]; then got=$([ -s "$TMP/story/ZENMAI.LOG" ] && echo y)
+    else got=$(grep -q "$2" "$TMP/story/out.txt" && echo y); fi
+    if [ "$got" = y ]; then
+        echo "OK  story: $1"
+    else
+        echo "NG  story: $1"; cat "$TMP/story/out.txt"; fail=1
+    fi
+    rm -f "$TMP/story/ZENMAI.LOG"
+}
+mkdir -p "$TMP/story" && cp pc98-out/ZORK1.ZMP "$TMP/story/"
+story_case "story が無い → 置くべき識別を言う" "no story file (release 119 / serial 880429)"
+cp pc98-out/ZORK1.Z3 "$TMP/story/GAME.DAT"
+story_case "別の名前（.DAT）でも識別で見つける" ok
+python3 -c "import sys; b=bytearray(open(sys.argv[1],'rb').read()); b[0x17]^=1; open(sys.argv[2],'wb').write(b)" \
+    pc98-out/ZORK1.Z3 "$TMP/story/GAME.DAT"
+cp "$TMP/story/GAME.DAT" "$TMP/story/ZORK1.Z3"
+story_case "識別の合わない story は使わない" "no story file"
 for s in ../test/walkthrough.txt pc98-test/*.txt; do
     name=$(basename "$s" .txt)
     mkdir -p "$TMP/$name/host"
-    cp pc98-out/ZORK1.ZMP "$TMP/$name/host/"     # ★作品はパックから読む（pack.h）
+    cp pc98-out/ZORK1.ZMP pc98-out/ZORK1.Z3 "$TMP/$name/host/"     # ★作品 = パック + story（pack.h）
     ( cd "$TMP/$name/host" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/$s" )
     PC98_EXTMEM=2 node pc98_run.js "$s" "$TMP/$name/qb" >"$TMP/$name/run.txt" 2>&1 || { cat "$TMP/$name/run.txt"; fail=1; continue; }
     cp "$TMP/$name/qb/screen-1x.png" "pc98-out/$name-1x.png"
@@ -38,6 +58,12 @@ for s in ../test/walkthrough.txt pc98-test/*.txt; do
         fail=1
     fi
 done
+# ★セーブは作品ごとの名前（ZORK1.ZMP → ZORK1.SAV）。kana.txt はセーブの往復をする
+if [ -s "$TMP/kana/host/ZORK1.SAV" ] && [ ! -e "$TMP/kana/host/ZENMAI.SAV" ]; then
+    echo "OK  セーブは ZORK1.SAV"
+else
+    echo "NG  セーブの名前"; ls "$TMP/kana/host"; fail=1
+fi
 # ★ローマ字の台本は kana.txt と同じコマンドを打鍵で打つので、記録も同じでなければならない
 if cmp -s "$TMP/kana/host/ZENMAI.LOG" "$TMP/romaji/host/ZENMAI.LOG"; then
     echo "OK  romaji = kana: 打鍵で打っても記録が同じ"

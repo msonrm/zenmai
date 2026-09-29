@@ -30,10 +30,13 @@ if [ -f "${MISAKI_BDF:-../pc98-mock/misaki_gothic.bdf}" ]; then python3 gen_misa
 # 起動画面の曲（Bach の謎カノン。先の声の書き起こしと反転の規則から）
 python3 gen_canon.py
 
-# ★作品（story）は焼き込まず、パック（ZORK1.ZMP）にして横に置く。本体は起動時に読む（pack.h・2026-09-29）。
-#   本体の像を小さくして、拡張 1MB でも載るようにするため（像が約 680KB を超えると DOS/4GW が載せない）
-python3 gen_pack.py ../vendor/zork1/zork1.z3 "Zork I" "$OUT/ZORK1.ZMP"
-rm -f "$OUT/story_pc98.c" "$OUT/story_pc98.obj"
+# ★作品は焼き込まない。story（ZORK1.Z3）と、Zenmai の層を持つパック（ZORK1.ZMP）を横に置く。
+#   本体は起動時にパックを読み、パックが持つ識別で story を探す（pack.h・2026-09-29）。
+#   ★story をパックに入れないのは、自由に配れない作品でも訳の束だけなら配れる形にするため
+cp ../vendor/zork1/zork1.z3 "$OUT/ZORK1.Z3"
+python3 gen_pack.py "$OUT/ZORK1.Z3" "$OUT/ZORK1.ZMP" "title=Zork I" "story=ZORK1.Z3" \
+    "author=Infocom (Marc Blank, Dave Lebling)" \
+    "translation=Zenmai (msonrm)" "license=story: MIT (historicalsource/zork1)"
 
 SRC="main_pc98.c session.c pack.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_data.c misaki_data.c \
