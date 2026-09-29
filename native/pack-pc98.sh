@@ -6,7 +6,7 @@
 # ★版は pc98_version.h の 1 か所から（起動画面と同じ番号）。
 # ★QuuBee は書庫の中の .bat を「起動レシピ」として読んで起動する。DOS/4GW は SET DOS16M=1 が要るので、
 #   それを書いた ZENMAI.BAT を入れる（実機でも同じ .BAT で起動する）。
-# ★**Zenmai は Z-machine で、Zork I は同梱の見本の作品**という書き方をする（商標の「ZORK」を前に出さない）。
+# ★**Zenmai は Z-machine で、Zork I〜III は同梱の見本の作品**という書き方をする（商標の「ZORK」を前に出さない）。
 #   書庫の名前にも Zork を入れない。
 # ★説明書とライセンスの文書は Shift_JIS・CRLF（DOS の流儀）。配るときの義務（Mozc の著作権表示と
 #   BSD 3-Clause の全文など）はここで満たす。
@@ -19,7 +19,9 @@ NAME=zenmai98-$VER
 OUT=pc98-out/$NAME
 rm -rf "$OUT" "pc98-out/$NAME.zip"
 mkdir -p "$OUT"
-cp pc98-out/ZENMAI.EXE pc98-out/ZORK1.ZMP pc98-out/ZORK1.Z3 pc98-out/DOS4GW.EXE "$OUT/"
+# ★作品 = パック（.ZMP）+ story（.Z3）。Zork I は訳つき、II・III は英語だけ（段 8 の C）
+WORKS="ZORK1.ZMP ZORK1.Z3 ZORK2.ZMP ZORK2.Z3 ZORK3.ZMP ZORK3.Z3"
+for f in ZENMAI.EXE DOS4GW.EXE $WORKS; do cp "pc98-out/$f" "$OUT/"; done
 
 # 文書: UTF-8 で書いて Shift_JIS・CRLF にする
 # ★— (U+2014) は Shift_JIS に無いので ― (U+2015) に寄せる（本体の字の表と同じ）
@@ -38,7 +40,8 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 ■ これは何か
   Z-machine（1979 年に Infocom が作った、テキストアドベンチャーを動かす仮想機械）を
   PC-98 に載せ、出力を日本語に訳し、かなで打てるようにしたものです。
-  見本の作品として Zork I を同梱しています（story file は 2025 年に MIT License で公開されたもの）。
+  見本の作品として Zork I・II・III を同梱しています（story file は 2025 年に MIT License で
+  公開されたもの）。日本語に訳してあるのは Zork I です。II と III は英語のまま遊べます。
 
 ■ 動かすのに要るもの（目安）
   - 386 以上の CPU の PC-9801 / PC-9821
@@ -50,12 +53,14 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ 起動
   ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
-  DOS/4GW を使います）。ZENMAI.EXE と同じ場所に、作品の 2 つのファイルを置いてください:
-    ZORK1.Z3   …… Zork I の story file（Z-machine のプログラムそのもの）
-    ZORK1.ZMP  …… Zenmai の層（どの story 向けか・訳・入力の語彙・ふりがな）
-  ★ZENMAI は ZORK1.ZMP を読み、それに合う story を同じ場所から探します（名前が違っても、
+  DOS/4GW を使います）。起動画面で ←→ で作品を、↑↓ で言語を選び、RETURN キーで始めます。
+
+  作品は ZENMAI.EXE と同じ場所に置いた 2 種類のファイルです:
+    ZORK1.Z3 など   …… story file（Z-machine のプログラムそのもの）
+    ZORK1.ZMP など  …… Zenmai の層（どの story 向けか・題・訳・入力の語彙・ふりがな）
+  ★ZENMAI は .ZMP を読み、それに合う story を同じ場所から探します（名前が違っても、
     中身の版が合えば見つけます。版が違う story は使いません）。
-  起動画面で ↑↓ で言語を選び、RETURN キーで始めます。
+  ★.ZMP の無い story file（Z-machine の版 3 のもの）も、英語の作品として起動画面に並びます。
 
 ■ 起動画面の曲
   J. S. バッハ『音楽の捧げもの』BWV 1079 より、2 声のカノン「Quaerendo invenietis」（謎カノン）。
@@ -74,7 +79,7 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ やめる・セーブ
   「やめる」（英語は quit）と打つ（ゲームが確かめてくる）。
-  セーブは「せーぶ」（save）、続きは「ろーど」（restore）。ファイルは ZORK1.SAV（作品ごと）。
+  セーブは「せーぶ」（save）、続きは「ろーど」（restore）。ファイルは ZORK1.SAV など（作品ごと）。
   ★0.2.0-beta までのセーブ ZENMAI.SAV は、名前を ZORK1.SAV に変えると続きから遊べます。
 
 ■ 実機で試してくださる方へ
@@ -94,6 +99,8 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ 出どころとライセンス
   Zork I の story file  …… historicalsource/zork1（MIT License。ZORK1.Z3）       → ZORK1.TXT
+  Zork II の story file …… historicalsource/zork2（MIT License。ZORK2.Z3）       → ZORK2.TXT
+  Zork III の story file…… historicalsource/zork3（MIT License。ZORK3.Z3）       → ZORK3.TXT
   Z-machine（MojoZork） …… Copyright (c) 2015-2025 Ryan C. Gordon（zlib License）→ MOJOZORK.TXT
   ローマ字の表          …… Mozc の romanji-hiragana.tsv
                            Copyright 2010-2018, Google Inc.（BSD 3-Clause）     → MOZC.TXT
@@ -108,9 +115,9 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   https://github.com/msonrm/zenmai
 DOC
 
-sjis < ../vendor/zork1/LICENSE > "$OUT/ZORK1.TXT"
+for n in 1 2 3; do sjis < ../vendor/zork$n/LICENSE > "$OUT/ZORK$n.TXT"; done
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE ZORK1.ZMP ZORK1.Z3 DOS4GW.EXE README.TXT ZORK1.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE $WORKS DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"

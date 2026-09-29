@@ -52,13 +52,15 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
 - QuuBee（ブラウザの PC-98）= `~/development/qb`。headless の土台は `tools/lib/machine.js`
   （`pc98_run.js` / `pc98-mock/shot.js` が使う）
 - 字のコード（UTF-16 → 漢字 ROM）の正典は `native/pc98_jis.py`
-- 台本（`native/pc98-test/*.txt`・`ZENMAI /S 台本`）の記法: `#!english`（1 行目・英語面）/ `#!keys`（以降を打鍵として流す）/
+- 台本（`native/pc98-test/*.txt`・`ZENMAI /S 台本`）の記法: `#!english`（頭・英語面）/ `#!work ZORK2`（頭・作品。無ければ一覧の最初）/ `#!keys`（以降を打鍵として流す）/
   `#!line 文`（文をそのまま本文に流す = 組み方を画面で見る）
 - ★作品は焼き込まず、**パック `ZORK1.ZMP`**（`gen_pack.py` が作る・書式の正典もそこ）を起動時に読み、
   パックが持つ識別で **story `ZORK1.Z3`** を横から探す。★story はパックに入れない（配れない作品でも訳の束だけ配れる形）。
   ★訳・語彙・ふりがなの表もパックの節（書式の正典 = `ctab.py`）。PC-98 は `*_data.c` の代わりに `*_tab.c` + `tabload.c` を links する。
   ★表の形や UI の文言（`gen_cmd.py` の `UI_FRAGS`）を変えたらパックも作り直す（要約値が違うと本体が断る）
-  `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）。セーブは作品ごと（`ZORK1.SAV`）
+  `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）。セーブは作品ごと（`ZORK1.SAV`）。
+  ★起動画面はカレントディレクトリの作品を並べる（`pack_list`）。Zork II・III（`vendor/zork2`・`zork3`・MIT）は訳が無いので英語だけ。
+  ★確保の順番: 大きなもの（story・表）を先に、本文の環の塊を後に（逆だと拡張 1MB で表が取れない）
 - ★曲・絵はパックに入れない（外のファイル + 作品ごとの `.INI`・計画書の「次にやること」）
 - 必要なメモリは像 約 262KB + 起動後に約 620KB（★要件は拡張 2MB。1MB は目標から外したが、今は QuuBee の 1MB でも動く ——
   測った境目と、大きなものを 59KB 以下の塊で取る理由は `docs/pc98-port-plan.md` の「段 8」）

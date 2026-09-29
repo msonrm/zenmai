@@ -1,4 +1,4 @@
-/* 作品の束（パック）を読み、合う story を探して読む。規則は pack.h、書式は gen_pack.py。 */
+/* 作品の一覧を作り、選んだ作品を開く。規則は pack.h、パックの書式は gen_pack.py。 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,31 +10,54 @@
 #include <dos.h>
 #endif
 
-enum { SEC_MAX = 16, INFO_MAX = 1024 };
+enum { SEC_MAX = 16, INFO_MAX = 1024, NAMES_MAX = 64 };
 
 /* 表の登録（ctab.py が作る <mod>_tab.c） */
 extern const TlTab translate_tabs[], cmd_tabs[], ruby_tabs[];
 extern const int translate_tabs_n, cmd_tabs_n, ruby_tabs_n;
 extern const unsigned long translate_schema, cmd_schema, ruby_schema;
+static const struct { const char *id; const TlTab *tabs; const int *n; const unsigned long *schema; } TABS[] = {
+    { "TRAN", translate_tabs, &translate_tabs_n, &translate_schema },
+    { "CMDS", cmd_tabs, &cmd_tabs_n, &cmd_schema },
+    { "RUBY", ruby_tabs, &ruby_tabs_n, &ruby_schema },
+};
+enum { TABS_N = 3 };
 
 static uint32_t le32(const uint8_t *p) { return p[0] | p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24; }
-
-/* 節を探す。在れば位置と長さを入れて 1 */
-static int find_sec(const uint8_t *idx, int n, const char *id, uint32_t *off, uint32_t *len)
-{
-    for (int i = 0; i < n; i++) {
-        if (!memcmp(idx + i * 12, id, 4)) {
-            *off = le32(idx + i * 12 + 4);
-            *len = le32(idx + i * 12 + 8);
-            return 1;
-        }
-    }
-    return 0;
-}
 
 static int read_at(FILE *f, uint32_t off, void *dst, uint32_t len)
 {
     return fseek(f, (long)off, SEEK_SET) == 0 && fread(dst, 1, len, f) == len;
+}
+
+/* ---- パックの索引 ---- */
+
+typedef struct {
+    uint8_t idx[SEC_MAX * 12];
+    int n;
+} Index;
+
+/* パックの頭と索引を読む。パックなら 1 */
+static int read_index(FILE *f, Index *x)
+{
+    uint8_t head[8];
+    if (fread(head, 1, 8, f) != 8 || memcmp(head, "ZMPK", 4) || (head[4] | head[5] << 8) != 1)
+        return 0;
+    x->n = head[6] | head[7] << 8;
+    return x->n >= 1 && x->n <= SEC_MAX && fread(x->idx, 1, (size_t)x->n * 12, f) == (size_t)x->n * 12;
+}
+
+/* 節を探す。在れば位置と長さを入れて 1 */
+static int find_sec(const Index *x, const char *id, uint32_t *off, uint32_t *len)
+{
+    for (int i = 0; i < x->n; i++) {
+        if (!memcmp(x->idx + i * 12, id, 4)) {
+            *off = le32(x->idx + i * 12 + 4);
+            *len = le32(x->idx + i * 12 + 8);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /* INFO（key=value の行）から 1 つ取り出す。無ければ空 */
@@ -56,75 +79,166 @@ static void info_get(const char *info, const char *key, char *dst, int max)
     }
 }
 
-/* ---- story を探す ---- */
+/* ---- ディレクトリ ---- */
 
-/* story のヘッダ（先頭 64 バイト）が識別と合えば 1 */
-static int story_matches(const char *name, const ZmPack *pk)
+static char names[NAMES_MAX][13];
+static int nnames;
+
+/* カレントディレクトリのファイルの名前を集めて、名前の順に並べる */
+static void list_dir(void)
 {
-    uint8_t h[64];
+    nnames = 0;
+#ifdef PC98_HOST
+    DIR *d = opendir(".");
+    struct dirent *e;
+    while (d && nnames < NAMES_MAX && (e = readdir(d)))
+        if (e->d_name[0] != '.' && strlen(e->d_name) <= 12)
+            strcpy(names[nnames++], e->d_name);
+    if (d)
+        closedir(d);
+#else
+    struct find_t ft;
+    for (unsigned r = _dos_findfirst("*.*", _A_NORMAL | _A_RDONLY, &ft); !r && nnames < NAMES_MAX; r = _dos_findnext(&ft))
+        strcpy(names[nnames++], ft.name);
+    _dos_findclose(&ft);
+#endif
+    for (int i = 1; i < nnames; i++)       /* 挿し込み整列（数十個なので） */
+        for (int j = i; j > 0 && strcmp(names[j - 1], names[j]) > 0; j--) {
+            char t[13];
+            strcpy(t, names[j]);
+            strcpy(names[j], names[j - 1]);
+            strcpy(names[j - 1], t);
+        }
+}
+
+static int has_ext(const char *name, const char *ext)
+{
+    const char *dot = strrchr(name, '.');
+    if (!dot || strlen(dot) != strlen(ext))
+        return 0;
+    for (int i = 0; dot[i]; i++) {
+        const char c = dot[i] >= 'a' && dot[i] <= 'z' ? (char)(dot[i] - 32) : dot[i];
+        if (c != ext[i])
+            return 0;
+    }
+    return 1;
+}
+
+static int is_story_name(const char *name) { return has_ext(name, ".Z3") || has_ext(name, ".DAT"); }
+
+/* 名前（拡張子なし・大文字・8 字まで） */
+static void set_base(char *base, const char *name)
+{
+    int n = 0;
+    while (name[n] && name[n] != '.' && n < 8) {
+        const char c = name[n];
+        base[n++] = (char)(c >= 'a' && c <= 'z' ? c - 32 : c);
+    }
+    base[n] = '\0';
+}
+
+/* ---- story ---- */
+
+/* story のヘッダ（先頭 64 バイト）を読む。★版 3 だけ（MojoZork が版 3 の処理系なので） */
+static int story_header(const char *name, uint8_t *h)
+{
     FILE *f = fopen(name, "rb");
     if (!f)
         return 0;
-    const int ok = fread(h, 1, sizeof h, f) == sizeof h;
+    const int ok = fread(h, 1, 64, f) == 64;
     fclose(f);
-    return ok && h[0] == 3
+    return ok && h[0] == 3;
+}
+
+static int story_matches(const char *name, const ZmPack *pk)
+{
+    uint8_t h[64];
+    return story_header(name, h)
         && (h[2] << 8 | h[3]) == pk->release
         && !memcmp(h + 0x12, pk->serial, 6)
         && (h[0x1C] << 8 | h[0x1D]) == pk->checksum;
 }
 
-static int is_story_name(const char *name)
-{
-    const char *dot = strrchr(name, '.');
-    if (!dot || strlen(name) > 12)
-        return 0;
-    char ext[5] = { 0 };
-    for (int i = 0; i < 4 && dot[i]; i++)
-        ext[i] = (char)(dot[i] >= 'a' && dot[i] <= 'z' ? dot[i] - 32 : dot[i]);
-    return !strcmp(ext, ".Z3") || !strcmp(ext, ".DAT");
-}
-
-/* カレントディレクトリの .Z3 / .DAT から識別の合うものを探す。見つかれば pk->story に入れて 1 */
-static int scan_stories(ZmPack *pk)
-{
-    int found = 0;
-#ifdef PC98_HOST
-    DIR *d = opendir(".");
-    if (!d)
-        return 0;
-    struct dirent *e;
-    while (!found && (e = readdir(d)))
-        if (is_story_name(e->d_name) && story_matches(e->d_name, pk)) {
-            strcpy(pk->story, e->d_name);
-            found = 1;
-        }
-    closedir(d);
-#else
-    struct find_t ft;
-    for (unsigned r = _dos_findfirst("*.*", _A_NORMAL | _A_RDONLY, &ft); !r && !found; r = _dos_findnext(&ft))
-        if (is_story_name(ft.name) && story_matches(ft.name, pk)) {
-            strcpy(pk->story, ft.name);
-            found = 1;
-        }
-    _dos_findclose(&ft);
-#endif
-    return found;
-}
-
-static int find_story(ZmPack *pk, const char *hint)
+/* パックに合う story を探す: INFO の story= → パックと同じ名前の .Z3 → 全部の .Z3 / .DAT */
+static void find_story(ZmPack *pk, const char *hint)
 {
     char name[13];
-    if (hint[0] && strlen(hint) <= 12 && story_matches(hint, pk)) {
-        strcpy(pk->story, hint);
-        return 1;
-    }
     snprintf(name, sizeof name, "%s.Z3", pk->base);
-    if (story_matches(name, pk)) {
+    if (hint[0] && strlen(hint) <= 12 && story_matches(hint, pk))
+        strcpy(pk->story, hint);
+    else if (story_matches(name, pk))
         strcpy(pk->story, name);
-        return 1;
-    }
-    return scan_stories(pk);
+    else
+        for (int i = 0; i < nnames && !pk->story[0]; i++)
+            if (is_story_name(names[i]) && story_matches(names[i], pk))
+                strcpy(pk->story, names[i]);
 }
+
+/* パックを 1 つ調べる（story と表はまだ読まない）。パックとして読めれば 1 */
+static int probe_pack(const char *name, ZmPack *pk)
+{
+    static Index x;
+    static char info[INFO_MAX + 1];
+    uint8_t id[10];
+    uint32_t off, len;
+    char hint[13];
+    FILE *f = fopen(name, "rb");
+    if (!f)
+        return 0;
+    int ok = read_index(f, &x) && find_sec(&x, "IDNT", &off, &len) && len == 10 && read_at(f, off, id, 10);
+    info[0] = '\0';
+    if (ok && find_sec(&x, "INFO", &off, &len) && len <= INFO_MAX && read_at(f, off, info, len))
+        info[len] = '\0';
+    fclose(f);
+    if (!ok)
+        return 0;
+    memset(pk, 0, sizeof *pk);
+    strcpy(pk->pack, name);
+    set_base(pk->base, name);
+    pk->release = (uint16_t)(id[0] | id[1] << 8);
+    memcpy(pk->serial, id + 2, 6);
+    pk->checksum = (uint16_t)(id[8] | id[9] << 8);
+    info_get(info, "title", pk->title, sizeof pk->title);
+    if (!pk->title[0])
+        strcpy(pk->title, name);
+    pk->has_ja = 1;
+    for (int i = 0; i < TABS_N; i++)
+        if (!find_sec(&x, TABS[i].id, &off, &len))
+            pk->has_ja = 0;
+    info_get(info, "story", hint, sizeof hint);
+    find_story(pk, hint);
+    return 1;
+}
+
+int pack_list(ZmPack *w, int max)
+{
+    int n = 0;
+    list_dir();
+    for (int i = 0; i < nnames && n < max; i++)
+        if (has_ext(names[i], ".ZMP") && probe_pack(names[i], &w[n]))
+            n++;
+    const int npack = n;
+    /* ★どのパックにも使われていない story は、英語だけの作品として並べる */
+    for (int i = 0; i < nnames && n < max; i++) {
+        uint8_t h[64];
+        int used = 0;
+        for (int k = 0; k < npack; k++)
+            used |= !strcmp(w[k].story, names[i]);
+        if (used || !is_story_name(names[i]) || !story_header(names[i], h))
+            continue;
+        ZmPack *pk = &w[n++];
+        memset(pk, 0, sizeof *pk);
+        strcpy(pk->story, names[i]);
+        strcpy(pk->title, names[i]);
+        set_base(pk->base, names[i]);
+        pk->release = (uint16_t)(h[2] << 8 | h[3]);
+        memcpy(pk->serial, h + 0x12, 6);
+        pk->checksum = (uint16_t)(h[0x1C] << 8 | h[0x1D]);
+    }
+    return n;
+}
+
+/* ---- 開く ---- */
 
 /* story を読んで、作業域と動的領域の控えを作る */
 static const char *load_story(ZmPack *pk)
@@ -154,82 +268,31 @@ static const char *load_story(ZmPack *pk)
     return 0;
 }
 
-/* パックの名前（拡張子なし・大文字・8 字まで）を path から */
-static void set_base(ZmPack *pk, const char *path)
+const char *pack_open(ZmPack *pk, int ja)
 {
-    const char *s = path;
-    for (const char *p = path; *p; p++)
-        if (*p == '/' || *p == '\\' || *p == ':')
-            s = p + 1;
-    int n = 0;
-    while (s[n] && s[n] != '.' && n < 8) {
-        const char c = s[n];
-        pk->base[n++] = (char)(c >= 'a' && c <= 'z' ? c - 32 : c);
-    }
-    pk->base[n] = '\0';
-}
-
-const char *pack_load(const char *path, ZmPack *pk)
-{
-    static uint8_t idx[SEC_MAX * 12];
-    static char info[INFO_MAX + 1];
     static char msg[96];
-    uint8_t head[8], id[10];
+    static Index x;
     uint32_t off, len;
-    const char *err = 0;
-    char hint[13];
-    memset(pk, 0, sizeof *pk);
-    set_base(pk, path);
-    FILE *f = fopen(path, "rb");
-    if (!f)
-        return "cannot open";
-    const int n = fread(head, 1, 8, f) == 8 ? head[6] | head[7] << 8 : 0;
-    info[0] = '\0';
-    if (memcmp(head, "ZMPK", 4) || (head[4] | head[5] << 8) != 1 || n < 1 || n > SEC_MAX
-        || fread(idx, 1, (size_t)n * 12, f) != (size_t)n * 12)
-        err = "not a Zenmai pack";
-    else if (!find_sec(idx, n, "IDNT", &off, &len) || len != 10 || !read_at(f, off, id, 10))
-        err = "no story identity";
-    else if (find_sec(idx, n, "INFO", &off, &len)) {    /* INFO は無くてもよい */
-        if (len > INFO_MAX || !read_at(f, off, info, len))
-            err = "cannot read the info";
-        else
-            info[len] = '\0';
-    }
-    fclose(f);
-    if (err)
-        return err;
-    pk->release = (uint16_t)(id[0] | id[1] << 8);
-    memcpy(pk->serial, id + 2, 6);
-    pk->checksum = (uint16_t)(id[8] | id[9] << 8);
-    info_get(info, "title", pk->title, sizeof pk->title);
-    info_get(info, "story", hint, sizeof hint);
-    if (!find_story(pk, hint)) {
+    if (!pk->story[0]) {
         /* ★どの story を置けばよいかを言う（題は UTF-8 なので DOS の画面に出せない。識別で言う） */
         snprintf(msg, sizeof msg, "no story file (release %u / serial %s) in this directory",
                  (unsigned)pk->release, pk->serial);
         return msg;
     }
-    if ((err = load_story(pk))) {
-        free(pk->ram);
-        free(pk->init);
-        pk->ram = pk->init = 0;
+    const char *err = load_story(pk);
+    if (err || !ja)
         return err;
-    }
-    /* ★訳・語彙・ふりがなの表（段 8 の B）。本体には焼き込んでいない */
-    static const struct { const char *id; const TlTab *tabs; const int *n; const unsigned long *schema; } T[] = {
-        { "TRAN", translate_tabs, &translate_tabs_n, &translate_schema },
-        { "CMDS", cmd_tabs, &cmd_tabs_n, &cmd_schema },
-        { "RUBY", ruby_tabs, &ruby_tabs_n, &ruby_schema },
-    };
-    if (!(f = fopen(path, "rb")))
-        return "cannot open";
-    for (int i = 0; i < 3 && !err; i++) {
-        if (!find_sec(idx, n, T[i].id, &off, &len))
+    /* ★訳・語彙・ふりがなの表（段 8 の B）。本体には焼き込んでいない。英語で遊ぶなら読まない */
+    FILE *f = fopen(pk->pack, "rb");
+    if (!f || !read_index(f, &x))
+        err = "cannot read the pack";
+    for (int i = 0; i < TABS_N && !err; i++) {
+        if (!find_sec(&x, TABS[i].id, &off, &len))
             err = "no Japanese tables";
         else
-            err = tab_load(f, off, len, T[i].tabs, *T[i].n, *T[i].schema);
+            err = tab_load(f, off, len, TABS[i].tabs, *TABS[i].n, *TABS[i].schema);
     }
-    fclose(f);
+    if (f)
+        fclose(f);
     return err;
 }

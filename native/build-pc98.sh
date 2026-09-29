@@ -43,6 +43,13 @@ python3 gen_pack.py "$OUT/ZORK1.Z3" "$OUT/ZORK1.ZMP" \
     "title=Zork I" "story=ZORK1.Z3" \
     "author=Infocom (Marc Blank, Dave Lebling)" \
     "translation=Zenmai (msonrm)" "license=story: MIT (historicalsource/zork1)"
+# ★Zork II・III はまだ訳が無いので、題などの情報だけのパック（= 英語だけ。段 8 の C）。story は同じく MIT
+cp ../vendor/zork2/zork2.z3 "$OUT/ZORK2.Z3"
+python3 gen_pack.py "$OUT/ZORK2.Z3" "$OUT/ZORK2.ZMP" "title=Zork II" "story=ZORK2.Z3" \
+    "author=Infocom (Dave Lebling, Marc Blank)" "license=story: MIT (historicalsource/zork2)"
+cp ../vendor/zork3/zork3.z3 "$OUT/ZORK3.Z3"
+python3 gen_pack.py "$OUT/ZORK3.Z3" "$OUT/ZORK3.ZMP" "title=Zork III" "story=ZORK3.Z3" \
+    "author=Infocom (Marc Blank, Dave Lebling)" "license=story: MIT (historicalsource/zork3)"
 
 SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_tab.c misaki_data.c \

@@ -24,8 +24,8 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 fail=0
 # ★story の探し方（pack.h）: パックは識別だけを持ち、story は横に置く。識別の合わない story は使わない
-story_case() {   # 名前 期待（ok = 起動する / それ以外 = 出るはずの文言）
-    ( cd "$TMP/story" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/pc98-test/english.txt" >out.txt 2>&1 ) || true
+story_case() {   # 名前 期待（ok = 起動する / それ以外 = 出るはずの文言）[台本（既定 = 英語）]
+    ( cd "$TMP/story" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/${3:-pc98-test/english.txt}" >out.txt 2>&1 ) || true
     if [ "$2" = ok ]; then got=$([ -s "$TMP/story/ZENMAI.LOG" ] && echo y)
     else got=$(grep -q "$2" "$TMP/story/out.txt" && echo y); fi
     if [ "$got" = y ]; then
@@ -55,11 +55,19 @@ for i in range(n):
         b[off] ^= 1
 open(sys.argv[2], 'wb').write(b)
 PY
-story_case "表の版が本体と違うパックは断る" "the tables are for another version of Zenmai"
+story_case "表の版が本体と違うパックは断る" "the tables are for another version of Zenmai" pc98-test/kana.txt
+story_case "英語で遊ぶなら表は読まない（版が違っても起動する）" ok
+# ★パックの無い story は英語だけの作品として並ぶ（題はファイル名・セーブもその名前）
+rm -f "$TMP/story/"*
+cp pc98-out/ZORK2.Z3 "$TMP/story/"
+story_case "パックの無い story（ZORK2.Z3）を英語で遊ぶ" ok pc98-test/zork2.txt
+[ -s "$TMP/story/ZORK2.SAV" ] && echo "OK  story: パックの無い story のセーブは ZORK2.SAV" || { echo "NG  story: ZORK2.SAV が無い"; fail=1; }
+rm -f "$TMP/story/"*
+story_case "作品が 1 つも無い → 置くものを言う" "no game here"
 for s in ../test/walkthrough.txt pc98-test/*.txt; do
     name=$(basename "$s" .txt)
     mkdir -p "$TMP/$name/host"
-    cp pc98-out/ZORK1.ZMP pc98-out/ZORK1.Z3 "$TMP/$name/host/"     # ★作品 = パック + story（pack.h）
+    cp pc98-out/*.ZMP pc98-out/*.Z3 "$TMP/$name/host/"     # ★作品 = パック + story（pack.h）。全部置く
     ( cd "$TMP/$name/host" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/$s" )
     PC98_EXTMEM=2 node pc98_run.js "$s" "$TMP/$name/qb" >"$TMP/$name/run.txt" 2>&1 || { cat "$TMP/$name/run.txt"; fail=1; continue; }
     cp "$TMP/$name/qb/screen-1x.png" "pc98-out/$name-1x.png"
@@ -71,6 +79,14 @@ for s in ../test/walkthrough.txt pc98-test/*.txt; do
         fail=1
     fi
 done
+# 参考: 拡張 1MB でも日本語の台本が通るか（★1MB は目標ではないので落とさない。届かなくなったら気付くための表示。
+#   確保の順番を変えると届かなくなる —— 大きなもの（story・表）を先に、本文の環の塊を後に・段 8）
+if PC98_EXTMEM=1 node pc98_run.js pc98-test/kana.txt "$TMP/kana/qb1" >/dev/null 2>&1 \
+    && cmp -s "$TMP/kana/host/ZENMAI.LOG" "$TMP/kana/qb1/ZENMAI.LOG"; then
+    echo "参考 拡張 1MB: kana が通る"
+else
+    echo "参考 拡張 1MB: ★kana が通らない（要件の 2MB では動く）"
+fi
 # ★セーブは作品ごとの名前（ZORK1.ZMP → ZORK1.SAV）。kana.txt はセーブの往復をする
 if [ -s "$TMP/kana/host/ZORK1.SAV" ] && [ ! -e "$TMP/kana/host/ZENMAI.SAV" ]; then
     echo "OK  セーブは ZORK1.SAV"
