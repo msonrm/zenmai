@@ -23,6 +23,7 @@
  *                         `#!keys` の後の行は**打鍵として**キーボードと同じ道（ki_key）を通す
  *                         （`#!text` で戻る。半角カナはカナキーの打鍵になる）。
  *                         `#!line 文` は文をそのまま本文に流す（組み方を画面で確かめる用。VM は回さない）。
+ *                         頭の `#!english` で英語面、`#!work 名前` で作品（ZORK2 など。無ければ一覧の最初）。
  *                         ★同じものをホストでも建てて（build-pc98.sh）記録を突き合わせる（test-pc98.sh）
  */
 #include <stdint.h>
@@ -35,6 +36,8 @@
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
+#include "pack.h"
+#include "save_dos.h"
 #include "translate.h"
 #include "kana_input.h"
 #include "pc98_version.h"
@@ -43,8 +46,10 @@
 #include <i86.h>
 #endif
 
-extern const uint8_t zm_story[];       /* story_pc98.c（build-pc98.sh が zork1.z3 から焼く） */
-extern const uint32_t zm_story_len;
+/* ★作品は焼き込まない。起動画面でカレントディレクトリの作品（パック + story・story だけ）を並べ、
+ *   選んだものを開く（pack.h・段 8 の C） */
+static ZmPack works[WORKS_MAX];
+static int nworks;
 
 enum { ROW_STATUS = 0, ROW_INPUT = 15, COL_L = BODY_COL0, COL_R = BODY_COL0 + BODY_CELLS };
 static KiLine line;                    /* 入力欄 */
@@ -214,7 +219,7 @@ static void draw_input(int caret)
 }
 
 #ifndef PC98_HOST
-enum { K_ROLLUP = 0x36, K_ROLLDOWN = 0x37, K_UP = 0x3A, K_DOWN = 0x3D };
+enum { K_ROLLUP = 0x36, K_ROLLDOWN = 0x37, K_UP = 0x3A, K_LEFT = 0x3B, K_RIGHT = 0x3C, K_DOWN = 0x3D };
 
 /* キーボードから 1 行（空でない行を Enter で送るまで戻らない） */
 static void key_line(void)
@@ -278,11 +283,16 @@ static int put_at(int row, int left, const char *s, uint8_t attr, int mark)
 
 static int center(int row, const char *s, uint8_t attr, int mark) { return put_at(row, -1, s, attr, mark); }
 
-static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
+/* 起動画面。*wi = 選んだ作品（入るときは初めの選択）。戻り値 1 = ENGLISH / 0 = 日本語。
+ * ★作品が 1 つなら今までと同じ見た目（題 → 日本語 / ENGLISH）。2 つ以上なら題の左右に ← → を出し、←→ で替える。
+ * ★訳の無い作品は ENGLISH だけ。パックはあるが story が無い作品は、置くべき story を言って始めさせない */
+static int title_menu(int *wi)
 {
     enum { R_TITLE = 3, R_SUB = 4, R_GAME = 7, R_JA = 9, R_EN = 10, R_HINT = 13, R_VER = 15 };
     /* ★PC-98 のキーは RETURN（Enter ではない） */
-    static const char *hint[2] = { "↑↓ で選び、Return キーでゲームスタート", "UP / DOWN TO CHOOSE, RETURN TO START" };
+    static const char *hint[2][2] = {
+        { "↑↓ で選び、Return キーでゲームスタート", "UP / DOWN TO CHOOSE, RETURN TO START" },
+        { "←→ で作品、↑↓ で言語を選び、Return キーでゲームスタート", "LEFT / RIGHT: GAME, UP / DOWN: LANGUAGE, RETURN TO START" } };
     const int menu_l = (TXT_COLS - 7) / 2;     /* 長いほう（ENGLISH = 7 桁）を中央に置いた左端 */
     gfx_palette(0, 0, 0, 0);
     gfx_palette(1, 3, 2, 7);           /* 地（上の帯と同じ紺） */
@@ -293,22 +303,42 @@ static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
     /* ★罫線は説明の幅（PS1 版と同じ）。塗りは 8px 単位なので桁の境目に合う */
     const int y = (R_SUB + 1) * TXT_RASTERS + 12;
     gfx_rect((TXT_COLS - w) / 2 * 8, y, ((TXT_COLS - w) / 2 + w) * 8, y + 1, 2);
-    center(R_GAME, "Zork I", TA_WHITE, 0);
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
-    int sel = 0;
+    const int many = nworks > 1;
+    int sel = 0, cur = *wi;
     music_start();                     /* 起動画面の曲（Bach の謎カノン）*/
     for (;;) {
-        put_at(R_JA, menu_l, "日本語", sel ? TA_WHITE : TA_YELLOW, !sel);
-        put_at(R_EN, menu_l, "ENGLISH", sel ? TA_YELLOW : TA_WHITE, sel);
-        center(R_HINT, hint[sel], TA_CYAN, 0);
+        const ZmPack *p = &works[cur];
+        const int ja_ok = p->has_ja && p->story[0];
+        const int s = ja_ok ? sel : 1;
+        char t[80];
+        snprintf(t, sizeof t, many ? "←　%s　→" : "%s", p->title);
+        center(R_GAME, t, TA_WHITE, 0);
+        if (!p->story[0]) {
+            snprintf(t, sizeof t, "story が見つかりません（release %u / serial %s）", (unsigned)p->release, p->serial);
+            center(R_JA, t, TA_CYAN, 0);
+            txt_clear(R_EN, R_EN, TA_WHITE);
+        } else {
+            put_at(R_JA, menu_l, ja_ok ? "日本語" : "日本語（この作品はまだ訳がありません）",
+                   !ja_ok ? TA_CYAN : s ? TA_WHITE : TA_YELLOW, !s);
+            put_at(R_EN, menu_l, "ENGLISH", s ? TA_YELLOW : TA_WHITE, s);
+        }
+        center(R_HINT, hint[many][s], TA_CYAN, 0);
         while (!kbd_hit())             /* ★曲は待つ間だけ進む（割り込みは使わない・pc98_fm.h） */
             music_poll();
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_UP || scan == K_DOWN)
-            sel ^= 1;
-        else if (c == '\r' || c == ' ')
+            sel = ja_ok ? sel ^ 1 : sel;
+        else if (scan == K_LEFT && many)
+            cur = (cur + nworks - 1) % nworks;
+        else if (scan == K_RIGHT && many)
+            cur = (cur + 1) % nworks;
+        else if ((c == '\r' || c == ' ') && p->story[0]) {
+            sel = s;
             break;
+        }
     }
+    *wi = cur;
     music_stop();
     txt_clear(0, TXT_ROWS - 1, TA_WHITE);
     return sel;
@@ -332,25 +362,59 @@ int main(int argc, char **argv)
         printf("zenmai: 台本を開けない\n");
         return 1;
     }
+    /* ★画面を切り替える前に作品を並べる（無ければ DOS の画面のまま言って返る） */
+    nworks = pack_list(works, WORKS_MAX);
+    if (!nworks) {
+        printf("zenmai: no game here (put a story file .Z3 and/or a Zenmai pack .ZMP)\n");
+        return 1;
+    }
+    int wi = 0;
     if (script) {
         render_log = fopen("ZENMAI.LOG", "wb");
-        /* ★台本の 1 行目が `#!english` なら英語面（起動画面は出さない） */
-        char head[16];
-        if (fgets(head, sizeof head, script) && !strncmp(head, "#!english", 9))
-            lang_en = 1;
-        else
-            rewind(script);
+        /* ★台本の頭の `#!english`（英語面）と `#!work 名前`（作品。無ければ一覧の最初）。起動画面は出さない */
+        char head[64];
+        long at = ftell(script);
+        while (fgets(head, sizeof head, script)) {
+            if (!strncmp(head, "#!english", 9)) {
+                lang_en = 1;
+            } else if (!strncmp(head, "#!work ", 7)) {
+                strtok(head + 7, "\r\n");
+                wi = -1;
+                for (int i = 0; i < nworks; i++)
+                    if (!strcmp(works[i].base, head + 7)) wi = i;
+                if (wi < 0) {
+                    printf("zenmai: no such game: %s\n", head + 7);
+                    return 1;
+                }
+            } else {
+                break;
+            }
+            at = ftell(script);
+        }
+        fseek(script, at, SEEK_SET);
     }
-
     txt_init();
     gfx_init();
 #ifndef PC98_HOST
     if (!script)
-        lang_en = title_menu();
+        lang_en = title_menu(&wi);
 #endif
+    ZmPack *pack = &works[wi];
+    /* ★大きなもの（story・表 = ひと続きで取る）を先に、本文の環（20KB の塊）を後に確保する。
+     *   逆にすると、拡張 1MB の機械では塊が拡張メモリの残りを食って、大きな表が取れなくなる（段 8） */
+    const char *err = pack_open(pack, !lang_en);
+    if (!err && !body_init())
+        err = "not enough memory";
+    if (err) {
+        gfx_fini();
+        txt_fini();
+        printf("zenmai: %s: %s\n", pack->pack[0] ? pack->pack : pack->story, err);
+        return 1;
+    }
+    save_dos_name(pack->base);         /* ZORK1.ZMP → ZORK1.SAV */
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */
-    sess_start(lang_en, zm_story, zm_story_len, die);
+    sess_start(lang_en, pack->ram, pack->len, pack->init, die);
     draw_status();
     body_show(0);
 

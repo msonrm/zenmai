@@ -17,8 +17,11 @@
 
 /* VM を用意して最初の入力待ちまで回し、そこまでの出力を流す。
  * en = 1 なら訳さずに英語のまま流す。die = VM が止まったときに呼ぶ（戻ってきたら固まる）。
- * ★story は初期イメージとして持ち続ける（セーブの差分の相手） */
-void sess_start(int en, const uint8_t *story, uint32_t len, void (*die)(const char *msg));
+ * ram = VM が読み書きする story の作業域（len バイト。★呼ぶ側が持ち、story を写しておく）。
+ * init = 初期イメージ。★持ち続ける（セーブの差分の相手）。見るのは動的領域（ヘッダ 0Eh の値まで）だけ。
+ * ★作業域を呼ぶ側が持つのは、PC-98 版が story をファイル（パック・pack.h）から読んで
+ *   確保するため（2026-09-29）。PS1 / SDL は焼き込んだ story を配列に写して渡す（main.c） */
+void sess_start(int en, uint8_t *ram, uint32_t len, const uint8_t *init, void (*die)(const char *msg));
 
 int sess_quit(void);                   /* 原作の QUIT が通ったら 1 */
 const char *sess_status(void);         /* Z-machine の状態行（49 桁・部屋名と得点の間は空白 2 つ以上） */

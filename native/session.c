@@ -15,8 +15,7 @@
 #include "vendor/mojozork.c"
 #undef main
 
-static const uint8_t *story_init;      /* 初期イメージ（セーブの差分の相手） */
-static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
+static const uint8_t *story_init;      /* 初期イメージ（セーブの差分の相手）。★動的領域だけ見る */
 static ZMachineState zm;
 static char statusbuf[49];
 static int lang_en;                    /* 1 = 訳さない */
@@ -188,14 +187,13 @@ static void run_until_read(void)
         runInstruction();
 }
 
-static void vm_init(const uint8_t *story, uint32_t len)
+static void vm_init(uint8_t *ram, uint32_t len, const uint8_t *init)
 {
-    story_init = story;
-    memcpy(story_ram, story, len);
+    story_init = init;
     GState = &zm;
     GState->die = zm_die;
     GState->writestr = zm_writestr;
-    initStory(0, story_ram, len);
+    initStory(0, ram, len);
     GState->status_bar = statusbuf;
     GState->status_bar_len = sizeof statusbuf;
     GState->status_bar_enabled = 1;
@@ -291,11 +289,11 @@ static void put_frag16(uint16_t *dst, int *o, int max, int fi)
 
 /* ---- 入口 ---- */
 
-void sess_start(int en, const uint8_t *story, uint32_t len, void (*die)(const char *msg))
+void sess_start(int en, uint8_t *ram, uint32_t len, const uint8_t *init, void (*die)(const char *msg))
 {
     lang_en = en;
     die_hook = die;
-    vm_init(story, len);
+    vm_init(ram, len, init);
     run_until_read();
     render_output();
 }

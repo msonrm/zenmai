@@ -14,6 +14,7 @@
  * 英語: T9 入力。日本語: かな→cmd.c。
  */
 #include <stdint.h>
+#include <string.h>
 #include "render.h"
 #include "input.h"
 #include "translate.h"
@@ -1426,8 +1427,13 @@ static void boot_once(void)
 #endif
     paint_screen(BG);                  /* メニューを消す */
 
-    sess_start(lang_en, _binary_story_bin_start,
-               (uint32_t)(_binary_story_bin_end - _binary_story_bin_start), zm_die_hook);
+    {
+        /* ★作業域はここが持つ（session.h）。初期イメージは焼き込んだ story そのもの */
+        static uint8_t story_ram[90 * 1024];   /* z3 は 84.8KB。スタック余地を確保 */
+        const uint32_t len = (uint32_t)(_binary_story_bin_end - _binary_story_bin_start);
+        memcpy(story_ram, _binary_story_bin_start, len);
+        sess_start(lang_en, story_ram, len, _binary_story_bin_start, zm_die_hook);
+    }
     view_bottom();
     render_window();
     draw_status();

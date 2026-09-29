@@ -1,10 +1,17 @@
 /* Zenmai セーブ —— DOS 版（PC-98。card.c / save_file.c の対）。
- * ★置き場はカレントディレクトリの ZENMAI.SAV。書式は PS1 / SDL と同じ（session.c が作る）ので、
- *   ファイルを持ち運べば版をまたいで続きから遊べる。 */
+ * ★置き場はカレントディレクトリの <パックの名前>.SAV（ZORK1.ZMP なら ZORK1.SAV）。作品ごとに分ける
+ *   （2026-09-29。それまでは ZENMAI.SAV の 1 つ —— 作品を足すと別の作品のセーブを読んでしまう）。
+ *   書式は PS1 / SDL と同じ（session.c が作る）ので、ファイルを持ち運べば版をまたいで続きから遊べる。 */
 #include <stdio.h>
 #include "card.h"
+#include "save_dos.h"
 
-static const char SAVE_PATH[] = "ZENMAI.SAV";
+static char SAVE_PATH[13] = "ZENMAI.SAV";
+
+void save_dos_name(const char *base)
+{
+    snprintf(SAVE_PATH, sizeof SAVE_PATH, "%.8s.SAV", base);
+}
 
 int card_save(const unsigned char *data, int len)
 {

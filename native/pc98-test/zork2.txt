@@ -1,0 +1,13 @@
+#!english
+#!work ZORK2
+take lamp
+take sword
+turn on lamp
+south
+south
+save
+east
+restore
+look
+inventory
+score

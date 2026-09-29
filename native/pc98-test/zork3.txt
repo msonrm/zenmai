@@ -1,0 +1,11 @@
+#!english
+#!work ZORK3
+take lamp
+turn on lamp
+south
+look
+save
+west
+restore
+look
+inventory

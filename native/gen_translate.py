@@ -7,11 +7,13 @@ Translator(src/translate.js)のコンストラクタ相当をビルド時に実�
   - 具体性(穴を除いた字数)降順の安定ソート
 挙動の正典は JS。ここを直すときは translate.js と突き合わせること。
 
-使い方: python3 gen_translate.py
+使い方: python3 gen_translate.py              → translate_data.{c,h}・translate_tab.c（ctab.py）
+        python3 gen_translate.py --sec 出力   → パックの節（TRAN）だけ
 """
 import json
 import re
 from pathlib import Path
+from ctab import Struct, Table, emit, sec_path
 
 HERE = Path(__file__).parent
 asset = json.loads((HERE.parent / 'assets' / 'zork1-ja.json').read_text())
@@ -183,41 +185,21 @@ for s in notrans:
     o, l = en_off(s)
     nt_rows.append((o, l))
 
-with open(HERE / 'translate_data.h', 'w') as f:
-    f.write('/* gen_translate.py が生成。手で編集しない */\n')
-    f.write('#ifndef TRANSLATE_DATA_H\n#define TRANSLATE_DATA_H\n')
-    f.write('typedef struct { unsigned int eo; unsigned short el; unsigned int jo; unsigned short jl; } TrPair;\n')
-    f.write('typedef struct { unsigned int off; unsigned short len; unsigned char kind; unsigned char slot; } TrSeg;\n')
-    f.write('typedef struct { unsigned short seg_off, en_n, ja_n, has_echo; } TrPat;\n')
-    f.write('enum { TRK_LIT, TRK_HOLE, TRK_QHOLE, TRK_JLIT, TRK_JREF };\n')
-    f.write('enum { TRF_ECHO = 1, TRF_VERB = 2, TRF_SAID = 4 };\n')
-    f.write(f'enum {{ TR_EXACT_N = {len(exact_rows)}, TR_PROPS_N = {len(props_rows)}, '
-            f'TR_WORDS_N = {len(words_rows)}, TR_PATS_N = {len(pats_out)}, TR_NT_N = {len(nt_rows)} }};\n')
-    f.write('extern const char tr_en_pool[];\n')
-    f.write('extern const unsigned short tr_ja_pool[];\n')
-    f.write('extern const TrPair tr_exact[TR_EXACT_N];\n')
-    f.write('extern const TrPair tr_props[TR_PROPS_N];\n')
-    f.write('extern const TrPair tr_words[TR_WORDS_N];\n')
-    f.write('extern const TrSeg tr_segs[];\n')
-    f.write('extern const TrPat tr_pats[TR_PATS_N];\n')
-    f.write('extern const TrPair tr_notrans[TR_NT_N];\n')
-    f.write('#endif\n')
-
-with open(HERE / 'translate_data.c', 'w') as f:
-    f.write('/* gen_translate.py が生成。手で編集しない */\n#include "translate_data.h"\n')
-    f.write('const char tr_en_pool[] = {\n  ' +
-            ','.join(str(b) for b in en_pool) + '\n};\n')
-    f.write('const unsigned short tr_ja_pool[] = {\n  ' +
-            ','.join(f'0x{c:04X}' for c in ja_pool) + '\n};\n')
-    for name, rows in [('tr_exact', exact_rows), ('tr_props', props_rows), ('tr_words', words_rows)]:
-        f.write(f'const TrPair {name}[] = {{\n' +
-                ''.join(f'  {{{eo},{el},{jo},{jl}}},\n' for _, eo, el, jo, jl in rows) + '};\n')
-    f.write('const TrSeg tr_segs[] = {\n' +
-            ''.join(f'  {{{o},{l},{k},{s}}},\n' for o, l, k, s in segs_out) + '};\n')
-    f.write('const TrPat tr_pats[] = {\n' +
-            ''.join(f'  {{{a},{b},{c},{d}}},\n' for a, b, c, d in pats_out) + '};\n')
-    f.write('const TrPair tr_notrans[] = {\n' +
-            ''.join(f'  {{{o},{l},0,0}},\n' for o, l in nt_rows) + '};\n')
+TrPair = Struct('TrPair', [('unsigned int', 'eo'), ('unsigned short', 'el'), ('unsigned int', 'jo'), ('unsigned short', 'jl')])
+TrSeg = Struct('TrSeg', [('unsigned int', 'off'), ('unsigned short', 'len'), ('unsigned char', 'kind'), ('unsigned char', 'slot')])
+TrPat = Struct('TrPat', [('unsigned short', 'seg_off'), ('unsigned short', 'en_n'), ('unsigned short', 'ja_n'), ('unsigned short', 'has_echo')])
+emit('translate', 'TR', 'gen_translate.py', [TrPair, TrSeg, TrPat], [
+    Table('tr_en_pool', 'char', en_pool),
+    Table('tr_ja_pool', 'unsigned short', ja_pool),
+    Table('tr_exact', TrPair, [r[1:] for r in exact_rows], 'TR_EXACT_N'),
+    Table('tr_props', TrPair, [r[1:] for r in props_rows], 'TR_PROPS_N'),
+    Table('tr_words', TrPair, [r[1:] for r in words_rows], 'TR_WORDS_N'),
+    Table('tr_segs', TrSeg, segs_out),
+    Table('tr_pats', TrPat, pats_out, 'TR_PATS_N'),
+    Table('tr_notrans', TrPair, [(o, l, 0, 0) for o, l in nt_rows], 'TR_NT_N'),
+], head_extra='enum { TRK_LIT, TRK_HOLE, TRK_QHOLE, TRK_JLIT, TRK_JREF };\n'
+              'enum { TRF_ECHO = 1, TRF_VERB = 2, TRF_SAID = 4 };\n',
+   sec_path=sec_path(), here=HERE)
 
 print(f'translate_data: exact {len(exact_rows)} / props {len(props_rows)} / words {len(words_rows)} '
       f'/ patterns {len(pats_out)} / notrans {len(nt_rows)} '
