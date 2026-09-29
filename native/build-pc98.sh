@@ -30,26 +30,19 @@ if [ -f "${MISAKI_BDF:-../pc98-mock/misaki_gothic.bdf}" ]; then python3 gen_misa
 # 起動画面の曲（Bach の謎カノン。先の声の書き起こしと反転の規則から）
 python3 gen_canon.py
 
-# ★story は C の配列にして焼き込む（PS1 / SDL 版と同じく、同梱していることを配布の形に頼らない）
-python3 - ../vendor/zork1/zork1.z3 "$OUT/story_pc98.c" <<'EOF'
-import sys
-b = open(sys.argv[1], 'rb').read()
-with open(sys.argv[2], 'w') as f:
-    f.write('/* build-pc98.sh が zork1.z3 から生成 */\n#include <stdint.h>\n')
-    f.write(f'const uint32_t zm_story_len = {len(b)};\nconst uint8_t zm_story[{len(b)}] = {{\n')
-    for i in range(0, len(b), 20):
-        f.write(','.join(str(x) for x in b[i:i + 20]) + ',\n')
-    f.write('};\n')
-EOF
+# ★作品（story）は焼き込まず、パック（ZORK1.ZMP）にして横に置く。本体は起動時に読む（pack.h・2026-09-29）。
+#   本体の像を小さくして、拡張 1MB でも載るようにするため（像が約 680KB を超えると DOS/4GW が載せない）
+python3 gen_pack.py ../vendor/zork1/zork1.z3 "Zork I" "$OUT/ZORK1.ZMP"
+rm -f "$OUT/story_pc98.c" "$OUT/story_pc98.obj"
 
-SRC="main_pc98.c session.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
+SRC="main_pc98.c session.c pack.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_data.c misaki_data.c \
      translate.c translate_data.c cmd.c cmd_data.c canon_data.c"
 
 # ---- PC-98（DOS/4GW）----
 CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=. $PC98_CFLAGS"   # PC98_CFLAGS: 見本を焼き分けるとき（例: -dFM_PAIR=1）
 OBJS=""
-for s in $SRC "$OUT/story_pc98.c"; do
+for s in $SRC; do
     o="$OUT/$(basename "${s%.c}").obj"
     wcc386 $CFLAGS -fo="$o" "$s"
     OBJS="$OBJS file $o"
@@ -60,6 +53,6 @@ cp "$WATCOM/binw/wstub.exe" "$OUT/" 2>/dev/null || true
 cp "$WATCOM/binw/dos4gw.exe" "$OUT/DOS4GW.EXE"
 
 # ---- ホスト（記録の突き合わせ用）----
-cc -std=gnu11 -O1 -DPC98_HOST -I. -w $SRC "$OUT/story_pc98.c" -o "$OUT/zenmai-host"
+cc -std=gnu11 -O1 -DPC98_HOST -I. -w $SRC -o "$OUT/zenmai-host"
 
 echo "OK: $OUT/ZENMAI.EXE ($(du -h "$OUT/ZENMAI.EXE" | cut -f1)) / $OUT/zenmai-host"

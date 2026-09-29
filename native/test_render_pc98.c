@@ -52,6 +52,7 @@ static void check(const char *title, const char *in, const char *want)
 
 int main(void)
 {
+    if (!body_init()) return 1;
     jp_text_init();
     /* 全角 32 字 = ちょうど 1 行 */
     const char *k32 = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみ";

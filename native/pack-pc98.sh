@@ -19,7 +19,7 @@ NAME=zenmai98-$VER
 OUT=pc98-out/$NAME
 rm -rf "$OUT" "pc98-out/$NAME.zip"
 mkdir -p "$OUT"
-cp pc98-out/ZENMAI.EXE pc98-out/DOS4GW.EXE "$OUT/"
+cp pc98-out/ZENMAI.EXE pc98-out/ZORK1.ZMP pc98-out/DOS4GW.EXE "$OUT/"
 
 # 文書: UTF-8 で書いて Shift_JIS・CRLF にする
 # ★— (U+2014) は Shift_JIS に無いので ― (U+2015) に寄せる（本体の字の表と同じ）
@@ -44,13 +44,14 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   - 386 以上の CPU の PC-9801 / PC-9821
   - 16 色（アナログ）表示
   - MS-DOS と拡張メモリ 2MB 以上（HIMEM.SYS など）
-    ★本体だけで約 920KB を使うので、640KB（本体メモリだけ）では動きません。
-      QuuBee では拡張メモリ 1MB だと DOS/4GW が「not enough memory」で止まりました
+    ★本体と作品で約 870KB を使うので、640KB（本体メモリだけ）では動きません。
+      QuuBee では拡張メモリ 1MB だと「not enough memory」で止まりました
   - FM 音源（PC-9801-26K / 86 相当）があれば、起動画面で曲が鳴ります（無くても動きます）
 
 ■ 起動
   ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
-  DOS/4GW を使います）。起動画面で ↑↓ で言語を選び、RETURN キーで始めます。
+  DOS/4GW を使います）。作品は ZORK1.ZMP で、ZENMAI.EXE と同じ場所に置いてください。
+  起動画面で ↑↓ で言語を選び、RETURN キーで始めます。
 
 ■ 起動画面の曲
   J. S. バッハ『音楽の捧げもの』BWV 1079 より、2 声のカノン「Quaerendo invenietis」（謎カノン）。
@@ -87,7 +88,7 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   作品の画面に出る表記（ZORK is a registered trademark of Infocom, Inc.）は原作のままです。
 
 ■ 出どころとライセンス
-  Zork I の story file  …… historicalsource/zork1（MIT License）                  → ZORK1.TXT
+  Zork I の story file  …… historicalsource/zork1（MIT License。ZORK1.ZMP の中）  → ZORK1.TXT
   Z-machine（MojoZork） …… Copyright (c) 2015-2025 Ryan C. Gordon（zlib License）→ MOJOZORK.TXT
   ローマ字の表          …… Mozc の romanji-hiragana.tsv
                            Copyright 2010-2018, Google Inc.（BSD 3-Clause）     → MOZC.TXT
@@ -106,5 +107,5 @@ sjis < ../vendor/zork1/LICENSE > "$OUT/ZORK1.TXT"
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE DOS4GW.EXE README.TXT ZORK1.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE ZORK1.ZMP DOS4GW.EXE README.TXT ZORK1.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"

@@ -54,4 +54,7 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
 - 字のコード（UTF-16 → 漢字 ROM）の正典は `native/pc98_jis.py`
 - 台本（`native/pc98-test/*.txt`・`ZENMAI /S 台本`）の記法: `#!english`（1 行目・英語面）/ `#!keys`（以降を打鍵として流す）/
   `#!line 文`（文をそのまま本文に流す = 組み方を画面で見る）
-- 必要なメモリは本体だけで約 920KB（拡張 2MB 以上。1MB では DOS/4GW が not enough memory）
+- ★作品（story）は焼き込まず、**パック `ZORK1.ZMP`**（`gen_pack.py` が作る・書式の正典もそこ）を起動時に読む。
+  `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）
+- 必要なメモリは像 約 618KB + 起動後に約 255KB（拡張 2MB 以上。★1MB では story の 85KB をひと続きで取れない ——
+  測った境目は `docs/pc98-port-plan.md` の「段 8」）

@@ -5,6 +5,7 @@
 #
 #   sh test-pc98.sh            # 建ててから流す。画面は pc98-out/<台本>-1x.png に残る
 #
+# ★QuuBee は**拡張メモリ 2MB**で流す（動かすのに要るものの下限。本体が要るメモリを増やしたらここで気付く）。
 # 台本: ../test/walkthrough.txt（英語 211 手）と pc98-test/*.txt（かなで打つもの・ローマ字の打鍵で打つもの）。
 # その前に、かな入力の核（test_kana_input）と本文の組み方（test_render_pc98）をホストで確かめる。
 # pc98-test/layout.txt は組み方を画面で見るための台本（#!line）—— 画面は pc98-out/layout-1x.png。
@@ -25,8 +26,9 @@ fail=0
 for s in ../test/walkthrough.txt pc98-test/*.txt; do
     name=$(basename "$s" .txt)
     mkdir -p "$TMP/$name/host"
+    cp pc98-out/ZORK1.ZMP "$TMP/$name/host/"     # ★作品はパックから読む（pack.h）
     ( cd "$TMP/$name/host" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/$s" )
-    node pc98_run.js "$s" "$TMP/$name/qb" >"$TMP/$name/run.txt" 2>&1 || { cat "$TMP/$name/run.txt"; fail=1; continue; }
+    PC98_EXTMEM=2 node pc98_run.js "$s" "$TMP/$name/qb" >"$TMP/$name/run.txt" 2>&1 || { cat "$TMP/$name/run.txt"; fail=1; continue; }
     cp "$TMP/$name/qb/screen-1x.png" "pc98-out/$name-1x.png"
     if cmp -s "$TMP/$name/host/ZENMAI.LOG" "$TMP/$name/qb/ZENMAI.LOG"; then
         echo "OK  $name: $(wc -l < "$TMP/$name/host/ZENMAI.LOG") 行一致（$(head -1 "$TMP/$name/run.txt")）"

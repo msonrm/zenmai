@@ -35,6 +35,7 @@
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
+#include "pack.h"
 #include "translate.h"
 #include "kana_input.h"
 #include "pc98_version.h"
@@ -43,8 +44,9 @@
 #include <i86.h>
 #endif
 
-extern const uint8_t zm_story[];       /* story_pc98.c（build-pc98.sh が zork1.z3 から焼く） */
-extern const uint32_t zm_story_len;
+/* ★作品は焼き込まず、起動時にパックから読む（pack.h）。いまは 1 作品だけ */
+static const char PACK_PATH[] = "ZORK1.ZMP";
+static ZmPack pack;
 
 enum { ROW_STATUS = 0, ROW_INPUT = 15, COL_L = BODY_COL0, COL_R = BODY_COL0 + BODY_CELLS };
 static KiLine line;                    /* 入力欄 */
@@ -293,7 +295,7 @@ static int title_menu(void)            /* 1 = ENGLISH / 0 = 日本語 */
     /* ★罫線は説明の幅（PS1 版と同じ）。塗りは 8px 単位なので桁の境目に合う */
     const int y = (R_SUB + 1) * TXT_RASTERS + 12;
     gfx_rect((TXT_COLS - w) / 2 * 8, y, ((TXT_COLS - w) / 2 + w) * 8, y + 1, 2);
-    center(R_GAME, "Zork I", TA_WHITE, 0);
+    center(R_GAME, pack.name, TA_WHITE, 0);         /* 作品名はパックから */
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
     int sel = 0;
     music_start();                     /* 起動画面の曲（Bach の謎カノン）*/
@@ -342,6 +344,16 @@ int main(int argc, char **argv)
             rewind(script);
     }
 
+    /* ★画面を切り替える前に読む（読めなければ DOS の画面のまま理由を出して返る） */
+    const char *err = pack_load(PACK_PATH, &pack);
+    if (err) {
+        printf("zenmai: %s: %s\n", PACK_PATH, err);
+        return 1;
+    }
+    if (!body_init()) {
+        printf("zenmai: not enough memory\n");
+        return 1;
+    }
     txt_init();
     gfx_init();
 #ifndef PC98_HOST
@@ -350,7 +362,7 @@ int main(int argc, char **argv)
 #endif
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */
-    sess_start(lang_en, zm_story, zm_story_len, die);
+    sess_start(lang_en, pack.ram, pack.len, pack.init, die);
     draw_status();
     body_show(0);
 

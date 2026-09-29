@@ -17,6 +17,7 @@
  * 記録: render_log を開いておくと、積んだ論理行を UTF-8 で書く（組み方に依らない＝台本の突き合わせ用）。
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "render.h"
 #include "kinsoku.h"
@@ -37,11 +38,20 @@ typedef struct {
     uint16_t rc[VL_RUBY];
 } VLine;
 
-static VLine hist[HIST_N];
+/* ★環は起動後に確保する（body_init）。157KB あるので、焼き込むと本体の像が拡張 1MB で載る大きさ
+ *   （約 680KB）を超える。malloc なら通常メモリからも取れる（pack.h と同じ理由・2026-09-29） */
+static VLine *hist;
 static long total;                     /* これまでに積んだ組んだ行の数（捨てた分を含む） */
 static long view;                      /* 窓の上端の行 */
 
 static long hist_min(void) { return total > HIST_N ? total - HIST_N : 0; }
+
+int body_init(void)
+{
+    if (!hist)
+        hist = malloc(sizeof(VLine) * HIST_N);
+    return hist != 0;
+}
 
 static void log_line(const uint16_t *s, int n)
 {

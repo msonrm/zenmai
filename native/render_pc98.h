@@ -22,6 +22,8 @@ enum {
 
 extern FILE *render_log;               /* 開いておくと積んだ論理行を UTF-8 で書く */
 
+int  body_init(void);                  /* 本文の環を確保する（積む前に 1 回）。1 = 確保できた */
+
 /* 窓を下端へ寄せて描く。animate = 1 なら 1 行ずつ送って見せる（キーボードで遊ぶとき） */
 void body_show(int animate);
 int  body_scroll(int d);               /* 遡る（負）/ 進む（正）。動いたら 1 */
