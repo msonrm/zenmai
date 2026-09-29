@@ -92,12 +92,14 @@ The same game runs in a browser at **https://zenmai.pages.dev/**
 （キーボード / ゲームパッド / スマホのフリック入力）。
 
 There is also a **PC-98 (MS-DOS) build**, in beta: romaji or kana-key input, furigana above the kanji,
-and a Bach canon on the FM chip at the title screen.
-Download it from **[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.2.0-beta)** —
+and a Bach canon on the FM chip at the title screen. It also carries *Zork II* and *Zork III* in the original English,
+and runs other version-3 story files placed next to it (games are separate files: a story file plus a Zenmai pack).
+Download it from **[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.3.0-beta)** —
 it also runs in the browser PC-98 emulator [QuuBee](https://quubee.pages.dev/) (drop the ZIP onto the page).
 
 **PC-98（MS-DOS）版**もある（beta）—— ローマ字 / カナキーで打ち、漢字の上にふりがな、起動画面では FM 音源で
-バッハのカノンが鳴る。**[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.2.0-beta)** から。
+バッハのカノンが鳴る。『Zork II』『Zork III』も原作の英語のまま遊べ、ほかの版 3 の story file も横に置けば動く
+（作品は story file と Zenmai のパックに分かれたファイル）。**[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.3.0-beta)** から。
 ブラウザの PC-98 エミュレータ [QuuBee](https://quubee.pages.dev/) でも動く（ZIP をページにドロップする）。
 
 Design notes, how the translation layer works, the vocabulary structure, and the test suite:
@@ -126,7 +128,8 @@ extracted from the **KH Dot Font** and is therefore under the
 [`native/vendor/kh-dotfont/`](native/vendor/kh-dotfont/README.md)).
 
 *Zork I* comes from the [ZIL sources released under MIT](https://github.com/historicalsource/zork1)
-(Microsoft, 2025); the Z-machine implementations are
+(Microsoft, 2025), as do *Zork II* and *Zork III* in the PC-98 build
+([zork2](https://github.com/historicalsource/zork2), [zork3](https://github.com/historicalsource/zork3)); the Z-machine implementations are
 [ZVM](https://github.com/curiousdannii/ifvms.js) (web) and
 [MojoZork](https://github.com/icculus/mojozork) (PlayStation, SDL, PC-98; zlib).
 Zork is a trademark of Infocom; the rights are now held by Microsoft.
@@ -139,7 +142,8 @@ Zork is a trademark of Infocom; the rights are now held by Microsoft.
 [`native/vendor/kh-dotfont/`](native/vendor/kh-dotfont/README.md)）。
 
 『Zork I』は [MIT で公開された ZIL ソース](https://github.com/historicalsource/zork1)
-（Microsoft・2025）由来。Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と
+（Microsoft・2025）由来。PC-98 版の『Zork II』『Zork III』も同じく
+（[zork2](https://github.com/historicalsource/zork2)・[zork3](https://github.com/historicalsource/zork3)）。Z-machine の実装は [ZVM](https://github.com/curiousdannii/ifvms.js)（web）と
 [MojoZork](https://github.com/icculus/mojozork)（PS1・SDL・PC-98・zlib）。
 Zork は Infocom の商標で、現在の権利者は Microsoft。
 **このプロジェクトはどちらとも関係が無く、作品名を自分の名称やブランドには用いない。**
