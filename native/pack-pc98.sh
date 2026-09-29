@@ -44,15 +44,15 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   - 386 以上の CPU の PC-9801 / PC-9821
   - 16 色（アナログ）表示
   - MS-DOS と拡張メモリ 2MB 以上（HIMEM.SYS など）
-    ★本体と作品で約 870KB を使うので、640KB（本体メモリだけ）では動きません。
-      QuuBee では拡張メモリ 1MB だと「not enough memory」で止まりました
+    ★本体と作品で約 880KB を使うので、640KB（本体メモリだけ）では動きません。
+      QuuBee では拡張メモリ 1MB でも動きました。1MB の実機で試した方は、ぜひ教えてください
   - FM 音源（PC-9801-26K / 86 相当）があれば、起動画面で曲が鳴ります（無くても動きます）
 
 ■ 起動
   ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
   DOS/4GW を使います）。ZENMAI.EXE と同じ場所に、作品の 2 つのファイルを置いてください:
     ZORK1.Z3   …… Zork I の story file（Z-machine のプログラムそのもの）
-    ZORK1.ZMP  …… Zenmai の層（どの story 向けかと、作品の情報）
+    ZORK1.ZMP  …… Zenmai の層（どの story 向けか・訳・入力の語彙・ふりがな）
   ★ZENMAI は ZORK1.ZMP を読み、それに合う story を同じ場所から探します（名前が違っても、
     中身の版が合えば見つけます。版が違う story は使いません）。
   起動画面で ↑↓ で言語を選び、RETURN キーで始めます。

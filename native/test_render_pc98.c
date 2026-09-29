@@ -40,7 +40,7 @@ static void check(const char *title, const char *in, const char *want)
     hist_line(s, n, INK);
     char got[2048] = "", one[512];
     for (long i = t0; i < total; i++) {
-        line_utf8(&hist[i % HIST_N], one);
+        line_utf8(HIST_AT(i), one);
         if (i > t0) strcat(got, "|");
         strcat(got, one);
     }
@@ -83,7 +83,7 @@ int main(void)
     /* ふりがな: 親字は格子のまま。読みは親字の中央（瓶 = 全角 1 字・びん = 2 字でちょうど） */
     check("ふりがなの付く語", "瓶が食卓に置かれている。", "瓶が食卓に置かれている。");
     {
-        const VLine *v = &hist[(total - 1) % HIST_N];
+        const VLine *v = HIST_AT(total - 1);
         /* 瓶(びん) は 64〜79 の中央 = 64。食卓(しょくたく) は 96〜127 に 40px → 中央から 92 */
         const int want_rx[] = { 64, 72, 92, 100, 108, 116, 124 };
         int ok = v->nr == 7;
@@ -98,7 +98,7 @@ int main(void)
     /* 読みが隣とぶつかるなら右へずらす（台所の窓 = 台所(だいどころ)・窓(まど)） */
     check("隣の読みとぶつからない", "台所の窓", "台所の窓");
     {
-        const VLine *v = &hist[(total - 1) % HIST_N];
+        const VLine *v = HIST_AT(total - 1);
         int ok = 1;
         for (int i = 1; i < v->nr; i++) ok &= v->rx[i] >= v->rx[i - 1] + RUBY_W;
         if (!ok || !v->nr) { printf("NG 読みが重なる\n"); fails++; }

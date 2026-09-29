@@ -5,11 +5,13 @@ createCommander(src/command.js)の語彙構築(lex・owners・ambigDisp・shared
 others・hypernyms・DIRS・ソート)をビルド時に再現する。挙動の正典は JS。
 C 側(cmd.c)は toCommand 本体だけを持つ。
 
-使い方: python3 gen_cmd.py
+使い方: python3 gen_cmd.py              → cmd_data.{c,h}・cmd_tab.c（ctab.py）
+        python3 gen_cmd.py --sec 出力   → パックの節（CMDS）だけ
 """
 import json
 import re
 from pathlib import Path
+from ctab import Struct, Table, emit, sec_path
 
 HERE = Path(__file__).parent
 asset = json.loads((HERE.parent / 'assets' / 'zork1-cmd.json').read_text())
@@ -255,64 +257,50 @@ if __name__ == '__main__':
     frows = [jput(s) for s in UI_FRAGS]
     role_ja_rows = [jput(ROLE_JA.get(r, '')) for r in ROLES]
 
-    with open(HERE / 'cmd_data.h', 'w') as f:
-        f.write('/* gen_cmd.py が生成。手で編集しない */\n#ifndef CMD_DATA_H\n#define CMD_DATA_H\n')
-        f.write('typedef struct { unsigned int kn; unsigned short knl; unsigned int dp; unsigned short dpl;\n'
-                '  unsigned int jo; unsigned short jl; unsigned int fo; unsigned short fl;\n'
-                '  unsigned int wo; unsigned short wl;\n'
-                '  unsigned char kind, vehicle, is_all; unsigned short ooff, on_; short vidx; } CmLex;\n')
-        f.write('typedef struct { unsigned int ko; unsigned short kl; unsigned int jo; unsigned short jl;\n'
-                '  unsigned short mask; unsigned char bare_ok, bare_ok2; } CmVerb;\n')
-        f.write('typedef struct { unsigned int po; unsigned short pl; unsigned int dp; unsigned short dpl;'
-                ' unsigned char role; } CmPart;\n')
-        f.write('typedef struct { unsigned int ko; unsigned short kl; unsigned int vo; unsigned short vl; } CmMap;\n')
-        f.write('typedef struct { unsigned int off; unsigned short len; } CmStr;\n')
-        f.write('enum { CMK_VERB, CMK_OBJ, CMK_DIR, CMK_NOCMD };\n')
-        f.write('enum { CMR_O, CMR_WITH, CMR_TO, CMR_IN, CMR_ON, CMR_UNDER, CMR_BEHIND, CMR_FROM,'
-                ' CMR_AND, CMR_EXCEPT, CMR_MOD, CMR_NONE };\n')
-        f.write('enum { CMT_IN = 1, CMT_ON = 2, CMT_AT = 4, CMT_TO = 8, CMT_UNDER = 16,'
-                ' CMT_BEHIND = 32, CMT_FROM = 64, CMT_WITH = 128, CMT_DOWN = 256, CMT_OBJ = 512 };\n')
-        all_idx = next(i for i, e in enumerate(lex) if e.get('key') == '*ALL*' and e['ja'] == ALL_WORDS[0])
-        f.write(f'enum {{ CM_ALL_LEX = {all_idx} }};\n')
-        f.write(f'enum {{ CM_LEX_N = {len(lrows)}, CM_VERB_N = {len(vrows)}, CM_PART_N = {len(prows)},'
-                f' CM_PW_N = {len(pw_rows)}, CM_YN_N = {len(yn_rows)}, CM_GUIDE_N = {len(grows)},'
-                f' CM_FRAG_N = {len(frows)}, CM_ROLE_N = {len(ROLES)} }};\n')
-        for k in ['VK_WALK', 'VK_CLIMB', 'VK_DISEMBARK', 'VK_ENTER', 'VK_EXIT', 'VK_LEAVE', 'VK_SWIM']:
-            name = k[3:]
-            f.write(f'enum {{ {k} = {vkeys.index(name) if name in vkeys else -1} }};\n')
-        f.write('extern const unsigned short cm_jpool[];\nextern const char cm_apool[];\n')
-        f.write('extern const CmLex cm_lex[CM_LEX_N];\nextern const CmVerb cm_verbs[CM_VERB_N];\n')
-        f.write('extern const CmPart cm_parts[CM_PART_N];\n')
-        f.write('extern const CmMap cm_pwords[CM_PW_N];\nextern const CmMap cm_yesno[CM_YN_N];\n')
-        f.write('extern const CmMap cm_guide[CM_GUIDE_N];\n')
-        f.write('extern const CmStr cm_frags[CM_FRAG_N];\nextern const CmStr cm_others[];\n')
-        f.write('extern const CmStr cm_role_ja[CM_ROLE_N];\n')
-        f.write('#endif\n')
-
-    with open(HERE / 'cmd_data.c', 'w') as f:
-        f.write('/* gen_cmd.py が生成。手で編集しない */\n#include "cmd_data.h"\n')
-        f.write('const unsigned short cm_jpool[] = {\n  ' + ','.join(f'0x{c:04X}' for c in jpool) + '\n};\n')
-        f.write('const char cm_apool[] = {\n  ' + ','.join(str(b) for b in apool) + '\n};\n')
-        f.write('const CmLex cm_lex[] = {\n' + ''.join(
-            f'  {{{a},{b},{c},{d},{e},{g},{h},{i},{j},{k},{m},{n},{o},{p},{q},{t}}},\n'
-            for a, b, c, d, e, g, h, i, j, k, m, n, o, p, q, t in
-            [(r[0], r[1], r[2], r[3], r[4], r[5], r[14], r[15], r[6], r[7], r[8], r[10], r[13],
-              r[11], r[12], r[9])
-             for r in lrows]) + '};\n')
-        # ↑ 並び: kn,knl,dp,dpl,jo,jl,fo,fl,wo,wl,kind,vehicle,is_all,ooff,on_,vidx
-        f.write('const CmVerb cm_verbs[] = {\n' + ''.join(
-            f'  {{{a},{b},{c},{d},{e},{g},{h}}},\n' for a, b, c, d, e, g, h in vrows) + '};\n')
-        f.write('const CmPart cm_parts[] = {\n' + ''.join(
-            f'  {{{a},{b},{c},{d},{e}}},\n' for a, b, c, d, e in prows) + '};\n')
-        for name, rows in [('cm_pwords', pw_rows), ('cm_yesno', yn_rows), ('cm_guide', grows)]:
-            f.write(f'const CmMap {name}[] = {{\n' + ''.join(
-                f'  {{{a},{b},{c},{d}}},\n' for a, b, c, d in rows) + '};\n')
-        f.write('const CmStr cm_frags[] = {\n' + ''.join(
-            f'  {{{a},{b}}},\n' for a, b in frows) + '};\n')
-        f.write('const CmStr cm_others[] = {\n' + (''.join(
-            f'  {{{a},{b}}},\n' for a, b in others_pool) or '  {0,0},\n') + '};\n')
-        f.write('const CmStr cm_role_ja[] = {\n' + ''.join(
-            f'  {{{a},{b}}},\n' for a, b in role_ja_rows) + '};\n')
+    CmLex = Struct('CmLex', [
+        ('unsigned int', 'kn'), ('unsigned short', 'knl'), ('unsigned int', 'dp'), ('unsigned short', 'dpl'),
+        ('unsigned int', 'jo'), ('unsigned short', 'jl'), ('unsigned int', 'fo'), ('unsigned short', 'fl'),
+        ('unsigned int', 'wo'), ('unsigned short', 'wl'),
+        ('unsigned char', 'kind'), ('unsigned char', 'vehicle'), ('unsigned char', 'is_all'),
+        ('unsigned short', 'ooff'), ('unsigned short', 'on_'), ('short', 'vidx')])
+    CmVerb = Struct('CmVerb', [('unsigned int', 'ko'), ('unsigned short', 'kl'), ('unsigned int', 'jo'), ('unsigned short', 'jl'),
+                               ('unsigned short', 'mask'), ('unsigned char', 'bare_ok'), ('unsigned char', 'bare_ok2')])
+    CmPart = Struct('CmPart', [('unsigned int', 'po'), ('unsigned short', 'pl'), ('unsigned int', 'dp'), ('unsigned short', 'dpl'),
+                               ('unsigned char', 'role')])
+    CmMap = Struct('CmMap', [('unsigned int', 'ko'), ('unsigned short', 'kl'), ('unsigned int', 'vo'), ('unsigned short', 'vl')])
+    CmStr = Struct('CmStr', [('unsigned int', 'off'), ('unsigned short', 'len')])
+    # ★作品に依る定数（語彙の表の中の番号）。昔は enum で焼き込んでいた —— パックへ出すので表 cm_k に入れ、
+    #   昔の名前はマクロで cm_k を指す（cmd.c は変わらない）
+    all_idx = next(i for i, e in enumerate(lex) if e.get('key') == '*ALL*' and e['ja'] == ALL_WORDS[0])
+    consts = [('CM_ALL_LEX', all_idx)]
+    for k in ['VK_WALK', 'VK_CLIMB', 'VK_DISEMBARK', 'VK_ENTER', 'VK_EXIT', 'VK_LEAVE', 'VK_SWIM']:
+        consts.append((k, vkeys.index(k[3:]) if k[3:] in vkeys else -1))
+    head = ('enum { CMK_VERB, CMK_OBJ, CMK_DIR, CMK_NOCMD };\n'
+            'enum { CMR_O, CMR_WITH, CMR_TO, CMR_IN, CMR_ON, CMR_UNDER, CMR_BEHIND, CMR_FROM,'
+            ' CMR_AND, CMR_EXCEPT, CMR_MOD, CMR_NONE };\n'
+            'enum { CMT_IN = 1, CMT_ON = 2, CMT_AT = 4, CMT_TO = 8, CMT_UNDER = 16,'
+            ' CMT_BEHIND = 32, CMT_FROM = 64, CMT_WITH = 128, CMT_DOWN = 256, CMT_OBJ = 512 };\n'
+            + ''.join(f'#define {k} (cm_k[{i}])\n' for i, (k, _) in enumerate(consts)))
+    # 並び: kn,knl,dp,dpl,jo,jl,fo,fl,wo,wl,kind,vehicle,is_all,ooff,on_,vidx
+    lex_rows = [(r[0], r[1], r[2], r[3], r[4], r[5], r[14], r[15], r[6], r[7], r[8], r[10], r[13],
+                 r[11], r[12], r[9]) for r in lrows]
+    emit('cmd', 'CM', 'gen_cmd.py', [CmLex, CmVerb, CmPart, CmMap, CmStr], [
+        Table('cm_jpool', 'unsigned short', jpool),
+        Table('cm_apool', 'char', apool),
+        Table('cm_k', 'short', [v for _, v in consts], doc='作品に依る定数: ' + ' / '.join(k for k, _ in consts)),
+        Table('cm_lex', CmLex, lex_rows, 'CM_LEX_N'),
+        Table('cm_verbs', CmVerb, vrows, 'CM_VERB_N'),
+        Table('cm_parts', CmPart, prows, 'CM_PART_N'),
+        Table('cm_pwords', CmMap, pw_rows, 'CM_PW_N'),
+        Table('cm_yesno', CmMap, yn_rows, 'CM_YN_N'),
+        Table('cm_guide', CmMap, grows, 'CM_GUIDE_N'),
+        Table('cm_frags', CmStr, frows, 'CM_FRAG_N'),
+        Table('cm_others', CmStr, others_pool),
+        Table('cm_role_ja', CmStr, role_ja_rows, 'CM_ROLE_N'),
+    ], head_extra=head,
+       # ★本体が番号で指すもの（UI の文言・役割の並び・定数の名前）も要約値に入れる —— 変われば古いパックを断る
+       schema_extra=repr((UI_FRAGS, ROLES, [k for k, _ in consts])),
+       sec_path=sec_path(), here=HERE)
 
     print(f'cmd_data: lex {len(lrows)} / verbs {len(vrows)} / parts {len(prows)} '
           f'/ guide {len(grows)} / jpool {len(jpool) * 2}B / apool {len(apool)}B')

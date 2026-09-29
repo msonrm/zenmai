@@ -43,6 +43,19 @@ python3 -c "import sys; b=bytearray(open(sys.argv[1],'rb').read()); b[0x17]^=1; 
     pc98-out/ZORK1.Z3 "$TMP/story/GAME.DAT"
 cp "$TMP/story/GAME.DAT" "$TMP/story/ZORK1.Z3"
 story_case "識別の合わない story は使わない" "no story file"
+# ★表の要約値（schema）が本体と違うパックは読む前に断る（ctab.py）
+cp pc98-out/ZORK1.Z3 "$TMP/story/ZORK1.Z3"
+python3 - pc98-out/ZORK1.ZMP "$TMP/story/ZORK1.ZMP" <<'PY'
+import struct, sys
+b = bytearray(open(sys.argv[1], 'rb').read())
+n = struct.unpack_from('<H', b, 6)[0]
+for i in range(n):
+    sid, off, ln = struct.unpack_from('<4sII', b, 8 + 12 * i)
+    if sid == b'TRAN':
+        b[off] ^= 1
+open(sys.argv[2], 'wb').write(b)
+PY
+story_case "表の版が本体と違うパックは断る" "the tables are for another version of Zenmai"
 for s in ../test/walkthrough.txt pc98-test/*.txt; do
     name=$(basename "$s" .txt)
     mkdir -p "$TMP/$name/host"

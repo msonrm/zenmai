@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pack.h"
+#include "tabload.h"
 #ifdef PC98_HOST
 #include <dirent.h>
 #else
@@ -10,6 +11,11 @@
 #endif
 
 enum { SEC_MAX = 16, INFO_MAX = 1024 };
+
+/* 表の登録（ctab.py が作る <mod>_tab.c） */
+extern const TlTab translate_tabs[], cmd_tabs[], ruby_tabs[];
+extern const int translate_tabs_n, cmd_tabs_n, ruby_tabs_n;
+extern const unsigned long translate_schema, cmd_schema, ruby_schema;
 
 static uint32_t le32(const uint8_t *p) { return p[0] | p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24; }
 
@@ -208,6 +214,22 @@ const char *pack_load(const char *path, ZmPack *pk)
         free(pk->ram);
         free(pk->init);
         pk->ram = pk->init = 0;
+        return err;
     }
+    /* ★訳・語彙・ふりがなの表（段 8 の B）。本体には焼き込んでいない */
+    static const struct { const char *id; const TlTab *tabs; const int *n; const unsigned long *schema; } T[] = {
+        { "TRAN", translate_tabs, &translate_tabs_n, &translate_schema },
+        { "CMDS", cmd_tabs, &cmd_tabs_n, &cmd_schema },
+        { "RUBY", ruby_tabs, &ruby_tabs_n, &ruby_schema },
+    };
+    if (!(f = fopen(path, "rb")))
+        return "cannot open";
+    for (int i = 0; i < 3 && !err; i++) {
+        if (!find_sec(idx, n, T[i].id, &off, &len))
+            err = "no Japanese tables";
+        else
+            err = tab_load(f, off, len, T[i].tabs, *T[i].n, *T[i].schema);
+    }
+    fclose(f);
     return err;
 }

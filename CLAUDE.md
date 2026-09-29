@@ -15,7 +15,7 @@ PC-98（ver. 0.2.0-beta を pre-release で公開・main に入れた・実機�
 - ★**訳・語彙・ルビの挙動の正典は JS**（`src/translate.js` / `src/command.js` / `src/ruby.js`）。
   `native/` の C は移植なので、**直すときは両方を見る**（各ファイルの頭書きに書いてある）
 - ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
-- ★**生成物は手で直さない**: `native/*_data.c`（`kana_input_data.c`・`misaki_data.c` を含む）・`pairs.h`・
+- ★**生成物は手で直さない**: `native/*_data.{c,h}`（`kana_input_data.c`・`misaki_data.c` を含む）・`native/*_tab.c`（`ctab.py`）・`pairs.h`・
   `glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
 - ★**禁則の表は `native/kinsoku.h` の 1 つだけ**（PS1 / SDL / PC-98 が共有。Python の参照実装 `ps1-mock/gen_mock.py` とは
   `check_kinsoku.py` が突き合わせる）
@@ -56,8 +56,10 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
   `#!line 文`（文をそのまま本文に流す = 組み方を画面で見る）
 - ★作品は焼き込まず、**パック `ZORK1.ZMP`**（`gen_pack.py` が作る・書式の正典もそこ）を起動時に読み、
   パックが持つ識別で **story `ZORK1.Z3`** を横から探す。★story はパックに入れない（配れない作品でも訳の束だけ配れる形）。
+  ★訳・語彙・ふりがなの表もパックの節（書式の正典 = `ctab.py`）。PC-98 は `*_data.c` の代わりに `*_tab.c` + `tabload.c` を links する。
+  ★表の形や UI の文言（`gen_cmd.py` の `UI_FRAGS`）を変えたらパックも作り直す（要約値が違うと本体が断る）
   `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）。セーブは作品ごと（`ZORK1.SAV`）
 - ★曲・絵はパックに入れない（外のファイル + 作品ごとの `.INI`・計画書の「次にやること」）
-- 必要なメモリは像 約 618KB + 起動後に約 255KB（★要件は拡張 2MB。1MB は目標から外した ——
-  測った境目は `docs/pc98-port-plan.md` の「段 8」）
+- 必要なメモリは像 約 262KB + 起動後に約 620KB（★要件は拡張 2MB。1MB は目標から外したが、今は QuuBee の 1MB でも動く ——
+  測った境目と、大きなものを 59KB 以下の塊で取る理由は `docs/pc98-port-plan.md` の「段 8」）
 - ★PS1 版との共有は重視しない（実験的な実装・msonrm 2026-09-29）。ただし共有の C を触ったら 8 本は流す

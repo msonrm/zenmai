@@ -38,9 +38,13 @@ typedef struct {
     uint16_t rc[VL_RUBY];
 } VLine;
 
-/* ★環は起動後に確保する（body_init）。157KB あるので、焼き込むと本体の像が拡張 1MB で載る大きさ
- *   （約 680KB）を超える。malloc なら通常メモリからも取れる（pack.h と同じ理由・2026-09-29） */
-static VLine *hist;
+/* ★環は起動後に確保する（body_init）。157KB あるので、焼き込むと本体の像が大きくなる（pack.h と同じ理由・2026-09-29）。
+ * ★しかも 50 行（約 20KB）ずつの塊に分けて取る —— DOS/4GW は拡張メモリが尽きると、残りを通常メモリから
+ *   1 本あたり 59KB 以下の細切れでしか返さない。1 本で 157KB を求めると拡張 1MB の機械では取れない
+ *   （docs/pc98-port-plan.md の「段 8」） */
+enum { HIST_CHUNK = 50 };
+static VLine *hist_blk[HIST_N / HIST_CHUNK];
+#define HIST_AT(i) (&hist_blk[(i) % HIST_N / HIST_CHUNK][(i) % HIST_CHUNK])
 static long total;                     /* これまでに積んだ組んだ行の数（捨てた分を含む） */
 static long view;                      /* 窓の上端の行 */
 
@@ -48,9 +52,10 @@ static long hist_min(void) { return total > HIST_N ? total - HIST_N : 0; }
 
 int body_init(void)
 {
-    if (!hist)
-        hist = malloc(sizeof(VLine) * HIST_N);
-    return hist != 0;
+    for (int b = 0; b < HIST_N / HIST_CHUNK; b++)
+        if (!hist_blk[b] && !(hist_blk[b] = malloc(sizeof(VLine) * HIST_CHUNK)))
+            return 0;
+    return 1;
 }
 
 static void log_line(const uint16_t *s, int n)
@@ -88,7 +93,7 @@ static int nfrag, fw;
 
 static void flush_line(uint16_t color)
 {
-    VLine *v = &hist[total % HIST_N];
+    VLine *v = HIST_AT(total);
     v->n = 0;
     v->nr = 0;
     v->attr = attr_of(color);
@@ -277,7 +282,7 @@ static void draw_window(void)
 {
     for (int r = 0; r < BODY_ROWS; r++) {
         const long i = view + r;
-        draw_row(r, i >= hist_min() && i < total ? &hist[i % HIST_N] : 0);
+        draw_row(r, i >= hist_min() && i < total ? HIST_AT(i) : 0);
     }
     /* 窓の外に続きがあることの印（右の装飾の上） */
     if (view > hist_min())

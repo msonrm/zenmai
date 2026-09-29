@@ -34,13 +34,19 @@ python3 gen_canon.py
 #   本体は起動時にパックを読み、パックが持つ識別で story を探す（pack.h・2026-09-29）。
 #   ★story をパックに入れないのは、自由に配れない作品でも訳の束だけなら配れる形にするため
 cp ../vendor/zork1/zork1.z3 "$OUT/ZORK1.Z3"
-python3 gen_pack.py "$OUT/ZORK1.Z3" "$OUT/ZORK1.ZMP" "title=Zork I" "story=ZORK1.Z3" \
+# ★訳・語彙・ふりがなの表もパックの節に入れる（本体には焼き込まない・ctab.py / tabload.c・段 8 の B）
+python3 gen_translate.py --sec "$OUT/TRAN.SEC" >/dev/null
+python3 gen_cmd.py --sec "$OUT/CMDS.SEC" >/dev/null
+python3 gen_ruby.py --sec "$OUT/RUBY.SEC" >/dev/null
+python3 gen_pack.py "$OUT/ZORK1.Z3" "$OUT/ZORK1.ZMP" \
+    --sec "TRAN=$OUT/TRAN.SEC" --sec "CMDS=$OUT/CMDS.SEC" --sec "RUBY=$OUT/RUBY.SEC" \
+    "title=Zork I" "story=ZORK1.Z3" \
     "author=Infocom (Marc Blank, Dave Lebling)" \
     "translation=Zenmai (msonrm)" "license=story: MIT (historicalsource/zork1)"
 
-SRC="main_pc98.c session.c pack.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
-     kana_input.c kana_input_data.c jp_text.c ruby_data.c misaki_data.c \
-     translate.c translate_data.c cmd.c cmd_data.c canon_data.c"
+SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
+     kana_input.c kana_input_data.c jp_text.c ruby_tab.c misaki_data.c \
+     translate.c translate_tab.c cmd.c cmd_tab.c canon_data.c"
 
 # ---- PC-98（DOS/4GW）----
 CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=. $PC98_CFLAGS"   # PC98_CFLAGS: 見本を焼き分けるとき（例: -dFM_PAIR=1）
