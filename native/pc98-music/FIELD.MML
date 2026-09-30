@@ -1,0 +1,28 @@
+; ★gen_ambient_mml.py が生成。手で編集しない（旋律は決まった種から組む音階上の散歩）
+#Title		Field
+#Composer	Zenmai
+#Memo		Ambient sample for room music.
+#Filename	.M
+#FFFile		FIELD.FF
+#Tempo		40
+
+@ 0  4 3  =flute
+  22  0  0  6  0  38  0  1  0  0
+  20  2  0  6  1   6  0  1  0  0
+  24  0  0  6  0  60  0  2  0  0
+  18  2  0  6  1  26  0  2  1  0
+@ 1  4 1  =pad
+  14  0  0  5  0  44  0  1  0  0
+  14  2  0  5  1   8  0  1  0  0
+  14  0  0  5  0  56  0  2  0  0
+  14  2  0  5  1  18  0  1  0  0
+
+A	@0 V127 p2 q2 L 
+A	o5 a%96 g%48 a%72 r%48 g%96 a%48 g%72 e%48 r%96 c%48 o4 a%72 o5 c%48
+A	e%96 c%48 o4 g%72 r%48 d%96 r%48 c%72 c%48 c%96 e%48 r%72
+B	@1 V118 p1 L
+B	o3 c%192 o2 a%192 f%192 g%192 o3 c%192 o2 a%192 f%192 g%192
+G	@6 v14 L
+G	r%96 r%96 o6 e%12 r%84 r%24 c%12 r%60 r%48 c%12 r%36 r%24 g%12 r%60 r%48
+G	d%12 r%36 d%12 r%84 r%24 c%12 r%60 c%12 r%84 r%48 e%12 r%36 r%96 g%12
+G	r%84 r%96 r%96 r%96

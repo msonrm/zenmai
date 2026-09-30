@@ -1,0 +1,30 @@
+; ★gen_ambient_mml.py が生成。手で編集しない（旋律は決まった種から組む音階上の散歩）
+#Title		House
+#Composer	Zenmai
+#Memo		Ambient sample for room music.
+#Filename	.M
+#FFFile		HOUSE.FF
+#Tempo		52
+
+@ 0  4 6  =harpsi
+  31 11  4  8  6  32  2  4  0  0
+  31  7  3  8  4   2  1  1  0  0
+  31 12  5  8  7  26  2  1  3  0
+  31  7  3  8  4  10  1  2  7  0
+@ 1  4 1  =pad
+  14  0  0  5  0  44  0  1  0  0
+  14  2  0  5  1   8  0  1  0  0
+  14  0  0  5  0  56  0  2  0  0
+  14  2  0  5  1  18  0  1  0  0
+
+A	@0 V127 p2 q2 L 
+A	o5 c%24 e%48 d%24 r%12 r%12 c%48 r%24 d%48 g%24 e%12 d%12 g%48 g%24 g%48
+A	g%24 r%12 r%12 e%48 r%24 g%48 g%24 g%12 g%12 r%48 r%24 g%48 e%24 c%12 o4
+A	g%12 e%48 d%24 e%48 a%24 r%12 r%12 e%48 d%24 r%48 c%24 r%12 o3 a%12 o4
+A	c%48 d%24 o3 a%48 o4 c%24 o3 a%12 o4 d%12 r%48 o3 a%24 a%48 o4 d%24 e%12
+A	d%12 e%48 d%24
+B	@1 V118 p1 L
+B	o2 a%192 f%192 o3 c%192 o2 g%192 a%192 f%192 o3 c%192 o2 g%192
+G	@6 v14 L
+G	r%96 r%96 r%96 r%24 o6 e%12 r%60 r%96 r%96 r%96 r%48 d%12 r%36 c%12 r%84
+G	r%96 r%96 e%12 r%84 r%96 r%24 e%12 r%60 r%24 d%12 r%60 r%96

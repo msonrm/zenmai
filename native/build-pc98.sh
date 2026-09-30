@@ -27,8 +27,8 @@ python3 pc98_jis.py
 python3 gen_kana_input.py
 # ふりがなの字形（美咲ゴシック）。★BDF は追跡していないので、あるときだけ焼き直す（vendor/misaki/）
 if [ -f "${MISAKI_BDF:-../pc98-mock/misaki_gothic.bdf}" ]; then python3 gen_misaki.py; fi
-# 起動画面の曲（Bach の謎カノン。先の声の書き起こしと反転の規則から）
-python3 gen_canon.py
+# 起動画面の曲（Bach の謎カノン）の MML。★`.M` は MC.EXE で作って pc98-music/ に置いてある（node mc98.js）
+python3 gen_canon_mml.py
 
 # ★作品は焼き込まない。story（ZORK1.Z3）と、Zenmai の層を持つパック（ZORK1.ZMP）を横に置く。
 #   本体は起動時にパックを読み、パックが持つ識別で story を探す（pack.h・2026-09-29）。
@@ -51,12 +51,12 @@ cp ../vendor/zork3/zork3.z3 "$OUT/ZORK3.Z3"
 python3 gen_pack.py "$OUT/ZORK3.Z3" "$OUT/ZORK3.ZMP" "title=Zork III" "story=ZORK3.Z3" \
     "author=Infocom (Marc Blank, Dave Lebling)" "license=story: MIT (historicalsource/zork3)"
 
-SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_fm.c pc98_jis.c \
+SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_music.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_tab.c misaki_data.c \
-     translate.c translate_tab.c cmd.c cmd_tab.c canon_data.c"
+     translate.c translate_tab.c cmd.c cmd_tab.c"
 
 # ---- PC-98（DOS/4GW）----
-CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=. $PC98_CFLAGS"   # PC98_CFLAGS: 見本を焼き分けるとき（例: -dFM_PAIR=1）
+CFLAGS="-q -za99 -bt=dos -ox -zp4 -fpi87 -i=. $PC98_CFLAGS"   # PC98_CFLAGS: 見本を焼き分けるとき
 OBJS=""
 for s in $SRC; do
     o="$OUT/$(basename "${s%.c}").obj"
@@ -67,6 +67,8 @@ cp "$WATCOM/binw/wstub.exe" "$OUT/" 2>/dev/null || true
 ( cd "$OUT" && wlink system dos4g option quiet option stack=65536 name ZENMAI.EXE \
       $(echo "$OBJS" | sed "s| $OUT/| |g") library clib3r )
 cp "$WATCOM/binw/dos4gw.exe" "$OUT/DOS4GW.EXE"
+# 起動画面の曲（PMD が鳴らす）と、その常駐ドライバ（README = pc98-music/README.md）
+cp pc98-music/*.M pc98-music/*.INI pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
 
 # ---- ホスト（記録の突き合わせ用）----
 cc -std=gnu11 -O1 -DPC98_HOST -I. -w $SRC -o "$OUT/zenmai-host"

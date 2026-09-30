@@ -17,7 +17,7 @@ const { Machine } = require(path.join(QB, 'tools/lib/machine'));
     fs.mkdirSync(game, { recursive: true });
     // ★作品 = パック + story（pack.h）。pc98-out の作品を全部置く（起動画面に並ぶのと同じ）
     const out = path.join(__dirname, 'pc98-out');
-    for (const f of ['ZENMAI.EXE', 'DOS4GW.EXE', ...fs.readdirSync(out).filter((n) => /\.(ZMP|Z3)$/.test(n))])
+    for (const f of ['ZENMAI.EXE', 'DOS4GW.EXE', ...fs.readdirSync(out).filter((n) => /\.(ZMP|Z3|INI)$/.test(n))])
         fs.copyFileSync(path.join(out, f), path.join(game, f));
     fs.copyFileSync(script, path.join(game, 'SCRIPT.TXT'));
     fs.writeFileSync(path.join(game, 'RUN.BAT'), 'SET DOS16M=1\r\nZENMAI /S SCRIPT.TXT\r\n');

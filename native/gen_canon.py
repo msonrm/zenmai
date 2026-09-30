@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""起動画面の曲 —— J. S. Bach『音楽の捧げもの』BWV 1079 の「2 声のカノン（Quaerendo invenietis・謎カノン）」→ canon_data.c/h。
+"""起動画面の曲 —— J. S. Bach『音楽の捧げもの』BWV 1079 の「2 声のカノン（Quaerendo invenietis・謎カノン）」の音の正典。
 
 ★原曲は 1747 年の作品で著作権は切れている。音は下の DUX に**自分で書き起こした**もの
   （参照: Kompy 浄書の解 6a『Canon 1 a 2 Quaerendo invenietis』= IMSLP の Musop.pdf 35 頁。
@@ -15,7 +15,7 @@
   上の音は調の中の隣: 先の声 D4 → E♭4・後の声 C3 → D3。32 分音符で上・下を 3 回くり返し、最後の下を伸ばす。
   ★トリルの 2 音目からは**弾き直さない**（レガート = 高さだけ変える）。弾き直すと 1 音ごとに立ち上がりの音が付く。
 
-使い方: python3 gen_canon.py
+★ここは音の列を作る（`build()`）だけ。PMD の MML に組むのは gen_canon_mml.py（→ pc98-music/CANON.MML）。
 """
 from pathlib import Path
 
@@ -75,7 +75,8 @@ def trill(main, upper, d):
     return out
 
 
-def main():
+def build():
+    """2 声の音の列を作る。各 [MIDI の音（0 = 休符・bit7 = 弾き直さない）, 長さ（32 分音符の数）] の並び"""
     for b, ev in DUX.items():
         assert sum(e[1] for e in ev) == 4, f'{b} 小節の拍が 4 でない'
     # 先の声を形どおりに並べる（長さは 32 分音符の数）。e = (始まり, 長さ, 音, 後の声の例外, トリル)
@@ -120,22 +121,4 @@ def main():
     v = [pack(dux), pack(comes)]
     total = sum(d for _, d in v[0])
     assert total == sum(d for _, d in v[1])
-    with open(HERE / 'canon_data.h', 'w') as f:
-        f.write('/* gen_canon.py が生成。手で編集しない */\n#ifndef CANON_DATA_H\n#define CANON_DATA_H\n'
-                '#include <stdint.h>\n')
-        f.write(f'enum {{ CANON_N0 = {len(v[0])}, CANON_N1 = {len(v[1])}, CANON_UNITS = {total}, CANON_LEGATO = 0x80 }};\n')
-        f.write('/* 1 音 = { MIDI の音の番号（0 = 休符・bit7 = 弾き直さない）, 長さ（32 分音符の数）} */\n')
-        f.write('extern const uint8_t canon_v0[CANON_N0][2];   /* 先の声 */\n')
-        f.write('extern const uint8_t canon_v1[CANON_N1][2];   /* 後の声 */\n#endif\n')
-    with open(HERE / 'canon_data.c', 'w') as f:
-        f.write('/* gen_canon.py が生成。手で編集しない */\n#include "canon_data.h"\n')
-        for i, vv in enumerate(v):
-            f.write(f'const uint8_t canon_v{i}[CANON_N{i}][2] = {{\n')
-            for k in range(0, len(vv), 10):
-                f.write('    ' + ', '.join(f'{{{n},{d}}}' for n, d in vv[k:k + 10]) + ',\n')
-            f.write('};\n')
-    print(f'canon_data: 先の声 {len(v[0])} 音 / 後の声 {len(v[1])} 音 / {total // (UNIT * 4)} 小節ぶん')
-
-
-if __name__ == '__main__':
-    main()
+    return v, total
