@@ -32,7 +32,7 @@
 #include <string.h>
 #include "pc98_text.h"
 #include "pc98_gfx.h"
-#include "pc98_fm.h"
+#include "pc98_music.h"
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
@@ -306,7 +306,7 @@ static int title_menu(int *wi)
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
     const int many = nworks > 1;
     int sel = 0, cur = *wi;
-    music_start();                     /* 起動画面の曲（Bach の謎カノン）*/
+    music_start("CANON.M");             /* 起動画面の曲（Bach の謎カノン・PMD が鳴らす）*/
     for (;;) {
         const ZmPack *p = &works[cur];
         const int ja_ok = p->has_ja && p->story[0];
@@ -324,8 +324,7 @@ static int title_menu(int *wi)
             put_at(R_EN, menu_l, "ENGLISH", s ? TA_YELLOW : TA_WHITE, s);
         }
         center(R_HINT, hint[many][s], TA_CYAN, 0);
-        while (!kbd_hit())             /* ★曲は待つ間だけ進む（割り込みは使わない・pc98_fm.h） */
-            music_poll();
+        while (!kbd_hit()) { }         /* ★曲は PMD が割り込みで鳴らす（pc98_music.h） */
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_UP || scan == K_DOWN)
             sel = ja_ok ? sel ^ 1 : sel;

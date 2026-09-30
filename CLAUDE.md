@@ -61,6 +61,9 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
   `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）。セーブは作品ごと（`ZORK1.SAV`）。
   ★起動画面はカレントディレクトリの作品を並べる（`pack_list`）。Zork II・III（`vendor/zork2`・`zork3`・MIT）は訳が無いので英語だけ。
   ★確保の順番: 大きなもの（story・表）を先に、本文の環の塊を後に（逆だと拡張 1MB で表が取れない）
+- ★**起動画面の曲は PMD が鳴らす**（`pc98_music.c` が常駐の PMD に `.M` を渡す。自前の FM 直叩きは無い）。曲の作り直し =
+  `python3 gen_canon_mml.py` → `node mc98.js pc98-music/CANON.MML`（MC.EXE は `sh build-mc.sh`・KAJA 氏の自由公開ソースから）。
+  出どころ・罠は `native/pc98-music/README.md`。検査は `test-pc98-music.js`（`test-pc98.sh` から流れる）
 - ★曲・絵はパックに入れない（外のファイル + 作品ごとの `.INI`・計画書の「次にやること」）
 - 必要なメモリは像 約 262KB + 起動後に約 620KB（★要件は拡張 2MB。1MB は目標から外したが、今は QuuBee の 1MB でも動く ——
   測った境目と、大きなものを 59KB 以下の塊で取る理由は `docs/pc98-port-plan.md` の「段 8」）

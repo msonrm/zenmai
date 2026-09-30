@@ -101,4 +101,6 @@ else
     diff "$TMP/kana/host/ZENMAI.LOG" "$TMP/romaji/host/ZENMAI.LOG" | head -20
     fail=1
 fi
+# ★起動画面の曲（PMD86 / PMD.COM で鳴る・PMD が無くても起動する・RETURN で消える）
+node test-pc98-music.js || fail=1
 exit $fail

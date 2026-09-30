@@ -26,3 +26,6 @@ pc98-mock/__pycache__/
 # PC-98 版の建てた物 (build-pc98.sh / test-pc98.sh の出力)
 native/pc98-out/
 native/__pycache__/
+
+# PC-98 の曲の道具（MC.EXE は native/build-mc.sh が建てる）
+native/pc98-music/.mc/

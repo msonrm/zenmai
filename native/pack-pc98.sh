@@ -22,12 +22,17 @@ mkdir -p "$OUT"
 # ★作品 = パック（.ZMP）+ story（.Z3）。Zork I は訳つき、II・III は英語だけ（段 8 の C）
 WORKS="ZORK1.ZMP ZORK1.Z3 ZORK2.ZMP ZORK2.Z3 ZORK3.ZMP ZORK3.Z3"
 for f in ZENMAI.EXE DOS4GW.EXE $WORKS; do cp "pc98-out/$f" "$OUT/"; done
+# ★起動画面の曲 = PMD の曲（CANON.M）と、鳴らす常駐ドライバ（86 = PMD86.COM・26K = PMD.COM）
+cp pc98-music/CANON.M pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
 
 # 文書: UTF-8 で書いて Shift_JIS・CRLF にする
 # ★— (U+2014) は Shift_JIS に無いので ― (U+2015) に寄せる（本体の字の表と同じ）
 sjis() { python3 -c "import sys; sys.stdout.buffer.write(sys.stdin.read().replace('—', '―').replace('\n', '\r\n').encode('cp932'))"; }
 
-printf 'SET DOS16M=1\nZENMAI\n' | sjis > "$OUT/ZENMAI.BAT"
+# ★PMD を常駐させてから起動する（/K = ESC・GRPH キーで曲を止めない）。すでに常駐していれば PMD は何も変えずに戻る。
+#   FM 音源が 26K だけの機種は ZENMAI26.BAT（PMD.COM）。どちらでも、常駐できなければ曲なしで動く
+printf 'SET DOS16M=1\nPMD86 /K\nZENMAI\n' | sjis > "$OUT/ZENMAI.BAT"
+printf 'SET DOS16M=1\nPMD /K\nZENMAI\n' | sjis > "$OUT/ZENMAI26.BAT"
 
 sed "s/@VER@/$VER/" <<'DOC' | sjis > "$OUT/README.TXT"
 Zenmai（ぜんまい）PC-98 版  ver. @VER@
@@ -49,11 +54,15 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   - MS-DOS と拡張メモリ 2MB 以上（HIMEM.SYS など）
     ★本体と作品で約 880KB を使うので、640KB（本体メモリだけ）では動きません。
       QuuBee では拡張メモリ 1MB でも動きました。1MB の実機で試した方は、ぜひ教えてください
-  - FM 音源（PC-9801-26K / 86 相当）があれば、起動画面で曲が鳴ります（無くても動きます）
+  - FM 音源（PC-9801-26K / 86 相当）があれば、起動画面で曲が鳴ります（無くても動きます）。
+    曲は常駐の音楽ドライバ PMD が鳴らします（同梱。下の「起動画面の曲」）
 
 ■ 起動
-  ZENMAI.BAT を実行する（中で SET DOS16M=1 をしてから ZENMAI.EXE を起動します。
-  DOS/4GW を使います）。起動画面で ←→ で作品を、↑↓ で言語を選び、RETURN キーで始めます。
+  ZENMAI.BAT を実行する（中で SET DOS16M=1 をし、音楽ドライバ PMD86 を常駐させてから
+  ZENMAI.EXE を起動します。DOS/4GW を使います）。
+  ★FM 音源が 26K だけの機種（86 ボードも内蔵の 86 互換も無い機種）は ZENMAI26.BAT を使います
+    （PMD86 の代わりに PMD.COM を常駐させます）。★どちらも、常駐できなければ曲なしで動きます。
+  起動画面で ←→ で作品を、↑↓ で言語を選び、RETURN キーで始めます。
 
   作品は ZENMAI.EXE と同じ場所に置いた 2 種類のファイルです:
     ZORK1.Z3 など   …… story file（Z-machine のプログラムそのもの）
@@ -64,8 +73,10 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
 
 ■ 起動画面の曲
   J. S. バッハ『音楽の捧げもの』BWV 1079 より、2 声のカノン「Quaerendo invenietis」（謎カノン）。
-  1 本だけ書かれた旋律を鏡に映して読むと、もう 1 声になる曲です。FM 音源の 2 声で鳴らしています。
-  RETURN キーで止まってゲームが始まります。
+  1 本だけ書かれた旋律を鏡に映して読むと、もう 1 声になる曲です。FM 音源の 2 声にドラムなどを足した、
+  PMD 用の編曲（CANON.M）です。RETURN キーで止まって（数秒かけて消えて）ゲームが始まります。
+  ★PMD は常駐します。あとで外したいときは PMD86 /R（26K は PMD /R）。曲を替えたいときは、PMD の
+    `.M` の曲を CANON.M の名前で置き換えられます（★枠は 16KB まで）。
 
 ■ 打ち方（日本語）
   ローマ字 …… 普段の打ち方。例: yuubinbakowoakeru → ゆうびんばこをあける
@@ -91,7 +102,7 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
        ここがいちばん確かめたいところです）
   4. ローマ字・カナキー・CAPS・ROLL UP / DOWN が効くか
   5. やめたあと、DOS の画面が元どおりに戻るか（画面下のファンクションキーの表示も）
-  6. 起動画面で曲が鳴るか（FM 音源の種類: 26K / 86 / 内蔵 など）
+  6. 起動画面で曲が鳴るか（FM 音源の種類: 26K / 86 / 内蔵 など。どちらの .BAT で・PMD の表示は何と出たか）
   7. 拡張メモリが 1MB の機種で動くか（QuuBee では動きました）
 
 ■ 商標
@@ -111,7 +122,10 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   DOS4GW.EXE           …… DOS/4GW（Tenberry Software）。Open Watcom 1.9 に同梱の
                            royalty-free の実行時版
   起動画面の曲          …… J. S. Bach『音楽の捧げもの』BWV 1079（1747 年。著作権は切れている）。
-                           音は Zenmai が楽譜から書き起こしたもの
+                           音は Zenmai が楽譜から書き起こし、PMD 用に編曲したもの（CANON.M）
+  PMD86.COM / PMD.COM  …… Professional Music Driver（PMD）Copyright (c) M.Kajihara（KAJA）。KAJA さんが 2019 年に
+                           公開したソースを「ご自由に使って頂いて構いません」として Zenmai がビルドしたもの
+                           （ソース = https://github.com/d2lmirrors/pmd）。曲の MML の変換にも同じ作者の MC を使っています
 
   https://github.com/msonrm/zenmai
 DOC
@@ -120,5 +134,5 @@ for n in 1 2 3; do sjis < ../vendor/zork$n/LICENSE > "$OUT/ZORK$n.TXT"; done
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI.EXE $WORKS DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI26.BAT ZENMAI.EXE $WORKS CANON.M PMD86.COM PMD.COM DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"
