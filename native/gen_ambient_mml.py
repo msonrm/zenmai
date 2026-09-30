@@ -122,12 +122,11 @@ def build(name, s):
             idx = max(0, min(len(span) - 1, idx + rnd.choice([-1, 1]) * rnd.randint(*s['walk'])))
             lead.append((span[idx], c))
         t += c
-    # 和音: 2 小節ごとに根と 5 度（ドローン = 根の 1 オクターブ下も）
-    pad, fifth = [], []
+    # 和音: 2 小節ごとに根だけ（★5 度の C パートは外した = ざらつきの元・msonrm 2026-09-30）
+    pad = []
     for b in range(0, BARS, 2):
         r = s['root'] - 12 + s['roots'][(b // 2) % len(s['roots'])]
         pad.append((r, BAR * 2))
-        fifth.append((r + 7, BAR * 2))
     # 鐘（SSG）: 1 小節に 1 回ぐらい、音階の高い音をぽつり
     bell = []
     for b in range(BARS):
@@ -139,7 +138,7 @@ def build(name, s):
             bell.append((None, BAR))
     # ドローン（SSG）: 根の音を低く伸ばす
     drone = [(s['root'] - 12 + s['roots'][(b // 2) % len(s['roots'])], BAR * 2) for b in range(0, BARS, 2)] if s.get('drone') else None
-    parts = {'A': lead, 'B': pad, 'C': fifth, 'G': bell}
+    parts = {'A': lead, 'B': pad, 'G': bell}
     if drone:
         parts['H'] = drone
     for p, seq in parts.items():
@@ -156,8 +155,6 @@ def build(name, s):
     lines += [f'A\t{x}' for x in wrap(notes(lead))]
     lines.append('B\t@1 V118 p1 L')
     lines += [f'B\t{x}' for x in wrap(notes(pad))]
-    lines.append('C\t@1 V112 p3 L')
-    lines += [f'C\t{x}' for x in wrap(notes(fifth))]
     lines.append('G\t@6 v14 L')
     lines += [f'G\t{x}' for x in wrap(notes(bell))]
     if drone:
