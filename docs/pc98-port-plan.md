@@ -1,6 +1,6 @@
 # Zenmai PC-98 版 移植計画
 
-**状態: ver. 0.3.0-beta を公開した**（2026-09-30・[Release `pc98-v0.3.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.3.0-beta)・pre-release）。
+**状態: ver. 0.4.0-beta を公開した**（2026-09-30・曲を PMD 化・部屋ごとの曲・[Release `pc98-v0.4.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.4.0-beta)・pre-release。0.3.0-beta = 作品をファイルに・作品選び）。
 0.2.0-beta（2026-09-29）からの差 = 段 8（作品をファイルに・Zork II / III を英語で同梱・起動画面で作品を選ぶ・QuuBee の拡張 1MB でも動く）。
 以下は 0.2.0-beta のときの記述:
 0.1.0-beta（2026-09-28）からの差 = 段 6（ファンクションキーの行・ふりがなの 1px・ボタンの言い方）と段 7（起動画面の曲）、起動画面を日本語が上に。
