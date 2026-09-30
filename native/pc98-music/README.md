@@ -9,6 +9,9 @@
 | `CANON.M` | `CANON.MML` を MC.EXE で変えたもの（★`node mc98.js pc98-music/CANON.MML`）。配る |
 | `PMD86.COM` | 常駐ドライバ（86 ボード = YM2608 の機種）。配る |
 | `PMD.COM` | 常駐ドライバ（26K = YM2203 の機種）。配る |
+| `ZENMAI.INI` | 本体の設定（`[zenmai]` music = on/off・title = 起動画面の曲）。手で書く |
+| `ZORK1.INI` | 作品ごとの割り当て（`[music]` 部屋名 = 曲・`[picture]` 部屋名 = 絵）。★作品 = `ZORK1.ZMP` なら `ZORK1.INI`（パックの無い story も `ZORK2.Z3` → `ZORK2.INI`）。手で書く |
+| `FIELD/HOUSE/WATER/TEMPLE/DEEP.{MML,M}` | 部屋ごとのアンビエントの見本（★`gen_ambient_mml.py` が MML を作る） |
 | `.mc/` | 道具の置き場（追跡しない）。`sh build-mc.sh` が MC.EXE と、上の 2 つの元を建てる |
 
 ## 出どころとライセンス
@@ -37,3 +40,16 @@ PMD.COM    1dab25533ee8ec0f7b613d15085c2f7245540ee379a455648e28f698673ea666
 - ★鳴らす側の罠は `pc98_music.h`（DOS/4GW の下から INT 60h を呼ぶ・DS は使えない）
 - 音を聞かずに確かめる: QuuBee の headless で PMD86 を常駐させ、`Machine.captureAudio()` で録って
   音の高さ（FFT）とピークを見る（2026-09-30: o4 の C = 261 Hz。音量はドラム以外を上げた（msonrm・2026-09-30）: FM = V127・搬送波 TL 0・SSG = v13 で、ピーク 28.5k / 32.7k（割れない））
+
+## 部屋ごとの曲（INI）
+
+- ★キーは**状態行の英語の部屋名**（版 3 は VM が毎回出すので、訳にも VM の中にも依らず、人が読んで書ける）。大文字小文字は区別しない。
+  末尾の `*` で前方一致（`Forest* = …`）、`*` だけで既定。上から順に見て最初に合ったもの。曲が `-` なら止める。どれにも合わなければ止める。
+  ★同じ曲の部屋どうしを動くときは頭に戻さず続ける（`pc98_music.c` の `music_room`）。Zork I の部屋名は story の物の表から取れる
+  （版 3 の物の木で「ROOMS の子」= 110 個のうち名前の種類 78）
+- ★**検査**: 本体は割り当てが替わったときだけ記録（`ZENMAI.LOG`）に `# music: FIELD.M` / `# picture: WHOUSE` を書く
+  （止まれば `-`）。台本 `pc98-test/music.txt`（外 → 家の中 → 屋根裏 → 地下室）をホストと QuuBee で流して突き合わせる
+  （`test-pc98.sh`）。PMD が常駐した状態で最後まで着いて地下室の曲が鳴ることは `test-pc98-music.js`
+- ★絵は**形だけ**（記録に書くだけ・ファイルは無い）。置き場所（本文の窓を削るか）と形式は、QuuBee で見本を表示して決める
+- ★アンビエントの音量: FM は V127 が上限（1 段 0.75 dB。V96 では rms 200 しか出なかった）。今は rms 2000〜3700・ピーク約 10k
+  （起動画面の曲は rms 約 8000）

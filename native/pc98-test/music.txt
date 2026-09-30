@@ -1,0 +1,14 @@
+#!english
+# 部屋ごとの曲・絵の割り当て（ZORK1.INI）を確かめる台本。★記録の `# music:` `# picture:` をホストと QuuBee で突き合わせる。
+# 外（FIELD）→ 家の中（HOUSE・部屋を動いても続く）→ 屋根裏 → 地下室（DEEP = 既定）
+south
+east
+open window
+enter house
+up
+down
+west
+take lamp
+move rug
+open trap door
+down

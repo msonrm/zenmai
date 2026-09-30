@@ -67,7 +67,7 @@ story_case "作品が 1 つも無い → 置くものを言う" "no game here"
 for s in ../test/walkthrough.txt pc98-test/*.txt; do
     name=$(basename "$s" .txt)
     mkdir -p "$TMP/$name/host"
-    cp pc98-out/*.ZMP pc98-out/*.Z3 "$TMP/$name/host/"     # ★作品 = パック + story（pack.h）。全部置く
+    cp pc98-out/*.ZMP pc98-out/*.Z3 pc98-out/*.INI "$TMP/$name/host/"     # ★作品 = パック + story（pack.h）。全部置く
     ( cd "$TMP/$name/host" && "$OLDPWD/pc98-out/zenmai-host" "$OLDPWD/$s" )
     PC98_EXTMEM=2 node pc98_run.js "$s" "$TMP/$name/qb" >"$TMP/$name/run.txt" 2>&1 || { cat "$TMP/$name/run.txt"; fail=1; continue; }
     cp "$TMP/$name/qb/screen-1x.png" "pc98-out/$name-1x.png"

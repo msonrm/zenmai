@@ -68,7 +68,7 @@ cp "$WATCOM/binw/wstub.exe" "$OUT/" 2>/dev/null || true
       $(echo "$OBJS" | sed "s| $OUT/| |g") library clib3r )
 cp "$WATCOM/binw/dos4gw.exe" "$OUT/DOS4GW.EXE"
 # 起動画面の曲（PMD が鳴らす）と、その常駐ドライバ（README = pc98-music/README.md）
-cp pc98-music/CANON.M pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
+cp pc98-music/*.M pc98-music/*.INI pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
 
 # ---- ホスト（記録の突き合わせ用）----
 cc -std=gnu11 -O1 -DPC98_HOST -I. -w $SRC -o "$OUT/zenmai-host"

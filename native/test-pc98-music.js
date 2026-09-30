@@ -35,6 +35,21 @@ async function run(driver) {
     return { level, last, title };
 }
 
+// 部屋ごとの曲: 台本（pc98-test/music.txt = 外 → 家の中 → 地下室）を PMD86 が常駐した状態で流し、
+// 終わりで（地下室 = DEEP.M が）鳴っていること・[END] まで着くこと（曲の読み込みで止まらない）を見る
+async function rooms() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'zm-rooms-'));
+    for (const f of fs.readdirSync(out).filter((n) => /\.(ZMP|Z3|INI|M|COM)$/i.test(n)).concat(['ZENMAI.EXE', 'DOS4GW.EXE']))
+        fs.copyFileSync(path.join(out, f), path.join(dir, f));
+    fs.copyFileSync(path.join(__dirname, 'pc98-test/music.txt'), path.join(dir, 'SCRIPT.TXT'));
+    fs.writeFileSync(path.join(dir, 'RUN.BAT'), 'SET DOS16M=1\r\nPMD86 /K\r\nZENMAI /S SCRIPT.TXT\r\n');
+    const m = await Machine.boot({ dir, bat: 'RUN.BAT', extmem: 2 });
+    const done = m.runUntil((mm) => mm.textVram(17)[15].includes('[END]'), 60000, 30);
+    const pcm = done ? m.captureAudio(4) : new Int16Array(0);
+    fs.rmSync(dir, { recursive: true, force: true });
+    return { done, level: rms(pcm, 0, pcm.length) };
+}
+
 (async () => {
     let fail = 0;
     const ok = (c, msg) => { console.log((c ? 'OK  ' : 'NG  ') + msg); if (!c) fail = 1; };
@@ -43,6 +58,9 @@ async function run(driver) {
         ok(r.level > 800, `${drv}: 起動画面で鳴る（rms ${r.level | 0}）`);
         ok(r.last < 50, `${drv}: RETURN のあと数秒で消える（rms ${r.last | 0}）`);
     }
+    const rr = await rooms();
+    ok(rr.done, '部屋ごとの曲: 台本が [END] まで着く（曲の読み込みで止まらない）');
+    ok(rr.level > 100, `部屋ごとの曲: 地下室（DEEP.M）が鳴っている（rms ${rr.level | 0}）`);
     const r = await run(null);
     ok(r.level < 50, `PMD なし: 無音で起動画面まで出る（rms ${r.level | 0}）`);
     process.exit(fail);

@@ -1,0 +1,30 @@
+; ★gen_ambient_mml.py が生成。手で編集しない（旋律は決まった種から組む音階上の散歩）
+#Title		Temple
+#Composer	Zenmai
+#Memo		Ambient sample for room music.
+#Filename	.M
+#FFFile		TEMPLE.FF
+#Tempo		30
+
+@ 0  4 5  =reed
+  24  4  0  7  2  28  0  1  0  0
+  22  2  0  7  1   2  0  1  0  0
+  26  6  0  7  3  40  0  3  0  0
+  22  2  0  7  1  12  0  1  3  0
+@ 1  4 7  =strings
+  18  0  0  7  0  24  0  1  0  0
+  16  1  0  6  1   4  0  1  3  0
+  18  0  0  7  0  26  0  1  0  0
+  16  1  0  6  1   6  0  1  7  0
+
+A	@0 V127 p2 q2 L 
+A	o5 f%96 g%144 f%96 d+%48 d%96 r%144 c%96 o4 a+%48 a%96 a+%144 a%96 r%48
+A	r%96 g%144 f%96 d+%48
+B	@1 V118 p1 L
+B	o2 d%192 d%192 g%192 d+%192 d%192 d%192 g%192 d+%192
+C	@1 V112 p3 L
+C	o2 a%192 a%192 o3 d%192 o2 a+%192 a%192 a%192 o3 d%192 o2 a+%192
+G	@6 v14 L
+G	r%96 r%96 o5 d%12 r%84 r%96 r%48 a+%12 r%36 r%24 d+%12 r%60 d%12 r%84
+G	r%48 g%12 r%36 r%48 f%12 r%36 a+%12 r%84 d+%12 r%84 r%96 r%96 r%96 r%96
+G	r%96

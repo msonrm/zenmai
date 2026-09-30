@@ -23,7 +23,7 @@ mkdir -p "$OUT"
 WORKS="ZORK1.ZMP ZORK1.Z3 ZORK2.ZMP ZORK2.Z3 ZORK3.ZMP ZORK3.Z3"
 for f in ZENMAI.EXE DOS4GW.EXE $WORKS; do cp "pc98-out/$f" "$OUT/"; done
 # ★起動画面の曲 = PMD の曲（CANON.M）と、鳴らす常駐ドライバ（86 = PMD86.COM・26K = PMD.COM）
-cp pc98-music/CANON.M pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
+cp pc98-music/*.M pc98-music/*.INI pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
 
 # 文書: UTF-8 で書いて Shift_JIS・CRLF にする
 # ★— (U+2014) は Shift_JIS に無いので ― (U+2015) に寄せる（本体の字の表と同じ）
@@ -77,6 +77,15 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   PMD 用の編曲（CANON.M）です。RETURN キーで止まって（数秒かけて消えて）ゲームが始まります。
   ★PMD は常駐します。あとで外したいときは PMD86 /R（26K は PMD /R）。曲を替えたいときは、PMD の
     `.M` の曲を CANON.M の名前で置き換えられます（★枠は 16KB まで）。
+
+■ 部屋ごとの曲（Zork I）
+  ゲームの中では、部屋（状態行の部屋名）に合わせて曲が替わります。外（FIELD.M）・家の中（HOUSE.M）・
+  ダムや川（WATER.M）・神殿（TEMPLE.M）・それ以外の地下（DEEP.M）。旋律というより雰囲気の見本です。
+  同じ曲の部屋どうしを動くときは、曲は頭に戻らず続きます。
+  割り当ては ZORK1.INI（作品と同じ名前の .INI）に書いてあります。部屋名は英語の状態行のもので、
+  `Forest* = FIELD.M` のように末尾の * で前方一致、`* = DEEP.M` で既定です（メモ帳で直せます）。
+  ★同じ名前の .M を置けば、曲を替えられます（16KB まで）。ZENMAI.INI の music = off で曲を切れます。
+  ★絵の割り当て（[picture]）はまだ形だけで、絵は出ません。
 
 ■ 打ち方（日本語）
   ローマ字 …… 普段の打ち方。例: yuubinbakowoakeru → ゆうびんばこをあける
@@ -134,5 +143,5 @@ for n in 1 2 3; do sjis < ../vendor/zork$n/LICENSE > "$OUT/ZORK$n.TXT"; done
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI26.BAT ZENMAI.EXE $WORKS CANON.M PMD86.COM PMD.COM DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI26.BAT ZENMAI.EXE $WORKS ZENMAI.INI ZORK1.INI CANON.M FIELD.M HOUSE.M WATER.M TEMPLE.M DEEP.M PMD86.COM PMD.COM DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"

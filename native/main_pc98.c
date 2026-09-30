@@ -130,6 +130,12 @@ static void draw_status(void)
         log_status(name, nn);
         log_status(sc, rl < 48 ? rl : 48);
     }
+    /* ★曲・絵の割り当て（INI）。状態行の英語の部屋名で決める。替わったときだけ記録に書く */
+    const int ch = music_room(sb, name_end);
+    if (render_log) {
+        if (ch & MUSIC_CHANGED) fprintf(render_log, "# music: %s\n", *music_current() ? music_current() : "-");
+        if (ch & PICTURE_CHANGED) fprintf(render_log, "# picture: %s\n", *picture_current() ? picture_current() : "-");
+    }
 }
 
 static void die(const char *msg)
@@ -306,7 +312,7 @@ static int title_menu(int *wi)
     center(R_VER, "ver. " ZM98_VERSION, TA_CYAN, 0);
     const int many = nworks > 1;
     int sel = 0, cur = *wi;
-    music_start("CANON.M");             /* 起動画面の曲（Bach の謎カノン・PMD が鳴らす）*/
+    if (*music_title_file()) music_start(music_title_file());   /* 起動画面の曲（既定は Bach の謎カノン・PMD が鳴らす）*/
     for (;;) {
         const ZmPack *p = &works[cur];
         const int ja_ok = p->has_ja && p->story[0];
@@ -392,6 +398,7 @@ int main(int argc, char **argv)
         }
         fseek(script, at, SEEK_SET);
     }
+    music_config();                    /* ZENMAI.INI（曲の入り切り・起動画面の曲） */
     txt_init();
     gfx_init();
 #ifndef PC98_HOST
@@ -411,6 +418,7 @@ int main(int argc, char **argv)
         return 1;
     }
     save_dos_name(pack->base);         /* ZORK1.ZMP → ZORK1.SAV */
+    music_work(pack->base);            /* ZORK1.INI（部屋ごとの曲・絵） */
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */
     sess_start(lang_en, pack->ram, pack->len, pack->init, die);

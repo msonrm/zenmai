@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // PMD の MML を `.M` にする（MC.EXE を QuuBee の headless で走らせる）。
-//   node mc98.js pc98-music/CANON.MML        → pc98-music/CANON.M
+//   node mc98.js pc98-music/CANON.MML [別の .MML …]   → 同じ場所に .M（複数渡せる）
 // ★MC.EXE は `sh build-mc.sh` で建てる（pc98-music/.mc/MC.EXE）。QuuBee のリポジトリ = 環境変数 QB_DIR（既定 ~/development/qb）。
 // ★音色を MML の中に書く（`@` 行）には、音色ファイル（.FF）が**先にある**必要がある（無いと MC が `@` を受けない）。
 //   空（0 で埋めた 256 音色）を置いて渡す。できた .FF は捨てる（音色は .M の中に添付される）
@@ -10,11 +10,7 @@ const os = require('os');
 const QB = process.env.QB_DIR || path.join(os.homedir(), 'development/qb');
 const { Machine } = require(path.join(QB, 'tools/lib/machine'));
 
-(async () => {
-    const mml = process.argv[2];
-    if (!mml) { console.error('使い方: node mc98.js X.MML'); process.exit(2); }
-    const mc = path.join(__dirname, 'pc98-music/.mc/MC.EXE');
-    if (!fs.existsSync(mc)) { console.error('MC.EXE が無い（sh build-mc.sh）'); process.exit(1); }
+async function compile(mml, mc) {
     const base = path.basename(mml).replace(/\.mml$/i, '').toUpperCase();
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mc98-'));
     fs.copyFileSync(mc, path.join(dir, 'MC.EXE'));
@@ -28,12 +24,22 @@ const { Machine } = require(path.join(QB, 'tools/lib/machine'));
     if (!data) {
         const shot = path.join(os.tmpdir(), 'mc98-error.png');
         m.screenshotPng(shot);
-        console.error(`コンパイルできなかった（画面 = ${shot}）`);
-        process.exit(1);
+        console.error(`${mml}: コンパイルできなかった（画面 = ${shot}）`);
+        return false;
     }
     const out = path.join(path.dirname(mml), base + '.M');
     fs.writeFileSync(out, data);
     console.log(`${out}（${data.length} バイト）`);
     fs.rmSync(dir, { recursive: true, force: true });
-    process.exit(0);
+    return true;
+}
+
+(async () => {
+    const files = process.argv.slice(2);
+    if (!files.length) { console.error('使い方: node mc98.js X.MML …'); process.exit(2); }
+    const mc = path.join(__dirname, 'pc98-music/.mc/MC.EXE');
+    if (!fs.existsSync(mc)) { console.error('MC.EXE が無い（sh build-mc.sh）'); process.exit(1); }
+    let ok = true;
+    for (const f of files) ok = (await compile(f, mc)) && ok;
+    process.exit(ok ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });
