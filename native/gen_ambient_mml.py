@@ -33,6 +33,10 @@ PATCH = {
                        (0, 1, 26, 0, 18, 0, 0, 0, 7), (7, 1, 18, 0, 16, 1, 0, 1, 6)]),
     'reed':   (4, 5, [(0, 1, 28, 0, 24, 4, 0, 2, 7), (0, 1, 14, 0, 22, 2, 0, 1, 7),
                       (0, 3, 40, 0, 26, 6, 0, 3, 7), (3, 1, 24, 0, 22, 2, 0, 1, 7)]),
+    # ★やわらかい pad: 帰還（FB）を絞り、2 組を上下にずらさない。ストリングスの FB 7 は鋸歯を狙った音で、
+    #   ずっと鳴らすと「ざらざらした雑音」に聞こえた（msonrm・2026-09-30）
+    'pad':    (4, 1, [(0, 1, 44, 0, 14, 0, 0, 0, 5), (0, 1, 20, 0, 14, 2, 0, 1, 5),
+                      (0, 2, 56, 0, 14, 0, 0, 0, 5), (0, 1, 30, 0, 14, 2, 0, 1, 5)]),
     'bell':   (4, 0, [(0, 14, 52, 2, 31, 14, 6, 15, 8), (3, 1, 14, 1, 31, 5, 2, 3, 6),
                       (0, 1, 30, 1, 31, 8, 3, 6, 6), (7, 1, 16, 1, 31, 5, 2, 3, 6)]),
     'bass':   (4, 6, [(0, 0, 24, 0, 31, 8, 2, 4, 8), (0, 1, 12, 0, 31, 4, 1, 2, 8),
@@ -42,15 +46,15 @@ PATCH = {
 # 曲の表。roots = 2 小節ごとのコードの根（root からの半音）・lead = 旋律の並び方
 SONGS = {
     'FIELD': dict(title='Field', tempo=40, root=60, scale=[0, 2, 4, 7, 9], roots=[0, -3, -7, -5], seed=11,
-                  lead='flute', pad='strings', walk=(1, 2), rest=0.15, lens=[96, 48, 72, 48], bell=True, oct_lead=0),
+                  lead='flute', pad='pad', walk=(1, 2), rest=0.15, lens=[96, 48, 72, 48], bell=True, oct_lead=0),
     'HOUSE': dict(title='House', tempo=52, root=57, scale=[0, 3, 5, 7, 10], roots=[0, -4, 3, -2], seed=23,
-                  lead='harpsi', pad='strings', walk=(1, 2), rest=0.3, lens=[24, 48, 24, 12, 12, 48], bell=True, oct_lead=0),
+                  lead='harpsi', pad='pad', walk=(1, 2), rest=0.3, lens=[24, 48, 24, 12, 12, 48], bell=True, oct_lead=0),
     'WATER': dict(title='Water', tempo=50, root=62, scale=[0, 2, 4, 6, 7, 9, 11], roots=[0, 4, -1, 2], seed=37,
-                  lead='bell', pad='strings', walk=(1, 1), rest=0.1, lens=[12], bell=False, oct_lead=0, echo=True),
+                  lead='bell', pad='pad', walk=(1, 1), rest=0.1, lens=[12], bell=False, oct_lead=0, echo=True),
     'TEMPLE': dict(title='Temple', tempo=30, root=50, scale=[0, 1, 3, 5, 7, 8, 10], roots=[0, 0, 5, 1], seed=41,
-                   lead='reed', pad='strings', walk=(1, 1), rest=0.25, lens=[96, 144, 96, 48], bell=True, oct_lead=1),
+                   lead='reed', pad='pad', walk=(1, 1), rest=0.25, lens=[96, 144, 96, 48], bell=True, oct_lead=1),
     'DEEP': dict(title='Deep', tempo=26, root=40, scale=[0, 3, 5, 7, 10], roots=[0, 0, -2, 3], seed=53,
-                 lead='bass', pad='strings', walk=(1, 3), rest=0.55, lens=[96, 192, 96], bell=False, oct_lead=1, drone=True),
+                 lead='bass', pad='pad', walk=(1, 3), rest=0.55, lens=[96, 192, 96], bell=False, oct_lead=1, drone=True),
 }
 
 
@@ -157,7 +161,7 @@ def build(name, s):
     lines.append('G\t@6 v14 L')
     lines += [f'G\t{x}' for x in wrap(notes(bell))]
     if drone:
-        lines.append('H\t@0 v13 L')
+        lines.append('H\t@0 v6 L')
         lines += [f'H\t{x}' for x in wrap(notes(drone))]
     text = '\n'.join(lines) + '\n'
     (OUT / f'{name}.MML').write_bytes(text.replace('\n', '\r\n').encode('cp932'))
