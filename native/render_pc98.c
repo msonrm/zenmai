@@ -284,11 +284,15 @@ static void draw_window(void)
         const long i = view + r;
         draw_row(r, i >= hist_min() && i < total ? HIST_AT(i) : 0);
     }
-    /* 窓の外に続きがあることの印（右の装飾の上） */
-    if (view > hist_min())
-        txt_put(BODY_ROW0, MARK_COL, 0x25B2, TA_CYAN);                    /* ▲ */
-    if (view + BODY_ROWS < total)
-        txt_put(BODY_ROW0 + BODY_ROWS - 1, MARK_COL, 0x25BC, TA_CYAN);    /* ▼ */
+    /* 下に続きがある印（▼）。本文の最下行の下の空きに、グラフィックで置く */
+    gfx_rect(MARK_X, MARK_Y, MARK_X + 16, MARK_Y + 16, 0);
+    if (view + BODY_ROWS < total) {
+        const int cx = MARK_X + 8, y0 = MARK_Y + (16 - MARK_H) / 2;
+        for (int i = 0; i < MARK_H; i++) {
+            const int w = MARK_W - 2 * (i / 2);                          /* 2 行ごとに 1 画素ずつ両側が細る */
+            gfx_fill(cx - w / 2, y0 + i, cx - w / 2 + w, y0 + i + 1, MARK_COLOR);
+        }
+    }
 }
 
 static long bottom(void)

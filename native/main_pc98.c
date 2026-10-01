@@ -13,7 +13,7 @@
  *   本文の上    縦 32〜44   装飾と同じ色
  *   左右の装飾  幅 40（DECO_W）
  *   本文        2〜13 行目・横 64〜575（全角 32 字 × 12 行）
- *   入力欄の枠  縦 352〜399 15 行目。上に 2px の縁
+ *   入力欄の枠  縦 352〜399 15 行目。全体を 1 色（縁は無い）
  *
  * 入力は 2 通り:
  *   ZENMAI              … キーボード（BIOS から直に読む）。ローマ字 / カナキーでかな、CAPS で英字
@@ -57,7 +57,7 @@ static int lang_en;                    /* 1 = ENGLISH（訳さない・英字で
 
 /* ---- 画面の外枠 ---- */
 
-enum { C_BG, C_BAND, C_DECO, C_INPUT, C_INPUT_EDGE };   /* パレットの番号（8 = ふりがな） */
+enum { C_BG, C_BAND, C_DECO, C_INPUT, C_CARET = MARK_COLOR };   /* パレットの番号（8 = ふりがな） */
 
 static void draw_chrome(void)
 {
@@ -65,7 +65,7 @@ static void draw_chrome(void)
     gfx_palette(C_BAND, 3, 2, 7);      /* 上の帯（紺） */
     gfx_palette(C_DECO, 4, 7, 3);      /* 左右の装飾（焦げ茶） */
     gfx_palette(C_INPUT, 5, 2, 5);     /* 入力欄の枠 */
-    gfx_palette(C_INPUT_EDGE, 9, 5, 9);
+    gfx_palette(C_CARET, 15, 15, 15);  /* キャレットと ▼（コマンド文字色 = 白）*/
     gfx_palette(RUBY_COLOR, 10, 10, 10);
     enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352,
            TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
@@ -75,7 +75,6 @@ static void draw_chrome(void)
     gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, C_DECO);
     gfx_rect(0, TOP_H, GFX_W, TOP_DECO, C_DECO);
     gfx_rect(0, IN_Y, GFX_W, GFX_H, C_INPUT);
-    gfx_rect(0, IN_Y, GFX_W, IN_Y + 2, C_INPUT_EDGE);
 }
 
 static void log_status(const uint16_t *s, int n)
@@ -209,6 +208,16 @@ static int kbd_hit(void) { return bios18(0x01).h.bh != 0; }
 static int kbd_get(void) { return bios18(0x00).w.ax; }                /* 上 = キーの番号・下 = 字 */
 #endif
 
+/* キャレット: グラフィックの細い縦線（幅 2px・字の高さ 16 ラスタ）。コマンド文字色。
+   ★反転の空白だと 24 ラスタ全部（ふりがなの帯まで）が塗られて長く太かった（msonrm の指摘・2026-10-01） */
+enum { CARET_W = 2, CARET_BLINK = 28 };    /* 点滅の半周期 = 垂直帰線の回数（約 0.5 秒） */
+static int caret_col;
+static void caret_show(int on)
+{
+    const int x = caret_col * 8, y = ROW_INPUT * TXT_RASTERS + (TXT_RASTERS - 16);
+    gfx_fill(x, y, x + CARET_W, y + 16, on ? C_CARET : C_INPUT);
+}
+
 /* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。
    ★右端の打ち方の表示（かな / 英字）はやめた —— 打てば分かる（msonrm の判断・2026-09-29） */
 static void draw_input(int caret)
@@ -220,8 +229,8 @@ static void draw_input(int caret)
         col += txt_put(ROW_INPUT, col, line.buf[i], TA_WHITE);
     for (int i = 0; i < line.np; i++)
         col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], TA_WHITE);
-    if (caret)
-        txt_put(ROW_INPUT, col, ' ', TA_WHITE | TA_REV);
+    caret_col = col;
+    caret_show(caret);                 /* 打つたびに点き直す（点滅の位相を戻す） */
 }
 
 #ifndef PC98_HOST
@@ -232,7 +241,13 @@ static void key_line(void)
 {
     ki_clear(&line);
     draw_input(1);
-    for (;;) {
+    for (int t = 0, on = 1; ; ) {
+        if (!kbd_hit()) {              /* 待つ間にキャレットを点滅させる */
+            txt_vsync();
+            if (++t >= CARET_BLINK) { t = 0; on = !on; caret_show(on); }
+            continue;
+        }
+        t = 0; on = 1;
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_ROLLDOWN) { body_scroll(-(BODY_ROWS - 1)); continue; }
         if (scan == K_ROLLUP)   { body_scroll(BODY_ROWS - 1); continue; }

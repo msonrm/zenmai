@@ -16,6 +16,8 @@ void gfx_fini(void);                   /* 消して表示をやめる（DOS へ�
 void gfx_palette(int idx, int g, int r, int b);      /* 各 0〜15 */
 /* 矩形 [x0,x1)×[y0,y1) を色 c で塗る。★x0 と x1 は 8 の倍数 */
 void gfx_rect(int x0, int y0, int x1, int y1, int c);
+/* 矩形 [x0,x1)×[y0,y1) を色 c で塗る。x は画素単位で任意（キャレットのような細い線用） */
+void gfx_fill(int x0, int y0, int x1, int y1, int c);
 /* 8×8 の字形を (x, y) に色 c で置く（x は画素単位で任意）。字形の 0 のところは触らない */
 void gfx_glyph8(int x, int y, const uint8_t rows[8], int c);
 

@@ -74,6 +74,19 @@ void gfx_rect(int x0, int y0, int x1, int y1, int c)
     }
 }
 
+void gfx_fill(int x0, int y0, int x1, int y1, int c)
+{
+    for (int b = x0 / 8; b <= (x1 - 1) / 8; b++) {
+        const int lo = x0 > b * 8 ? x0 - b * 8 : 0, hi = x1 < b * 8 + 8 ? x1 - b * 8 : 8;
+        const uint8_t m = (uint8_t)((0xFF >> lo) & (0xFF << (8 - hi)));    /* 左端の画素が最上位ビット */
+        for (int i = 0; i < 4; i++)
+            for (int y = y0; y < y1; y++) {
+                uint8_t *p = PLANE_AT(i) + y * 80 + b;
+                if ((c >> i) & 1) *p |= m; else *p &= (uint8_t)~m;
+            }
+    }
+}
+
 void gfx_glyph8(int x, int y, const uint8_t rows[8], int c)
 {
     const int b = x / 8, sh = x % 8;
