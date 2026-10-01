@@ -1,6 +1,6 @@
 # Zenmai PC-98 版 移植計画
 
-**状態: ver. 0.5.0-beta を公開した**（2026-10-01・画面の仕上げ（段 7d）・[Release `pc98-v0.5.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.0-beta)・pre-release。0.4.0-beta = 曲を PMD 化・部屋ごとの曲。0.3.0-beta = 作品をファイルに・作品選び）。
+**状態: ver. 0.5.1-beta を公開した**（2026-10-01・[Release `pc98-v0.5.1-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.1-beta)・pre-release。0.5.0-beta の「打つたびにキャレットの跡が残る」を直した ——★グラフィックの線はテキストを消しても残るので、描き直すときは前の線を消す。0.5.0-beta = 画面の仕上げ（段 7d）。0.4.0-beta = 曲を PMD 化・部屋ごとの曲。0.3.0-beta = 作品をファイルに・作品選び）。
 0.2.0-beta（2026-09-29）からの差 = 段 8（作品をファイルに・Zork II / III を英語で同梱・起動画面で作品を選ぶ・QuuBee の拡張 1MB でも動く）。
 以下は 0.2.0-beta のときの記述:
 0.1.0-beta（2026-09-28）からの差 = 段 6（ファンクションキーの行・ふりがなの 1px・ボタンの言い方）と段 7（起動画面の曲）、起動画面を日本語が上に。

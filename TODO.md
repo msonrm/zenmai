@@ -9,7 +9,7 @@
 > ★★**残っている関門は 1 つだけ = テストの記録**（実機が要るので人の仕事）。
 > ★★**手順の正典は `docs/portmaster-testing.md`** —— 実機を触りながら潰す紙として
 > 書いてあるので、**次に始めるときはそこから読む**。
-> ★**PC-98 版は ver. 0.5.0-beta を公開**（2026-10-01・pre-release。画面の仕上げ = 本文 13 行・キャレット・色の INI・縁の絵柄。0.4.0-beta は 2026-09-30・0.3.0-beta は 2026-09-29・0.2.0-beta は 2026-09-29・0.1.0-beta は 2026-09-28）—— 実機の報告待ち。→ 下の 3。
+> ★**PC-98 版は ver. 0.5.1-beta を公開**（2026-10-01・pre-release。0.5.0-beta の「打つたびにキャレットの跡が残る」を直した。0.5.0 = 画面の仕上げ = 本文 13 行・キャレット・色の INI・縁の絵柄。0.4.0-beta は 2026-09-30・0.3.0-beta は 2026-09-29・0.2.0-beta は 2026-09-29・0.1.0-beta は 2026-09-28）—— 実機の報告待ち。→ 下の 3。
 > ★2026-09-29: `feat/pc98` を main へ入れ（PR #50）、語彙の直しを載せて Web 版をデプロイ。README に PC-98 版を書いた。
 > PS1 版は出し直していない（語彙の直し「黄色いボタン」ほかは、次に PS1 版を出すときに入る）
 > ★**PC-98 版 ver. 0.3.0-beta を公開**（2026-09-30・pre-release）—— 作品をファイル（パック + story）で渡す形（段 8）・
@@ -54,7 +54,7 @@ Microsoft Open Source Programs Office / Team Xbox / Activision）。story ファ
 
 ## 3. PC-98 版
 
-★**ver. 0.5.0-beta を公開した**（2026-10-01・画面の仕上げ・[Release `pc98-v0.5.0-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.0-beta)・0.4.0-beta = 曲を PMD 化・部屋ごとの曲・
+★**ver. 0.5.1-beta を公開した**（2026-10-01・0.5.0-beta のキャレットの跡を直した・[Release `pc98-v0.5.1-beta`](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.1-beta)。0.5.0-beta = 画面の仕上げ・0.4.0-beta = 曲を PMD 化・部屋ごとの曲・
 pre-release。0.2.0-beta は 2026-09-29・0.1.0-beta は 2026-09-28）。★**正典は `docs/pc98-port-plan.md`**（段の表・決めたこと・末尾の「次にやること」）。
 
 - ★**次は実機の報告を待って直す**（msonrm は PC-98 の実機を持っていない。報告先 = GitHub の issues）。
