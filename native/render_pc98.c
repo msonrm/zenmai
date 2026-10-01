@@ -268,13 +268,13 @@ static void draw_row(int r, const VLine *v)
 {
     const int row = BODY_ROW0 + r, y = row * TXT_RASTERS;
     txt_clear(row, row, TA_WHITE);
-    /* ふりがなの帯を消す（左右の装飾の内側）。★窓の先頭行の帯は上の帯の下端なので、帯の色で消す */
-    gfx_rect(DECO_W, y, RUBY_X_MAX, y + RUBY_BAND, r == 0 ? PAL_BAND : PAL_BODY);
+    /* ふりがなの帯を消す（左右の装飾の内側）。★窓の先頭行（r == 0）の帯は上の帯の下端に重なるので、触らず読みも書かない */
+    if (r > 0) gfx_rect(DECO_W, y, RUBY_X_MAX, y + RUBY_BAND, PAL_BODY);
     if (!v) return;
     int col = BODY_COL0;
     for (int i = 0; i < v->n; i++)
         col += txt_put(row, col, v->ch[i], v->attr);
-    for (int i = 0; i < v->nr; i++) {
+    for (int i = 0; i < v->nr && r > 0; i++) {
         const uint8_t *g = misaki(v->rc[i]);
         if (g) gfx_glyph8(v->rx[i] + RUBY_DX, y + RUBY_DY, g, RUBY_COLOR);
     }
