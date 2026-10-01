@@ -94,12 +94,12 @@ The same game runs in a browser at **https://zenmai.pages.dev/**
 There is also a **PC-98 (MS-DOS) build**, in beta: romaji or kana-key input, furigana above the kanji,
 and a Bach canon (arranged for the PMD music driver) at the title screen. It also carries *Zork II* and *Zork III* in the original English,
 and runs other version-3 story files placed next to it (games are separate files: a story file plus a Zenmai pack).
-Download it from **[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.4.0-beta)** —
+Download it from **[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.0-beta)** —
 it also runs in the browser PC-98 emulator [QuuBee](https://quubee.pages.dev/) (drop the ZIP onto the page).
 
 **PC-98（MS-DOS）版**もある（beta）—— ローマ字 / カナキーで打ち、漢字の上にふりがな、起動画面では PMD（音楽ドライバ）で
 バッハのカノンが鳴る。『Zork II』『Zork III』も原作の英語のまま遊べ、ほかの版 3 の story file も横に置けば動く
-（作品は story file と Zenmai のパックに分かれたファイル）。**[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.4.0-beta)** から。
+（作品は story file と Zenmai のパックに分かれたファイル）。**[Releases](https://github.com/msonrm/zenmai/releases/tag/pc98-v0.5.0-beta)** から。
 ブラウザの PC-98 エミュレータ [QuuBee](https://quubee.pages.dev/) でも動く（ZIP をページにドロップする）。
 
 Design notes, how the translation layer works, the vocabulary structure, and the test suite:
