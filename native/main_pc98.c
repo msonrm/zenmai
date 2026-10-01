@@ -71,12 +71,13 @@ static void draw_sides(void)
     const char *name = theme_pattern();
     Mag m;
     if (!*name || !mag_load(name, &m)) return;
+    if (m.w != 2 * SIDE || m.h != GFX_H - TOP_H) { mag_free(&m); return; }   /* ★絵柄は 80×368 だけ（ほかは読まない = 色のまま） */
     for (int i = 0; i < 16; i++)
         if (i > 4 && i != PAL_RUBY)
             gfx_palette(i, m.pal[i][0], m.pal[i][1], m.pal[i][2]);
-    const int h = m.h < GFX_H - TOP_H ? m.h : GFX_H - TOP_H, stride = m.w / 2;
-    gfx_blit4(0, TOP_H, m.px, stride, SIDE, h);
-    gfx_blit4(GFX_W - SIDE, TOP_H, m.px + (m.w > SIDE ? (m.w - SIDE) / 2 : 0), stride, SIDE, h);
+    const int stride = m.w / 2;
+    gfx_blit4(0, TOP_H, m.px, stride, SIDE, m.h);
+    gfx_blit4(GFX_W - SIDE, TOP_H, m.px + SIDE / 2, stride, SIDE, m.h);
     mag_free(&m);
 }
 
