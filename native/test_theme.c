@@ -14,7 +14,7 @@ int main(void)
     fclose(f);
     f = fopen("T.INI", "w");
     fputs("[theme]\nbody = #0A0\n[scene]\n"
-          "Kitchen =\nForest* = band=#ABC text=red input_fg=cyan side=#zzz\nDam = top=#F00 ruby=#111\n* = band=#001\n", f);
+          "Kitchen =\nForest* = band=#ABC text=red input_fg=cyan side=#zzz\nDam = input=#F00 ruby=#111\n* = band=#001\n", f);
     fclose(f);
 
     theme_config();
@@ -35,7 +35,7 @@ int main(void)
     CHECK(theme_room("Forest", 6) == 0);        /* 同じ装い → 替わらない */
     CHECK(theme_room("Dam", 3) == 1);
     CHECK(theme_rgb(TH_BAND) == 0x123);         /* 前の場面の色は残らない */
-    CHECK(theme_rgb(TH_TOP) == 0xF00 && theme_rgb(TH_RUBY) == 0x111);
+    CHECK(theme_rgb(TH_INPUT) == 0xF00 && theme_rgb(TH_RUBY) == 0x111);
     CHECK(theme_room("Dam Lobby", 9) == 1);     /* 完全一致の Dam には合わず * へ */
     CHECK(theme_rgb(TH_BAND) == 0x001);
     CHECK(theme_room("Kitchen", 7) == 1);       /* * より先の空の行 → 全体に戻る */

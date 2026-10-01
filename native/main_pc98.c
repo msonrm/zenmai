@@ -10,7 +10,7 @@
  *
  * 画面（1 行 24 ラスタ × 16 行。寸法と色は試作 pc98-mock/gen_screen.py と同じ・色は仮）:
  *   上の帯      縦 0〜31    0 行目に場所（左・黄）と得点（右）
- *   本文の上    縦 32〜44   装飾と同じ色
+ *   本文の地    縦 32〜 から黒（1 行目 = 縦 24〜47 は本文の行にせず、ふりがなも書かない = 上の帯に食い込まない余白）
  *   左右の装飾  幅 40（DECO_W）
  *   本文        2〜13 行目・横 64〜575（全角 32 字 × 12 行）
  *   入力欄の枠  縦 352〜399 15 行目。全体を 1 色（縁は無い）
@@ -62,7 +62,7 @@ static int lang_en;                    /* 1 = ENGLISH（訳さない・英字で
 enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352 };
 
 /* 本文の左右の縁: 色で塗り、絵柄（.MAG）が決まっていれば上に敷く。
-   ★MAG のパレットのうち書くのは UI の予約（0〜5・8）以外だけ（pc98_theme.h）。読めない・無いときは色のまま */
+   ★MAG のパレットのうち書くのは UI の予約（0〜4・8）以外だけ（pc98_theme.h）。読めない・無いときは色のまま */
 static void draw_sides(void)
 {
     gfx_rect(0, TOP_H, SIDE, IN_Y, PAL_SIDE);
@@ -71,7 +71,7 @@ static void draw_sides(void)
     Mag m;
     if (!*name || !mag_load(name, &m)) return;
     for (int i = 0; i < 16; i++)
-        if (i > 5 && i != PAL_RUBY)
+        if (i > 4 && i != PAL_RUBY)
             gfx_palette(i, m.pal[i][0], m.pal[i][1], m.pal[i][2]);
     const int h = m.h < IN_Y - TOP_H ? m.h : IN_Y - TOP_H, stride = m.w / 2;
     gfx_blit4(0, TOP_H, m.px, stride, SIDE, h);
@@ -82,10 +82,8 @@ static void draw_sides(void)
 static void draw_chrome(void)
 {
     theme_apply();                     /* 色はパレットで決まる（INI で替えられる = pc98_theme.h） */
-    enum { TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
     gfx_rect(0, 0, GFX_W, GFX_H, PAL_BODY);  /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
     gfx_rect(0, 0, GFX_W, TOP_H, PAL_BAND);
-    gfx_rect(0, TOP_H, GFX_W, TOP_DECO, PAL_TOP);
     gfx_rect(0, IN_Y, GFX_W, GFX_H, PAL_INPUT);
     draw_sides();
 }

@@ -9,7 +9,7 @@ enum { SCENE_N = 48, KEY_N = 40, LINE_N = 200 };
 typedef struct { char key[KEY_N]; unsigned char prefix; short v[TH_N]; } Scene;
 
 static const char *const names[TH_N] = {
-    "band", "top", "side", "input", "body", "ruby", "pattern",
+    "band", "side", "input", "body", "ruby", "pattern",
     "status", "score", "prompt", "input_fg", "text", "echo",
 };
 static const struct { const char *name; int attr; } colors[] = {
@@ -17,7 +17,7 @@ static const struct { const char *name; int attr; } colors[] = {
     { "green", 0x81 }, { "cyan", 0xA1 }, { "yellow", 0xC1 }, { "white", 0xE1 },
 };
 /* 既定 = 今までの色 */
-#define DEFAULTS { 0x237, 0x743, 0x743, 0x255, 0x000, 0xAAA, 0, \
+#define DEFAULTS { 0x237, 0x743, 0x255, 0x000, 0xAAA, 0, \
                    TA_YELLOW, TA_WHITE, TA_CYAN, TA_WHITE, TA_WHITE, TA_CYAN }
 static const short defaults[TH_N] = DEFAULTS;
 
@@ -189,7 +189,6 @@ void theme_apply(void)
     pal(PAL_BAND, cur[TH_BAND]);
     pal(PAL_SIDE, cur[TH_SIDE]);
     pal(PAL_INPUT, cur[TH_INPUT]);
-    pal(PAL_TOP, cur[TH_TOP]);
     pal(PAL_RUBY, cur[TH_RUBY]);
     const int a = cur[TH_INPUT_FG];                        /* キャレット・▼ = コマンド文字色（属性 bit7 = G・bit6 = R・bit5 = B） */
     gfx_palette(PAL_CARET, a >> 7 & 1 ? 15 : 0, a >> 6 & 1 ? 15 : 0, a >> 5 & 1 ? 15 : 0);
