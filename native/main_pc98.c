@@ -13,7 +13,8 @@
  *   本文の地    縦 32〜 から黒
  *   左右の装飾  幅 40（DECO_W）
  *   本文        1〜13 行目・横 64〜575（全角 32 字 × 13 行）。★窓の先頭行だけふりがなを書かない
- *   入力欄の枠  縦 352〜399 15 行目。全体を 1 色（縁は無い）
+ *   入力欄の枠  縦 352〜399・横 40〜599（左右の縁の間）。15 行目。全体を 1 色（縁は無い）
+ *   左右の縁    横 40 ずつ・縦 32〜399（画面の下端まで）
  *
  * 入力は 2 通り:
  *   ZENMAI              … キーボード（BIOS から直に読む）。ローマ字 / カナキーでかな、CAPS で英字
@@ -65,15 +66,15 @@ enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352 };
    ★MAG のパレットのうち書くのは UI の予約（0〜4・8）以外だけ（pc98_theme.h）。読めない・無いときは色のまま */
 static void draw_sides(void)
 {
-    gfx_rect(0, TOP_H, SIDE, IN_Y, PAL_SIDE);
-    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, PAL_SIDE);
+    gfx_rect(0, TOP_H, SIDE, GFX_H, PAL_SIDE);               /* ★左右の縁は画面の下端まで（入力欄は縁の間） */
+    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, GFX_H, PAL_SIDE);
     const char *name = theme_pattern();
     Mag m;
     if (!*name || !mag_load(name, &m)) return;
     for (int i = 0; i < 16; i++)
         if (i > 4 && i != PAL_RUBY)
             gfx_palette(i, m.pal[i][0], m.pal[i][1], m.pal[i][2]);
-    const int h = m.h < IN_Y - TOP_H ? m.h : IN_Y - TOP_H, stride = m.w / 2;
+    const int h = m.h < GFX_H - TOP_H ? m.h : GFX_H - TOP_H, stride = m.w / 2;
     gfx_blit4(0, TOP_H, m.px, stride, SIDE, h);
     gfx_blit4(GFX_W - SIDE, TOP_H, m.px + (m.w > SIDE ? (m.w - SIDE) / 2 : 0), stride, SIDE, h);
     mag_free(&m);
@@ -84,7 +85,7 @@ static void draw_chrome(void)
     theme_apply();                     /* 色はパレットで決まる（INI で替えられる = pc98_theme.h） */
     gfx_rect(0, 0, GFX_W, GFX_H, PAL_BODY);  /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
     gfx_rect(0, 0, GFX_W, TOP_H, PAL_BAND);
-    gfx_rect(0, IN_Y, GFX_W, GFX_H, PAL_INPUT);
+    gfx_rect(SIDE, IN_Y, GFX_W - SIDE, GFX_H, PAL_INPUT);
     draw_sides();
 }
 
