@@ -51,7 +51,7 @@ cp ../vendor/zork3/zork3.z3 "$OUT/ZORK3.Z3"
 python3 gen_pack.py "$OUT/ZORK3.Z3" "$OUT/ZORK3.ZMP" "title=Zork III" "story=ZORK3.Z3" \
     "author=Infocom (Marc Blank, Dave Lebling)" "license=story: MIT (historicalsource/zork3)"
 
-SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_music.c pc98_jis.c \
+SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_music.c pc98_theme.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_tab.c misaki_data.c \
      translate.c translate_tab.c cmd.c cmd_tab.c"
 

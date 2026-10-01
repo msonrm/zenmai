@@ -33,6 +33,7 @@
 #include "pc98_text.h"
 #include "pc98_gfx.h"
 #include "pc98_music.h"
+#include "pc98_theme.h"
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
@@ -57,24 +58,17 @@ static int lang_en;                    /* 1 = ENGLISH（訳さない・英字で
 
 /* ---- 画面の外枠 ---- */
 
-enum { C_BG, C_BAND, C_DECO, C_INPUT, C_CARET = MARK_COLOR };   /* パレットの番号（8 = ふりがな） */
-
 static void draw_chrome(void)
 {
-    gfx_palette(C_BG, 0, 0, 0);
-    gfx_palette(C_BAND, 3, 2, 7);      /* 上の帯（紺） */
-    gfx_palette(C_DECO, 4, 7, 3);      /* 左右の装飾（焦げ茶） */
-    gfx_palette(C_INPUT, 5, 2, 5);     /* 入力欄の枠 */
-    gfx_palette(C_CARET, 15, 15, 15);  /* キャレットと ▼（コマンド文字色 = 白）*/
-    gfx_palette(RUBY_COLOR, 10, 10, 10);
+    theme_apply();                     /* 色はパレットで決まる（INI で替えられる = pc98_theme.h） */
     enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352,
            TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
-    gfx_rect(0, 0, GFX_W, GFX_H, C_BG);      /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
-    gfx_rect(0, 0, GFX_W, TOP_H, C_BAND);
-    gfx_rect(0, TOP_H, SIDE, IN_Y, C_DECO);
-    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, C_DECO);
-    gfx_rect(0, TOP_H, GFX_W, TOP_DECO, C_DECO);
-    gfx_rect(0, IN_Y, GFX_W, GFX_H, C_INPUT);
+    gfx_rect(0, 0, GFX_W, GFX_H, PAL_BODY);  /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
+    gfx_rect(0, 0, GFX_W, TOP_H, PAL_BAND);
+    gfx_rect(0, TOP_H, SIDE, IN_Y, PAL_SIDE);
+    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, PAL_SIDE);
+    gfx_rect(0, TOP_H, GFX_W, TOP_DECO, PAL_TOP);
+    gfx_rect(0, IN_Y, GFX_W, GFX_H, PAL_INPUT);
 }
 
 static void log_status(const uint16_t *s, int n)
@@ -104,6 +98,15 @@ static void draw_status(void)
     int name_end = 0;
     while (sb[name_end] && !(sb[name_end] == ' ' && sb[name_end + 1] == ' '))
         name_end++;
+    /* ★場面の装い（INI）。文字の色を決める前に替える。パレットだけなので再描画は要らない */
+    if (theme_room(sb, name_end)) {
+        theme_apply();
+        if (render_log) {
+            char d[200];
+            theme_describe(d, sizeof d);
+            fprintf(render_log, "# theme: %s\n", d);
+        }
+    }
     uint16_t name[64];
     int nn;
     if (lang_en) {
@@ -114,7 +117,7 @@ static void draw_status(void)
     }
     int col = COL_L;
     for (int i = 0; i < nn && col < COL_R - 24; i++)
-        col += txt_put(ROW_STATUS, col, name[i], TA_YELLOW);
+        col += txt_put(ROW_STATUS, col, name[i], (uint8_t)theme_attr(TH_STATUS));
     int re = name_end;
     while (sb[re] == ' ') re++;
     int rl = 0;
@@ -123,7 +126,7 @@ static void draw_status(void)
     uint16_t sc[48];
     for (int i = 0; i < rl && i < 48; i++) {
         sc[i] = (uint8_t)sb[re + i];
-        txt_put(ROW_STATUS, COL_R - rl + i, sc[i], TA_WHITE);
+        txt_put(ROW_STATUS, COL_R - rl + i, sc[i], (uint8_t)theme_attr(TH_SCORE));
     }
     if (render_log) {
         log_status(name, nn);
@@ -215,7 +218,7 @@ static int caret_col;
 static void caret_show(int on)
 {
     const int x = caret_col * 8, y = ROW_INPUT * TXT_RASTERS + (TXT_RASTERS - 16);
-    gfx_fill(x, y, x + CARET_W, y + 16, on ? C_CARET : C_INPUT);
+    gfx_fill(x, y, x + CARET_W, y + 16, on ? PAL_CARET : PAL_INPUT);
 }
 
 /* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。
@@ -224,11 +227,11 @@ static void draw_input(int caret)
 {
     txt_clear(ROW_INPUT, ROW_INPUT, TA_WHITE);
     int col = COL_L;
-    col += txt_put(ROW_INPUT, col, 0xFF1E, TA_CYAN);     /* ＞ */
+    col += txt_put(ROW_INPUT, col, 0xFF1E, (uint8_t)theme_attr(TH_PROMPT));     /* ＞ */
     for (int i = 0; i < line.n; i++)
-        col += txt_put(ROW_INPUT, col, line.buf[i], TA_WHITE);
+        col += txt_put(ROW_INPUT, col, line.buf[i], (uint8_t)theme_attr(TH_INPUT_FG));
     for (int i = 0; i < line.np; i++)
-        col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], TA_WHITE);
+        col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], (uint8_t)theme_attr(TH_INPUT_FG));
     caret_col = col;
     caret_show(caret);                 /* 打つたびに点き直す（点滅の位相を戻す） */
 }
@@ -413,6 +416,7 @@ int main(int argc, char **argv)
         }
         fseek(script, at, SEEK_SET);
     }
+    theme_config();                    /* ZENMAI.INI の [theme]（色の既定） */
     music_config();                    /* ZENMAI.INI（曲の入り切り・起動画面の曲） */
     txt_init();
     gfx_init();
@@ -433,6 +437,7 @@ int main(int argc, char **argv)
         return 1;
     }
     save_dos_name(pack->base);         /* ZORK1.ZMP → ZORK1.SAV */
+    theme_work(pack->base);            /* ZORK1.INI の [theme] と [scene]（場面ごとの色） */
     music_work(pack->base);            /* ZORK1.INI（部屋ごとの曲・絵） */
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */

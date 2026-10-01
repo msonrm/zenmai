@@ -23,6 +23,7 @@
 #include "kinsoku.h"
 #include "pc98_text.h"
 #include "pc98_gfx.h"
+#include "pc98_theme.h"
 #include "misaki_data.h"
 #include "render_pc98.h"
 
@@ -79,7 +80,7 @@ static void log_line(const uint16_t *s, int n)
 
 static uint8_t attr_of(uint16_t color)
 {
-    return color == ACCENT ? TA_CYAN : TA_WHITE;
+    return (uint8_t)theme_attr(color == ACCENT ? TH_ECHO : TH_TEXT);
 }
 
 /* ---- 割り付け（render.c と同じ形。幅の単位は桁 = 8px）---- */
