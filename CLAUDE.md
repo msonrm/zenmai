@@ -1,7 +1,7 @@
 # Zenmai —— 作業の手引き
 
 Zork I（Z-machine）を日本語で読み、日本語で打つ。版はブラウザ（`web/` + `src/`）・PS1・SDL2（PortMaster）・
-PC-98（ver. 0.4.0-beta を pre-release で公開・Zork II / III を英語で同梱・作品はパック + story のファイル・実機の報告待ち）。
+PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で同梱・作品はパック + story のファイル・実機の報告待ち）。
 
 ## まず読むもの
 
@@ -65,6 +65,9 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
   `python3 gen_canon_mml.py` → `node mc98.js pc98-music/CANON.MML`（MC.EXE は `sh build-mc.sh`・KAJA 氏の自由公開ソースから）。
   出どころ・罠は `native/pc98-music/README.md`。検査は `test-pc98-music.js`（`test-pc98.sh` から流れる）。
   ★部屋ごとの曲は `ZENMAI.INI` / `<作品>.INI`（状態行の英語の部屋名 → 曲。書式は `pc98_music.h`）。記録の `# music:` をホストと突き合わせる
+- ★**画面の色と縁の絵柄も INI**（`[theme]` 全体 / `[scene]` 場面ごと。書式の正典は `pc98_theme.h`。絵柄は `.MAG` 80×368 だけ・`gen_edge_mag.py` が作る見本。
+  検査は `test_theme.c`・`test_mag.c` + `test-mag.js`）。★グラフィックの線（キャレット・▼）はテキストを消しても残るので、描き直すときは前の線を自分で消す
+- ★配る書庫の `README.TXT` は PC-98 時代の流儀（NEC 罫線の枠・76 桁）。**台本 `native/pc98-readme.txt` を直し**、`fmt_readme.py` が折る（生成物を手で直さない）
 - ★曲・絵はパックに入れない（外のファイル + 作品ごとの `.INI`・計画書の「次にやること」）
 - 必要なメモリは像 約 262KB + 起動後に約 620KB（★要件は拡張 2MB。1MB は目標から外したが、今は QuuBee の 1MB でも動く ——
   測った境目と、大きなものを 59KB 以下の塊で取る理由は `docs/pc98-port-plan.md` の「段 8」）
