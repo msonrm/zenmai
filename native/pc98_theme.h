@@ -9,6 +9,8 @@
  *   <作品>.INI                [scene]  部屋名 = キー=値 キー=値 …   場面ごとに替えるもの（部屋名の照合は曲の INI と同じ）
  *   背景など（#RGB）: band 上の帯 / top 本文の上の細い帯 / side 本文の左右 / input 入力欄 / body 本文の地 / ruby ふりがな
  *   文字（名前）:     status 上の帯の場所 / score 上の帯の得点 / prompt 入力欄の ＞ / input_fg コマンド文字（キャレットと ▼ も同じ色）
+ *   絵柄: pattern = 名前.MAG（本文の左右の縁。`-` で無し）。80×320 の絵の左半分が左・右半分が右の縁（40 のとき両側に同じ）。
+ *         ★パレットの 6・7・9〜15 だけを絵のパレットで書き換える（0〜5・8 は UI の予約。絵が使えばそのときの色で出る）
  *   ★全体だけ（[theme] のみ。履歴の行が色を持つので場面で替えると混ざる）: text 本文 / echo 打ったコマンドの反響
  *   ★キーが無い・値が読めないときは既定（今までの色）のまま。
  */
@@ -17,6 +19,7 @@
 
 enum {
     TH_BAND, TH_TOP, TH_SIDE, TH_INPUT, TH_BODY, TH_RUBY,                  /* 色（#RGB・0x0RGB） */
+    TH_PATTERN,                                                            /* 絵柄の名前の番号（0 = 無し） */
     TH_STATUS, TH_SCORE, TH_PROMPT, TH_INPUT_FG, TH_TEXT, TH_ECHO,         /* 文字（テキストの属性） */
     TH_N, TH_FG0 = TH_STATUS
 };
@@ -29,7 +32,8 @@ void theme_work(const char *base);     /* <作品>.INI の [theme] と [scene] �
 int  theme_room(const char *name, int n);   /* 状態行の英語の部屋名 → 場面の装い。替わったら 1 */
 void theme_apply(void);                /* 今の装いをパレットに書く */
 int  theme_attr(int key);              /* 文字の属性（TH_FG0 以降） */
-int  theme_rgb(int key);               /* 背景などの色（0x0RGB） */
+int  theme_rgb(int key);
+const char *theme_pattern(void);       /* 今の縁の絵柄のファイル名（無ければ ""） */               /* 背景などの色（0x0RGB） */
 void theme_describe(char *buf, int n); /* 今の装いの 1 行（記録用） */
 
 #endif

@@ -85,7 +85,15 @@ Zenmai（ぜんまい）PC-98 版  ver. @VER@
   割り当ては ZORK1.INI（作品と同じ名前の .INI）に書いてあります。部屋名は英語の状態行のもので、
   `Forest* = FIELD.M` のように末尾の * で前方一致、`* = DEEP.M` で既定です（メモ帳で直せます）。
   ★同じ名前の .M を置けば、曲を替えられます（16KB まで）。ZENMAI.INI の music = off で曲を切れます。
-  ★絵の割り当て（[picture]）はまだ形だけで、絵は出ません。
+
+■ 画面の色と縁の絵柄（Zork I）
+  ZORK1.INI の [theme]（全体の既定）と [scene]（部屋ごと）で、画面の色を替えられます。
+  背景などは #RGB（16 進 3 桁）、文字は色の名前（white・cyan など）です。部屋名の書き方は曲と同じです。
+    band 上の帯 / top 本文の上の細い帯 / side 本文の左右 / input 入力欄 / body 本文の地 / ruby ふりがな
+    status 場所 / score 得点 / prompt ＞ / input_fg コマンドの文字（キャレットも同じ色）/ text 本文 / echo 打ったコマンド
+    pattern 本文の左右に敷く絵柄（.MAG。本体と同じ場所に置く。- で無し）
+  ★text と echo は [theme] にだけ書けます。絵柄（FIELD.MAG など）は適当なタイル模様の見本です。
+  差し替えるときは、80×320・16 色の MAG（パレットの 6・7・9〜15 が絵柄の色になります）を作ってください。
 
 ■ 打ち方（日本語）
   ローマ字 …… 普段の打ち方。例: yuubinbakowoakeru → ゆうびんばこをあける
@@ -143,5 +151,5 @@ for n in 1 2 3; do sjis < ../vendor/zork$n/LICENSE > "$OUT/ZORK$n.TXT"; done
 sjis < vendor/LICENSE.txt > "$OUT/MOJOZORK.TXT"
 sjis < vendor/mozc/LICENSE > "$OUT/MOZC.TXT"
 
-( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI26.BAT ZENMAI.EXE $WORKS ZENMAI.INI ZORK1.INI CANON.M FIELD.M HOUSE.M WATER.M TEMPLE.M DEEP.M PMD86.COM PMD.COM DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
+( cd "$OUT" && zip -q -X "../$NAME.zip" ZENMAI.BAT ZENMAI26.BAT ZENMAI.EXE $WORKS ZENMAI.INI ZORK1.INI CANON.M FIELD.M HOUSE.M WATER.M TEMPLE.M DEEP.M FIELD.MAG HOUSE.MAG WATER.MAG TEMPLE.MAG DEEP.MAG PMD86.COM PMD.COM DOS4GW.EXE README.TXT ZORK1.TXT ZORK2.TXT ZORK3.TXT MOJOZORK.TXT MOZC.TXT )
 echo "OK: pc98-out/$NAME.zip ($(du -h "pc98-out/$NAME.zip" | cut -f1)) —— https://quubee.pages.dev/ にドロップする"

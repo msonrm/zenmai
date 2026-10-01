@@ -51,7 +51,7 @@ cp ../vendor/zork3/zork3.z3 "$OUT/ZORK3.Z3"
 python3 gen_pack.py "$OUT/ZORK3.Z3" "$OUT/ZORK3.ZMP" "title=Zork III" "story=ZORK3.Z3" \
     "author=Infocom (Marc Blank, Dave Lebling)" "license=story: MIT (historicalsource/zork3)"
 
-SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_music.c pc98_theme.c pc98_jis.c \
+SRC="main_pc98.c session.c pack.c tabload.c render_pc98.c save_dos.c pc98_text.c pc98_gfx.c pc98_music.c pc98_theme.c pc98_mag.c pc98_jis.c \
      kana_input.c kana_input_data.c jp_text.c ruby_tab.c misaki_data.c \
      translate.c translate_tab.c cmd.c cmd_tab.c"
 
@@ -67,6 +67,8 @@ cp "$WATCOM/binw/wstub.exe" "$OUT/" 2>/dev/null || true
 ( cd "$OUT" && wlink system dos4g option quiet option stack=65536 name ZENMAI.EXE \
       $(echo "$OBJS" | sed "s| $OUT/| |g") library clib3r )
 cp "$WATCOM/binw/dos4gw.exe" "$OUT/DOS4GW.EXE"
+# 本文の左右の縁の絵柄（.MAG・場面ごと）。適当なタイル模様（gen_edge_mag.py）
+python3 gen_edge_mag.py "$OUT" >/dev/null
 # 起動画面の曲（PMD が鳴らす）と、その常駐ドライバ（README = pc98-music/README.md）
 cp pc98-music/*.M pc98-music/*.INI pc98-music/PMD86.COM pc98-music/PMD.COM "$OUT/"
 

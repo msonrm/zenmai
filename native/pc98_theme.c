@@ -9,7 +9,7 @@ enum { SCENE_N = 48, KEY_N = 40, LINE_N = 200 };
 typedef struct { char key[KEY_N]; unsigned char prefix; short v[TH_N]; } Scene;
 
 static const char *const names[TH_N] = {
-    "band", "top", "side", "input", "body", "ruby",
+    "band", "top", "side", "input", "body", "ruby", "pattern",
     "status", "score", "prompt", "input_fg", "text", "echo",
 };
 static const struct { const char *name; int attr; } colors[] = {
@@ -17,7 +17,7 @@ static const struct { const char *name; int attr; } colors[] = {
     { "green", 0x81 }, { "cyan", 0xA1 }, { "yellow", 0xC1 }, { "white", 0xE1 },
 };
 /* 既定 = 今までの色 */
-#define DEFAULTS { 0x237, 0x743, 0x743, 0x255, 0x000, 0xAAA, \
+#define DEFAULTS { 0x237, 0x743, 0x743, 0x255, 0x000, 0xAAA, 0, \
                    TA_YELLOW, TA_WHITE, TA_CYAN, TA_WHITE, TA_WHITE, TA_CYAN }
 static const short defaults[TH_N] = DEFAULTS;
 
@@ -52,9 +52,26 @@ static int hex(int c)
     return c >= 'a' && c <= 'f' ? c - 'a' + 10 : -1;
 }
 
+/* 絵柄の名前の表（0 = 無し）。INI に書かれたものを順に入れる */
+enum { PAT_N = 16, PAT_LEN = 13 };
+static char pats[PAT_N][PAT_LEN];
+static int npats = 1;
+
+static int pattern_index(const char *v)
+{
+    if (!strcmp(v, "-") || !*v) return 0;
+    if (strlen(v) >= PAT_LEN) return -1;
+    for (int i = 1; i < npats; i++)
+        if (seq(pats[i], v)) return i;
+    if (npats >= PAT_N) return -1;
+    strcpy(pats[npats], v);
+    return npats++;
+}
+
 /* 値を読む。背景など（#RGB）と文字（名前）で形が違う。読めなければ -1 */
 static int parse_value(int key, const char *v)
 {
+    if (key == TH_PATTERN) return pattern_index(v);
     if (key < TH_FG0) {
         if (v[0] != '#' || hex(v[1]) < 0 || hex(v[2]) < 0 || hex(v[3]) < 0 || v[4]) return -1;
         return hex(v[1]) << 8 | hex(v[2]) << 4 | hex(v[3]);
@@ -181,10 +198,14 @@ void theme_apply(void)
 int theme_attr(int key) { return cur[key]; }
 int theme_rgb(int key) { return cur[key]; }
 
+const char *theme_pattern(void) { return pats[cur[TH_PATTERN]]; }
+
 void theme_describe(char *buf, int n)
 {
     int w = 0;
-    for (int i = 0; i < TH_N && w < n - 16; i++)
-        w += snprintf(buf + w, (size_t)(n - w), i < TH_FG0 ? "%s=#%03X " : "%s=%02X ", names[i], cur[i]);
+    for (int i = 0; i < TH_N && w < n - 16; i++) {
+        if (i == TH_PATTERN) w += snprintf(buf + w, (size_t)(n - w), "%s=%s ", names[i], *pats[cur[i]] ? pats[cur[i]] : "-");
+        else w += snprintf(buf + w, (size_t)(n - w), i < TH_FG0 ? "%s=#%03X " : "%s=%02X ", names[i], cur[i]);
+    }
     if (w > 0) buf[w - 1] = 0;
 }

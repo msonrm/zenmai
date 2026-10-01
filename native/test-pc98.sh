@@ -17,9 +17,13 @@ sh build-pc98.sh >/dev/null
 cc -std=c11 -Wall test_kana_input.c kana_input.c kana_input_data.c -o pc98-out/test_kana_input
 pc98-out/test_kana_input || exit 1
 # 本文の組み方（禁則・ぶら下げ・英字の語・ふりがなの位置）
+# 縁の絵柄（.MAG）の復号を QuuBee のデコーダと突き合わせる（★MAG は圧縮のある形で作ってある）
+cc -std=gnu11 -Wall -I. test_mag.c pc98_mag.c -o pc98-out/test_mag
+( cd pc98-out && ./test_mag FIELD.MAG WATER.MAG TEMPLE.MAG DEEP.MAG HOUSE.MAG > mag-c.txt && node ../test-mag.js FIELD.MAG WATER.MAG TEMPLE.MAG DEEP.MAG HOUSE.MAG > mag-js.txt \
+  && cmp mag-c.txt mag-js.txt && echo "MAG: 5 枚とも QuuBee のデコーダと画素が一致" ) || { echo "NG MAG の復号が QuuBee と違う"; exit 1; }
 # 色の設定（INI）の読みと場面の照合
 ( cd pc98-out && cc -std=gnu11 -Wall -DPC98_HOST -I.. ../test_theme.c ../pc98_theme.c ../pc98_gfx.c -o test_theme && ./test_theme ) || exit 1
-cc -std=gnu11 -Wall -DPC98_HOST -I. test_render_pc98.c pc98_text.c pc98_gfx.c pc98_theme.c pc98_jis.c misaki_data.c \
+cc -std=gnu11 -Wall -DPC98_HOST -I. test_render_pc98.c pc98_text.c pc98_gfx.c pc98_theme.c pc98_mag.c pc98_jis.c misaki_data.c \
     jp_text.c ruby_data.c -o pc98-out/test_render_pc98
 pc98-out/test_render_pc98 || exit 1
 TMP=$(mktemp -d)
