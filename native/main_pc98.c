@@ -10,10 +10,11 @@
  *
  * 画面（1 行 24 ラスタ × 16 行。寸法と色は試作 pc98-mock/gen_screen.py と同じ・色は仮）:
  *   上の帯      縦 0〜31    0 行目に場所（左・黄）と得点（右）
- *   本文の上    縦 32〜44   装飾と同じ色
+ *   本文の地    縦 32〜 から黒
  *   左右の装飾  幅 40（DECO_W）
- *   本文        2〜13 行目・横 64〜575（全角 32 字 × 12 行）
- *   入力欄の枠  縦 352〜399 15 行目。上に 2px の縁
+ *   本文        1〜13 行目・横 64〜575（全角 32 字 × 13 行）。★窓の先頭行だけふりがなを書かない
+ *   入力欄の枠  縦 352〜399・横 40〜599（左右の縁の間）。15 行目。全体を 1 色（縁は無い）
+ *   左右の縁    横 40 ずつ・縦 32〜399（画面の下端まで）
  *
  * 入力は 2 通り:
  *   ZENMAI              … キーボード（BIOS から直に読む）。ローマ字 / カナキーでかな、CAPS で英字
@@ -33,6 +34,8 @@
 #include "pc98_text.h"
 #include "pc98_gfx.h"
 #include "pc98_music.h"
+#include "pc98_theme.h"
+#include "pc98_mag.h"
 #include "render.h"
 #include "render_pc98.h"
 #include "session.h"
@@ -57,25 +60,34 @@ static int lang_en;                    /* 1 = ENGLISH（訳さない・英字で
 
 /* ---- 画面の外枠 ---- */
 
-enum { C_BG, C_BAND, C_DECO, C_INPUT, C_INPUT_EDGE };   /* パレットの番号（8 = ふりがな） */
+enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352 };
+
+/* 本文の左右の縁: 色で塗り、絵柄（.MAG）が決まっていれば上に敷く。
+   ★MAG のパレットのうち書くのは UI の予約（0〜4・8）以外だけ（pc98_theme.h）。読めない・無いときは色のまま */
+static void draw_sides(void)
+{
+    gfx_rect(0, TOP_H, SIDE, GFX_H, PAL_SIDE);               /* ★左右の縁は画面の下端まで（入力欄は縁の間） */
+    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, GFX_H, PAL_SIDE);
+    const char *name = theme_pattern();
+    Mag m;
+    if (!*name || !mag_load(name, &m)) return;
+    if (m.w != 2 * SIDE || m.h != GFX_H - TOP_H) { mag_free(&m); return; }   /* ★絵柄は 80×368 だけ（ほかは読まない = 色のまま） */
+    for (int i = 0; i < 16; i++)
+        if (i > 4 && i != PAL_RUBY)
+            gfx_palette(i, m.pal[i][0], m.pal[i][1], m.pal[i][2]);
+    const int stride = m.w / 2;
+    gfx_blit4(0, TOP_H, m.px, stride, SIDE, m.h);
+    gfx_blit4(GFX_W - SIDE, TOP_H, m.px + SIDE / 2, stride, SIDE, m.h);
+    mag_free(&m);
+}
 
 static void draw_chrome(void)
 {
-    gfx_palette(C_BG, 0, 0, 0);
-    gfx_palette(C_BAND, 3, 2, 7);      /* 上の帯（紺） */
-    gfx_palette(C_DECO, 4, 7, 3);      /* 左右の装飾（焦げ茶） */
-    gfx_palette(C_INPUT, 5, 2, 5);     /* 入力欄の枠 */
-    gfx_palette(C_INPUT_EDGE, 9, 5, 9);
-    gfx_palette(RUBY_COLOR, 10, 10, 10);
-    enum { TOP_H = 32, SIDE = DECO_W, IN_Y = 352,
-           TOP_DECO = BODY_ROW0 * TXT_RASTERS + RUBY_DY - 4 };   /* 本文 1 行目のふりがなの 4 ラスタ上 */
-    gfx_rect(0, 0, GFX_W, GFX_H, C_BG);      /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
-    gfx_rect(0, 0, GFX_W, TOP_H, C_BAND);
-    gfx_rect(0, TOP_H, SIDE, IN_Y, C_DECO);
-    gfx_rect(GFX_W - SIDE, TOP_H, GFX_W, IN_Y, C_DECO);
-    gfx_rect(0, TOP_H, GFX_W, TOP_DECO, C_DECO);
-    gfx_rect(0, IN_Y, GFX_W, GFX_H, C_INPUT);
-    gfx_rect(0, IN_Y, GFX_W, IN_Y + 2, C_INPUT_EDGE);
+    theme_apply();                     /* 色はパレットで決まる（INI で替えられる = pc98_theme.h） */
+    gfx_rect(0, 0, GFX_W, GFX_H, PAL_BODY);  /* ★起動画面の地を消してから（残ると本文の地が縞になる） */
+    gfx_rect(0, 0, GFX_W, TOP_H, PAL_BAND);
+    gfx_rect(SIDE, IN_Y, GFX_W - SIDE, GFX_H, PAL_INPUT);
+    draw_sides();
 }
 
 static void log_status(const uint16_t *s, int n)
@@ -105,6 +117,16 @@ static void draw_status(void)
     int name_end = 0;
     while (sb[name_end] && !(sb[name_end] == ' ' && sb[name_end + 1] == ' '))
         name_end++;
+    /* ★場面の装い（INI）。文字の色を決める前に替える。パレットだけなので再描画は要らない */
+    if (theme_room(sb, name_end)) {
+        theme_apply();
+        draw_sides();
+        if (render_log) {
+            char d[200];
+            theme_describe(d, sizeof d);
+            fprintf(render_log, "# theme: %s\n", d);
+        }
+    }
     uint16_t name[64];
     int nn;
     if (lang_en) {
@@ -115,7 +137,7 @@ static void draw_status(void)
     }
     int col = COL_L;
     for (int i = 0; i < nn && col < COL_R - 24; i++)
-        col += txt_put(ROW_STATUS, col, name[i], TA_YELLOW);
+        col += txt_put(ROW_STATUS, col, name[i], (uint8_t)theme_attr(TH_STATUS));
     int re = name_end;
     while (sb[re] == ' ') re++;
     int rl = 0;
@@ -124,7 +146,7 @@ static void draw_status(void)
     uint16_t sc[48];
     for (int i = 0; i < rl && i < 48; i++) {
         sc[i] = (uint8_t)sb[re + i];
-        txt_put(ROW_STATUS, COL_R - rl + i, sc[i], TA_WHITE);
+        txt_put(ROW_STATUS, COL_R - rl + i, sc[i], (uint8_t)theme_attr(TH_SCORE));
     }
     if (render_log) {
         log_status(name, nn);
@@ -209,19 +231,29 @@ static int kbd_hit(void) { return bios18(0x01).h.bh != 0; }
 static int kbd_get(void) { return bios18(0x00).w.ax; }                /* 上 = キーの番号・下 = 字 */
 #endif
 
+/* キャレット: グラフィックの細い縦線（幅 2px・字の高さ 16 ラスタ）。コマンド文字色。
+   ★反転の空白だと 24 ラスタ全部（ふりがなの帯まで）が塗られて長く太かった（msonrm の指摘・2026-10-01） */
+enum { CARET_W = 2, CARET_BLINK = 28 };    /* 点滅の半周期 = 垂直帰線の回数（約 0.5 秒） */
+static int caret_col;
+static void caret_show(int on)
+{
+    const int x = caret_col * 8, y = ROW_INPUT * TXT_RASTERS + (TXT_RASTERS - 16);
+    gfx_fill(x, y, x + CARET_W, y + 16, on ? PAL_CARET : PAL_INPUT);
+}
+
 /* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。
    ★右端の打ち方の表示（かな / 英字）はやめた —— 打てば分かる（msonrm の判断・2026-09-29） */
 static void draw_input(int caret)
 {
     txt_clear(ROW_INPUT, ROW_INPUT, TA_WHITE);
     int col = COL_L;
-    col += txt_put(ROW_INPUT, col, 0xFF1E, TA_CYAN);     /* ＞ */
+    col += txt_put(ROW_INPUT, col, 0xFF1E, (uint8_t)theme_attr(TH_PROMPT));     /* ＞ */
     for (int i = 0; i < line.n; i++)
-        col += txt_put(ROW_INPUT, col, line.buf[i], TA_WHITE);
+        col += txt_put(ROW_INPUT, col, line.buf[i], (uint8_t)theme_attr(TH_INPUT_FG));
     for (int i = 0; i < line.np; i++)
-        col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], TA_WHITE);
-    if (caret)
-        txt_put(ROW_INPUT, col, ' ', TA_WHITE | TA_REV);
+        col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], (uint8_t)theme_attr(TH_INPUT_FG));
+    caret_col = col;
+    caret_show(caret);                 /* 打つたびに点き直す（点滅の位相を戻す） */
 }
 
 #ifndef PC98_HOST
@@ -232,7 +264,13 @@ static void key_line(void)
 {
     ki_clear(&line);
     draw_input(1);
-    for (;;) {
+    for (int t = 0, on = 1; ; ) {
+        if (!kbd_hit()) {              /* 待つ間にキャレットを点滅させる */
+            txt_vsync();
+            if (++t >= CARET_BLINK) { t = 0; on = !on; caret_show(on); }
+            continue;
+        }
+        t = 0; on = 1;
         const int k = kbd_get(), scan = k >> 8 & 0x7F, c = k & 0xFF;
         if (scan == K_ROLLDOWN) { body_scroll(-(BODY_ROWS - 1)); continue; }
         if (scan == K_ROLLUP)   { body_scroll(BODY_ROWS - 1); continue; }
@@ -398,6 +436,7 @@ int main(int argc, char **argv)
         }
         fseek(script, at, SEEK_SET);
     }
+    theme_config();                    /* ZENMAI.INI の [theme]（色の既定） */
     music_config();                    /* ZENMAI.INI（曲の入り切り・起動画面の曲） */
     txt_init();
     gfx_init();
@@ -418,7 +457,8 @@ int main(int argc, char **argv)
         return 1;
     }
     save_dos_name(pack->base);         /* ZORK1.ZMP → ZORK1.SAV */
-    music_work(pack->base);            /* ZORK1.INI（部屋ごとの曲・絵） */
+    theme_work(pack->base);            /* ZORK1.INI の [theme] と [scene]（場面ごとの色） */
+    music_work(pack->base);            /* ZORK1.INI（部屋ごとの曲） */
     draw_chrome();
     jp_text_init();                    /* ふりがなを分ける描画器（jp_text.c）を本文に登録する */
     sess_start(lang_en, pack->ram, pack->len, pack->init, die);

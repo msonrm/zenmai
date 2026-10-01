@@ -74,6 +74,36 @@ void gfx_rect(int x0, int y0, int x1, int y1, int c)
     }
 }
 
+void gfx_fill(int x0, int y0, int x1, int y1, int c)
+{
+    for (int b = x0 / 8; b <= (x1 - 1) / 8; b++) {
+        const int lo = x0 > b * 8 ? x0 - b * 8 : 0, hi = x1 < b * 8 + 8 ? x1 - b * 8 : 8;
+        const uint8_t m = (uint8_t)((0xFF >> lo) & (0xFF << (8 - hi)));    /* 左端の画素が最上位ビット */
+        for (int i = 0; i < 4; i++)
+            for (int y = y0; y < y1; y++) {
+                uint8_t *p = PLANE_AT(i) + y * 80 + b;
+                if ((c >> i) & 1) *p |= m; else *p &= (uint8_t)~m;
+            }
+    }
+}
+
+void gfx_blit4(int x, int y, const uint8_t *px, int stride, int w, int h)
+{
+    for (int r = 0; r < h && y + r < GFX_H; r++) {
+        const uint8_t *row = px + r * stride;
+        for (int g = 0; g < w / 8; g++) {              /* 8 画素 = 4 バイトを 4 枚のプレーンの 1 バイトずつへ */
+            uint8_t pl[4] = { 0, 0, 0, 0 };
+            for (int j = 0; j < 8; j++) {
+                const int idx = j & 1 ? row[g * 4 + j / 2] & 15 : row[g * 4 + j / 2] >> 4;
+                for (int i = 0; i < 4; i++)
+                    pl[i] |= (uint8_t)((idx >> i & 1) << (7 - j));
+            }
+            for (int i = 0; i < 4; i++)
+                PLANE_AT(i)[(y + r) * 80 + x / 8 + g] = pl[i];
+        }
+    }
+}
+
 void gfx_glyph8(int x, int y, const uint8_t rows[8], int c)
 {
     const int b = x / 8, sh = x % 8;

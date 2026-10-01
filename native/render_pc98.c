@@ -23,6 +23,7 @@
 #include "kinsoku.h"
 #include "pc98_text.h"
 #include "pc98_gfx.h"
+#include "pc98_theme.h"
 #include "misaki_data.h"
 #include "render_pc98.h"
 
@@ -79,7 +80,7 @@ static void log_line(const uint16_t *s, int n)
 
 static uint8_t attr_of(uint16_t color)
 {
-    return color == ACCENT ? TA_CYAN : TA_WHITE;
+    return (uint8_t)theme_attr(color == ACCENT ? TH_ECHO : TH_TEXT);
 }
 
 /* ---- 割り付け（render.c と同じ形。幅の単位は桁 = 8px）---- */
@@ -267,12 +268,13 @@ static void draw_row(int r, const VLine *v)
 {
     const int row = BODY_ROW0 + r, y = row * TXT_RASTERS;
     txt_clear(row, row, TA_WHITE);
-    gfx_rect(DECO_W, y, RUBY_X_MAX, y + RUBY_BAND, 0);   /* ふりがなの帯を消す（左右の装飾の内側） */
+    /* ふりがなの帯を消す（左右の装飾の内側）。★窓の先頭行（r == 0）の帯は上の帯の下端に重なるので、触らず読みも書かない */
+    if (r > 0) gfx_rect(DECO_W, y, RUBY_X_MAX, y + RUBY_BAND, PAL_BODY);
     if (!v) return;
     int col = BODY_COL0;
     for (int i = 0; i < v->n; i++)
         col += txt_put(row, col, v->ch[i], v->attr);
-    for (int i = 0; i < v->nr; i++) {
+    for (int i = 0; i < v->nr && r > 0; i++) {
         const uint8_t *g = misaki(v->rc[i]);
         if (g) gfx_glyph8(v->rx[i] + RUBY_DX, y + RUBY_DY, g, RUBY_COLOR);
     }
@@ -284,11 +286,15 @@ static void draw_window(void)
         const long i = view + r;
         draw_row(r, i >= hist_min() && i < total ? HIST_AT(i) : 0);
     }
-    /* 窓の外に続きがあることの印（右の装飾の上） */
-    if (view > hist_min())
-        txt_put(BODY_ROW0, MARK_COL, 0x25B2, TA_CYAN);                    /* ▲ */
-    if (view + BODY_ROWS < total)
-        txt_put(BODY_ROW0 + BODY_ROWS - 1, MARK_COL, 0x25BC, TA_CYAN);    /* ▼ */
+    /* 下に続きがある印（▼）。本文の最下行の下の空きに、グラフィックで置く */
+    gfx_rect(MARK_X, MARK_Y, MARK_X + 16, MARK_Y + 16, 0);
+    if (view + BODY_ROWS < total) {
+        const int cx = MARK_X + 8, y0 = MARK_Y + (16 - MARK_H) / 2;
+        for (int i = 0; i < MARK_H; i++) {
+            const int w = MARK_W - 2 * (i / 2);                          /* 2 行ごとに 1 画素ずつ両側が細る */
+            gfx_fill(cx - w / 2, y0 + i, cx - w / 2 + w, y0 + i + 1, MARK_COLOR);
+        }
+    }
 }
 
 static long bottom(void)
