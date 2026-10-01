@@ -241,6 +241,13 @@ static void caret_show(int on)
     gfx_fill(x, y, x + CARET_W, y + 16, on ? PAL_CARET : PAL_INPUT);
 }
 
+/* 入力欄のキャレットの帯（字の高さ 16 ラスタ・縁の間）を地の色に戻す */
+static void caret_clear(void)
+{
+    const int y = ROW_INPUT * TXT_RASTERS + (TXT_RASTERS - 16);
+    gfx_rect(SIDE, y, GFX_W - SIDE, y + 16, PAL_INPUT);
+}
+
 /* 入力欄: ＞ + 確定した字 + 組み立て途中のローマ字 + カーソル（反転の空白）。
    ★右端の打ち方の表示（かな / 英字）はやめた —— 打てば分かる（msonrm の判断・2026-09-29） */
 static void draw_input(int caret)
@@ -252,6 +259,7 @@ static void draw_input(int caret)
         col += txt_put(ROW_INPUT, col, line.buf[i], (uint8_t)theme_attr(TH_INPUT_FG));
     for (int i = 0; i < line.np; i++)
         col += txt_put(ROW_INPUT, col, (uint8_t)line.pend[i], (uint8_t)theme_attr(TH_INPUT_FG));
+    caret_clear();                     /* ★前のキャレットを消す（グラフィックの線はテキストを消しても残る） */
     caret_col = col;
     caret_show(caret);                 /* 打つたびに点き直す（点滅の位相を戻す） */
 }
