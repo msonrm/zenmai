@@ -7,6 +7,7 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
 
 - **`TODO.md`** —— 現在地と次にやること。★作業を始めるときは冒頭の「現在地」と、該当する節から
 - `docs/overview.md` —— 設計・しくみ・語彙の構造・検査・出典
+- **`docs/translation-guide.md`** —— 訳・語彙の作り方・踏んだ罠・Zork II / III を始める手順・パックの共通化の判断
 - 版ごとの計画と実装ノート: `docs/ps1-port-plan.md` / `docs/ps1-implementation-notes.md` /
   `docs/portmaster-testing.md` / **`docs/pc98-port-plan.md`**（段の表と未決）
 
@@ -55,7 +56,7 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
 - 台本（`native/pc98-test/*.txt`・`ZENMAI /S 台本`）の記法: `#!english`（頭・英語面）/ `#!work ZORK2`（頭・作品。無ければ一覧の最初）/ `#!keys`（以降を打鍵として流す）/
   `#!line 文`（文をそのまま本文に流す = 組み方を画面で見る）
 - ★作品は焼き込まず、**パック `ZORK1.ZMP`**（`gen_pack.py` が作る・書式の正典もそこ）を起動時に読み、
-  パックが持つ識別で **story `ZORK1.Z3`** を横から探す。★story はパックに入れない（配れない作品でも訳の束だけ配れる形）。
+  パックが持つ識別で **story `ZORK1.Z3`** を横から探す。★story はパックに入れない（story を分けた意図）。★ただし**パックの TRAN 節は訳の照合キーとして英語の原文を持つ**ので、原作が再配布不可なら訳の束も配れない（2026-10-05 に確認・`docs/translation-guide.md` の 6.4）。
   ★訳・語彙・ふりがなの表もパックの節（書式の正典 = `ctab.py`）。PC-98 は `*_data.c` の代わりに `*_tab.c` + `tabload.c` を links する。
   ★表の形や UI の文言（`gen_cmd.py` の `UI_FRAGS`）を変えたらパックも作り直す（要約値が違うと本体が断る）
   `pc98-out/` に EXE と並べて置く（`pc98_run.js`・`test-pc98.sh`・`pack-pc98.sh` はそうしている）。セーブは作品ごと（`ZORK1.SAV`）。

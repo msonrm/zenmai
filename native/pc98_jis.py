@@ -85,7 +85,9 @@ def rom_of(ch):
 def main():
     t = rom_table()
     need = set()
-    for f in ('zork1-ja.json', 'zork1-cmd.json'):
+    # ★`--work 名前` を繰り返せる（既定 zork1）。作品の訳・語彙の字がこの漢字 ROM に全部あるかを、パックを作る前に見る
+    works = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == '--work'] or ['zork1']
+    for f in [f'{w}-{k}.json' for w in works for k in ('ja', 'cmd')]:
         s = json.dumps(json.load(open(os.path.join(HERE, '..', 'assets', f), encoding='utf-8')),
                        ensure_ascii=False)
         need |= {c for c in s if ord(c) > 0x7f}

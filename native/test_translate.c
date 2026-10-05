@@ -89,5 +89,18 @@ int main(void)
         printf("\n");
         return 1;
     }
+
+    /* ★穴は終止符を跨げないが、**頭文字の `X.`**（`J. Pierpont Flathead`）は穴に含める。
+       無いと、その名前の物が入る文型が全部外れた（Zork II の肖像画・fuzz で判明）。translate.js と同じ。 */
+    static const unsigned short INI[] = {0x3053, 0x3053, 0x306B, 'J', '.', ' ', 'P', 'i', 'e', 'r', 'p', 'o', 'n', 't', ' ', 't', 'h', 'i', 'n', 'g', 0x304C, 0x3042, 0x308B, 0x3002};   /* ここにJ. Pierpont thingがある。 */
+    sr = tr_line("There is a J. Pierpont thing here.", so, 64);
+    sok = sr == (int)(sizeof INI / sizeof *INI) && !memcmp(so, INI, sizeof INI);
+    printf("%s 頭文字つきの穴: There is a J. Pierpont thing here.\n", sok ? "✓" : "✗");
+    if (!sok) {
+        printf("  実際:");
+        for (int t = 0; t < sr; t++) printf(" %04X", so[t]);
+        printf("\n");
+        return 1;
+    }
     return 0;
 }

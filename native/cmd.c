@@ -452,6 +452,8 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     }
 
     /* 降りる: 乗り物でなければ climb down */
+    /* 「〜から出る／降りる／去る」の「から」は起点 = 離れる物そのもの = 原作の目的語（command.js の motionVerb と同じ） */
+    const int motion_verb = vidx == VK_ENTER || vidx == VK_EXIT || vidx == VK_DISEMBARK || vidx == VK_LEAVE;
     int fixed_down = 0;
     if (vidx == VK_DISEMBARK && prso && !prso->vehicle) {
         vidx = VK_CLIMB;
@@ -477,7 +479,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         Tok *o = objs[t];
         if (!is_spatial(o->role) || has_tok(vv, role_tok(o->role)))
             continue;
-        if (o->role == CMR_FROM && vidx == VK_ENTER && has_tok(vv, CMT_OBJ))
+        if (o->role == CMR_FROM && motion_verb && has_tok(vv, CMT_OBJ))
             continue;
         r->note_len = 0;
         put_frag(r->note, &r->note_len, 160, 0);              /* 「 */

@@ -9,10 +9,10 @@
 """
 import json
 from pathlib import Path
-from ctab import Struct, Table, emit, sec_path
+from ctab import Struct, Table, emit, sec_path, work_name
 
 HERE = Path(__file__).parent
-ruby = json.loads((HERE.parent / 'assets' / 'zork1-ja.json').read_text())['ruby']
+ruby = json.loads((HERE.parent / 'assets' / f'{work_name()}-ja.json').read_text())['ruby']
 
 keys = sorted(ruby.keys(), key=len, reverse=True)
 

@@ -241,6 +241,19 @@ static int tr_word(const char *en, int en_len, u16 *out, int o, int outmax)
 
 static int is_term(char c) { return c == '.' || c == '!' || c == '?'; }
 
+/* 穴の打ち切り。終止符で止まるが、**頭文字の `X.`**（`J. Pierpont` の `J.`・大文字 1 字で、その前が英字でない）は穴に含める。
+   ★translate.js の `(?:[^.!?]|(?<![A-Za-z])[A-Z]\.)` と同じ */
+static int slot_stop(const char *key, int i)
+{
+    if (!is_term(key[i])) return 0;
+    if (key[i] == '.' && i >= 1 && key[i - 1] >= 'A' && key[i - 1] <= 'Z') {
+        if (i == 1) return 0;
+        char b = key[i - 2];
+        if (!((b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z'))) return 0;
+    }
+    return 1;
+}
+
 /* key に pat を当てる。成功なら 1、captures に (off,len) を入れる */
 /* 穴つき型の照合。★JS 側は正規表現なので**バックトラックする** —— ここも同じに
    すること。以前は「貪欲なら最右・非貪欲なら最左」を 1 回だけ試して打ち切っていて、
@@ -276,7 +289,7 @@ static int match_from(const TrPat *pat, const TrSeg *segs, int si, int pos,
     int limit = pos;
     while (limit < klen) {
         const char c = key[limit];
-        if (quoted ? (c == '"') : is_term(c))
+        if (quoted ? (c == '"') : slot_stop(key, limit))
             break;
         limit++;
     }

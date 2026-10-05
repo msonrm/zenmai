@@ -35,9 +35,11 @@ const path = require('path')
 const { createCommander } = require('../src/command.js')
 
 const A = (f) => path.join(__dirname, '..', 'assets', f)
-const cmdAsset = JSON.parse(fs.readFileSync(A('zork1-cmd.json'), 'utf8'))
+// ★作品は環境変数 WORK（既定 zork1）
+const WORK = process.env.WORK || 'zork1'
+const cmdAsset = JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8'))
 const cm = createCommander(cmdAsset)
-const ruby = JSON.parse(fs.readFileSync(A('zork1-ja.json'), 'utf8')).ruby
+const ruby = JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8')).ruby
 
 // ★表記が違うだけで**同じ読み**なら食い違いではない（`燐寸(まっち)` → マッチ /
 //   `船(ふね)` → 舟）。指した物の読みを語彙から引いて突き合わせる
@@ -61,7 +63,7 @@ const walk = (v) => {
   else if (Array.isArray(v)) v.forEach(walk)
   else if (v && typeof v === 'object') Object.values(v).forEach(walk)
 }
-const jaAsset = JSON.parse(fs.readFileSync(A('zork1-ja.json'), 'utf8'))
+const jaAsset = JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8'))
 for (const k of ['exact', 'assembled', 'templates', 'props']) walk(jaAsset[k])
 const cands = Object.entries(ruby).map(([w, segs]) =>
   [w, segs.map((s) => (Array.isArray(s) ? (s[1] || s[0]) : s)).join('')])

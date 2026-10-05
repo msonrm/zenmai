@@ -1317,8 +1317,8 @@ static const unsigned char raw_659[] = {0};
 static const unsigned short ja_659[] = {0};
 static const unsigned char raw_660[] = {62,0};
 static const unsigned short ja_660[] = {0x003E};
-static const unsigned char raw_661[] = {89,111,117,32,99,97,110,39,116,32,115,101,101,32,97,110,121,32,111,102,32,98,111,97,116,32,104,101,114,101,33,0};
-static const unsigned short ja_661[] = {0x006F,0x0066,0x0020,0x0062,0x006F,0x0061,0x0074,0x306A,0x3069,0x3001,0x3053,0x3053,0x306B,0x306F,0x898B,0x5F53,0x305F,0x3089,0x306A,0x3044,0x3002};
+static const unsigned char raw_661[] = {89,111,117,32,99,97,110,39,116,32,115,101,101,32,97,110,121,32,98,111,97,116,32,104,101,114,101,33,0};
+static const unsigned short ja_661[] = {0x821F,0x306A,0x3069,0x3001,0x3053,0x3053,0x306B,0x306F,0x898B,0x5F53,0x305F,0x3089,0x306A,0x3044,0x3002};
 static const unsigned char raw_662[] = {0};
 static const unsigned short ja_662[] = {0};
 static const unsigned char raw_663[] = {62,0};
@@ -2080,7 +2080,7 @@ static const Pair PAIRS[] = {
   {raw_658, 57, ja_658, 21, "beach"},
   {raw_659, 0, ja_659, 0, "beach"},
   {raw_660, 1, ja_660, 1, "beach"},
-  {raw_661, 31, ja_661, 21, "boat"},
+  {raw_661, 28, ja_661, 15, "boat"},
   {raw_662, 0, ja_662, 0, "boat"},
   {raw_663, 1, ja_663, 1, "boat"},
   {raw_664, 30, ja_664, 18, "shovel"},

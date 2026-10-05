@@ -134,6 +134,17 @@ def write_sec(path, tables, sch):
         f.write(struct.pack('<IHH', sch, len(tables), 0) + idx + body)
 
 
+def work_name():
+    """生成器の引数 `--work 作品名`（既定 zork1）。assets/<作品名>-ja.json・<作品名>-cmd.json を読む。
+    ★既定でない作品は C の焼き込み（*_data.c）を作らない（Zork I の表を上書きしないため）= `--sec` が要る"""
+    import sys
+    a = sys.argv[1:]
+    w = a[a.index('--work') + 1] if '--work' in a else 'zork1'
+    if w != 'zork1' and '--sec' not in a:
+        sys.exit(f'--work {w}: 焼き込みの C は zork1 だけ。パックの節を作るなら --sec を付ける')
+    return w
+
+
 def sec_path():
     """生成器の引数 `--sec 出力` を読む（無ければ None = C を書く）"""
     import sys

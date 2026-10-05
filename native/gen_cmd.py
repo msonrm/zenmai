@@ -11,10 +11,10 @@ C 側(cmd.c)は toCommand 本体だけを持つ。
 import json
 import re
 from pathlib import Path
-from ctab import Struct, Table, emit, sec_path
+from ctab import Struct, Table, emit, sec_path, work_name
 
 HERE = Path(__file__).parent
-asset = json.loads((HERE.parent / 'assets' / 'zork1-cmd.json').read_text())
+asset = json.loads((HERE.parent / 'assets' / f'{work_name()}-cmd.json').read_text())
 
 # ---- command.js の定数 ----
 DIRS = {
@@ -23,6 +23,10 @@ DIRS = {
     '北': 'north', 'きた': 'north', '南': 'south', 'みなみ': 'south',
     '東': 'east', 'ひがし': 'east', '西': 'west', 'にし': 'west',
     '上': 'up', 'うえ': 'up', '下': 'down', 'した': 'down', '中': 'in', 'なか': 'in', '外': 'out', 'そと': 'out',
+    '着陸': 'land', 'ちゃくりく': 'land', '着陸する': 'land', 'ちゃくりくする': 'land',
+    '上陸': 'land', 'じょうりく': 'land', '上陸する': 'land', 'じょうりくする': 'land',
+    '着岸': 'land', 'ちゃくがん': 'land', '着岸する': 'land', 'ちゃくがんする': 'land',
+    '岸に着く': 'land', 'きしにつく': 'land', '岸につく': 'land',
 }
 ALL_WORDS = ['ぜんぶ', 'すべて', 'のこらず', '全部', '全て', '残らず']
 PARTICLES = [

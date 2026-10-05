@@ -13,10 +13,10 @@ Translator(src/translate.js)のコンストラクタ相当をビルド時に実�
 import json
 import re
 from pathlib import Path
-from ctab import Struct, Table, emit, sec_path
+from ctab import Struct, Table, emit, sec_path, work_name
 
 HERE = Path(__file__).parent
-asset = json.loads((HERE.parent / 'assets' / 'zork1-ja.json').read_text())
+asset = json.loads((HERE.parent / 'assets' / f'{work_name()}-ja.json').read_text())
 
 norm = lambda s: re.sub(r'\s+', ' ', s).strip()
 
@@ -64,6 +64,12 @@ for en, ja in list(exact.items()) + list(props.items()):
     for a, b in zip(e, j):
         if a and b and a not in exact:
             exact[a] = b
+        # ★行末の `>` はプロンプトとして剥がしてから引かれるので、剥がした形も登録する（translate.js と同じ）
+        ga, gb = re.search(r'>+$', a), re.search(r'>+$', b)
+        if ga and gb and ga.group() == gb.group():
+            ks, js = a[:-len(ga.group())].rstrip(), b[:-len(gb.group())].rstrip()
+            if ks and js and ks not in exact:
+                exact[ks] = js
 
 notrans = []
 for en in asset.get('notrans', []):

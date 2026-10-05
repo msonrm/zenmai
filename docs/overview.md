@@ -160,7 +160,7 @@ sh test-sdl.sh                                  # ★PS1 版と SDL 版が同じ
 
 | ファイル | 中身 |
 |---|---|
-| `ZORK1.Z3` など | story file（Z-machine のプログラム）。★パックには入れない —— 自由に配れない作品でも訳の束だけ配れる形 |
+| `ZORK1.Z3` など | story file（Z-machine のプログラム）。★パックには入れない —— story だけを分けた形。★**パックの訳の節は照合キーに英語の原文を持つ**ので、原作が再配布不可なら訳の束も配れない（`docs/translation-guide.md` の 6.4） |
 | `ZORK1.ZMP` など | パック: 合う story の識別・作品の情報・訳 / 入力の語彙 / ふりがなの表（書式 = `native/gen_pack.py`・表の節 = `native/ctab.py`） |
 
 - 表の生成器（`gen_translate.py` / `gen_cmd.py` / `gen_ruby.py`）は `ctab.py` で書き出す。1 つの定義から
@@ -228,7 +228,7 @@ curl -sSL https://zenmai.pages.dev/ | md5sum ; md5sum < dist/index.html   # 一�
 | 作品のソース | `/vendor/zork1/LICENSE`（出どころは `/vendor/zork1/README.md`） |
 
 そのうえで、**設定と手引き（歯車）の「ライセンスと出典」から全文を読める**ようにしてある
-（入口の案内からも行ける。押しても案内は閉じない ＝ まだ始まらない）。
+（トップページ = メニューの「ライセンスと出典」からも行ける。選んでいる作品の URL を `&about=1` つきで開き、手引きを出す）。
 ★画面には**書き写さない** —— 実ファイルを fetch して出す。書き写すと `LICENSE` を直したとき
 画面だけが古くなる。★Pages は**無いパスにも index.html を 200 で返す**ので、`ok` ではなく
 **中身**を見て弾いている（`/LICENSE` は実際、この対応まで 404 で index.html が返っていた）。

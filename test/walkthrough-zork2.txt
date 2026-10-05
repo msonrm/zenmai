@@ -1,0 +1,278 @@
+take lamp
+take sword
+s
+s
+s
+sw
+s
+light lamp
+se
+enter gazebo
+take teapot
+take place mat
+take letter opener
+take matchbook
+take paper
+out
+s
+w
+sw
+#goto Marble Hall
+n
+fill teapot with water
+n
+u
+open lid
+put mat under door
+put opener in keyhole
+remove opener
+drop opener
+pull mat
+take key
+unlock door with key
+open door
+drop key
+n
+take blue sphere
+s
+d
+w
+n
+hit dragon with sword
+s
+hit dragon with sword
+s
+hit dragon with sword
+w
+drop sword
+e
+n
+n
+n
+open chest
+open chest
+take dragon
+s
+e
+e
+d
+s
+wait
+wait
+e
+e
+n
+in
+wait
+wait
+wait
+out
+s
+s
+w
+se
+#goto Riddle
+answer "a well"
+e
+e
+drop dragon
+drop paper
+get in bucket
+fill bucket with water
+get out of bucket
+e
+drop teapot
+take red cake
+take blue cake
+take green cake
+eat green cake
+e
+put red cake in pool
+take candy
+w
+eat blue cake
+nw
+tell robot "east and south"
+e
+s
+take red sphere
+tell robot "lift cage"
+take red sphere
+tell robot "north and press triangular button"
+n
+w
+#goto Tea
+take teapot
+w
+get in bucket
+fill teapot
+get out of bucket
+w
+w
+nw
+drop teapot
+drop rose
+drop candy
+drop gold key
+se
+e
+e
+take dragon
+take paper
+w
+take necklace
+w
+nw
+open box
+drop necklace
+drop dragon
+n
+take brick
+s
+sw
+take string
+ne
+nw
+w
+w
+take ruby
+s
+open receptacle
+put paper in receptacle
+get in basket
+strike match
+burn paper
+wait
+wait
+w
+tie wire to hook
+get out of basket
+s
+read white book
+drop white book
+open purple book
+take stamp
+n
+put string in brick
+take zorkmid
+get in basket
+untie wire
+wait
+wait
+wait
+wait
+w
+tie wire to hook
+get out of basket
+s
+put brick in hole
+light match
+burn string
+n
+s
+take crown
+examine card
+n
+get in basket
+close receptacle
+untie wire
+wait
+wait
+wait
+wait
+get out of basket
+n
+e
+e
+se
+drop crown
+drop stamp
+drop zorkmid
+drop ruby
+nw
+n
+n
+w
+w
+nw
+w
+s
+take portrait
+n
+go through curtain
+go through south wall
+go through curtain
+take bills
+go through north wall
+drop portrait
+drop bills
+w
+w
+take portrait
+take bills
+go through curtain
+s
+e
+e
+s
+s
+se
+s
+s
+d
+sw
+take club
+u
+n
+n
+take candy
+take gold key
+sw
+sw
+give candy to lizard
+unlock door with key
+open door
+s
+w
+put blue sphere in sapphire stand
+put red sphere in ruby stand
+w
+turn off lamp
+throw club at aquarium
+take clear sphere
+e
+put clear sphere in diamond stand
+take sphere
+s
+put sphere on pentagram
+give gold key to demon
+give portrait to demon
+give bills to demon
+tell demon "give me wand"
+take wand
+n
+e
+n
+n
+ne
+s
+point wand at menhir
+say "float"
+sw
+take collar
+ne
+s
+d
+sw
+se
+ne
+nw
+sw
+d
+put collar on dog
+e
+open door
+s
+turn off lamp
+open secret door
+s

@@ -30,7 +30,10 @@ function compile(en) {
     //   OBJ=`nasty` / PREP=`knives in` に割れて `何knives innastyを入れる？` になった）。
     //   空白は語の中にも現れるので区切りとして位置を決められない —— 左を最長に採る
     const adjacent = /^ \{[A-Z]/.test(en.slice(m.index + m[0].length))
-    re += quoted ? '([^"]*)' : adjacent ? '([^.!?]+)' : '([^.!?]+?)'
+    // ★穴は終止符（`.!?`）を跨げないが、**頭文字の `X.`**（`J. Pierpont Flathead` の `J.`）は穴に含められる。
+    //   無いと、その名前を持つ物（Zork II の肖像画）が入る文型が全部外れた（2026-10-05・fuzz で判明）
+    const SLOT = '(?:[^.!?]|(?<![A-Za-z])[A-Z]\\.)'
+    re += quoted ? '([^"]*)' : adjacent ? `(${SLOT}+)` : `(${SLOT}+?)`
     i = m.index + m[0].length
   }
   re += escapeRe(en.slice(i))
@@ -67,7 +70,16 @@ class Translator {
       const e = en.split('|').map((x) => x.trim())
       const j = ja.split('|').map((x) => x.trim())
       if (e.length !== j.length) continue
-      for (let i = 0; i < e.length; i++) if (e[i] && j[i] && !this.exact.has(e[i])) this.exact.set(e[i], j[i])
+      for (let i = 0; i < e.length; i++) {
+        if (e[i] && j[i] && !this.exact.has(e[i])) this.exact.set(e[i], j[i])
+        // ★行末の `>` はプロンプトとして剥がしてから引かれる（`line()`）ので、`<-- VIEWING ROOMS -->` のような
+        //   看板の行は**剥がした形**でも登録する（Zork II の銀行の玄関・2026-10-05 に未訳で判明）
+        const ge = e[i].match(/>+$/), gj = j[i].match(/>+$/)
+        if (ge && gj && ge[0] === gj[0]) {
+          const ks = e[i].slice(0, -ge[0].length).trimEnd(), js = j[i].slice(0, -gj[0].length).trimEnd()
+          if (ks && js && !this.exact.has(ks)) this.exact.set(ks, js)
+        }
+      }
     }
     // 版権表示など「訳さない行」は miss と分けて数える。★こちらも `|` で割る
     this.notrans = new Set()
