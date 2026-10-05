@@ -41,37 +41,43 @@
   }
   #intro[hidden] { display: none }
   #intro-box {
-    max-width: 30em; background: var(--panel); border: 1px solid var(--rule); border-radius: .5em;
-    padding: 1.4em 1.6em; line-height: 1.9;
+    width: 100%; max-width: 32em; max-height: 100%; overflow-y: auto; background: var(--panel);
+    border: 1px solid var(--rule); border-radius: .5em; padding: 1.4em 1.5em 0; line-height: 1.7;
   }
+  /* ★トップページ（メニュー）。ゲームの器は出さず、案内は紙の上にそのまま置く */
+  body.menu #head, body.menu #screen, body.menu #foot { display: none }
+  body.menu #intro { background: var(--bg) }
   #intro-box p { margin: 0 0 .7em }
-  .intro-title { font-size: 1.15em; letter-spacing: .04em }
-  .intro-ex { color: var(--accent) }
-  .intro-dim { color: var(--dim); font-size: .9em }
+  .intro-title { font-size: 1.7em; font-weight: normal; letter-spacing: .1em; margin: 0; line-height: 1.3 }
+  #intro-box .intro-sub { color: var(--dim); font-size: .9em; letter-spacing: .03em; margin: 0 0 1.1em }
+  #intro-box .intro-dim { color: var(--dim); font-size: .85em; margin: 1em 0 0 }
+  /* ★作品の札。選んでいる札に枠と帯が付く。押しても動かない（動くのは「はじめる」） */
+  .intro-works { display: flex; flex-direction: column; gap: .5em }
+  .intro-work {
+    display: flex; flex-direction: column; align-items: flex-start; gap: .1em; width: 100%; padding: .55em .8em;
+    text-align: left; font: inherit; line-height: 1.6; background: transparent;
+    border: 1px solid var(--rule); border-radius: .35em; color: var(--ink); cursor: pointer;
+  }
+  .intro-work:hover { border-color: var(--accent) }
+  .intro-work.on { border-color: var(--accent); box-shadow: inset .25em 0 0 var(--accent); padding-left: 1.05em }
+  .w-title { font-size: 1.05em; letter-spacing: .04em }
+  .w-intro { font-size: .88em }
+  .w-beta { color: var(--dim); font-size: .78em }
   /* ★商標は名乗りではなく**帰属の明示**として書く（名前・ロゴ・ドメインには使わない） */
-  .intro-note { color: var(--dim); font-size: .78em; line-height: 1.7; margin-top: 1em }
-  /* ★案内から全文へ渡る道。押しても**案内は閉じない** —— 閉じることが「始める合図」なので、
-     ライセンスを読んだだけでゲームが始まってはいけない（#panel は #intro の上に出る） */
+  #intro-box .intro-note { color: var(--dim); font-size: .78em; line-height: 1.7; margin: 1.2em 0 0; padding-bottom: 1.2em }
   .linkish {
     background: transparent; border: 0; border-bottom: 1px solid currentColor;
     color: var(--accent); font: inherit; font-size: inherit; padding: 0; cursor: pointer;
   }
-  #intro-ok {
-    display: block; margin: .8em auto 0; background: transparent; border: 1px solid var(--accent); border-radius: .3em;
-    color: var(--accent); font: inherit; padding: .25em 1.4em; cursor: pointer;
+  /* ★案内が画面より長くても「プレイ」が見えるよう、箱の下端に貼りつける */
+  .intro-go {
+    position: sticky; bottom: 1.2em; display: flex; flex-wrap: wrap; gap: .5em; margin: 1em 0 0; background: var(--panel);
   }
-  #intro-ok:hover { background: var(--accent); color: var(--panel) }
-  /* 言語の選択（入口）。★英語は「訳さない＝原作のまま」なので、並べて選ばせる */
-  .intro-lang { display: flex; flex-wrap: wrap; gap: .6em; justify-content: center; margin: 1.1em 0 .1em }
-  /* ★`hidden` は UA の `display:none` なので、**こちらの `display` 指定に負ける**。
-     隠す要素には必ず `[hidden]` の打ち消しを書くこと（#intro / #panel では書いていたのに、
-     ここだけ忘れて「起動前に とじる が出る／起動後に言語ボタンが残る」になった） */
-  .intro-lang[hidden], #intro-ok[hidden] { display: none }
-  .intro-lang button {
-    background: transparent; border: 1px solid var(--rule); border-radius: .3em;
-    color: var(--ink); font: inherit; font-size: .9em; padding: .25em .9em; cursor: pointer;
+  .intro-go button {
+    flex: 1 1 auto; white-space: nowrap; background: var(--panel); border: 1px solid var(--accent); border-radius: .3em;
+    color: var(--accent); font: inherit; padding: .45em .8em; cursor: pointer;
   }
-  .intro-lang button:hover { border-color: var(--accent); color: var(--accent) }
+  .intro-go button:hover, .intro-go button.primary { background: var(--accent); color: var(--panel) }
   #panel select {
     font: inherit; font-size: .9em; margin-left: .4em; padding: .1em .3em;
     background: var(--bg); color: var(--ink); border: 1px solid var(--rule); border-radius: .3em;
@@ -377,13 +383,24 @@
 </head>
 <body>
   <!-- ★入口の案内。軽いので毎回出す（初見の人に「何ができて、どう打つか」を渡す） -->
+  <!-- ★トップページ = 作品を選ぶメニュー（`?work=` が無いときだけ出す。作品の URL には案内を出さずすぐ始める）。
+       言語と作品を選んで「はじめる」で作品の URL へ移る。ゲームも訳もここでは読まない -->
   <div id="intro" hidden>
     <div id="intro-box">
-      <p class="intro-title">Zenmai —— 日本語で読むテキストアドベンチャー</p>
-      <p>1980年の <i>Zork I</i>（Infocom）を、日本語で遊べるようにした。コマンドもひらがなで打てる。</p>
-      <p class="intro-ex">ゆうびんばこをあける　／　きたへいく　／　じゅうたんをめくる　／　もちもの</p>
-      <p class="intro-dim">キーボードで打てる。スマートフォンなら右下の「かな」で専用のフリック入力キーが出る。
-        ゲームコントローラーを繋げば、それでもひらがなが打てる。</p>
+      <h1 class="intro-title" id="intro-h">Zenmai</h1>
+      <p class="intro-sub">A Z-machine interpreter for Japanese</p>
+
+      <div class="intro-works" id="intro-works" role="radiogroup" aria-label="作品"></div>
+
+      <p class="intro-dim">キーボード / フリック入力 / ゲームコントローラー対応</p>
+
+      <!-- ★言語は「はじめる」を兼ねる 2 つのボタンで選ぶ。英語は「訳さない＝原作のまま」。
+           ブラウザの言語に合うほうを濃くする -->
+      <div class="intro-go">
+        <button id="intro-ja" type="button">日本語でプレイ</button>
+        <button id="intro-en" type="button">English（原典）でプレイ</button>
+      </div>
+
       <!-- ★「登録商標」とは書かない。Infocom の登録（Reg. 1,227,668 / 1983-02-15）は
            2003-11-22 に取り消されている（Activision が Section 8 の更新をしなかった）。
            Activision は 2023 年に Microsoft 傘下へ。
@@ -393,14 +410,6 @@
       <p class="intro-note">原作は 2025 年に MIT ライセンスで公開された ZIL ソース由来。
         Zork は Infocom, Inc. の商標で、現在の権利者は Microsoft です（このプロジェクトはいずれとも無関係）。
         <button id="intro-license" type="button" class="linkish">ライセンスと出典</button></p>
-      <!-- ★言語は最初に選ばせる（既定はブラウザの言語）。英語は「訳さない＝原作のまま」。
-           ★この 2 つが**始める合図**なので「はじめる」は要らない。
-           遊び始めたあとに題から開き直したときは、代わりに「とじる」だけを出す -->
-      <p class="intro-lang" id="intro-lang">
-        <button id="intro-ja" type="button">日本語ではじめる</button>
-        <button id="intro-en" type="button">Start in English</button>
-      </p>
-      <button id="intro-ok" type="button" hidden>とじる</button>
     </div>
   </div>
 
@@ -424,7 +433,7 @@
       <p class="note" id="stat-note"></p>
 
       <h3>システムの言葉</h3>
-      <p class="note">ゲームの中の行動ではなく、進行そのものへの指示。<b>ひらがなで打つ</b>。</p>
+      <p class="note">ゲームの中の行動ではなく、進行そのものへの指示。<b>ひらがな・漢字まじり・英語</b>のどれでも打てる。</p>
       <table id="sys-list"></table>
 
       <!-- ★3 つの MIT の上に立っている。MIT が求めているのは「複製物に含めること」で、
@@ -519,7 +528,7 @@
   </div>
 
   <div id="head" class="edge">
-    <span id="title" title="案内をもう一度見る"><b>Zenmai</b><span class="tag"> —— 日本語で読むテキストアドベンチャー</span></span>
+    <span id="title" title="作品の選択へ戻る"><b>Zenmai</b><span class="tag" id="title-tag"> —— Z-machine for Japanese</span></span>
     <span id="place">　</span>
     <span id="score"></span>
     <!-- ★字は**絵文字ではなく記号**として出す（︎）。付けないと端末によって
@@ -531,7 +540,7 @@
     <div id="prompt" class="gutter">
       <span class="caret">&gt;</span>
       <input id="input" autocomplete="off" autocapitalize="off" autocorrect="off"
-             spellcheck="false" placeholder="ひらがなで打つ">
+             spellcheck="false" placeholder="ひらがな・漢字・英語で打つ">
       <button id="flick-btn" type="button" title="かなの盤を開閉">かな</button>
       <button id="pad-btn" type="button" title="いま選んでいる子音。押すと操作図を開閉">あ</button>
     </div>

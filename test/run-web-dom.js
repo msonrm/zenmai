@@ -98,7 +98,13 @@ document.handlers = {}
 document.addEventListener = (ev, fn) => { (document.handlers[ev] = document.handlers[ev] || []).push(fn) }
 global.window = window
 global.document = document
+// ★作品は ZENMAI_WORK（既定 zork1）。本番の `?work=zork2` と同じ道を通す
+// ★作品の URL（`?work=`）はゲーム、無ければトップページ（メニュー）。既定は zork1 のゲーム。
+//   メニューを試すときは ZENMAI_MENU=1
+global.location = { search: process.env.ZENMAI_MENU ? '' : `?work=${process.env.ZENMAI_WORK || 'zork1'}`, href: '' }
+const fetched = []
 global.fetch = async (url) => {
+  fetched.push(url)
   const p = path.join(ROOT, WEB, url)
   // ★Cloudflare Pages は**無いパスにも index.html を 200 で返す**。器も同じ意地悪をして、
   //   ホストが中身を確かめているかを試す（これを入れる前は本番だけで壊れた）
@@ -170,6 +176,8 @@ vm2.runInThisContext(fs.readFileSync(path.join(ROOT, WEB, 'main.js'), 'utf8'), {
 let n = 0
 // ★案内を閉じる前に本文が出ていないか（言語を選ぶ前に冒頭が印字されると手遅れになる）
 let introGate = false
+// ★入力欄の例は works.json の `examples`（作品ごと）の 3 つがすべて載る
+let exampleOk = false
 const tick = () => {
   if (els.input.disabled) return setTimeout(tick, 30)          // まだ入力待ちではない
   if (n >= cmds.length) return finish()
@@ -346,7 +354,8 @@ const finish = async () => {
       ['「?」で使い方が開く', helpOpen],
       ['使い方を閉じられる', helpClosed],
       ['★使い方の中身がモードに追随する（かな / 英字）', helpJa && helpEn],
-      ['★案内を閉じるまで本文は始まらない（言語を選べる）', introGate],
+      ['★作品の URL は案内なしですぐ始まる', introGate],
+      ['★入力欄の例が 3 つの形（ひらがな・漢字まじり・英語）', exampleOk],
       ['★コントローラは本文と同じ言語で始まる', padFollowsBody],
       ['★図の字がエンジンの表と一致する', !!vsrc && drift.length === 0],
       ['JA / EN の 2 つが並ぶ', langBtns.length === 2],
@@ -438,7 +447,7 @@ const finish = async () => {
   //   ここが「画面に出した語は、打てなければならない」の機械化。
   //   手引きに言葉を書き写すと必ずずれるので、器のほうで塞ぐ
   let cmdAsset = null
-  for (const p of ['../assets/zork1-cmd.json', 'assets/zork1-cmd.json']) {
+  for (const p of [`../assets/${process.env.ZENMAI_WORK || 'zork1'}-cmd.json`, `assets/${process.env.ZENMAI_WORK || 'zork1'}-cmd.json`]) {
     // ★器は無いパスにも index.html を返す（本番と同じ意地悪）ので、中身で見分ける
     try { const j = await (await fetch(p)).json(); if (j && j.verbs) { cmdAsset = j; break } } catch (e) { /* 次 */ }
   }
@@ -455,12 +464,6 @@ const finish = async () => {
   const licOk = lic.length === 3
     && licTexts.every((t) => /Permission is hereby granted/.test(t) && !/<!doctype/i.test(t))
   const licWho = licTexts.map((t) => (t.match(/Copyright \(c\) [^\n]*/i) || [''])[0])
-  // ★案内（入口）からも全文へ行けること。押しても案内は閉じない＝まだ始めない
-  //   （閉じることが「はじめる」の合図なので、読んだだけで始まってはいけない）
-  els.panel.hidden = true
-  els.intro.hidden = false
-  els['intro-license'].dispatch('click')
-  const licFromIntro = els.panel.hidden === false && els.intro.hidden === false
   // ふりがなの入切
   els['ruby-chk'].checked = false; els['ruby-chk'].dispatch('change')
   const rubyOff = document.body.classList.contains('no-ruby')
@@ -469,18 +472,18 @@ const finish = async () => {
   // Escape で閉じる
   for (const fn of document.handlers.keydown || []) fn({ key: 'Escape' })
   const closed = els.panel.hidden === true
-  // ★題を押すと入口の案内が戻る（2 度目は「とじる」）
-  // ★遊び始めたあとに題から開き直したときは、**言語ボタンを出さない**
-  //   （途中で言語は変えられないので、選ばせると嘘になる）。代わりに「とじる」だけ
-  els.intro.hidden = true
+  // ★題はメニューへ戻る道。確かめて「いいえ」なら動かず、「はい」ならトップへ
+  location.href = ''
+  global.confirm = () => false
   els.title.dispatch('click')
-  const introBack = els.intro.hidden === false
-    && els['intro-lang'].hidden === true && els['intro-ok'].hidden === false
-  els['intro-ok'].dispatch('click')
-  const introClosed = els.intro.hidden === true
+  const titleStay = location.href === ''
+  global.confirm = () => true
+  els.title.dispatch('click')
+  const titleBack = location.href === './'
   const pchecks = [
-    ['★題から開き直すと言語ボタンは出ない（とじるだけ）', introBack],
-    ['案内を閉じられる', introClosed],
+    ['★題を押しても、確かめて「いいえ」ならメニューへ戻らない', titleStay],
+    ['★題を押して「はい」ならメニュー（./）へ戻る', titleBack],
+    ['★ヘッダに遊んでいる作品が出る', els['title-tag'].textContent.includes(process.env.ZENMAI_WORK === 'zork2' ? 'Zork II' : 'Zork I')],
     ['歯車で開く', opened],
     ['Escape で閉じる', closed],
     ['システムの言葉が並ぶ', rows.length >= 10],
@@ -492,7 +495,6 @@ const finish = async () => {
     ['ふりがなを戻せる', rubyOn],
     ['★ライセンス全文が 3 本とも本物（HTML ではない）', licOk],
     ['★3 者ぶんが別々に読まれている', new Set(licWho).size === 3 && licWho.every(Boolean)],
-    ['案内からも全文へ行ける（案内は閉じない）', licFromIntro],
     ['成績が出ている', /引けた \d+ 行/.test(els.stat.textContent)],
   ]
   for (const [name, ok] of pchecks) console.log(`--- 手引き ${ok ? '✓' : '✗'} ${name}`)
@@ -503,11 +505,52 @@ const finish = async () => {
     + rows.slice(0, 4).map((r) => r.children[0].textContent + '=' + r.children[1].textContent).join(' / '))
   process.exit(0)
 }
-// ★入口の案内を閉じるまでゲームは始まらない（言語を選ぶ前に冒頭を印字しないため）。
-//   器も実際の手順どおり、まず閉じる
-setTimeout(() => {
-  // ★閉じる前に本文が出ていたら、言語を選んでも手遅れになっている（実機で出た不具合）
-  introGate = els.screen.children.length === 0
-  els['intro-ja'].dispatch('click')      // ★これが「はじめる」を兼ねる
+if (process.env.ZENMAI_MENU) {
+  // ★トップページ = 作品を選ぶメニュー。ゲームも訳も読まず、選んで「はじめる」で作品の URL へ移る
+  setTimeout(async () => {
+    let wj = { works: [] }
+    for (const p of ['works.json', '../web/works.json']) { try { const j = await (await fetch(p)).json(); if (j.works) { wj = j; break } } catch (e) { /* 次 */ } }
+    const cards = els['intro-works'].children
+    const on = () => cards.filter((k) => k.classList.contains('on'))
+    const checks = []
+    checks.push(['メニューが出る（ゲームの器は隠す）', els.intro.hidden === false && document.body.classList.contains('menu')])
+    checks.push(['★作品の札が works.json のとおり並ぶ（題つき）',
+      cards.length === wj.works.length && wj.works.every((w, i) => cards[i].textContent.includes(w.title))])
+    checks.push(['★β の作品の札に β が出る',
+      wj.works.filter((w) => w.beta).every((w) => cards.find((k) => k.textContent.includes(w.title)).textContent.includes('β'))])
+    checks.push(['★作品の札は 1 枚だけ選ばれている', on().length === 1])
+    checks.push(['★ゲームも訳も読まない（story・訳・語彙を fetch しない）',
+      fetched.length > 0 && fetched.every((u) => /works\.json/.test(u)) && els.screen.children.length === 0])
+    // 作品を選ぶ（選ぶだけで動かない）
+    const last = cards[cards.length - 1], lastId = wj.works[wj.works.length - 1].id
+    last.dispatch('click')
+    checks.push(['★作品を選んでもページは動かない・選んだ札に枠が移る', location.href === '' && on().length === 1 && on()[0] === last])
+    checks.push(['★言語は「プレイ」のボタン 2 つ（日本語 / English（原典））',
+      // ★器は静的な HTML の字面を持たないので、index.html から読む
+      /id="intro-ja"[^>]*>日本語でプレイ</.test(html) && /id="intro-en"[^>]*>English（原典）でプレイ</.test(html)])
+    checks.push(['ブラウザの言語（ja）に合うほうが濃い', els['intro-ja'].classList.contains('primary') && !els['intro-en'].classList.contains('primary')])
+    // 「English でプレイ」= 言語を覚えて作品の URL へ
+    els['intro-en'].dispatch('click')
+    checks.push(['★「English（原典）でプレイ」で英語を覚えて作品の URL へ移る',
+      store['zenmai-body-lang'] === 'english' && location.href === `?work=${lastId}` && store['zenmai-work'] === lastId])
+    location.href = ''
+    els['intro-ja'].dispatch('click')
+    checks.push(['★「日本語でプレイ」で日本語を覚えて作品の URL へ移る', store['zenmai-body-lang'] === 'japanese' && location.href === `?work=${lastId}`])
+    els['intro-license'].dispatch('click')
+    checks.push(['ライセンスと出典は作品の URL（手引き）へ', location.href === `?work=${lastId}&about=1`])
+    for (const [name, ok] of checks) console.log(`--- メニュー ${ok ? '✓' : '✗'} ${name}`)
+    if (checks.some(([, ok]) => !ok)) { console.error('★メニューの配線が壊れている'); process.exit(1) }
+    process.exit(0)
+  }, 200)
+} else {
+// ★作品の URL は案内なしですぐ始まる（言語はメニューで決まっている）。始まっていることを先に確かめる
+setTimeout(async () => {
+  introGate = els.intro.hidden === true && els.screen.children.length > 0
+  {
+    let ex = []
+    for (const p of ['works.json', '../web/works.json']) { try { const j = await (await fetch(p)).json(); const w = (j.works || []).find((x) => x.id === (process.env.ZENMAI_WORK || 'zork1')); if (w) { ex = w.examples || []; break } } catch (e) { /* 次 */ } }
+    exampleOk = ex.length === 3 && ex.every((e) => els.input.placeholder.includes(e))
+  }
   setTimeout(tick, 100)
 }, 150)
+}

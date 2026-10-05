@@ -13,7 +13,12 @@ const path = require('path')
 const ZVM = require('ifvms/src/zvm.js')
 const { createGlk } = require('../src/glk-shim.js')
 
-const CMDS = ['open mailbox', 'save', 'north', 'north', 'restore', 'look']
+// ★作品は環境変数 WORK（既定 zork1）。セーブ枠は作品ごと（`slot`）: Zork I は従来の `zenmai-save`、ほかは `zenmai-save-<作品>`
+const WORK = process.env.WORK || 'zork1'
+const SLOT = WORK === 'zork1' ? 'zenmai-save' : `zenmai-save-${WORK}`
+const START = WORK === 'zork1' ? 'West of House' : 'Inside the Barrow'
+const CMDS = WORK === 'zork1' ? ['open mailbox', 'save', 'north', 'north', 'restore', 'look']
+  : ['take lamp', 'save', 's', 's', 'restore', 'look']
 const saved = new Map()
 let n = 0
 let out = ''
@@ -22,6 +27,7 @@ let last = ''
 const Glk = createGlk({
   cols: 64,
   rows: 24,
+  slot: WORK === 'zork1' ? undefined : SLOT,
   files: { read: (k) => saved.get(k) || null, write: (k, b) => { saved.set(k, b) } },
   write(t) { out += t },
   status(line) { last = line },
@@ -37,12 +43,13 @@ const Glk = createGlk({
 
 function finish() {
   const place = (last.match(/^(.*?)\s{2,}/) || [0, last])[1].trim()
-  const bytes = saved.get('zenmai-save')
+  const bytes = saved.get(SLOT)
   const checks = [
-    ['保存できた', !!bytes && bytes.length > 0],
+    ['保存できた（作品ごとの枠）', !!bytes && bytes.length > 0],
+    ['★ほかの作品の枠に書いていない', [...saved.keys()].every((k) => k === SLOT)],
     ['保存の中身が Quetzal 形式', !!bytes && String.fromCharCode(...bytes.slice(0, 4)) === 'FORM'],
-    ['復帰で場所が戻った', place === 'West of House'],
-    ['復帰の返事が出た', /Ok\./.test(out) || /West of House/.test(out)],
+    ['復帰で場所が戻った', place === START],
+    ['復帰の返事が出た', /Ok\./.test(out) || new RegExp(START).test(out)],
   ]
   let ng = 0
   for (const [name, ok] of checks) {
@@ -54,6 +61,6 @@ function finish() {
 }
 
 const vm = new ZVM()
-vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', 'zork1', 'zork1.z3')),
+vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', WORK, `${WORK}.z3`)),
   { vm, Glk, GlkOte: null, Dialog: null })
 Glk.init({ vm })

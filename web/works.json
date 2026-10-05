@@ -1,0 +1,17 @@
+{
+ "works": [
+  {
+   "id": "zork1",
+   "title": "Zork I",
+   "examples": ["ゆうびんばこをあける", "郵便箱を開ける", "open mailbox"],
+   "intro": "1980年の <i>Zork I</i>（Infocom）。白い家の前から、地下の大帝国の宝を探しに行く。"
+  },
+  {
+   "id": "zork2",
+   "title": "Zork II",
+   "beta": true,
+   "examples": ["けんをとる", "剣を取る", "take sword"],
+   "intro": "1981年の <i>Zork II</i>（Infocom）。ウィザードの住む地下を探る。呪文は日本語の言葉で唱える。"
+  }
+ ]
+}
