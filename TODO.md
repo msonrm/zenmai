@@ -79,6 +79,7 @@ pre-release。0.2.0-beta は 2026-09-29・0.1.0-beta は 2026-09-28）。★**�
 - **（アイデア・msonrm 2026-10-05）SCRIPT / UNSCRIPT = 「日本語でのプレイ記録」** —— 原作の `SCRIPT`（画面の出力を記録する）を日本語の記録として残せたら貴重かもしれない。
   いまは動詞が未記入（原簿の「未記入 14 語」の 1 つ）。打った日本語と日本語の返答をファイルへ書く形を、Web / SDL / PC-98 のどれで出せるか調べる。
 - **（Web 公開・Zork II）** ★**2026-10-06 に公開した**（https://zenmai.pages.dev/・Zork I の訳の直し + Zork II を **β** で）。トップは作品を選ぶメニューだけ・「日本語でプレイ」「English（原典）でプレイ」で作品の URL（`?work=`）へ移る・入力欄の例はひらがな / 漢字まじり / 英語。訳文は msonrm の確認を経て確定（語り手の「私」を整理）。残り = Zork II の実プレイで出る取りこぼしを拾う・C（`cmd.c`）とパックへ呪文・呼びかけ・LAND・「から出る」を写す・Zork III・SCRIPT/UNSCRIPT（日本語プレイ記録）。詳細 = `docs/translation-guide.md`。
+- **（Zork I の「画面に出た複合語」・2026-10-06）** `WORK=zork1 node test/run-visible.js` が約 20 語（小川・水路・戸口・坑道・水位・貯水池・円蓋…）を挙げる。Zork II の「ほどうきょうをわたる」と同じ型（原作も知らない語なので**不適語に載せて名指しで断る**のが筋）。baseline（`test/visible-known-zork1.txt`）に現状を残した。直すと Zork I の C の生成物が変わる → `gen_cmd.py` ほか + 8 本の画素一致・`cmd_test_host` を流す必要があるので、次に PS1/SDL/PC-98 を触るときにまとめて。
 - **F. Zork II・III の訳** —— ★手順・見積もり・踏んだ罠は **`docs/translation-guide.md`**（2026-10-05）。仕組みの側は小さい（抽出器と生成器の作品名の固定を外す・字の範囲の検査を `gen_pack.py` へ）。エンジン文 477 件は Zork I の訳が ID で当たる
 - 建てる・確かめる・配る = `sh native/build-pc98.sh` / `sh native/test-pc98.sh`（数十秒）/ `sh native/pack-pc98.sh`
 
