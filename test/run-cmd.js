@@ -58,6 +58,16 @@ const CASES = [
   ['はしごをおりる', 'climb down ladder'],  // 乗り物でなければ climb down
   ['きをおりる', 'climb down tree'],        // 実プレイ: disembark tree は「乗っていない」
   ['ふねをおりる', 'disembark boat'],       // 乗り物（VEHBIT）なら disembark
+  // ★「〜から出る／降りる／去る」の「から」は起点 = 離れる物そのもの（原作の `exit boat` / `disembark boat` / `leave boat`）。
+  //   以前は「原作にない言い方」で断っていた（2026-10-05・Zork II の桶と気球で判明）
+  // ★キュクロプスに効く言葉（原作は動詞 `odysseus` / `ulysses`）。日本語は**表記がゆれる**ので、よくある書き方を全部受ける
+  ['オデュッセウス', 'odysseus'], ['オデュセウス', 'odysseus'], ['オデッセウス', 'odysseus'], ['オディッセウス', 'odysseus'],
+  ['オデュッセイア', 'odysseus'], ['オデッセイ', 'odysseus'], ['オデッセイア', 'odysseus'], ['オデュセイ', 'odysseus'],
+  ['ユリシーズ', 'odysseus'], ['ユリシス', 'odysseus'],
+  ['ふねからおりる', 'disembark boat'],
+  ['ふねからでる', 'exit boat'],
+  ['ふねからさる', 'leave boat'],
+  ['きからおりる', 'climb down tree'],     // 乗り物でなければ climb down（「から」でも同じ）
   ['なかにはいる', 'enter'],
   // --- 実プレイで出た取りこぼし（2026-08-13）---
   ['いたをはずす', 'take boards'],          // BOARD が動詞と物で衝突していた

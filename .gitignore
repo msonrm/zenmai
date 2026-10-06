@@ -29,3 +29,6 @@ native/__pycache__/
 
 # PC-98 の曲の道具（MC.EXE は native/build-mc.sh が建てる）
 native/pc98-music/.mc/
+
+# 原作の ZIL ソース（tools/fetch-zil.sh で取る・MIT。抽出器が読むだけ）
+zil/

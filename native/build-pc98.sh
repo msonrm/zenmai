@@ -32,7 +32,7 @@ python3 gen_canon_mml.py
 
 # ★作品は焼き込まない。story（ZORK1.Z3）と、Zenmai の層を持つパック（ZORK1.ZMP）を横に置く。
 #   本体は起動時にパックを読み、パックが持つ識別で story を探す（pack.h・2026-09-29）。
-#   ★story をパックに入れないのは、自由に配れない作品でも訳の束だけなら配れる形にするため
+#   ★story をパックに入れないのは、story の側だけを分けるため（★TRAN 節は英語の原文を持つので、再配布不可の作品では訳の束も配れない）
 cp ../vendor/zork1/zork1.z3 "$OUT/ZORK1.Z3"
 # ★訳・語彙・ふりがなの表もパックの節に入れる（本体には焼き込まない・ctab.py / tabload.c・段 8 の B）
 python3 gen_translate.py --sec "$OUT/TRAN.SEC" >/dev/null

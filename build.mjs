@@ -1,7 +1,7 @@
 // Cloudflare Pages 用の配置を作る。
 // ★`web/` をそのまま root にできない —— `../assets` `../vendor` `../src` を参照しているから。
 //   ここで 1 階層に畳んで、参照も畳んだ形に書き換える。
-import { mkdir, rm, cp, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, rm, cp, readFile, writeFile, readdir } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 
@@ -13,12 +13,26 @@ await mkdir(OUT, { recursive: true })
 
 // 1 階層に畳む（配布に要るものだけ）
 for (const d of ['src', 'assets']) await cp(path.join(ROOT, d), path.join(OUT, d), { recursive: true })
-await mkdir(path.join(OUT, 'vendor', 'zork1'), { recursive: true })
+// ★公開する作品は ZENMAI_WORKS（既定 zork1,zork2。2026-10-06 に zork2 を足した）。作りかけの作品の訳・語彙（assets/zork2-*.json など）は配らない
+const WORKS = (process.env.ZENMAI_WORKS || 'zork1,zork2').split(',').map((s) => s.trim()).filter(Boolean)
+for (const f of await readdir(path.join(OUT, 'assets'))) {
+  const m = /^(zork\d)-/.exec(f)
+  if (m && !WORKS.includes(m[1])) await rm(path.join(OUT, 'assets', f))
+}
+for (const w of WORKS) await mkdir(path.join(OUT, 'vendor', w), { recursive: true })
+// ★入口に出す作品の一覧（web/works.json）も公開する作品に絞る（書いていない作品は選べない）
+{
+  const j = JSON.parse(await readFile(path.join(ROOT, 'web', 'works.json'), 'utf8'))
+  j.works = j.works.filter((w) => WORKS.includes(w.id))
+  await writeFile(path.join(OUT, 'works.json'), JSON.stringify(j, null, 1) + '\n')
+}
 for (const f of ['zvm.min.js', 'gamepad-engine.js', 'flick-engine.js', 'LICENSE.ifvms']) {
   await cp(path.join(ROOT, 'vendor', f), path.join(OUT, 'vendor', f))
 }
-for (const f of ['zork1.z3', 'LICENSE', 'README.md']) {
-  await cp(path.join(ROOT, 'vendor', 'zork1', f), path.join(OUT, 'vendor', 'zork1', f))
+for (const w of WORKS) {
+  for (const f of [`${w}.z3`, 'LICENSE', 'README.md']) {
+    await cp(path.join(ROOT, 'vendor', w, f), path.join(OUT, 'vendor', w, f))
+  }
 }
 // ★自作分の LICENSE も配る。MIT が求めているのは「**複製物に**著作権表示と許諾文を含める」
 //   ことなので、リポジトリに置いてあるだけでは配布物に無い。

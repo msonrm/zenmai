@@ -1,0 +1,174 @@
+#give ^lamp$
+light lamp
+#goto 2
+look
+#goto 8
+look
+#goto 13
+look
+#goto 15
+look
+#goto 16
+look
+#goto 19
+look
+#goto 21
+look
+#goto 28
+look
+#goto 30
+look
+#goto 34
+look
+#goto 38
+look
+#goto 45
+look
+#goto 46
+look
+#goto 49
+look
+#goto 51
+look
+#goto 53
+look
+#goto 54
+look
+#goto 59
+look
+#goto 63
+look
+#goto 64
+look
+#goto 69
+look
+#goto 75
+look
+#goto 80
+look
+#goto 82
+look
+#goto 86
+look
+#goto 87
+look
+#goto 91
+look
+#goto 92
+look
+#goto 94
+look
+#goto 95
+look
+#goto 102
+look
+#goto 106
+look
+#goto 113
+look
+#goto 117
+look
+#goto 119
+look
+#goto 121
+look
+#goto 122
+look
+#goto 124
+look
+#goto 125
+look
+#goto 128
+look
+#goto 136
+look
+#goto 141
+look
+#goto 142
+look
+#goto 143
+look
+#goto 144
+look
+#goto 152
+look
+#goto 157
+look
+#goto 158
+look
+#goto 159
+look
+#goto 161
+look
+#goto 162
+look
+#goto 168
+look
+#goto 171
+look
+#goto 172
+look
+#goto 176
+look
+#goto 177
+look
+#goto 182
+look
+#goto 183
+look
+#goto 184
+look
+#goto 185
+look
+#goto 187
+look
+#goto 190
+look
+#goto 194
+look
+#goto 200
+look
+#goto 201
+look
+#goto 202
+look
+#goto 204
+look
+#goto 206
+look
+#goto 207
+look
+#goto 210
+look
+#goto 212
+look
+#goto 218
+look
+#goto 224
+look
+#goto 226
+look
+#goto 227
+look
+#goto 228
+look
+#goto 230
+look
+#goto 231
+look
+#goto 233
+look
+#goto 234
+look
+#goto 237
+look
+#goto 238
+look
+#goto 240
+look
+#goto 242
+look
+#goto 243
+look
+#goto 248
+look

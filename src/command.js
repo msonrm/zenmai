@@ -20,6 +20,13 @@ const DIRS = {
   北: 'north', きた: 'north', 南: 'south', みなみ: 'south',
   東: 'east', ひがし: 'east', 西: 'west', にし: 'west',
   上: 'up', うえ: 'up', 下: 'down', した: 'down', 中: 'in', なか: 'in', 外: 'out', そと: 'out',
+  // ★`land` も原作の**方角の語**（`<DIRECTIONS … LAND>`・Zork I の舟 / Zork II の気球で「着陸・上陸」）。
+  //   以前は日本語から届く道が無かった（「じょうりくする」が知らない言葉・2026-10-05 に判明）
+  着陸: 'land', ちゃくりく: 'land', 着陸する: 'land', ちゃくりくする: 'land',
+  上陸: 'land', じょうりく: 'land', 上陸する: 'land', じょうりくする: 'land',
+  着岸: 'land', ちゃくがん: 'land', 着岸する: 'land', ちゃくがんする: 'land',
+  // ★「岸に着く」も言う。無いと `し` を読みの外に残し、`き`（木）が食って `poke tree` になっていた
+  岸に着く: 'land', きしにつく: 'land', 岸につく: 'land',
 }
 // ★「ぜんぶ」= 原作の `all`。物ではなく**パーサが直接受ける語**（z3 の辞書に
 //   `all` / `but` / `except` / `and` が入っている）。複数対象を捌くのは原作の仕事なので、
@@ -83,6 +90,62 @@ const NEGATIVE = /(ない|ないで|ぬ|ません|なかった)$/
 function createCommander(asset) {
   // ★原作に無い言い方への案内（`zork1-guide.md`）。「知らない言葉」で突き放さない
   const guide = asset.guide || {}
+  // ★呪文（Zork II の杖）。**語彙の表（lex）には載せない** —— 呪文は動詞と目的語に分けず、
+  //   句まるごとを固定句として照合し、原作の入力 `say "float"` へ写す（助詞を含む句があり、
+  //   「こおり」のような日常語と衝突するため）。原作の呪文は辞書の語で、引用符の中で唱える
+  //   （`say "float"` / `incant "float"`。引用符なしだと効かない・実測 2026-10-05）
+  const spells = new Map()
+  for (const sp of asset.spells || []) {
+    for (const ja of [sp.form, ...(sp.alts || [])]) spells.set(kana(ja), sp)
+  }
+  // 「…と唱える」「…と言う」の言い回しと、括弧・感嘆符を落として、句だけにする
+  const CAST = /(?:と)?(?:となえる|唱える|いう|言う|さけぶ|叫ぶ|つぶやく|ささやく|よむ|詠む|詠じる)$/
+  const spellOf = (raw) => {
+    if (!spells.size) return null
+    let t = kana(raw).replace(/[「」『』“”"']/g, '')
+    for (let i = 0; i < 2; i++) t = t.replace(CAST, '')
+    return spells.get(t) || null
+  }
+  // ★口に出す語（Zork II のなぞなぞ `answer "well"`）。呪文と同じく**引用符の中の語**を原作が読むが、
+  //   語が日常語（井戸）なので、**裸で打つと物の名前と区別が付かない**。受けるのは
+  //   「井戸」とカギカッコで書いたとき、か「…と答える／言う」が付いたときだけ。
+  //   「答える」なら `answer "well"`、それ以外は `say "well"`（原作はどちらも受ける・実測 2026-10-05）
+  const speech = new Map()
+  for (const sp of asset.speech || []) {
+    for (const ja of [sp.form, ...(sp.yomi || []), ...(sp.alts || [])]) speech.set(kana(ja), sp)
+  }
+  const ANSWER = /(?:と)?(?:こたえる|答える|こたえよ|答えよ|こたえた|答えた|へんじする|返事する)$/
+  const speechOf = (input) => {
+    if (!speech.size) return null
+    const quoted = /[「『“"]/.test(input)
+    let t = kana(strip(input)).replace(/[「」『』“”"']/g, '')
+    let verb = null
+    const m = t.match(ANSWER)
+    if (m) { t = t.slice(0, m.index); verb = 'answer' }
+    else if (CAST.test(t)) { for (let i = 0; i < 2; i++) t = t.replace(CAST, ''); verb = 'say' }
+    // 「井戸だ」「井戸です」は答えの言い切りなので、カギカッコも「答える」も要らない（物を指す言い方ではない）
+    if (!quoted && !verb && !/(だ|です)$/.test(t)) return null
+    const sp = speech.get(t)
+    return sp ? { sp, verb: verb || 'say' } : null
+  }
+  // ★登場人物への呼びかけ（Zork II のロボット）。**「ろぼっと、きたへいけ」= 読点つきの呼び名が頭に付く**形だけ。
+  //   原作のパーサは `robot, go south` / `tell robot to go south` を持っているので、こちらは
+  //   中の命令を普通の道で英語にして、頭に `robot, ` を付けるだけ（実測 2026-10-05）。
+  //   ★読点が無い「ろぼっとをみる」は呼びかけではなく物への命令（`look at robot`）なので、読点を必ず要る形にした
+  const actorNames = new Map()
+  for (const a of asset.actors || []) {
+    for (const ja of [a.form, ...(a.yomi || []), ...(a.alts || [])]) actorNames.set(kana(ja), a)
+  }
+  const actorRe = actorNames.size
+    ? new RegExp('^(' + [...actorNames.keys()].sort((x, y) => y.length - x.length)
+        .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')よ?[、,]')
+    : null
+  // 命令形 → 終止形（語彙は終止形だけを持つ。呼びかけの中は「とれ」「あけろ」「いけ」と打つのが自然）
+  const IMPERATIVE = [
+    [/しろ$/, ['する']], [/せよ$/, ['する']], [/ろ$/, ['る']], [/れ$/, ['る']],
+    [/け$/, ['く', 'ける']], [/せ$/, ['す', 'せる']], [/め$/, ['む', 'める']],
+    [/べ$/, ['ぶ', 'べる']], [/げ$/, ['ぐ', 'げる']], [/ね$/, ['ぬ']], [/よ$/, ['る']],
+  ]
   // 語彙をひとつの表に畳んで、長いものから当てる（逐次入力の配列エンジンと同じ最長一致）
   const lex = []
   for (const [key, v] of Object.entries(asset.verbs || {})) {
@@ -249,6 +312,40 @@ function createCommander(asset) {
     if (YESNO[raw] || YESNO[kana(raw)]) {
       return { command: YESNO[raw] || YESNO[kana(raw)], trace: 'はい／いいえ', unknown: [], echo: raw }
     }
+    // 呼びかけ: 「ろぼっと、きたへいけ」→ `robot, north`。読点は **strip する前の入力**で見る
+    const am = actorRe && actorRe.exec(kana(String(input).trim()))
+    if (am) {
+      const a = actorNames.get(am[1])
+      const rest = String(input).trim().slice(am[0].length)
+      if (!strip(rest)) return { command: null, trace: '何をさせるか言っていない', unknown: [], echo: a.form + '、' }
+      let r = toCommand(rest, opts)
+      if (!(r.command && !r.unknown.length)) {
+        // 命令形のままでは語彙に無い（「とれ」）。終止形に戻して当たるものを採る
+        const t = strip(rest)
+        outer: for (const [re, ends] of IMPERATIVE) {
+          if (!re.test(t)) continue
+          for (const e of ends) {
+            const r2 = toCommand(t.replace(re, e), opts)
+            if (r2.command && !r2.unknown.length) { r = r2; break outer }
+          }
+        }
+      }
+      if (r.spell) return { command: null, trace: '呪文は呼びかけの中では唱えられない', unknown: [], echo: a.form + '、' + r.echo }
+      const echo = a.form + '、' + r.echo
+      if (!r.command) return { ...r, echo }
+      // ★呼びかけの中の「渡せ／よこせ」は**話し手（きみ）に**渡させること（`give X` だけでは誰に渡すか足りない）
+      const inner = /^give /.test(r.command) && !/ to /.test(r.command) ? r.command + ' to me' : r.command
+      return { ...r, command: `${a.word}, ${inner}`, trace: '呼びかけ', echo, actor: a.en }
+    }
+    const spk = speechOf(input)
+    if (spk) {
+      const { sp, verb: sv } = spk
+      return { command: `${sv} "${sp.word}"`, trace: '口に出す語', unknown: [], echo: `「${sp.form}」と${sv === 'answer' ? '答える' : '言う'}`, speech: sp.en }
+    }
+    const sp = spellOf(raw)
+    if (sp) {
+      return { command: `say "${sp.word}"`, trace: '呪文', unknown: [], echo: `「${sp.form}」と唱える`, spell: sp.en }
+    }
     if (NEGATIVE.test(raw)) {
       // ★「扉を開けない」の「ない」を捨てると逆の命令になる。止める
       return { command: null, trace: '否定は扱えない', unknown: [], echo: raw }
@@ -398,6 +495,10 @@ function createCommander(asset) {
     // ★同じ日本語の動詞でも、**対象が英語の動詞を決める**。
     //   「降りる」は乗り物なら `disembark`、そうでなければ `climb down`
     //   （実プレイ: 木の上で「きをおりる」→ `disembark tree` → 「それには乗っていない。」）
+    // ★「〜から出る／降りる／去る」の「から」は**起点 = 離れる物そのもの**で、原作の目的語に当たる
+    //   （`exit bucket` / `disembark boat` / `leave bucket`。`get out of bucket` も同じ意味）。
+    //   役を外して裸で渡す（`ENTER` の「窓から入る」と同じ扱い）。「降りる」が `climb down` に替わるときも同じ
+    const motionVerb = ['ENTER', 'EXIT', 'DISEMBARK', 'LEAVE'].includes(verb.key)
     if (verb.key === 'DISEMBARK' && prso && !prso.vehicle) {
       verb = { ...verb, key: 'CLIMB', shapes: (asset.verbs.CLIMB || {}).shapes || [], fixed: 'DOWN' }
     }
@@ -418,7 +519,7 @@ function createCommander(asset) {
       // ★「窓から入る」は原作の `enter window`（`ENTER OBJECT = V-THROUGH`）と同じこと ——
       //   日本語の「から」はここでは起点ではなく**通り道**を指している。
       //   ENTER は OBJ 形を持つので、役を外して裸で渡せばそのまま通る
-      if (o.role === 'FROM' && verb.key === 'ENTER' && has('OBJ')) continue
+      if (o.role === 'FROM' && motionVerb && has('OBJ')) continue
       const hint = ['WALK', 'ENTER', 'EXIT'].includes(verb.key) ? ' —— 移動は方角で言う: 北・東・上・下' : ''
       return {
         command: null,

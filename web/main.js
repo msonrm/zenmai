@@ -29,7 +29,24 @@
   // ★アセットは差し替わる。ブラウザのキャッシュが残ると、訳文と語彙の版がずれて
   //   「画面には新しい名前が出るのに、その名前で打てない」という混乱が起きる（実プレイで発生）
   const load = async (p) => (await fetch(p, { cache: 'no-store' })).json()
-  const asset = await load('../assets/zork1-ja.json')
+  // ★作品は `?work=zork2` か、入口で選んだもの（覚えている）。既定 zork1。訳・語彙・story をその作品のものに
+  //   差し替えるだけで、層（translate.js / command.js / ruby.js）は同じ。
+  //   ★公開する作品は `works.json`（build.mjs が ZENMAI_WORKS に絞って書く）が決める。読めなければ Zork I だけ
+  const DEFAULT_WORKS = [{ id: 'zork1', title: 'Zork I', examples: ['ゆうびんばこをあける', '郵便箱を開ける', 'open mailbox'] }]
+  const worksList = await (async () => {
+    try {
+      const j = await load('works.json')
+      return Array.isArray(j.works) && j.works.length ? j.works : DEFAULT_WORKS
+    } catch (e) { return DEFAULT_WORKS }
+  })()
+  // ★トップページ（`?work=` が無い・知らない作品）は**作品を選ぶメニューだけ**。ゲームも訳も読まない。
+  //   「はじめる」で作品ごとの URL（`?work=zork2`）へ移り、そこは案内なしですぐ始まる
+  const qs = new URLSearchParams(typeof location !== 'undefined' ? location.search : '')
+  const WORK_CFG = worksList.find((w) => w.id === qs.get('work')) || null
+  const label = (w) => (w.beta ? `${w.title}（β）` : w.title)
+  if (!WORK_CFG) { renderMenu(); return }
+  const WORK = WORK_CFG.id
+  const asset = await load(`../assets/${WORK}-ja.json`)
   const tr = new Translator(asset)
   const rb = createRubifier(asset.ruby)
 
@@ -38,7 +55,7 @@
   // ★デバッグ表示（渡した英語コマンドの行）。物語ではなく機械の側。
   //   ★既定は**切**。遊ぶ人には要らないものなので、出すのは点検するときだけ
   if (localStorage.getItem('zenmai-debug') !== 'on') document.body.classList.add('no-debug')
-  const cmdAsset = await load('../assets/zork1-cmd.json')
+  const cmdAsset = await load(`../assets/${WORK}-cmd.json`)
   const cm = createCommander(cmdAsset)
 
   // ================= 本文の言語 =================
@@ -120,7 +137,7 @@
   const LICENSES = [
     ['この Zenmai（自作部分）', '../LICENSE'],
     ['Z-machine 実装 — ifvms.js (ZVM)', '../vendor/LICENSE.ifvms'],
-    ['作品のソース — historicalsource（2025 年公開）', '../vendor/zork1/LICENSE'],
+    [`作品のソース — historicalsource（2025 年公開・${WORK_CFG.title}）`, `../vendor/${WORK}/LICENSE`],
   ]
   async function renderLicense() {
     const box = $('license')
@@ -164,7 +181,7 @@
   //   Z-code は先頭バイトが版（1〜8）なので、そこで見分ける
   const looksLikeStory = (b) => b && b.length > 1024 && b[0] >= 1 && b[0] <= 8
   let story = null
-  for (const url of ['vendor/zork1/zork1.z3', '../vendor/zork1/zork1.z3', 'zork1.z3']) {
+  for (const url of [`vendor/${WORK}/${WORK}.z3`, `../vendor/${WORK}/${WORK}.z3`, `${WORK}.z3`]) {
     try {
       const r = await fetch(url, { cache: 'no-store' })
       if (!r.ok) continue
@@ -173,7 +190,7 @@
     } catch (e) { /* 次を試す */ }
   }
   if (!story) {
-    show('story file が読めなかった（`vendor/zork1/zork1.z3`）。', 'raw')
+    show(`story file が読めなかった（\`vendor/${WORK}/${WORK}.z3\`）。`, 'raw')
     return
   }
 
@@ -219,6 +236,8 @@
   const Glk = createGlk({
     cols: 64,
     rows: 24,
+    // ★枠は作品ごと（Zork I は従来の名前のまま = 公開済みの利用者のセーブを失わない）
+    slot: WORK === 'zork1' ? undefined : `zenmai-save-${WORK}`,
     // ★セーブの置き場。localStorage に base64 で 1 枠だけ持つ
     //   （枠を選ばせる画面を出すとコントローラだけでは操作できない）
     files: {
@@ -693,54 +712,23 @@
     })
   }
 
-  // ★入口の案内を閉じる道は 1 本にする（✕ / 背景 / Escape / 言語ボタン）。
-  //   ★ここが**ゲームを始める合図**でもある —— 言語を選ぶ前に冒頭が印字されないように
-  function closeIntro() {
-    const i = $('intro')
-    if (i) i.hidden = true
-    startGame()
-    refocus()
-  }
-
-  /**
-   * 案内の見せ方を、**始める前 / 始めたあと**で変える。
-   * ★始める前は言語ボタンだけ（それが「はじめる」を兼ねる）。
-   * ★始めたあとは「とじる」だけ —— 途中で言語は変えられないので、選ばせると嘘になる。
-   */
-  function introMode() {
-    const started = !!startGame._done
-    const lang = $('intro-lang')
-    if (lang) lang.hidden = started
-    const ok = $('intro-ok')
-    if (ok) ok.hidden = !started
-  }
-
-  // ★入口の案内。軽いので毎回出す
-  const intro = $('intro')
-  if (intro) {
-    intro.hidden = false
-    introMode()
-    $('intro-ok').addEventListener('click', closeIntro)
-    intro.addEventListener('click', (e) => { if (e.target === intro) closeIntro() })
-    // ★ライセンスは案内の**上に重ねて**出す。案内を閉じない＝まだ始めない
-    //   （閉じることが始める合図なので、読んだだけで冒頭が印字されてはいけない）
-    if ($('intro-license')) $('intro-license').addEventListener('click', () => showPanel(true))
-    // ★題を押すともう一度出す。★2 度目からは「はじめる」ではなく「とじる」——
-    //   遊んでいる途中に押した人に「最初からやり直る」と読ませない
-    if ($('title')) {
-      $('title').addEventListener('click', () => {
-        intro.hidden = false
-        introMode()
-      })
-    }
-    if (document.addEventListener) {
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !intro.hidden) closeIntro() })
-    }
+  // ★作品ごとの URL では案内を出さず、すぐ始める。ヘッダには遊んでいる作品を出す
+  document.title = `Zenmai — ${label(WORK_CFG)}`
+  if ($('title-tag')) $('title-tag').textContent = ` —— ${label(WORK_CFG)}`
+  // ★題はメニューへ戻る道。遊びの途中で押してしまうと失われるので、確かめてから戻る
+  if ($('title')) {
+    $('title').addEventListener('click', () => {
+      if (typeof confirm !== 'function' || confirm('作品の選択へ戻ります。いまの遊びは、先に「保存する」しておかないと失われます。戻りますか？')) location.href = './'
+    })
   }
 
   // ★狭い画面では例まで入らず**末尾が切れて読めない**。畳んで名詞だけ残す
-  const hint = () => (window.innerWidth < 520
-    ? 'ひらがなで打つ' : 'ひらがなで打つ（例: ゆうびんばこをあける）')
+  // ★打てる形は 3 つ（ひらがな・漢字まじり・英語）。作品ごとの例は works.json の `examples`
+  const hint = () => {
+    const ex = WORK_CFG.examples || ['ゆうびんばこをあける', '郵便箱を開ける', 'open mailbox']
+    if (bodyLang === 'english') return `Type a command (e.g. ${ex[2] || 'look'})`
+    return window.innerWidth < 520 ? 'ひらがな・漢字・英語で打つ' : `例：${ex.join(' / ')}`
+  }
   window.addEventListener('resize', () => {
     if (Glk.waitingFor() === 'line') $('input').placeholder = hint()
   })
@@ -752,15 +740,13 @@
     el.value = value
     el.addEventListener('change', () => apply(el.value))
   }
-  for (const [id, lang] of [['intro-ja', 'japanese'], ['intro-en', 'english']]) {
-    if ($(id)) $(id).addEventListener('click', () => { setBodyLang(lang); closeIntro() })
-  }
   applyBodyLang()
 
-  // ★ゲームは**案内を閉じてから**始める。先に走らせると、冒頭の文が
-  //   言語を選ぶ前に印字されてしまい、選んでも手遅れになる（リロードするまで直らない）。
-  //   ★訳したあとの文からは元の英語に戻せないので、後から刷り直す手は使えない
-  if (!intro) startGame()
+  // ★作品ごとの URL では、言語の設定（メニューで選んだもの）を反映したら**すぐ始める**。
+  //   言語は始める前に決まっている。後から訳を刷り直す手は無い（訳したあとの文は英語に戻せない）
+  startGame()
+  // ★メニューの「ライセンスと出典」から来たときは、始めたうえで手引きを開く
+  if (qs.get('about')) showPanel(true)
 
   function startGame() {
     if (startGame._done) return
@@ -772,4 +758,52 @@
   }
 
   function show2() {}   // （予約）ゲームパッド入力はここに繋ぐ
+
+  // ================= トップページ（作品を選ぶメニュー）=================
+  // ★ここでは**ゲームも訳も読まない**。選んだ言語と作品を覚え、「はじめる」で `?work=` の URL へ移るだけ
+  function renderMenu() {
+    const root = $('intro')
+    if (!root) return
+    document.body.classList.add('menu')
+    document.title = 'Zenmai'
+    root.hidden = false
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+    const get = (k) => { try { return localStorage.getItem(k) } catch (e) { return null } }
+    const put = (k, v) => { try { localStorage.setItem(k, v) } catch (e) { /* 覚えられなくても動く */ } }
+    // 言語は「プレイ」のボタンで選ぶ（始める合図を兼ねる）。ブラウザの言語に合うほうを濃くする
+    const browserJa = String((typeof navigator !== 'undefined' && navigator.language) || 'ja').toLowerCase().startsWith('ja')
+    if ($(browserJa ? 'intro-ja' : 'intro-en')) $(browserJa ? 'intro-ja' : 'intro-en').classList.add('primary')
+    // 作品（前に遊んだものを選んでおく）。選ぶだけで、ページは動かない
+    const last = get('zenmai-work')
+    let sel = (worksList.find((w) => w.id === last) || worksList[0]).id
+    const box = $('intro-works')
+    const cards = []
+    if (box) {
+      box.textContent = ''
+      for (const w of worksList) {
+        const c = document.createElement('button')
+        c.type = 'button'
+        c.classList.add('intro-work')
+        c.setAttribute('role', 'radio')
+        c.innerHTML = `<span class="w-title">${esc(label(w))}</span>`
+          + `<span class="w-intro">${w.intro || ''}</span>`
+          + (w.beta ? '<span class="w-beta">β 版 ― 訳や入力に不具合が残っているかもしれません</span>' : '')
+        c.addEventListener('click', () => { sel = w.id; syncWorks() })
+        box.appendChild(c)
+        cards.push([w.id, c])
+      }
+    }
+    const syncWorks = () => {
+      for (const [id, c] of cards) {
+        c.classList.toggle('on', id === sel)
+        c.setAttribute('aria-checked', String(id === sel))
+      }
+    }
+    syncWorks()
+    for (const [id, l] of [['intro-ja', 'japanese'], ['intro-en', 'english']]) {
+      if ($(id)) $(id).addEventListener('click', () => { put('zenmai-body-lang', l); put('zenmai-work', sel); location.href = `?work=${sel}` })
+    }
+    // ライセンスと出典は、作品の URL で手引きを開いて見せる
+    if ($('intro-license')) $('intro-license').addEventListener('click', () => { location.href = `?work=${sel}&about=1` })
+  }
 })()

@@ -16,8 +16,10 @@ const { Translator } = require('../src/translate.js')
 const { createCommander } = require('../src/command.js')
 
 const A = (f) => path.join(__dirname, '..', 'assets', f)
-const tr = new Translator(JSON.parse(fs.readFileSync(A('zork1-ja.json'), 'utf8')))
-const cm = createCommander(JSON.parse(fs.readFileSync(A('zork1-cmd.json'), 'utf8')))
+// ★作品は環境変数 WORK（既定 zork1）。例: WORK=zork2 node test/run-full-ja.js "こおりつけ"
+const WORK = process.env.WORK || 'zork1'
+const tr = new Translator(JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8')))
+const cm = createCommander(JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8')))
 const inputs = process.argv.slice(2)
 let n = 0
 let place = ''
@@ -30,6 +32,22 @@ const sink = (t) => { if (trial) trial.buf += t; else process.stdout.write(t) }
 
 // ★セーブの往復もここで試せるように、記憶の上のファイル置き場を渡す
 const saved = new Map()
+// ★検査用: 杖を持たせる・ロボットを同じ部屋に呼ぶ（序盤から届かない物を試すため）。
+//   ZENMAI_GIVE="^magic wand$"（持ち物へ）/ ZENMAI_HERE="^robot$"（いまの部屋へ）。カンマで複数。
+//   ★VM のメモリは init のあとでないと触れないので、最初の update で 1 度だけ行う
+let primed = false
+const prime = () => {
+  if (primed) return
+  primed = true
+  if (!process.env.ZENMAI_GIVE && !process.env.ZENMAI_HERE && !process.env.ZENMAI_GOTO) return
+  const { zobjs, findObj } = require('../tools/zobjs.js')
+  const names = zobjs(fs.readFileSync(path.join(__dirname, '..', 'vendor', WORK, `${WORK}.z3`)))
+  const player = findObj(names, /^cretin$/)[0]
+  if (process.env.ZENMAI_GOTO) vm.insert_obj(player, /^\d+$/.test(process.env.ZENMAI_GOTO) ? Number(process.env.ZENMAI_GOTO) : findObj(names, new RegExp(process.env.ZENMAI_GOTO, 'i'))[0])   // プレイヤーを部屋へ（名前か番号）
+  for (const re of (process.env.ZENMAI_GIVE || '').split(',').filter(Boolean)) for (const o of findObj(names, new RegExp(re, 'i'))) vm.insert_obj(o, player)
+  const room = vm.get_parent(player)
+  for (const re of (process.env.ZENMAI_HERE || '').split(',').filter(Boolean)) for (const o of findObj(names, new RegExp(re, 'i'))) vm.insert_obj(o, room)
+}
 const Glk = createGlk({
   cols: 64,
   rows: 24,
@@ -37,6 +55,7 @@ const Glk = createGlk({
   write(text) { rawSince += text; sink(tr.feed(text).replace(/^[ \t]*>+[ \t]*$/gm, '')) },
   status(line) { place = tr.word((line.match(/^(.*?)\s{2,}/) || [0, line])[1]) },
   update() {
+    prime()
     const rest = tr.flush().replace(/^[ \t]*>+[ \t]*$/gm, '')
     if (rest.trim()) sink(rest)
     if (trial) {
@@ -85,5 +104,5 @@ const Glk = createGlk({
 })
 
 const vm = new ZVM()
-vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', 'zork1', 'zork1.z3')), { vm, Glk, GlkOte: null, Dialog: null })
+vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', WORK, `${WORK}.z3`)), { vm, Glk, GlkOte: null, Dialog: null })
 Glk.init({ vm })

@@ -1,0 +1,290 @@
+take all
+s
+s
+s
+sw
+s
+light lamp
+se
+enter gazebo
+take teapot
+exit
+n
+ne
+fill teapot
+s
+se
+s
+s
+w
+e
+take pearls
+e
+get into bucket
+pour water
+get out
+e
+take red, blue, and green cakes
+eat green cake
+e
+throw red cake into pool
+take candy
+w
+eat blue cake
+nw
+go east
+e
+push triangle
+go south
+s
+take sphere
+lift cage
+take sphere
+n
+w
+w
+get into bucket
+fill teapot
+get out
+drop teapot
+w
+w
+nw
+open box
+take violin
+e
+n
+n
+enter gazebo
+drop all but lamp and sword
+take mat and opener
+exit
+s
+s
+w
+n
+take brick
+n
+n
+u
+put mat under door
+open lid
+put opener in hole
+take mat
+take key
+take opener
+unlock door with key
+open door
+n
+take sphere
+s
+d
+s
+s
+s
+e
+n
+n
+enter gazebo
+drop all but lamp, sword, and brick
+take newspaper and matches
+exit
+s
+s
+w
+sw
+take string
+n
+d
+e
+n
+n
+attack dragon
+s
+attack dragon
+s
+attack dragon
+w
+w
+take ruby
+s
+get into basket
+open recepticle
+put paper in receptical
+light match
+light paper with match
+wait
+wait
+w
+tie wire to hook
+get out
+take coin
+s
+open purple book
+take stamp
+n
+get into basket
+untie wire
+wait
+wait
+wait
+wait
+w
+tie wire to hook
+get out
+s
+put string on brick
+put brick in hole
+light match
+light string with match
+n
+s
+take crown
+n
+get into basket
+untie wire
+close receptical
+wait
+get out
+n
+e
+e
+se
+e
+n
+n
+enter gazebo
+drop all but lamp
+exit
+s
+w
+sw
+n
+n
+n
+w
+n
+n
+take chest
+kiss princess
+s
+s
+s
+se
+e
+n
+n
+enter gazebo
+wait
+open chest
+again
+take dragon
+drop chest and rose
+take candy, red sphere, blue sphere, and pearls
+exit
+s
+s
+w
+s
+s
+d
+s
+take club
+se
+ne
+nw
+sw
+s
+u
+n
+n
+sw
+sw
+feed lizard candy
+unlock door with gold key
+open door
+s
+w
+drop all but lamp
+e
+n
+n
+ne
+n
+n
+n
+w
+n
+w
+w
+ne
+e
+s
+take portrait
+n
+enter light
+enter south wall
+enter light
+take bills
+kill
+w
+w
+w
+take lamp
+s
+s
+s
+sw
+s
+se
+enter gazebo
+take violin, ruby, coin, stamp, and crown
+exit
+s
+s
+w
+sw
+sw
+s
+w
+drop all but lamp
+take club
+w
+throw club at glass
+take white sphere
+e
+put white sphere on diamond stand
+put red sphere on ruby stand
+put blue sphere on sapphire stand
+take black sphere
+s
+put sphere in circle
+n
+take ruby, coin, stamp, and violin
+s
+give all but lamp to demon
+n
+take all
+s
+give all but lamp to demon
+take wand
+n
+e
+n
+n
+ne
+s
+point wand at menhir
+sw
+take collar
+ne
+s
+d
+d
+put collar on dog
+e
+open door
+s
+turn off lamp
+open secret door
+s

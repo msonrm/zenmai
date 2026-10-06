@@ -43,12 +43,15 @@ class RefStruct {
  *                         ★セーブは**枠を 1 つ**にしてある。名前を訊く画面を出すと
  *                         コントローラだけでは操作できないため（この企画の芯を壊す）
  */
-// ★セーブの枠は 1 つ。名前を訊かない（コントローラだけで遊べることを壊さないため）
+// ★セーブの枠は**作品ごとに 1 つ**。名前を訊かない（コントローラだけで遊べることを壊さないため）。
+//   ★作品が違う story のセーブを読ませると壊れるので、枠の名前は作品で分ける（ホストが `slot` で渡す。
+//   渡さなければ従来の `zenmai-save` = Zork I の枠のまま。公開済みの利用者のセーブを失わないため）
 const SLOT = 'zenmai-save'
 const filemode_Write = 0x01
 const filemode_WriteAppend = 0x05
 
 function createGlk(host) {
+  const slot = host.slot || SLOT
   const mem = new Map()
   const files = host.files || {
     read: (n) => mem.get(n) || null,
@@ -146,8 +149,8 @@ function createGlk(host) {
     //   ここで null を返して放置していたので `save` が固まっていた（実プレイで判明）
     glk_fileref_create_by_prompt(usage, mode) {
       const write = mode === filemode_Write || mode === filemode_WriteAppend
-      const data = write ? null : files.read(SLOT)
-      const fref = (write || data) ? { name: SLOT, mode, data } : null   // 読めるものが無ければ失敗
+      const data = write ? null : files.read(slot)
+      const fref = (write || data) ? { name: slot, mode, data } : null   // 読めるものが無ければ失敗
       setTimeout(() => { if (vm) vm.resume(fref) }, 0)
       return fref
     },
