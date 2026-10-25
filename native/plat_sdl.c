@@ -415,6 +415,10 @@ static void script_load(void)
             sc[sc_n++] = (typeof(sc[0])){ f0, f1, mask };
     }
     fclose(f);
+    if (!sc_n) {
+        fprintf(stderr, "台本にボタン行が 1 つも無い: %s\n", path);
+        exit(2);
+    }
 }
 
 /* 台本を再生中なら 1 を返し、p / axes をその回の内容で埋める。 */
