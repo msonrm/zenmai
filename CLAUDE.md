@@ -1,6 +1,6 @@
 # Zenmai —— 作業の手引き
 
-Zork I（Z-machine）を日本語で読み、日本語で打つ。版はブラウザ（`web/` + `src/`）・PS1・SDL2（PortMaster）・
+Zork I（Z-machine）を日本語で読み、日本語で打つ。版はブラウザ（`web/` + `src/`）・SDL2（PortMaster）・PS1（★凍結）・
 PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で同梱・作品はパック + story のファイル・実機の報告待ち）。
 
 ## まず読むもの
@@ -26,7 +26,12 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
   上の層（`session.c`・`render.c`・`input.c`・`translate.c`・`cmd.c`）は無改造で運ぶ
 - ★**VM とのつなぎは `session.c` の 1 本だけ**（全版が共有）。版ごとの入口（`main.c` / `main_pc98.c`）に
   VM に触る道を書かない
-- ★PS1 と SDL は**画素一致**を検査している（`native/test-*.sh`）。共有の C を触ったら流す
+- ★**PS1 版は凍結**（開発を停止した扱い・msonrm 2026-11-13）。コード（`plat_ps1.c`・`build.sh`・`sim.py`・`card.c`）は**消さずに残す**が、
+  直さない・出し直さない・検査も流さない。共有の C を触るときに PS1 で建つかは気にしない（`plat.h` の境界があるので残しても邪魔にならない）
+- ★**先に進めるのは Zork III の翻訳まで素直に通すこと**（同日）。構造の直しは、その道の邪魔になるものから
+- ★**SDL 版の検査は「字の記録」へ寄せる**（同日に決めた・★まだ作っていない → `TODO.md`）。PC-98 版と同じに、台本を流して記録を突き合わせる。
+  理由: PS1 との**画素一致**（`test-sdl.sh`）が守っていたのは「PS1 への移植が SDL と同じ絵を出すか」で、相手を止めたので目的ごと消えた。
+  上の層（訳・語彙・折り返し・禁則・ふりがな）は字の単位で足りる。★記録で見えないのは重ね描き（オプション・手引きの図）—— そこは実機か目視
 - ★**配る物・公に出す文章では「Zenmai は Z-machine、Zork I は同梱の見本の作品」と書く**（商標の「ZORK」を前に出さない。
   書庫の名前にも入れない・msonrm の判断 2026-09-28）
 - 文書は日本語。★は要点、決めたことには**理由と日付**、踏んだ罠は症状ごと残す（既存の文書の書き方に合わせる）
@@ -35,8 +40,8 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
 
 | 版 | 建てる | 確かめる |
 |---|---|---|
-| PS1 | `sh native/build.sh` | `native/test-*.sh`（★`.test-lock` がある間は焼き直さない。★8 本で 30 分ほど、`test-options.sh` だけで 15 分を超える —— PS1 の模擬 `sim.py` が Python で MIPS を 1 命令ずつ解く（毎秒 約 90 万命令）ため。時間切れを短くすると後片付けで切れる） |
-| SDL2 | `sh native/build-sdl.sh` | `sh native/test-sdl.sh` |
+| SDL2 | `sh native/build-sdl.sh` | `native/test-wrap.sh`・`test-glyph.sh`・`test-face.sh`（PS1 の模擬に頼らない 3 本）。★入力・やめる・セーブ・オプションは記録方式の検査を作るまで網が無い |
+| PS1（凍結） | `sh native/build.sh` | 流さない。`test-sdl.sh`・`test-entry.sh`・`test-quit.sh`・`test-save.sh`・`test-options.sh` は PS1 の模擬 `sim.py` に頼る（5 本で 30 分近く）ので、ふだんの検査から外した |
 | 訳・語彙（C） | | `native/test_translate.c`・`native/cmd_test_host.c`（JS の記録と照合） |
 | PC-98 | `sh native/build-pc98.sh` | `sh native/test-pc98.sh`（数秒。打鍵と組み方のホスト検査 + 台本をホストと QuuBee で流して記録を突き合わせる） |
 
@@ -72,4 +77,4 @@ Release のタグは `pc98-vX.Y.Z`（PS1 版は `ps1-vX.Y.Z`）。
 - ★曲・絵はパックに入れない（外のファイル + 作品ごとの `.INI`・計画書の「次にやること」）
 - 必要なメモリは像 約 262KB + 起動後に約 620KB（★要件は拡張 2MB。1MB は目標から外したが、今は QuuBee の 1MB でも動く ——
   測った境目と、大きなものを 59KB 以下の塊で取る理由は `docs/pc98-port-plan.md` の「段 8」）
-- ★PS1 版との共有は重視しない（実験的な実装・msonrm 2026-09-29）。ただし共有の C を触ったら 8 本は流す
+- ★PS1 版との共有は重視しない（実験的な実装・msonrm 2026-09-29）。★PS1 版は 2026-11-13 に凍結したので、共有の C を触っても PS1 の検査は流さない
