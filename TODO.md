@@ -33,8 +33,13 @@
 >   混ぜると「`assets/*.json` だけ直すと次の生成で戻る」の罠が共通の側にも広がる）。③ 語順が規則の表（助詞）は配列のまま
 > - **順番**: 1. 共通の JSON を作り `command.js` と `gen_cmd.py` が読む（挙動は変えない。`run-*.js` と JS ↔ C の照合で同じ出力を確かめる。
 >   ★PC-98 のパックは作り直し）→ 2. 断りの文言を寄せる → 3. 作品固有の動詞名の宣言は Zork III で当たったものから `*-cmd.json` へ
-> - ★その前に小さく: **テストを作品名で流せるように**（`run-cmd.js`・`run-actor.js`・`run-web-dom.js`・`run-ja.js`・`run-shim.js`・
->   `cmd_ref.js`・`make_corpus.py` が Zork I 固定）し、`npm test` で全作品をまとめて流す入口を作る
+> - ★その前に小さく（**済・2026-11-14**）: **テストを作品名で流せるように**した。作品の口は `test/work.js` の 1 か所（`WORK=zork2`・既定 zork1）、
+>   作品ごとの材料（固定表・始まりの部屋・通しの手の列）は **`test/works/<作品>.js`**、全作品をまとめて流す入口は **`npm test`**
+>   （= `test/run-all.js`・両作品で約 8 秒・`npm test -- zork2` で作品を選ぶ）。`run-cmd.js` の Zork I の表は `test/works/zork1.js` へ移し、
+>   `run-leave.js` は Zork II の表（`test/works/zork2.js`）へ畳んだ。`cmd_ref.js`・`make_corpus.py` も `WORK` を読む（Zork I のコーパスは同じ 4,069 件）。
+>   ★**Zork III を足すときに検査の側で触るのは `test/works/zork3.js` だけ**。★CI はまだ無い（`npm test` を流すだけの形にはなった）
+> - ★上の作業で見つけた（**未修正**・Zork II）: 命令形の「いけ」の**復唱**が物の「池」に化ける ——「きたへいけ」「ろぼっと、きたへいけ」の
+>   送る英語は正しい（`north` / `robot, north`）が、画面の復唱が「きたへ涙の池」になる（Zork I は語彙に池が無いので出ない）
 > ★★**native が追うもの**（JS に入れて、C にはまだ入れていない挙動。節目 = Zork II・III の日本語を native に載せるときにまとめて移す・
 > 決めたのは 2026-11-13 = `CLAUDE.md` の「守ること」）。★JS の挙動を変えたら、ここに 1 行足す:
 > - 呪文（`say "float"`）・口に出す語（`answer "well"`）・登場人物への呼びかけ（`robot, north`・命令形）—— `command.js` にあり、`cmd.c` と `gen_cmd.py` に無い（Zork II・2026-10-05〜06）

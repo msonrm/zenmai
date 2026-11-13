@@ -8,17 +8,18 @@
  *
  * 使い方: node test/run-save.js
  */
-const fs = require('fs')
-const path = require('path')
 const ZVM = require('ifvms/src/zvm.js')
 const { createGlk } = require('../src/glk-shim.js')
 
 // ★作品は環境変数 WORK（既定 zork1）。セーブ枠は作品ごと（`slot`）: Zork I は従来の `zenmai-save`、ほかは `zenmai-save-<作品>`
-const WORK = process.env.WORK || 'zork1'
-const SLOT = WORK === 'zork1' ? 'zenmai-save' : `zenmai-save-${WORK}`
-const START = WORK === 'zork1' ? 'West of House' : 'Inside the Barrow'
-const CMDS = WORK === 'zork1' ? ['open mailbox', 'save', 'north', 'north', 'restore', 'look']
-  : ['take lamp', 'save', 's', 's', 'restore', 'look']
+// ★始まりの部屋と手の列は作品の事実 = `test/works/<作品>.js`（`start`・`save.cmds`: 何かする → save → 2 歩 → restore → look）
+const work = require('./work.js')
+const WORK = work.WORK
+const SPEC = work.spec()
+if (!SPEC.start || !SPEC.save) { console.error(`test/works/${WORK}.js に start と save.cmds が要る`); process.exit(2) }
+const SLOT = WORK === 'zork1' ? 'zenmai-save' : `zenmai-save-${WORK}`   // ★枠の名前は web/main.js の決まり（Zork I だけ昔の名前）
+const START = SPEC.start
+const CMDS = SPEC.save.cmds
 const saved = new Map()
 let n = 0
 let out = ''
@@ -61,6 +62,6 @@ function finish() {
 }
 
 const vm = new ZVM()
-vm.prepare(fs.readFileSync(path.join(__dirname, '..', 'vendor', WORK, `${WORK}.z3`)),
+vm.prepare(work.story(),
   { vm, Glk, GlkOte: null, Dialog: null })
 Glk.init({ vm })

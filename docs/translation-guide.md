@@ -120,7 +120,8 @@ ZIL ソース（MIT）                                  手で書く側（原簿
 | `zork1_coverage_check.py` / `fragment_check.py` | 原簿側 | 断片と完成行の被り・名前を行と誤検出していないか |
 | `zork1_yomi_check.py` | 原簿側 | 読みの無い漢字形（宣言ベース） |
 | `zork1_collide_check.py` / `typable_check.py` / `verb_check.py` / `name_check.py` / `naming_check.py` | 原簿側 | 入力の衝突・原作の SYNONYM が打てるか・動詞・名前 |
-| `node test/run-cmd.js` | repo | 入力の固定表（期待値は `zork1-cmd.json` の shapes から決まる） |
+| **`npm test`** | repo | ★**下の repo の検査を全作品まとめて流す入口**（2026-11-14・`test/run-all.js`）。作品は `assets/<作品>-cmd.json` と `-ja.json` が揃っているもの。`npm test -- zork2` で選ぶ。1 本ずつ流すときは `WORK=<作品>`（既定 zork1・口は `test/work.js`） |
+| `node test/run-cmd.js` | repo | 入力の固定表（期待値は `<作品>-cmd.json` の shapes から決まる）。★表は **`test/works/<作品>.js`**（実プレイの取りこぼしはそこへ足す） |
 | `node test/run-swallow.js` | repo | **語の食い合い**（ベースライン化） |
 | `WORK=zork2 node test/run-visible.js` | repo | ★**画面に出た複合語（ふりがな語）を読みのまま打てるか**。語彙の語を含むのに断られるものを挙げる（歩道橋型）。baseline = `test/visible-known-<作品>.txt`（文の断片だけ） |
 | `node test/run-walkthrough.js test/walkthrough.txt` | repo | 全経路を流して**未訳ログ**（Zork I は 211 手・未訳 0 行を 3 回連続） |
@@ -378,7 +379,7 @@ ZORK_SRC=$S python3 zork1_cmd.py   build   --work zork2 --src $S      # → zork
   ★**指し分けの形容詞を直した**（原簿ビルダー）: 名詞を共有する物では、**他の物が持たない最長の形容詞**を先頭にする（水晶球が全部 `crystal palantir` になっていた）。Zork I は変えない。
 - ★**「X から出る／降りる／去る」を通した**（2026-10-05）: 原作は `exit X` / `disembark X` / `leave X` / `get out of X` をどれも受ける（Zork II の桶で確かめた）。入力層は「から」を空間の役（`FROM`）として**断っていた**ので、
   **離れる物そのもの**（原作の目的語）として役を外して渡す（`ENTER` の「窓から入る」と同じ扱いを `EXIT` / `DISEMBARK` / `LEAVE` へ広げた・JS の `motionVerb`・`cmd.c` の `motion_verb`）。
-  「降りる」が `climb down` に替わるとき（木・梯子）も同じ。検査: `run-cmd.js` に 4 件・`run-leave.js`（Zork II）5 件・JS ↔ C の照合 4,037 件一致。
+  「降りる」が `climb down` に替わるとき（木・梯子）も同じ。検査: `run-cmd.js` に 4 件・`run-leave.js`（Zork II）5 件（★2026-11-14 に `test/works/zork2.js` の表へ畳んだ）・JS ↔ C の照合 4,037 件一致。
   ★「マッチをすって」のような **te 形**は一般には通らない（呼びかけの中だけ命令形を終止形に戻す）。
 
 ★**ふりがなの表（`zork2-ruby.md`）を作った**（2026-10-05・470 語）。本文の漢字の連なり 1,580 種のうち、読みが難しいものを手で選んで読みを付けた（一覧は `assets/zork2-ja.json` の `ruby`＝物の名前の自動分 + この表）。
@@ -411,7 +412,7 @@ ZORK_SRC=$S python3 zork1_cmd.py   build   --work zork2 --src $S      # → zork
 2. ★**Zork II は物 159 個・上位語 35 行を書いた**（`zork2-cmd-ja.md`）。未記入は 14 語（デバッグ用の動詞 12 + 内部用の物 2）だけ。
    上位語は扉・窓・壁・ボタン・本・鍵・台座・ランタン・杖・ケーキ・ドラゴン・蛇・ユニコーン・姫・ケルベロス・メンヒル・水晶球・陳列棚・気球・箱・テーブル・ラベル・蓋・鍵穴・フック・ノーム・水。
    ★「ふる」は Zork II では **WAVE（杖を振る）に割り当て**、SWING は「振り回す／斬りつける」にした（Zork I は SWING が「振る」）。
-   ★検査: 全 286 形が「〜をみる」で自分の名詞に当たる／`WORK=zork2 node test/run-swallow.js` は 234 語で食い合い 0（★「1 字の不適語が無い」の警告は Zork I 用の見張りなので無視）。
+   ★検査: 全 286 形が「〜をみる」で自分の名詞に当たる／`WORK=zork2 node test/run-swallow.js` は 234 語で食い合い 0（★「1 字の不適語が無い」の警告は Zork I 用の見張り —— 2026-11-14 から `test/works/<作品>.js` の `nocmdOneChar: false` で鳴らさない。赤を「無視する」と書くと本物を見落とすので）。
 3. 守ること（2.2 章）:
    - 1 語 = `表記(よみ)`。第一読みがふりがな。
    - **1 モーラの読みは危険**。まず `×`（ルビ専用）。**打ちたい語は不適語・上位語の宣言で守る**。
@@ -436,7 +437,7 @@ ZORK_SRC=$S python3 zork1_cmd.py   build   --work zork2 --src $S      # → zork
 
 1. `gen_translate.py` / `gen_cmd.py` / `gen_ruby.py` を作品名つきで流す → 節。
 2. `gen_pack.py story.z3 ZORK2.ZMP --sec TRAN=… --sec CMDS=… --sec RUBY=… title=…`。★**表の形や UI の文言を変えたらパックも作り直す**（要約値が違うと本体が断る）。
-3. 検査: `run-cmd` / `run-swallow` / **`run-visible`** / walkthrough で未訳 0 行 3 回 / JS ↔ C の照合 / `test-pc98.sh`（台本 `zork2.txt` を日本語面に）。
+3. 検査: ★先に **`test/works/<作品>.js`** を作る（始まりの部屋 `start`・セーブの手 `save.cmds`・通しの手の列 `walkthrough`・固定表 `cmd.cases`。`zork2.js` が雛形）→ **`npm test -- <作品>`** = `run-cmd` / `run-swallow` / **`run-visible`** / walkthrough ほか。そのうえで walkthrough で未訳 0 行 3 回 / JS ↔ C の照合 / `test-pc98.sh`（台本 `zork2.txt` を日本語面に）。
 4. ★**メモリ**: Zork I は表を足して約 620KB。Zork II・III も同程度か少し多い。**要件は拡張 2MB のまま**で収まるか、`test-pc98.sh` の 1MB 参考値で見る。
 
 ### 段 4. 実プレイで穴を拾う

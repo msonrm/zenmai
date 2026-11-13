@@ -99,8 +99,12 @@ for (const n of cmdAsset.nocmd || []) {
   }
 }
 // ★カナリア: 1 字の語が実際に載っていること。無いとこの見張りは**素通り**する
+//   ★1 字の語を持つかは作品の事実（`test/works/<作品>.js` の `nocmdOneChar`）。持たない作品（Zork II）では鳴らさない ——
+//   以前は Zork II でいつも赤になり、「無視する」と文書に書いていた（赤に慣れると本物を見落とす・2026-11-14）
 const oneChar = (cmdAsset.nocmd || []).filter((n) => n.form.length === 1).map((n) => n.form)
-if (!oneChar.length) {
+if (!oneChar.length && require('./work.js').spec().nocmdOneChar === false) {
+  console.log(`✓ 不適語 ${(cmdAsset.nocmd || []).length} 語はすべて名指しできる（1 字の語は無い作品）`)
+} else if (!oneChar.length) {
   console.log('✗ ★カナリア: 1 字の不適語が 1 つも無い = この見張りは効いていない')
   flagNg++
 } else {

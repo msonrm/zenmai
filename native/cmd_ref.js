@@ -1,10 +1,14 @@
 'use strict'
-/** コマンド変換の参照出力: 入力(1 行 1 件)→ JSON 行。C 移植(cmd.c)との diff 用。 */
+/** コマンド変換の参照出力: 入力(1 行 1 件)→ JSON 行。C 移植(cmd.c)との diff 用。
+ *   node native/cmd_ref.js corpus.txt ref.jsonl      （WORK=zork2 で作品を替える。既定 zork1）
+ * ★相手の `cmd_test_host` は焼き込みの表（`cmd_data.c`）= いまは Zork I だけ。ほかの作品の参照出力は、
+ *   C がその作品の語彙を載せる節目（`TODO.md` の「native が追うもの」）まで突き合わせる相手が無い */
 const fs = require('fs')
 const path = require('path')
 const { createCommander } = require(path.join(__dirname, '..', 'src/command.js'))
 
-const asset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets/zork1-cmd.json'), 'utf8'))
+const WORK = process.env.WORK || 'zork1'
+const asset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', `assets/${WORK}-cmd.json`), 'utf8'))
 const cm = createCommander(asset)
 
 const TRACE = {

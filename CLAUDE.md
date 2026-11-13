@@ -46,6 +46,7 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
 |---|---|---|
 | SDL2 | `sh native/build-sdl.sh` | `native/test-wrap.sh`・`test-glyph.sh`・`test-face.sh`（PS1 の模擬に頼らない 3 本）。★入力・やめる・セーブ・オプションは記録方式の検査を作るまで網が無い |
 | PS1（凍結） | `sh native/build.sh` | 流さない。`test-sdl.sh`・`test-entry.sh`・`test-quit.sh`・`test-save.sh`・`test-options.sh` は PS1 の模擬 `sim.py` に頼る（5 本で 30 分近く）ので、ふだんの検査から外した |
+| 訳・語彙（JS・Web） | | **`npm test`**（全作品・約 8 秒。`npm test -- zork2` で作品を選ぶ）。1 本ずつは `WORK=zork2 node test/run-cmd.js` など。★作品ごとの固定表・手の列は `test/works/<作品>.js`（検査の本体に作品名を書かない） |
 | 訳・語彙（C） | | `native/test_translate.c`・`native/cmd_test_host.c`（JS の記録と照合） |
 | PC-98 | `sh native/build-pc98.sh` | `sh native/test-pc98.sh`（数秒。打鍵と組み方のホスト検査 + 台本をホストと QuuBee で流して記録を突き合わせる） |
 
