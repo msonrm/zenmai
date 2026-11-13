@@ -8,7 +8,6 @@
  *   仕組みだけを見るために、ここで 1 人と 1 つを書き足す。
  * ★命令の中の物は作品の語彙なので、物を伴う命令は `test/works/<作品>.js` の `actorOrders`
  */
-const { createCommander } = require('../src/command.js')
 const work = require('./work.js')
 
 const asset = work.cmdAsset()
@@ -18,7 +17,7 @@ if (!(asset.actors || []).some((a) => a.word === 'robot')) {
 if (!(asset.spells || []).some((s) => s.form === 'こおりつけ')) {
   asset.spells = [...(asset.spells || []), { en: 'FREEZE', word: 'freeze', form: 'こおりつけ', alts: [] }]
 }
-const c = createCommander(asset)
+const c = work.commander(asset)
 const orders = work.spec().actorOrders || [
   ['ろぼっと、ランタンをとれ', 'robot, take lamp'],
   ['ろぼっと、ふくろをあけろ', 'robot, open bag'],

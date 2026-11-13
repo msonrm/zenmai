@@ -40,6 +40,10 @@ module.exports = {
   cmdAsset: () => read(asset(WORK, 'cmd')),
   /** 訳（`assets/<作品>-ja.json`） */
   jaAsset: () => read(asset(WORK, 'ja')),
+  /** 日本語共通の語の表（`assets/japanese.json`）。作品によらない */
+  common: () => read(path.join(ROOT, 'assets', 'japanese.json')),
+  /** 入力の変換器。`cmd` を渡せばその語彙で（検査が書き足した語彙・小さな表）、無ければ作品の語彙で作る */
+  commander: (cmd) => require('../src/command.js').createCommander(cmd || read(asset(WORK, 'cmd')), read(path.join(ROOT, 'assets', 'japanese.json'))),
   storyPath,
   story: () => fs.readFileSync(storyPath),
   /** 題など（`web/works.json` の 1 件）。載っていなければ id だけ */

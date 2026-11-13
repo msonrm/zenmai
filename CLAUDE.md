@@ -19,7 +19,10 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
   ★そのあいだ **JS ↔ C の照合（`cmd_ref.js` ↔ `cmd_test_host`・`test_translate`）は食い違っていてよい**（赤は「C が遅れている」で、壊れたのではない）。
   ★C に入れていない挙動の変更は **`TODO.md` の「native が追うもの」に 1 行ずつ残す**（節目で拾う一覧。残さないと何を移すか分からなくなる）。
   ★native の不具合の報告（実機で出たもの）は節目を待たずに直す。節目で C を追うときは、これまでどおり両方を見る（各ファイルの頭書き）
-- ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
+- ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/<作品>-*.json` だけ直すと次の生成で戻る
+- ★**言葉の知識は 2 段**（2026-11-14）: 作品が変わっても同じもの（方角・助詞と役・「ぜんぶ」・「もういちど」・否定と命令形の語尾…）は
+  **`assets/japanese.json`**（★手書き・ここを直接直す。`command.js` と `gen_cmd.py` が読む = 写しは無い）、作品ごとの語は `assets/<作品>-cmd.json`（原簿から生成）。
+  ★1 ファイルに混ぜない（出どころが違う）。★条件つきの規則はコードに残す（データに出すのは語の表まで）
 - ★**生成物は手で直さない**: `native/*_data.{c,h}`（`kana_input_data.c`・`misaki_data.c` を含む）・`native/*_tab.c`（`ctab.py`）・`pairs.h`・
   `glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
 - ★**禁則の表は `native/kinsoku.h` の 1 つだけ**（PS1 / SDL / PC-98 が共有。Python の参照実装 `ps1-mock/gen_mock.py` とは

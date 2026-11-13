@@ -7,12 +7,11 @@
  *
  * 使い方: node test/run-cmd.js            （WORK=zork2 で作品を替える。既定 zork1）
  */
-const { createCommander } = require('../src/command.js')
 const { Translator } = require('../src/translate.js')
 const work = require('./work.js')
 
 const asset = work.cmdAsset()
-const cm = createCommander(asset)
+const cm = work.commander(asset)
 const T = work.spec().cmd || {}
 const CASES = T.cases || []
 

@@ -347,6 +347,7 @@ ZORK_SRC=$S python3 zork1_cmd.py   build   --work zork2 --src $S      # → zork
 - ★**Zork I の揺れも直した（2026-10-05）**: `ZORKMID` の DESC「ゾーキッド」→「ゾークミッド」／「フロボズ」→「フロボッズ」（「ZORK II: フロボッズの魔法使い」・`FROBOZZ` の語は両形を受ける）。
 - ★**`land`（着陸・上陸）を日本語から打てるようにした**。`land` は原作の**方角の語**（各作品の `<DIRECTIONS … LAND>`）で、`command.js` の `DIRS`（手書き）に無かったため、
   Zork I の舟でも日本語では上陸できなかった（「じょうりくする」が未知語・「きしにつく」は `き` が木を食って `poke tree` になっていた）。
+  （★2026-11-14 から置き場は**原簿の `## 方角` の節**（作品の側）→ `<作品>-cmd.json` の `dirs`。東西南北などの共通の方角は `assets/japanese.json`。`CROSS` は Zork II・III の `<DIRECTIONS>` にあるが未記入 —— Zork III を始めるときに `## 方角` を見ること）
   → `DIRS` に 着陸・上陸・着岸（かな・「〜する」つき）と「岸に着く」を足した（JS と `gen_cmd.py` の両方）。舟の説明書は「「漕ぎ出す」と言う」「「上陸」と言うか」、Zork II の気球の説明書は「「着陸」と言ってください」に直した。
   ★**確かめたこと**: Zork I の JSON・C の生成物を作り直し、`run-cmd` 70・`run-swallow`・`run-web-dom`・walkthrough 未訳 0・JS ↔ C（`test_translate` 711 行・`cmd_test_host` 4,031 件）・`test-pc98.sh` が通る。
 

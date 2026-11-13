@@ -453,7 +453,11 @@ const finish = async () => {
     // ★器は無いパスにも index.html を返す（本番と同じ意地悪）ので、中身で見分ける
     try { const j = await (await fetch(p)).json(); if (j && j.verbs) { cmdAsset = j; break } } catch (e) { /* 次 */ }
   }
-  const cm2 = cmdAsset ? window.ZenmaiCommand.createCommander(cmdAsset) : null
+  let jaCommon = null
+  for (const p of ['../assets/japanese.json', 'assets/japanese.json']) {
+    try { const j = await (await fetch(p)).json(); if (j && j.particles) { jaCommon = j; break } } catch (e) { /* 次 */ }
+  }
+  const cm2 = cmdAsset && jaCommon ? window.ZenmaiCommand.createCommander(cmdAsset, jaCommon) : null
   const cannot = cm2 ? words.filter((w) => !cm2.toCommand(w).command) : ['(アセットが読めない)']
   // ★かなだけで書かれているか（漢字の形を案内しても打てない）
   const notKana = words.filter((w) => !/^[ぁ-んァ-ヶーa-z]+$/.test(w))

@@ -62,7 +62,9 @@
   //   ★既定は**切**。遊ぶ人には要らないものなので、出すのは点検するときだけ
   if (store.get('zenmai-debug') !== 'on') document.body.classList.add('no-debug')
   const cmdAsset = await load(`../assets/${WORK}-cmd.json`)
-  const cm = createCommander(cmdAsset)
+  // ★日本語共通の語の表（方角・助詞・「もういちど」…）。作品の語彙とは別のファイル（手書き・`assets/japanese.json`）
+  const jaCommon = await load('../assets/japanese.json')
+  const cm = createCommander(cmdAsset, jaCommon)
 
   // ================= 本文の言語 =================
   // ★英語版は「訳を足したもの」ではなく**訳すのをやめたもの** —— 原作がそのまま出る。
@@ -124,7 +126,7 @@
   function renderSys() {
     const t = $('sys-list')
     if (!t || t._filled) return
-    const { PARSER_WORDS } = window.ZenmaiCommand
+    const PARSER_WORDS = jaCommon.parserWords   // ★手引きは入力と**同じ表**を見る（書き写すと手引きだけ古くなる）
     for (const [label, key] of SYS) {
       const words = key === '@again' ? pickKana(Object.keys(PARSER_WORDS), 2)
         : pickKana(((cmdAsset.verbs || {})[key] || {}).ja || [], 2)

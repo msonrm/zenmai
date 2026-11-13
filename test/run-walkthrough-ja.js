@@ -21,12 +21,11 @@ const path = require('path')
 const ZVM = require('ifvms/src/zvm.js')
 const { createGlk } = require('../src/glk-shim.js')
 const { Translator } = require('../src/translate.js')
-const { createCommander } = require('../src/command.js')
 
 const WORK = process.env.WORK || 'zork2'
 const A = (f) => path.join(__dirname, '..', 'assets', f)
 const tr = new Translator(JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8')))
-const cm = createCommander(JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8')))
+const cm = require('./work.js').commander(JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8')))
 const steps = fs.readFileSync(process.argv[2], 'utf8').split('\n').map((s) => s.trim()).filter((s) => s && !s.startsWith('//'))
 
 // 原作が入力を受け付けなかった返事

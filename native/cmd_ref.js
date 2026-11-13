@@ -9,7 +9,8 @@ const { createCommander } = require(path.join(__dirname, '..', 'src/command.js')
 
 const WORK = process.env.WORK || 'zork1'
 const asset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', `assets/${WORK}-cmd.json`), 'utf8'))
-const cm = createCommander(asset)
+const common = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets/japanese.json'), 'utf8'))   // 日本語共通の語の表
+const cm = createCommander(asset, common)
 
 const TRACE = {
   '空': 'EMPTY', '英語のまま': 'ENGLISH', 'パーサの語': 'PARSER', 'はい／いいえ': 'YESNO',
