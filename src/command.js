@@ -293,6 +293,9 @@ function createCommander(asset) {
   const SMALL = /[ぁぃぅぇぉっゃゅょゎゕゖー]/
   const wordAt = (s, at) => lex.find((e) => s.startsWith(e.kana, at) && !SMALL.test(s[at + e.kana.length] || ''))
 
+  // 入力の末尾が語彙の語で終わっているか（否定の語尾に見えるものが、語の一部かを見分ける）
+  const endsWithWord = (s) => lex.some((e) => s.endsWith(e.kana))
+
   /**
    * @param {string} input 日本語
    * @param {{verb?: string}} [opts] ★原作が「何を◯◯？」と聞き返している最中は、
@@ -346,7 +349,9 @@ function createCommander(asset) {
     if (sp) {
       return { command: `say "${sp.word}"`, trace: '呪文', unknown: [], echo: `「${sp.form}」と唱える`, spell: sp.en }
     }
-    if (NEGATIVE.test(raw)) {
+    // ★ただし**語彙の語がその語尾を含んでいる**なら否定ではない（「いぬ」「あんない」。2026-11-13 ——
+    //   聞き返しへ名詞だけで答えると「打ち消しの言い方はまだ扱えない」になっていた）
+    if (NEGATIVE.test(raw) && !endsWithWord(kana(raw))) {
       // ★「扉を開けない」の「ない」を捨てると逆の命令になる。止める
       return { command: null, trace: '否定は扱えない', unknown: [], echo: raw }
     }

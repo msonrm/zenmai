@@ -236,6 +236,12 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                   (rn >= 1 && u16_starts(raw, rn, rn - 1, NEG3, 1)) ||
                   (rn >= 3 && u16_starts(raw, rn, rn - 3, NEG4, 3)) ||
                   (rn >= 4 && u16_starts(raw, rn, rn - 4, NEG5, 4));
+        /* ★語彙の語がその語尾を含んでいるなら否定ではない（「いぬ」「あんない」。command.js の endsWithWord と同じ） */
+        for (int i = 0; neg && i < (int)CM_LEX_N; i++) {
+            const int kl = cm_lex[i].knl;
+            if (kl <= rn && u16_starts(kraw, rn, rn - kl, cm_jpool + cm_lex[i].kn, kl))
+                neg = 0;
+        }
         if (neg) {
             put_j(r->echo, &r->echo_len, 96, raw, rn);
             r->trace = CMD_TR_NEG;
