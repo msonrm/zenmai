@@ -35,6 +35,9 @@
 >   ★PC-98 のパックは作り直し）→ 2. 断りの文言を寄せる → 3. 作品固有の動詞名の宣言は Zork III で当たったものから `*-cmd.json` へ
 > - ★その前に小さく: **テストを作品名で流せるように**（`run-cmd.js`・`run-actor.js`・`run-web-dom.js`・`run-ja.js`・`run-shim.js`・
 >   `cmd_ref.js`・`make_corpus.py` が Zork I 固定）し、`npm test` で全作品をまとめて流す入口を作る
+> ★★**native が追うもの**（JS に入れて、C にはまだ入れていない挙動。節目 = Zork II・III の日本語を native に載せるときにまとめて移す・
+> 決めたのは 2026-11-13 = `CLAUDE.md` の「守ること」）。★JS の挙動を変えたら、ここに 1 行足す:
+> - 呪文（`say "float"`）・口に出す語（`answer "well"`）・登場人物への呼びかけ（`robot, north`・命令形）—— `command.js` にあり、`cmd.c` と `gen_cmd.py` に無い（Zork II・2026-10-05〜06）
 
 ## ★★1. PortMaster への申請
 

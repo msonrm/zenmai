@@ -13,8 +13,12 @@ PC-98（ver. 0.5.1-beta を pre-release で公開・Zork II / III を英語で�
 
 ## 守ること
 
-- ★**訳・語彙・ルビの挙動の正典は JS**（`src/translate.js` / `src/command.js` / `src/ruby.js`）。
-  `native/` の C は移植なので、**直すときは両方を見る**（各ファイルの頭書きに書いてある）
+- ★**訳・語彙・ルビの挙動の正典は JS**（`src/translate.js` / `src/command.js` / `src/ruby.js`）。`native/` の C は移植。
+  ★**訳・語彙は Web（JS）で進め、native は節目でまとめて追う**（msonrm 2026-11-13）—— データだけでなく**挙動の変更も、節目まで C に入れない**。
+  節目 = Zork II・III の日本語を native に載せるとき（`TODO.md`）。理由: 1 件ごとに C・生成物・パックがついて回ると、Zork III の訳が進まない。
+  ★そのあいだ **JS ↔ C の照合（`cmd_ref.js` ↔ `cmd_test_host`・`test_translate`）は食い違っていてよい**（赤は「C が遅れている」で、壊れたのではない）。
+  ★C に入れていない挙動の変更は **`TODO.md` の「native が追うもの」に 1 行ずつ残す**（節目で拾う一覧。残さないと何を移すか分からなくなる）。
+  ★native の不具合の報告（実機で出たもの）は節目を待たずに直す。節目で C を追うときは、これまでどおり両方を見る（各ファイルの頭書き）
 - ★**語彙の原簿は非公開**（`zork1-cmd-ja.md` / `zork1-ja.md`）。`assets/*.json` だけ直すと次の生成で戻る
 - ★**生成物は手で直さない**: `native/*_data.{c,h}`（`kana_input_data.c`・`misaki_data.c` を含む）・`native/*_tab.c`（`ctab.py`）・`pairs.h`・
   `glyphs.h`・`ui_data.h`・`pc98_jis.{c,h}`。生成元（`gen_*.py`・`pc98_jis.py`）を直して焼き直す
