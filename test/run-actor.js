@@ -51,6 +51,6 @@ r = c.toCommand('ろぼっと、ほげほげをとれ')
 ok(r.command === null || !/^robot, /.test(r.command || ''), `未知語は黙って送らない（${r.command} / ${r.trace}）`)
 // エコーは「呼び名、命令」
 r = c.toCommand('ろぼっと、きたへいけ')
-ok(/^ロボット、/.test(r.echo), `エコー: ${r.echo}`)
+ok(r.echo === 'ロボット、きたへ行く', `エコー: ${r.echo}（★命令形の「いけ」を物の「池」と読まない・2026-11-14）`)
 console.log(`\n--- ${work.WORK}: ${cases.length + 5} 件 / 食い違い ${bad} 件 ---`)
 process.exit(bad ? 1 : 0)

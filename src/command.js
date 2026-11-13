@@ -264,6 +264,19 @@ function createCommander(asset, common) {
    *   （「おりる」→「き」が `disembark tree` になり「それには乗っていない」と出ていた）
    * @returns {{command:string|null, trace:string, unknown:string[]}}
    */
+  // 命令形 → 終止形に戻して、**きれいに通る**（送れる・余りが無い）ものを返す。無ければ null
+  //   ★`plain` = 戻した形をもう一度戻さない
+  const viaImperative = (t, opts) => {
+    for (const [re, ends] of IMPERATIVE) {
+      if (!re.test(t)) continue
+      for (const e of ends) {
+        const r2 = toCommand(t.replace(re, e), { ...opts, plain: true })
+        if (r2.command && !r2.unknown.length) return r2
+      }
+    }
+    return null
+  }
+
   function toCommand(input, opts) {
     const raw = strip(String(input || ''))
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
@@ -282,18 +295,12 @@ function createCommander(asset, common) {
       const a = actorNames.get(am[1])
       const rest = String(input).trim().slice(am[0].length)
       if (!strip(rest)) return { command: null, trace: '何をさせるか言っていない', unknown: [], echo: a.form + '、' }
+      // 命令形のままでは語彙に無い（「とれ」）。そのままで通らなかったら、終止形に戻して当たるものを採る。
+      // ★順番は「そのまま → 戻す」。逆（戻した形を先）は試して退けた（2026-11-14）—— 命令形らしい語尾の**物の名前**が動詞に化ける
+      //   （「紙切れ」→ `cut`・「空気入れ」→ `enter`・「おけ」→ `drop`・呪文の「こおりつけ」→ 氷 + 付ける）。
+      //   「きたへいけ」の「いけ」（Zork II の池）は、方角に余りがあるときの読み直し（下の「方角」の所）が拾う
       let r = toCommand(rest, opts)
-      if (!(r.command && !r.unknown.length)) {
-        // 命令形のままでは語彙に無い（「とれ」）。終止形に戻して当たるものを採る
-        const t = strip(rest)
-        outer: for (const [re, ends] of IMPERATIVE) {
-          if (!re.test(t)) continue
-          for (const e of ends) {
-            const r2 = toCommand(t.replace(re, e), opts)
-            if (r2.command && !r2.unknown.length) { r = r2; break outer }
-          }
-        }
-      }
+      if (!(r.command && !r.unknown.length)) r = viaImperative(strip(rest), opts) || r
       if (r.spell) return { command: null, trace: '呪文は呼びかけの中では唱えられない', unknown: [], echo: a.form + '、' + r.echo }
       const echo = a.form + '、' + r.echo
       if (!r.command) return { ...r, echo }
@@ -398,6 +405,13 @@ function createCommander(asset, common) {
     //   物を伴わずに方角だけが立っているときに限って方角へ寄せる
     const MOVE_DIR = ['CLIMB', 'DISEMBARK']
     if (dirs.length && (!verb || verb.key === 'WALK' || (MOVE_DIR.includes(verb.key) && !objs.length))) {
+      // ★方角だけを送るのに**余り**（使わない物・知らない言葉）があるなら、命令形かもしれない（「きたへいけ」）。
+      //   終止形に戻してきれいに通るなら、そちらを採る —— 余りの「いけ」が池として復唱に出ていた（Zork II・2026-11-14）。
+      //   Zork I では「いけ」が知らない言葉として余っていた（送るのは同じ `north`）
+      if ((objs.length || unknown.length) && !(opts && opts.plain)) {
+        const r2 = viaImperative(raw, opts)
+        if (r2) return r2
+      }
       return { command: dirs[0].word, trace: '方角', unknown, echo: echo.join('') }
     }
     // 「中に入る」「外に出る」の中／外は方角ではなく動詞のほうに含まれている

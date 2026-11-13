@@ -45,6 +45,12 @@ for (const [ja, want] of CASES) {
   const ok = r.command === want
   check(ok, `${ja.padEnd(14, '　')} → ${String(r.command).padEnd(24)}${ok ? '' : ` ★期待: ${want}`}`)
 }
+// ★復唱（画面に出す「こう読んだ」）。送る英語が合っていても、復唱が別の物を言っていたら打った人は戸惑う。[打つ, 送る英語, 復唱]
+for (const [ja, want, shown] of T.shown || []) {
+  const r = cm.toCommand(ja)
+  const ok = r.command === want && r.echo === shown
+  check(ok, `復唱 ${ja.padEnd(12, '　')} → ${r.command} / ${r.echo}${ok ? '' : ` ★期待: ${want} / ${shown}`}`)
+}
 // --- 訳の側（原作の 1 行 → 日本語）。打った語が訳にどう映るかは入力と対なので、ここで見る ---
 if (T.passthrough || T.lines || T.echo || T.said || T.noSaid) {
   const tr = new Translator(work.jaAsset())
