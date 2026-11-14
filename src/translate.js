@@ -164,7 +164,7 @@ class Translator {
         const m = key.match(p.re)
         if (!m) continue
         let out = p.ja
-        p.names.forEach((name) => { out = out.replace('{' + name + '}', this.echoWord) })
+        p.names.forEach((name) => { out = out.replace('{' + name + '}', () => this.echoWord) })
         return out
       }
     }
@@ -189,7 +189,9 @@ class Translator {
         const v = name === 'ECHO' && this.echoWord ? this.echoWord
           : name === 'SAID' && this.saidWord ? this.saidWord
           : p.quotes[idx] && name !== 'VERB' ? m[idx + 1] : this.word(m[idx + 1])
-        out = out.replace('{' + name + '}', v)
+        // ★置き換えは**関数で渡す** —— 文字列で渡すと、打った語の中の `$&` `$'` を置換の記法として読む
+        //   （英語で `$&x` と打つと `「{WORD}x」という言葉は知らない。` になった・2026-11-13）
+        out = out.replace('{' + name + '}', () => v)
       })
       return out
     }
@@ -267,7 +269,9 @@ class Translator {
     }
     // ★版権バナーは実行時に連結されて出る（`Copyright (c) 1981, … Infocom, Inc. All rights reserved.`）
     //   ので、完全一致では拾えない。包含関係で判定する（相手は定型の版権表示だけなので安全）
-    if (this.notrans.has(key) || [...this.notrans].some((n) => n.includes(key) || key.includes(n))) {
+    //   ★`n.includes(key)` の側は**短い行を何でも拾う**（`a` `1` `the` が版権表示の一部として数えられ、
+    //   未訳の数から漏れていた・2026-11-13）ので、字数の下限を置く。連結の断片は 12 字より長い
+    if (this.notrans.has(key) || [...this.notrans].some((n) => key.includes(n) || (key.length >= 12 && n.includes(key)))) {
       this.stats.notrans++
       return null
     }

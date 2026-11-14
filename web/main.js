@@ -20,6 +20,12 @@
     if (touchDevice() && !document.body.classList.contains('flick-open')) return
     $('input').focus()
   }
+  // ★localStorage は**触るだけで投げる**ことがある（保存を切ったブラウザ・容量超過）。覚えられなくても遊べるように、
+  //   読み書きは必ずここを通す（以前はメニューだけ包んでいて、ゲームの側は素で触っていた・2026-11-13）
+  const store = {
+    get(k) { try { return localStorage.getItem(k) } catch (e) { return null } },
+    set(k, v) { try { localStorage.setItem(k, v); return true } catch (e) { return false } },
+  }
   const screen = $('screen')
   const { Translator } = window.ZenmaiTranslate
   const { createGlk } = window.GlkShim
@@ -51,12 +57,14 @@
   const rb = createRubifier(asset.ruby)
 
   // ★ふりがなの入切。切っても組み直さないよう、CSS で隠すだけにする
-  if (localStorage.getItem('zenmai-ruby') === 'off') document.body.classList.add('no-ruby')
+  if (store.get('zenmai-ruby') === 'off') document.body.classList.add('no-ruby')
   // ★デバッグ表示（渡した英語コマンドの行）。物語ではなく機械の側。
   //   ★既定は**切**。遊ぶ人には要らないものなので、出すのは点検するときだけ
-  if (localStorage.getItem('zenmai-debug') !== 'on') document.body.classList.add('no-debug')
+  if (store.get('zenmai-debug') !== 'on') document.body.classList.add('no-debug')
   const cmdAsset = await load(`../assets/${WORK}-cmd.json`)
-  const cm = createCommander(cmdAsset)
+  // ★日本語共通の語の表（方角・助詞・「もういちど」…）。作品の語彙とは別のファイル（手書き・`assets/japanese.json`）
+  const jaCommon = await load('../assets/japanese.json')
+  const cm = createCommander(cmdAsset, jaCommon)
 
   // ================= 本文の言語 =================
   // ★英語版は「訳を足したもの」ではなく**訳すのをやめたもの** —— 原作がそのまま出る。
@@ -64,7 +72,7 @@
   //   既定はブラウザの言語。入口の案内と設定から変えられる
   const browserJa = String((typeof navigator !== 'undefined' && navigator.language) || 'ja')
     .toLowerCase().startsWith('ja')
-  let bodyLang = localStorage.getItem('zenmai-body-lang')
+  let bodyLang = store.get('zenmai-body-lang')
   if (bodyLang !== 'english' && bodyLang !== 'japanese') bodyLang = browserJa ? 'japanese' : 'english'
   // ★コントローラの言語は**本文と同じで始まり**、盤の札で切り替える。
   //   設定に置くのはやめた（盤で選べるものを 2 か所に置くと、どちらが正か分からなくなる）。
@@ -80,19 +88,19 @@
   }
   const setBodyLang = (lang) => {
     bodyLang = lang === 'english' ? 'english' : 'japanese'
-    localStorage.setItem('zenmai-body-lang', bodyLang)
+    store.set('zenmai-body-lang', bodyLang)
     applyBodyLang()
   }
 
   // ================= 設定と手引き（ヘッダの歯車）=================
   const panel = $('panel')
-  const bindChk = (id, cls, store) => {
+  const bindChk = (id, cls, key) => {
     const el = $(id)
     if (!el) return
     el.checked = !document.body.classList.contains(cls)
     el.addEventListener('change', () => {
       document.body.classList.toggle(cls, !el.checked)
-      localStorage.setItem(store, el.checked ? 'on' : 'off')
+      store.set(key, el.checked ? 'on' : 'off')
     })
   }
   bindChk('ruby-chk', 'no-ruby', 'zenmai-ruby')
@@ -118,7 +126,7 @@
   function renderSys() {
     const t = $('sys-list')
     if (!t || t._filled) return
-    const { PARSER_WORDS } = window.ZenmaiCommand
+    const PARSER_WORDS = jaCommon.parserWords   // ★手引きは入力と**同じ表**を見る（書き写すと手引きだけ古くなる）
     for (const [label, key] of SYS) {
       const words = key === '@again' ? pickKana(Object.keys(PARSER_WORDS), 2)
         : pickKana(((cmdAsset.verbs || {})[key] || {}).ja || [], 2)
@@ -242,17 +250,23 @@
     //   （枠を選ばせる画面を出すとコントローラだけでは操作できない）
     files: {
       read(name) {
-        const b64 = localStorage.getItem(name)
+        const b64 = store.get(name)
         if (!b64) return null
-        const bin = atob(b64)
-        const out = new Uint8Array(bin.length)
-        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
-        return out
+        try {
+          const bin = atob(b64)
+          const out = new Uint8Array(bin.length)
+          for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+          return out
+        } catch (e) { return null }   // 壊れた枠は「無い」と同じ（原作が「失敗した」と答える）
       },
       write(name, bytes) {
         let bin = ''
         for (const b of bytes) bin += String.fromCharCode(b)
-        try { localStorage.setItem(name, btoa(bin)) } catch (e) { /* 容量超過は諦める */ }
+        // ★書けなかったら**言う**。Glk の口には失敗を返す道が無く、原作は「よし。」と答えてしまう ——
+        //   黙っていると、保存したつもりで閉じて失う（2026-11-13）
+        if (!store.set(name, btoa(bin))) {
+          show('（★保存できなかった —— ブラウザが保存先を使わせてくれない。このあとの「よし。」は当てにならない）', 'raw')
+        }
       },
     },
     write(text) {
@@ -387,7 +401,7 @@
     const flickOpen = () => document.body.classList.contains('flick-open')
     const showFlick = async (on) => {
       document.body.classList.toggle('flick-open', on)
-      localStorage.setItem('zenmai-flick', on ? 'on' : 'off')
+      store.set('zenmai-flick', on ? 'on' : 'off')
       // ★盤を出しているあいだは OS のキーボードを出さない（二重に出ると本文が潰れる）
       $('input').setAttribute('inputmode', on ? 'none' : 'text')
       if (!on) { if (kbd) { kbd.destroy(); kbd = null } return }
@@ -417,7 +431,7 @@
     $('flick-btn').addEventListener('click', () => { showFlick(!flickOpen()).then(refocus) })
     // ★触る画面なら最初から開いておく（スマホで来た人に「打てない」と思わせない）
     const touch = (navigator.maxTouchPoints || 0) > 0
-    if (localStorage.getItem('zenmai-flick') === 'on' || (touch && localStorage.getItem('zenmai-flick') !== 'off')) {
+    if (store.get('zenmai-flick') === 'on' || (touch && store.get('zenmai-flick') !== 'off')) {
       showFlick(true)
     }
   }
@@ -663,7 +677,7 @@
     const padOpen = () => document.body.classList.contains('pad-open')
     const showPad = (on) => {
       document.body.classList.toggle('pad-open', on)
-      localStorage.setItem('zenmai-pad', on ? 'on' : 'off')
+      store.set('zenmai-pad', on ? 'on' : 'off')
       if (on && !vis) { buildPad($('pad')); vis = true }
       if (!on && vis) { $('pad').textContent = ''; padBtns.clear(); padCenter = null; vis = null }
     }
@@ -698,7 +712,7 @@
       },
       onState(st) {
         document.body.classList.toggle('pad-on', !!st.connected)
-        if (st.connected && localStorage.getItem('zenmai-pad') !== 'off' && !padOpen()) showPad(true)
+        if (st.connected && store.get('zenmai-pad') !== 'off' && !padOpen()) showPad(true)
         // ★英語は**数字だけでなく英字も併記**する（1 段だと何が打てるか分からない）。
         //   日本語は「あ」だけで伝わるので 1 段のまま —— ただし**高さは同じ**にして、
         //   言語を切り替えたときに欄が伸び縮みしないようにする（CSS の min-height）
@@ -768,8 +782,8 @@
     document.title = 'Zenmai'
     root.hidden = false
     const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
-    const get = (k) => { try { return localStorage.getItem(k) } catch (e) { return null } }
-    const put = (k, v) => { try { localStorage.setItem(k, v) } catch (e) { /* 覚えられなくても動く */ } }
+    const get = store.get
+    const put = store.set
     // 言語は「プレイ」のボタンで選ぶ（始める合図を兼ねる）。ブラウザの言語に合うほうを濃くする
     const browserJa = String((typeof navigator !== 'undefined' && navigator.language) || 'ja').toLowerCase().startsWith('ja')
     if ($(browserJa ? 'intro-ja' : 'intro-en')) $(browserJa ? 'intro-ja' : 'intro-en').classList.add('primary')
