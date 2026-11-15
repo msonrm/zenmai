@@ -1,0 +1,237 @@
+take lamp
+turn on lamp
+s
+w
+w
+take bread
+d
+z
+tie rope to chest
+z
+z
+z
+z
+take rope
+z
+z
+e
+sw
+z
+z
+z
+z
+z
+z
+attack figure with sword
+attack figure with sword
+attack figure with sword
+attack figure with sword
+attack figure with sword
+attack figure with sword
+attack figure with sword
+attack figure with sword
+take hood
+take cloak
+e
+e
+s
+s
+drop all
+enter lake
+d
+take amulet
+take amulet
+take amulet
+take amulet
+u
+w
+i
+s
+take torch
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+examine indicator
+touch table
+take can
+look
+examine indicator
+touch table
+drop torch
+z
+n
+enter lake
+d
+take can
+u
+s
+i
+spray repellent on me
+s
+s
+e
+take key
+move cover
+d
+n
+n
+n
+take torch
+w
+s
+s
+s
+take all
+i
+n
+n
+e
+e
+s
+s
+e
+n
+push gold machine south
+open stone door
+push gold machine east
+enter gold machine
+turn dial to 776
+push button
+take ring
+z
+z
+z
+z
+open door
+w
+open wooden door
+n
+enter gold machine
+put ring under seat
+turn dial to 948
+push button
+look under seat
+exit gold machine
+open wooden door
+s
+open stone door
+e
+take all
+w
+s
+look
+d
+push south wall
+e
+se
+e
+push south wall
+take book
+n
+n
+n
+push east wall
+sw
+sw
+nw
+nw
+push east wall
+s
+se
+se
+push south wall
+e
+ne
+n
+n
+push west wall
+nw
+push south wall
+push south wall
+push south wall
+push east wall
+s
+s
+push west wall
+push north wall
+ne
+push west wall
+push west wall
+se
+push west wall
+push west wall
+push north wall
+push north wall
+push north wall
+nw
+u
+n
+w
+n
+n
+w
+w
+n
+e
+ne
+sw
+ne
+sw
+ne
+sw
+ne
+wake old man
+give bread to old man
+look
+open secret door
+n
+look
+n
+drop sword
+s
+push red button
+n
+n
+n
+raise short pole
+push red panel
+push red panel
+lower short pole
+push mahogany panel
+push mahogany panel
+push mahogany panel
+push mahogany panel
+raise short pole
+push red panel
+push red panel
+push red panel
+push red panel
+lower short pole
+push pine panel
+n
+knock on door
+n
+e
+n
+n
+turn dial to 4
+push button
+master, stay
+s
+open cell door
+s
+look
+master, turn dial to 1
+master, push button
+look
+unlock bronze door with key
+open bronze door
+s

@@ -121,7 +121,9 @@ function createCommander(asset, common) {
   //   日本語で一意なら（「揚げ戸」）形容詞を添えて聞き返しを省く。
   const owners = {}
   for (const [key, o] of Object.entries(asset.objects || {})) {
-    for (const ja of o.ja) (owners[kana(ja)] = owners[kana(ja)] || []).push(key)
+    // ★同じ物を 2 度数えない（2026-11-15）。カタカナだけの名前は**表記と読みが同じかな**になる（マホガニーのパネル / まほがにーのぱねる）。
+    //   2 度積むと「2 つの物が名乗る言い方」に見え、形容詞を落として `push wall` を送っていた（Zork III の鏡の箱）
+    for (const ja of o.ja) { const k = kana(ja); (owners[k] = owners[k] || []); if (!owners[k].includes(key)) owners[k].push(key) }
   }
   const objOf = asset.objects || {}
   // ★英語の名詞を複数の物が共有するときだけ形容詞を添える。
@@ -130,6 +132,11 @@ function createCommander(asset, common) {
   for (const o of Object.values(objOf)) {
     const n = (o.nouns[0] || '').toLowerCase()
     nounUse[n] = (nounUse[n] || 0) + 1
+  }
+  // 名乗る物すべてが持つ形容詞（最初の物の形容詞の順で、最初に共通するもの）
+  const commonAdj = (own) => {
+    const lists = own.map((x) => (objOf[x].adjs || []).map((a) => a.toLowerCase()))
+    return (lists[0] || []).find((a) => lists.every((l) => l.includes(a))) || ''
   }
   const seen = new Set()
   // ★英語が割れる言い方（箱 = mailbox / case / chest / trunk）の見せ方。
@@ -187,7 +194,11 @@ function createCommander(asset, common) {
         // ★同じ言い方を複数の物が名乗るとき、**その物にとってどれだけ中心的な名前か**で順を決める
         //   （`ランタン` は真鍮のランタンでは 2 番目・壊れたランタンでは 3 番目 → 真鍮を先に試す）
         rank,
-        word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
+        // ★共有された言い方でも、**名乗る物どうしに共通の形容詞**があり、その名詞をほかの物も使うなら添える（2026-11-15）。
+        //   「木の扉」= ダンジョンの入口の扉と博物館の扉（どちらも WOODEN）。裸の `door` を送ると、その場の石の扉・鉄の扉まで
+        //   候補に入って「どの扉のことか」と聞き返された。`wooden door` なら日本語が指す範囲と同じになる
+        word: shared ? (commonAdj(own) && nounUse[noun] > own.length ? commonAdj(own) + ' ' + noun : noun)
+          : !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
         // ★共有された言い方（舟 = ビニールの塊 / 魔法の舟 / 穴の空いた舟）は、
         //   **どれかが乗り物なら乗り物として扱う**。どれを指すかは場が決める
         vehicle: shared ? own.some((x) => objOf[x].vehicle) : !!o.vehicle,
@@ -219,7 +230,9 @@ function createCommander(asset, common) {
   //   （以前は各物の ja 内の位置から逆算していて、順序が編集のたびに揺れた）
   for (const h of asset.hypernyms || []) {
     const targets = (h.targets || []).filter((t) => objOf[t])
-    if (!targets.length) continue
+    // ★対象を持たない上位語 = 原作の**部屋付きの仮の物**（PSEUDO。滝・霧・流砂・岸）の名詞（2026-11-15・Zork III）。
+    //   物の表には居ないが原作は語を知っているので、語だけ渡す（どこで通じるかは原作が決める）。名詞も無いものは積まない
+    if (!targets.length && !h.noun) continue
     const vehicle = targets.some((t) => !!objOf[t].vehicle)
     const wordOf = (t) => {
       const o = objOf[t]
@@ -256,6 +269,16 @@ function createCommander(asset, common) {
 
   // 入力の末尾が語彙の語で終わっているか（否定の語尾に見えるものが、語の一部かを見分ける）
   const endsWithWord = (s) => lex.some((e) => s.endsWith(e.kana))
+  // ★数字はそのまま原作へ渡す（2026-11-15・Zork III の「ダイヤルを 4 に合わせる」= `turn dial to 4`、時間移動機の 776）。
+  //   語彙には載せない（数は無限にある）。半角・全角の数字の並びを 1 語の「物」として読む。漢数字は受けない
+  //   （「一」「二」は物の名前の中にも出るので、黙って数に読むと別の命令になる）
+  const numAt = (s, at) => {
+    const m = /^[0-9０-９]+/.exec(s.slice(at))
+    if (!m) return null
+    const n = m[0].replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    return { ja: n, form: n, disp: n, kana: m[0], kind: 'obj', key: '*NUM*', word: n, rank: 0, others: [], vehicle: false }
+  }
+  const tokenAt = (s, at) => numAt(s, at) || wordAt(s, at)
 
   /**
    * @param {string} input 日本語
@@ -330,7 +353,7 @@ function createCommander(asset, common) {
     const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
     while (i < s.length) {
-      const hit = wordAt(s, i)
+      const hit = tokenAt(s, i)
       // ★コマンドにならない語に当たったら、そこで止めて「知らない」と言う。
       //   ★**黙って読み飛ばしてはいけない** —— 飛ばすと中の短い語が拾われ、
       //   `てんじょうをみる` が `look at grate`（錠）になる。打った本人には
@@ -352,7 +375,7 @@ function createCommander(asset, common) {
           //   ★続きは語彙とは限らない。助詞は 2 つ並ぶ（「じゅうたんのしたを」の「のした」+「を」）
           const next = i + p.length
           const goes = next >= s.length
-            || wordAt(s, next)
+            || tokenAt(s, next)
             || PARTICLES.some(([q]) => s.startsWith(kana(q), next))
           if (!goes) continue
           role = r; i = next; echo.push(p)
@@ -365,7 +388,7 @@ function createCommander(asset, common) {
       }
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
-      while (j < s.length && !wordAt(s, j)) j++
+      while (j < s.length && !tokenAt(s, j)) j++
       let word = s.slice(i, j)
       // ★未知語が格助詞を背負っていたら、それは「物のつもり」だ。捨ててはいけない。
       //   動詞だけ送るとゲームが**別の物を勝手に補う**ことがあり、たまたま正しく
@@ -559,6 +582,10 @@ function createCommander(asset, common) {
       out.push(dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
+    // ★物を方角へ動かす（「機械を南へ押す」= `push machine south`）。原作の `PUSH OBJECT OBJECT`（2 つ目が方角）の形。
+    //   動詞がその形（`OBJ OBJ`）を持つときだけ方角を後ろに付ける —— 黙って落とすと `push machine` になり、
+    //   原作は「どの方向へ押すのか」と聞き返す（Zork III の時間移動機・2026-11-15）
+    else if (prso && !tool && !dest && bareDirs.length && shapes.includes('OBJ OBJ')) out.push(bareDirs[0].word)
     // ★除くものは目的語の並びの最後に付く（`take all except lamp` / `… except a and b`）
     if (excepts.length) {
       out.push('except')
@@ -571,7 +598,8 @@ function createCommander(asset, common) {
     const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others, prso]
       : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others, tool]
       : destAt >= 0 && dest.others && dest.others.length ? [destAt, dest.others, dest] : null
-    const alts = at ? at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')) : []
+    // ★同じ英語になる候補は 1 つにする（2026-11-15。表記と読みの両方から同じ物が挙がると、同じ命令を 2 度試すことになる）
+    const alts = at ? [...new Set(at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')))].filter((c) => c !== out.join(' ')) : []
     // ★候補が全部外れたとき、**打った言葉**で断るために覚えておく
     const objDisp = at ? at[2].disp : ''
     // ★目的語を取らないと成り立たない動詞なのに目的語が無いなら、**送らない**。

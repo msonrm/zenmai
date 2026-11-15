@@ -87,6 +87,16 @@ class Translator {
       this.notrans.add(norm(en))
       for (const part of en.split('|')) if (norm(part)) this.notrans.add(norm(part))
     }
+    // ★**形を保って出す行**（2026-11-15・Zork III の王家の難題の図 `West  +MM .. SS+  East`）。
+    //   等幅で組んだ図は、ふつうの道（空白を詰めて引く）に載せると形が崩れる。作品の JSON の `verbatim`
+    //   （`re` = 行の形の正規表現 / `map` = 置き換える語。★置き換え先は**同じ表示幅**で書く: `West` → `西  `）に
+    //   合う行は、空白も字下げもそのまま出し、表の語だけ置き換える。無い作品では何もしない
+    // ★形を保って出した行は覚えておく（画面の側が**その行だけ等幅で描く**ため。`web/main.js` の `show`）
+    this.fixed = new Set()
+    this.verbatim = (asset.verbatim || []).map((v) => {
+      const words = Object.keys(v.map || {})
+      return { re: new RegExp(v.re), map: v.map || {}, words: words.length ? new RegExp(words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g') : null }
+    })
     // ★パーサが**プレイヤーの打った語をそのまま復唱する**ときの語訳
     //   （`You can't see any window here!` の window は DESC ではなく辞書の裸の名詞）
     this.words = new Map(Object.entries(asset.words || {}))
@@ -250,6 +260,14 @@ class Translator {
     //   日本語の字面の中で浅く見えて入れ子が読み取れない
     const sp = (raw.match(/^[ \t]*/) || [''])[0].length
     const indent = '　'.repeat(Math.round(sp / 2))
+    for (const v of this.verbatim) {
+      if (v.re.test(raw)) {
+        this.stats.hit++
+        const out = v.words ? raw.replace(v.words, (m) => v.map[m]) : raw
+        this.fixed.add(out.replace(/\s+$/, ''))
+        return out
+      }
+    }
     const whole = this.lookup(key)
     if (whole !== null) { this.stats.hit++; return indent + whole }
     const g = this.greedy(key)

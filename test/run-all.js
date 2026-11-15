@@ -8,6 +8,7 @@
  * ★ここは**流す順番と合否の集計だけ**。検査の中身は各 `run-*.js`、作品ごとの材料は `test/works/<作品>.js`。
  * ★合否は終了コード。終了コードを返さない道具（通しの記録・煙の検査）は、出力の 1 行（`expect`）で見る ——
  *   `run-walkthrough.js` は未訳を**数える道具**で、赤にするかはここが決める（未訳 0 行を守る）。
+ *   ★通しは「未訳 0 行」に加えて「**英字が残った 0 行**」も守る（2026-11-15。行の後ろだけ訳せて前が英語のまま出る穴は、未訳には数えられない）
  * ★流さないもの: native の照合（`cmd_ref.js` ↔ `cmd_test_host`）。節目まで食い違っていてよい約束（`CLAUDE.md`）
  */
 const { spawnSync } = require('child_process')
@@ -60,9 +61,13 @@ for (const WORK of works) {
   // 煙の検査（VM が立って 1 手打てる・未訳なし）
   step(`${WORK} Glk シム`, 'run-shim.js', { env, args: ['look'], expect: /★未訳 0 ---/ })
   step(`${WORK} 端末（glkote-term）`, 'run-ja.js', { env, args: ['look'], expect: /★引けなかった 0 行/ })
-  if (spec.walkthrough) step(`${WORK} 通し（英語の手）`, 'run-walkthrough.js', { env, args: [path.join('test', spec.walkthrough)], expect: /★未訳 0 行/ })
+  // ★通しは「最後の場所」も見る（`walkthroughEnd` / `walkthroughJaEnd` = 状態行の英語の部屋名・2026-11-15）。
+  //   手の列の途中で 1 手ずれると、未訳 0 行・問題 0 件のまま結末に着かない（Zork III の木の扉で踏んだ）
+  const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  if (spec.walkthrough) step(`${WORK} 通し（英語の手）`, 'run-walkthrough.js', { env, args: [path.join('test', spec.walkthrough)],
+    expect: new RegExp('★未訳 0 行[\\s\\S]*★英字が残った 0 行' + (spec.walkthroughEnd ? '[\\s\\S]*★最後の場所: ' + esc(spec.walkthroughEnd) + '\\s*$' : ''), 'm') })
   else console.log(`– ${WORK} 通し（英語の手）: 手の列が無い`)
-  if (spec.walkthroughJa) step(`${WORK} 通し（日本語の手）`, 'run-walkthrough-ja.js', { env, args: [path.join('test', spec.walkthroughJa)] })
+  if (spec.walkthroughJa) step(`${WORK} 通し（日本語の手）`, 'run-walkthrough-ja.js', { env: { ...env, ...(spec.walkthroughJaEnd ? { ZENMAI_END: spec.walkthroughJaEnd } : {}) }, args: [path.join('test', spec.walkthroughJa)] })
   else console.log(`– ${WORK} 通し（日本語の手）: 手の列が無い`)
 }
 

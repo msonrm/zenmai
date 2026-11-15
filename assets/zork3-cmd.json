@@ -1,0 +1,7796 @@
+{
+ "actors": [
+  {
+   "alts": [
+    "マスター",
+    "ますたー",
+    "ダンジョンマスター",
+    "主",
+    "あるじ"
+   ],
+   "en": "MASTER",
+   "form": "ダンジョン・マスター",
+   "word": "master",
+   "yomi": [
+    "だんじょんますたー"
+   ]
+  }
+ ],
+ "guide": {},
+ "hypernyms": [
+  {
+   "form": "流砂",
+   "noun": "QUICKSAND",
+   "targets": [],
+   "yomi": [
+    "りゅうさ"
+   ]
+  },
+  {
+   "form": "湖岸",
+   "noun": "SHORE",
+   "targets": [],
+   "yomi": [
+    "こがん"
+   ]
+  },
+  {
+   "form": "岸",
+   "noun": "SHORE",
+   "targets": [],
+   "yomi": [
+    "きし"
+   ]
+  },
+  {
+   "form": "北岸",
+   "noun": "SHORE",
+   "targets": [],
+   "yomi": [
+    "ほくがん"
+   ]
+  },
+  {
+   "form": "南岸",
+   "noun": "SHORE",
+   "targets": [],
+   "yomi": [
+    "なんがん"
+   ]
+  },
+  {
+   "form": "西岸",
+   "noun": "SHORE",
+   "targets": [],
+   "yomi": [
+    "せいがん"
+   ]
+  },
+  {
+   "form": "霧",
+   "noun": "MIST",
+   "targets": [],
+   "yomi": [
+    "きり"
+   ]
+  },
+  {
+   "form": "沼",
+   "noun": "SWAMP",
+   "targets": [],
+   "yomi": [
+    "ぬま"
+   ]
+  },
+  {
+   "form": "滝",
+   "noun": "WATERFALL",
+   "targets": [],
+   "yomi": [
+    "たき"
+   ]
+  },
+  {
+   "form": "涸れた滝",
+   "noun": "WATERFALL",
+   "targets": [],
+   "yomi": [
+    "かれたたき"
+   ]
+  },
+  {
+   "form": "アーチ",
+   "noun": "ARCH",
+   "targets": [],
+   "yomi": []
+  },
+  {
+   "form": "王冠の宝石",
+   "noun": "JEWELS",
+   "targets": [
+    "RING",
+    "SCEPTRE",
+    "JEWELLED-KNIFE"
+   ],
+   "yomi": [
+    "おうかんのほうせき"
+   ]
+  },
+  {
+   "form": "宝石",
+   "noun": "JEWELS",
+   "targets": [
+    "RING",
+    "SCEPTRE",
+    "JEWELLED-KNIFE"
+   ],
+   "yomi": [
+    "ほうせき"
+   ]
+  },
+  {
+   "form": "壁",
+   "noun": "WALL",
+   "targets": [
+    "CPEWL",
+    "CPWWL",
+    "CPNWL",
+    "CPSWL",
+    "EAST-WALL",
+    "WEST-WALL",
+    "NORTH-WALL",
+    "SOUTH-WALL",
+    "STONE-WALL",
+    "WOODEN-WALL"
+   ],
+   "yomi": [
+    "かべ"
+   ]
+  },
+  {
+   "form": "扉",
+   "noun": "DOOR",
+   "targets": [
+    "DUNGEON-DOOR",
+    "CELL-DOOR",
+    "LOCKED-DOOR",
+    "GOOD-LOCKED-DOOR",
+    "BRONZE-DOOR",
+    "SECRET-DOOR",
+    "CPDOOR",
+    "IRON-DOOR",
+    "JEWEL-DOOR",
+    "WOODEN-DOOR"
+   ],
+   "yomi": [
+    "とびら"
+   ]
+  },
+  {
+   "form": "ドア",
+   "noun": "DOOR",
+   "targets": [
+    "DUNGEON-DOOR",
+    "CELL-DOOR",
+    "LOCKED-DOOR",
+    "GOOD-LOCKED-DOOR",
+    "BRONZE-DOOR",
+    "SECRET-DOOR",
+    "CPDOOR",
+    "IRON-DOOR",
+    "JEWEL-DOOR",
+    "WOODEN-DOOR"
+   ],
+   "yomi": []
+  }
+ ],
+ "nocmd": [
+  {
+   "form": "一撃",
+   "yomi": [
+    "いちげき"
+   ]
+  },
+  {
+   "form": "勇敢",
+   "yomi": [
+    "ゆうかん"
+   ]
+  },
+  {
+   "form": "原始的",
+   "yomi": [
+    "げんしてき"
+   ]
+  },
+  {
+   "form": "大理石",
+   "yomi": [
+    "だいりせき"
+   ]
+  },
+  {
+   "form": "完璧",
+   "yomi": [
+    "かんぺき"
+   ]
+  },
+  {
+   "form": "宿敵",
+   "yomi": [
+    "しゅくてき"
+   ]
+  },
+  {
+   "form": "小脇",
+   "yomi": [
+    "こわき"
+   ]
+  },
+  {
+   "form": "脇",
+   "yomi": [
+    "わき"
+   ]
+  },
+  {
+   "form": "岩壁",
+   "yomi": [
+    "がんぺき"
+   ]
+  },
+  {
+   "form": "擁壁",
+   "yomi": [
+    "ようへき"
+   ]
+  },
+  {
+   "form": "持続時間",
+   "yomi": [
+    "じぞくじかん"
+   ]
+  },
+  {
+   "form": "曲芸師",
+   "yomi": [
+    "きょくげいし"
+   ]
+  },
+  {
+   "form": "株券",
+   "yomi": [
+    "かぶけん"
+   ]
+  },
+  {
+   "form": "玄関",
+   "yomi": [
+    "げんかん"
+   ]
+  },
+  {
+   "form": "王冠",
+   "yomi": [
+    "おうかん"
+   ]
+  },
+  {
+   "form": "瓜二つ",
+   "yomi": [
+    "うりふたつ"
+   ]
+  },
+  {
+   "form": "瓜二",
+   "yomi": [
+    "うりふた"
+   ]
+  },
+  {
+   "form": "筆跡",
+   "yomi": [
+    "ひっせき"
+   ]
+  },
+  {
+   "form": "紫",
+   "yomi": [
+    "むらさき"
+   ]
+  },
+  {
+   "form": "舳先",
+   "yomi": [
+    "へさき"
+   ]
+  },
+  {
+   "form": "蒸気",
+   "yomi": [
+    "じょうき"
+   ]
+  },
+  {
+   "form": "衝撃",
+   "yomi": [
+    "しょうげき"
+   ]
+  },
+  {
+   "form": "補佐官",
+   "yomi": [
+    "ほさかん"
+   ]
+  },
+  {
+   "form": "起伏",
+   "yomi": [
+    "きふく"
+   ]
+  },
+  {
+   "form": "頂",
+   "yomi": [
+    "いただき"
+   ]
+  },
+  {
+   "form": "一枚岩",
+   "yomi": [
+    "いちまいいわ"
+   ]
+  },
+  {
+   "form": "土木",
+   "yomi": [
+    "どぼく"
+   ]
+  },
+  {
+   "form": "宝物庫",
+   "yomi": [
+    "ほうもつこ"
+   ]
+  },
+  {
+   "form": "機械室",
+   "yomi": [
+    "きかいしつ"
+   ]
+  },
+  {
+   "form": "水門",
+   "yomi": [
+    "すいもん"
+   ]
+  },
+  {
+   "form": "治水",
+   "yomi": [
+    "ちすい"
+   ]
+  },
+  {
+   "form": "砂利",
+   "yomi": [
+    "じゃり"
+   ]
+  },
+  {
+   "form": "砂地",
+   "yomi": [
+    "すなじ"
+   ]
+  },
+  {
+   "form": "砂岩",
+   "yomi": [
+    "さがん"
+   ]
+  },
+  {
+   "form": "砂浜",
+   "yomi": [
+    "すなはま"
+   ]
+  },
+  {
+   "form": "給水",
+   "yomi": [
+    "きゅうすい"
+   ]
+  },
+  {
+   "form": "草木",
+   "yomi": [
+    "くさき"
+   ]
+  }
+ ],
+ "objects": {
+  "ADVENTURER": {
+   "adjs": [],
+   "desc": "cretin",
+   "ja": [
+    "まぬけ"
+   ],
+   "nouns": [
+    "ADVENTURER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "まぬけ",
+     "yomi": []
+    }
+   ]
+  },
+  "ALGAE": {
+   "adjs": [],
+   "desc": "plants and algae",
+   "ja": [
+    "水草と藻",
+    "みずくさとも",
+    "水草",
+    "みずくさ"
+   ],
+   "nouns": [
+    "PLANT",
+    "PLANTS",
+    "ALGAE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "水草と藻",
+     "yomi": [
+      "みずくさとも"
+     ]
+    },
+    {
+     "form": "水草",
+     "yomi": [
+      "みずくさ"
+     ]
+    }
+   ]
+  },
+  "AMULET": {
+   "adjs": [
+    "GOLD",
+    "GOLDEN",
+    "SHINY"
+   ],
+   "desc": "golden amulet",
+   "ja": [
+    "金の護符",
+    "きんのごふ",
+    "護符",
+    "ごふ",
+    "お守り",
+    "おまもり",
+    "アミュレット",
+    "あみゅれっと"
+   ],
+   "nouns": [
+    "AMULET",
+    "OBJECT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "金の護符",
+     "yomi": [
+      "きんのごふ"
+     ]
+    },
+    {
+     "form": "護符",
+     "yomi": [
+      "ごふ"
+     ]
+    },
+    {
+     "form": "お守り",
+     "yomi": [
+      "おまもり"
+     ]
+    },
+    {
+     "form": "アミュレット",
+     "yomi": [
+      "あみゅれっと"
+     ]
+    }
+   ]
+  },
+  "AQUEDUCT": {
+   "adjs": [
+    "STONE"
+   ],
+   "desc": "aqueduct",
+   "ja": [
+    "水道橋",
+    "すいどうきょう"
+   ],
+   "nouns": [
+    "AQUEDUCT",
+    "DUCT",
+    "CHASM"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "水道橋",
+     "yomi": [
+      "すいどうきょう"
+     ]
+    }
+   ]
+  },
+  "BEAM": {
+   "adjs": [
+    "RED"
+   ],
+   "desc": "red beam of light",
+   "ja": [
+    "赤い光線",
+    "あかいこうせん",
+    "光線",
+    "こうせん"
+   ],
+   "nouns": [
+    "BEAM",
+    "LIGHT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "赤い光線",
+     "yomi": [
+      "あかいこうせん"
+     ]
+    },
+    {
+     "form": "光線",
+     "yomi": [
+      "こうせん"
+     ]
+    }
+   ]
+  },
+  "BLACK-PANEL": {
+   "adjs": [
+    "BLACK"
+   ],
+   "desc": "black panel",
+   "ja": [
+    "黒いパネル",
+    "くろいぱねる",
+    "黒い壁",
+    "くろいかべ"
+   ],
+   "nouns": [
+    "WALL",
+    "PANEL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "黒いパネル",
+     "yomi": [
+      "くろいぱねる"
+     ]
+    },
+    {
+     "form": "黒い壁",
+     "yomi": [
+      "くろいかべ"
+     ]
+    }
+   ]
+  },
+  "BLESSINGS": {
+   "adjs": [],
+   "desc": "blessings",
+   "ja": [
+    "祝福",
+    "しゅくふく"
+   ],
+   "nouns": [
+    "BLESSINGS",
+    "GRACES"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "祝福",
+     "yomi": [
+      "しゅくふく"
+     ]
+    }
+   ]
+  },
+  "BROKEN-LAMP": {
+   "adjs": [
+    "BROKEN",
+    "BRASS"
+   ],
+   "desc": "broken lantern",
+   "ja": [
+    "壊れたランタン",
+    "こわれたらんたん",
+    "ランタン",
+    "らんたん"
+   ],
+   "nouns": [
+    "LAMP",
+    "LANTERN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "壊れたランタン",
+     "yomi": [
+      "こわれたらんたん"
+     ]
+    },
+    {
+     "form": "ランタン",
+     "yomi": [
+      "らんたん"
+     ]
+    }
+   ]
+  },
+  "BROKEN-STAFF": {
+   "adjs": [
+    "BROKEN"
+   ],
+   "desc": "broken staff",
+   "ja": [
+    "折れた杖",
+    "おれたつえ"
+   ],
+   "nouns": [
+    "STAFF"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "折れた杖",
+     "yomi": [
+      "おれたつえ"
+     ]
+    }
+   ]
+  },
+  "BRONZE-DOOR": {
+   "adjs": [
+    "BRONZE"
+   ],
+   "desc": "bronze door",
+   "ja": [
+    "青銅の扉",
+    "せいどうのとびら",
+    "青銅のドア",
+    "せいどうのどあ"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "青銅の扉",
+     "yomi": [
+      "せいどうのとびら"
+     ]
+    },
+    {
+     "form": "青銅のドア",
+     "yomi": [
+      "せいどうのどあ"
+     ]
+    }
+   ]
+  },
+  "CAGE": {
+   "adjs": [
+    "STEEL"
+   ],
+   "desc": "steel cage",
+   "ja": [
+    "鋼鉄の檻",
+    "こうてつのおり",
+    "檻",
+    "おり"
+   ],
+   "nouns": [
+    "CAGE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "鋼鉄の檻",
+     "yomi": [
+      "こうてつのおり"
+     ]
+    },
+    {
+     "form": "檻",
+     "yomi": [
+      "おり"
+     ]
+    }
+   ]
+  },
+  "CELL-DOOR": {
+   "adjs": [
+    "WOOD",
+    "WOODEN",
+    "CELL"
+   ],
+   "desc": "cell door",
+   "ja": [
+    "独房の扉",
+    "どくぼうのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "独房の扉",
+     "yomi": [
+      "どくぼうのとびら"
+     ]
+    }
+   ]
+  },
+  "CHANNEL": {
+   "adjs": [
+    "STONE"
+   ],
+   "desc": "stone channel",
+   "ja": [
+    "石の水路",
+    "いしのすいろ",
+    "水路",
+    "すいろ"
+   ],
+   "nouns": [
+    "CHANNEL",
+    "HOLE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "石の水路",
+     "yomi": [
+      "いしのすいろ"
+     ]
+    },
+    {
+     "form": "水路",
+     "yomi": [
+      "すいろ"
+     ]
+    }
+   ]
+  },
+  "CHASM": {
+   "adjs": [
+    "ROCKY",
+    "DEEP"
+   ],
+   "desc": "chasm",
+   "ja": [
+    "深い裂け目",
+    "ふかいさけめ",
+    "峡谷",
+    "きょうこく"
+   ],
+   "nouns": [
+    "CHASM",
+    "GORGE",
+    "RAVINE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "深い裂け目",
+     "yomi": [
+      "ふかいさけめ"
+     ]
+    },
+    {
+     "form": "峡谷",
+     "yomi": [
+      "きょうこく"
+     ]
+    }
+   ]
+  },
+  "CHEST": {
+   "adjs": [
+    "LOCKED"
+   ],
+   "desc": "chest",
+   "ja": [
+    "箱",
+    "はこ",
+    "宝箱",
+    "たからばこ",
+    "チェスト",
+    "ちぇすと"
+   ],
+   "nouns": [
+    "CHEST"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "箱",
+     "yomi": [
+      "はこ"
+     ]
+    },
+    {
+     "form": "宝箱",
+     "yomi": [
+      "たからばこ"
+     ]
+    },
+    {
+     "form": "チェスト",
+     "yomi": [
+      "ちぇすと"
+     ]
+    }
+   ]
+  },
+  "CLEFT": {
+   "adjs": [],
+   "desc": "cleft",
+   "ja": [
+    "岩の裂け目",
+    "いわのさけめ",
+    "裂け目",
+    "さけめ"
+   ],
+   "nouns": [
+    "CLEFT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "岩の裂け目",
+     "yomi": [
+      "いわのさけめ"
+     ]
+    },
+    {
+     "form": "裂け目",
+     "yomi": [
+      "さけめ"
+     ]
+    }
+   ]
+  },
+  "CLIFF-OBJECT": {
+   "adjs": [],
+   "desc": "cliff",
+   "ja": [
+    "崖",
+    "がけ"
+   ],
+   "nouns": [
+    "CLIFF"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "崖",
+     "yomi": [
+      "がけ"
+     ]
+    }
+   ]
+  },
+  "CLOAK": {
+   "adjs": [],
+   "desc": "cloak",
+   "ja": [
+    "外套",
+    "がいとう",
+    "マント",
+    "まんと"
+   ],
+   "nouns": [
+    "CLOAK"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "外套",
+     "yomi": [
+      "がいとう"
+     ]
+    },
+    {
+     "form": "マント",
+     "yomi": [
+      "まんと"
+     ]
+    }
+   ]
+  },
+  "COMPASS-ARROW": {
+   "adjs": [
+    "COMPASS"
+   ],
+   "desc": "compass arrow",
+   "ja": [
+    "方位の矢印",
+    "ほういのやじるし",
+    "矢印",
+    "やじるし"
+   ],
+   "nouns": [
+    "ARROW"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "方位の矢印",
+     "yomi": [
+      "ほういのやじるし"
+     ]
+    },
+    {
+     "form": "矢印",
+     "yomi": [
+      "やじるし"
+     ]
+    }
+   ]
+  },
+  "COVER": {
+   "adjs": [
+    "MANHOLE",
+    "LARGE"
+   ],
+   "desc": "manhole cover",
+   "ja": [
+    "マンホールの蓋",
+    "まんほーるのふた",
+    "蓋",
+    "ふた"
+   ],
+   "nouns": [
+    "COVER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "マンホールの蓋",
+     "yomi": [
+      "まんほーるのふた"
+     ]
+    },
+    {
+     "form": "蓋",
+     "yomi": [
+      "ふた"
+     ]
+    }
+   ]
+  },
+  "CP-HOLE": {
+   "adjs": [
+    "ROUND"
+   ],
+   "desc": "hole",
+   "ja": [
+    "穴",
+    "あな"
+   ],
+   "nouns": [
+    "HOLE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "穴",
+     "yomi": [
+      "あな"
+     ]
+    }
+   ]
+  },
+  "CP-SLOT": {
+   "adjs": [
+    "SMALL"
+   ],
+   "desc": "small slot",
+   "ja": [
+    "小さな差し込み口",
+    "ちいさなさしこみぐち",
+    "差し込み口",
+    "さしこみぐち",
+    "スロット",
+    "すろっと"
+   ],
+   "nouns": [
+    "CPSLT",
+    "SLIT",
+    "SLOT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "小さな差し込み口",
+     "yomi": [
+      "ちいさなさしこみぐち"
+     ]
+    },
+    {
+     "form": "差し込み口",
+     "yomi": [
+      "さしこみぐち"
+     ]
+    },
+    {
+     "form": "スロット",
+     "yomi": [
+      "すろっと"
+     ]
+    }
+   ]
+  },
+  "CPDOOR": {
+   "adjs": [
+    "STEEL",
+    "METAL"
+   ],
+   "desc": "steel door",
+   "ja": [
+    "鋼鉄の扉",
+    "こうてつのとびら",
+    "金属の扉",
+    "きんぞくのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "鋼鉄の扉",
+     "yomi": [
+      "こうてつのとびら"
+     ]
+    },
+    {
+     "form": "金属の扉",
+     "yomi": [
+      "きんぞくのとびら"
+     ]
+    }
+   ]
+  },
+  "CPEWL": {
+   "adjs": [
+    "EAST",
+    "EASTERN"
+   ],
+   "desc": "eastern wall",
+   "ja": [
+    "東の壁",
+    "ひがしのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "東の壁",
+     "yomi": [
+      "ひがしのかべ"
+     ]
+    }
+   ]
+  },
+  "CPLADDER": {
+   "adjs": [],
+   "desc": "ladder",
+   "ja": [
+    "梯子",
+    "はしご"
+   ],
+   "nouns": [
+    "LADDER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "梯子",
+     "yomi": [
+      "はしご"
+     ]
+    }
+   ]
+  },
+  "CPNWL": {
+   "adjs": [
+    "NORTH"
+   ],
+   "desc": "northern wall",
+   "ja": [
+    "北の壁",
+    "きたのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "北の壁",
+     "yomi": [
+      "きたのかべ"
+     ]
+    }
+   ]
+  },
+  "CPSWL": {
+   "adjs": [
+    "SOUTH"
+   ],
+   "desc": "southern wall",
+   "ja": [
+    "南の壁",
+    "みなみのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "南の壁",
+     "yomi": [
+      "みなみのかべ"
+     ]
+    }
+   ]
+  },
+  "CPWWL": {
+   "adjs": [
+    "WEST",
+    "WESTERN"
+   ],
+   "desc": "western wall",
+   "ja": [
+    "西の壁",
+    "にしのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "西の壁",
+     "yomi": [
+      "にしのかべ"
+     ]
+    }
+   ]
+  },
+  "CRYSTALS": {
+   "adjs": [],
+   "desc": "rock structure",
+   "ja": [
+    "岩の造形",
+    "いわのぞうけい",
+    "結晶",
+    "けっしょう",
+    "石筍",
+    "せきじゅん",
+    "水晶",
+    "すいしょう"
+   ],
+   "nouns": [
+    "CRYSTAL",
+    "STALAG"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "岩の造形",
+     "yomi": [
+      "いわのぞうけい"
+     ]
+    },
+    {
+     "form": "結晶",
+     "yomi": [
+      "けっしょう"
+     ]
+    },
+    {
+     "form": "石筍",
+     "yomi": [
+      "せきじゅん"
+     ]
+    },
+    {
+     "form": "水晶",
+     "yomi": [
+      "すいしょう"
+     ]
+    }
+   ]
+  },
+  "DEBRIS": {
+   "adjs": [],
+   "desc": "dust and debris",
+   "ja": [
+    "塵と瓦礫",
+    "ちりとがれき",
+    "塵",
+    "ちり"
+   ],
+   "nouns": [
+    "DUST",
+    "DEBRIS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "塵と瓦礫",
+     "yomi": [
+      "ちりとがれき"
+     ]
+    },
+    {
+     "form": "塵",
+     "yomi": [
+      "ちり"
+     ]
+    }
+   ]
+  },
+  "DIAL-BUTTON": {
+   "adjs": [
+    "LARGE"
+   ],
+   "desc": "large button",
+   "ja": [
+    "大きなボタン",
+    "おおきなぼたん",
+    "ボタン",
+    "ぼたん"
+   ],
+   "nouns": [
+    "BUTTON"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "大きなボタン",
+     "yomi": [
+      "おおきなぼたん"
+     ]
+    },
+    {
+     "form": "ボタン",
+     "yomi": [
+      "ぼたん"
+     ]
+    }
+   ]
+  },
+  "DUNGEON-DOOR": {
+   "adjs": [
+    "WOOD",
+    "WOODEN"
+   ],
+   "desc": "wooden door",
+   "ja": [
+    "木の扉",
+    "きのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の扉",
+     "yomi": [
+      "きのとびら"
+     ]
+    }
+   ]
+  },
+  "DUNGEON-MASTER": {
+   "adjs": [
+    "DUNGEON"
+   ],
+   "desc": "dungeon master",
+   "ja": [
+    "ダンジョン・マスター",
+    "だんじょんますたー",
+    "マスター",
+    "ますたー"
+   ],
+   "nouns": [
+    "MASTER",
+    "DUNGEON",
+    "MAN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ダンジョン・マスター",
+     "yomi": [
+      "だんじょんますたー"
+     ]
+    },
+    {
+     "form": "マスター",
+     "yomi": [
+      "ますたー"
+     ]
+    }
+   ]
+  },
+  "DUNGEON-PANEL": {
+   "adjs": [],
+   "desc": "panel",
+   "ja": [
+    "パネル",
+    "ぱねる"
+   ],
+   "nouns": [
+    "PANEL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "パネル",
+     "yomi": [
+      "ぱねる"
+     ]
+    }
+   ]
+  },
+  "EAST-WALL": {
+   "adjs": [
+    "EAST",
+    "EASTERN"
+   ],
+   "desc": "eastern wall",
+   "ja": [
+    "東側の壁",
+    "ひがしがわのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "東側の壁",
+     "yomi": [
+      "ひがしがわのかべ"
+     ]
+    }
+   ]
+  },
+  "FISH": {
+   "adjs": [],
+   "desc": "fish",
+   "ja": [
+    "魚",
+    "さかな"
+   ],
+   "nouns": [
+    "FISH"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "魚",
+     "yomi": [
+      "さかな"
+     ]
+    }
+   ]
+  },
+  "FLAMING-PIT": {
+   "adjs": [
+    "FIERY",
+    "FLAMING"
+   ],
+   "desc": "flaming pit",
+   "ja": [
+    "炎の穴",
+    "ほのおのあな",
+    "深淵",
+    "しんえん"
+   ],
+   "nouns": [
+    "PIT",
+    "ABYSS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "炎の穴",
+     "yomi": [
+      "ほのおのあな"
+     ]
+    },
+    {
+     "form": "深淵",
+     "yomi": [
+      "しんえん"
+     ]
+    }
+   ]
+  },
+  "FRIED-LAMP": {
+   "adjs": [
+    "BRASS"
+   ],
+   "desc": "lamp",
+   "ja": [
+    "真鍮のランタン",
+    "しんちゅうのらんたん",
+    "ランタン",
+    "らんたん"
+   ],
+   "nouns": [
+    "LAMP",
+    "LANTERN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "真鍮のランタン",
+     "yomi": [
+      "しんちゅうのらんたん"
+     ]
+    },
+    {
+     "form": "ランタン",
+     "yomi": [
+      "らんたん"
+     ]
+    }
+   ]
+  },
+  "FRIED-TORCH": {
+   "adjs": [
+    "BURNED",
+    "DEAD"
+   ],
+   "desc": "burned-out torch",
+   "ja": [
+    "燃え尽きた松明",
+    "もえつきたたいまつ"
+   ],
+   "nouns": [
+    "TORCH"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "燃え尽きた松明",
+     "yomi": [
+      "もえつきたたいまつ"
+     ]
+    }
+   ]
+  },
+  "GLOBAL-MAN": {
+   "adjs": [],
+   "desc": "man",
+   "ja": [
+    "男",
+    "おとこ",
+    "友人",
+    "ゆうじん"
+   ],
+   "nouns": [
+    "MAN",
+    "FRIEND"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "男",
+     "yomi": [
+      "おとこ"
+     ]
+    },
+    {
+     "form": "友人",
+     "yomi": [
+      "ゆうじん"
+     ]
+    }
+   ]
+  },
+  "GLOBAL-ROPE": {
+   "adjs": [
+    "DANGLING"
+   ],
+   "desc": "rope",
+   "ja": [
+    "ロープ",
+    "ろーぷ",
+    "縄",
+    "なわ"
+   ],
+   "nouns": [
+    "ROPE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ロープ",
+     "yomi": [
+      "ろーぷ"
+     ]
+    },
+    {
+     "form": "縄",
+     "yomi": [
+      "なわ"
+     ]
+    }
+   ]
+  },
+  "GLOBAL-WATER": {
+   "adjs": [],
+   "desc": "water",
+   "ja": [
+    "水"
+   ],
+   "nouns": [
+    "WATER",
+    "QUANTITY"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "水",
+     "yomi": []
+    }
+   ]
+  },
+  "GOOD-LOCKED-DOOR": {
+   "adjs": [
+    "LOCKED",
+    "WOOD",
+    "WOODEN",
+    "CELL"
+   ],
+   "desc": "cell door",
+   "ja": [
+    "独房の扉",
+    "どくぼうのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "独房の扉",
+     "yomi": [
+      "どくぼうのとびら"
+     ]
+    }
+   ]
+  },
+  "GROUND": {
+   "adjs": [],
+   "desc": "ground",
+   "ja": [
+    "地面",
+    "じめん",
+    "床",
+    "ゆか",
+    "砂",
+    "すな"
+   ],
+   "nouns": [
+    "GROUND",
+    "SAND",
+    "DIRT",
+    "FLOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "地面",
+     "yomi": [
+      "じめん"
+     ]
+    },
+    {
+     "form": "床",
+     "yomi": [
+      "ゆか"
+     ]
+    },
+    {
+     "form": "砂",
+     "yomi": [
+      "すな"
+     ]
+    }
+   ]
+  },
+  "GRUE": {
+   "adjs": [
+    "LURKING",
+    "SINISTER",
+    "HUNGRY",
+    "SILENT"
+   ],
+   "desc": "lurking grue",
+   "ja": [
+    "グルー"
+   ],
+   "nouns": [
+    "GRUE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "グルー",
+     "yomi": []
+    }
+   ]
+  },
+  "GUARDIAN": {
+   "adjs": [],
+   "desc": "Guardians of Zork",
+   "ja": [
+    "ゾークの守護者",
+    "ぞーくのしゅごしゃ",
+    "守護者",
+    "しゅごしゃ",
+    "石像",
+    "せきぞう"
+   ],
+   "nouns": [
+    "STATUE",
+    "GUARDIAN",
+    "GUARD",
+    "GUARDS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ゾークの守護者",
+     "yomi": [
+      "ぞーくのしゅごしゃ"
+     ]
+    },
+    {
+     "form": "守護者",
+     "yomi": [
+      "しゅごしゃ"
+     ]
+    },
+    {
+     "form": "石像",
+     "yomi": [
+      "せきぞう"
+     ]
+    }
+   ]
+  },
+  "HANDS": {
+   "adjs": [
+    "BARE"
+   ],
+   "desc": "pair of hands",
+   "ja": [
+    "両手",
+    "りょうて"
+   ],
+   "nouns": [
+    "PAIR",
+    "HANDS",
+    "HAND"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "両手",
+     "yomi": [
+      "りょうて"
+     ]
+    }
+   ]
+  },
+  "HOOD": {
+   "adjs": [],
+   "desc": "hood",
+   "ja": [
+    "頭巾",
+    "ずきん",
+    "フード",
+    "ふーど"
+   ],
+   "nouns": [
+    "HOOD"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "頭巾",
+     "yomi": [
+      "ずきん"
+     ]
+    },
+    {
+     "form": "フード",
+     "yomi": [
+      "ふーど"
+     ]
+    }
+   ]
+  },
+  "INTDIR": {
+   "adjs": [],
+   "desc": "direction",
+   "ja": [
+    "方角",
+    "ほうがく"
+   ],
+   "nouns": [
+    "INTDIR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "方角",
+     "yomi": [
+      "ほうがく"
+     ]
+    }
+   ]
+  },
+  "IRON-DOOR": {
+   "adjs": [
+    "IRON"
+   ],
+   "desc": "iron door",
+   "ja": [
+    "鉄の扉",
+    "てつのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "鉄の扉",
+     "yomi": [
+      "てつのとびら"
+     ]
+    }
+   ]
+  },
+  "IT": {
+   "adjs": [],
+   "desc": "random object",
+   "ja": [
+    "それ"
+   ],
+   "nouns": [
+    "IT",
+    "THEM",
+    "HER",
+    "HIM"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "それ",
+     "yomi": []
+    }
+   ]
+  },
+  "JEWEL-DOOR": {
+   "adjs": [
+    "STONE",
+    "EAST"
+   ],
+   "desc": "stone door",
+   "ja": [
+    "石の扉",
+    "いしのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "石の扉",
+     "yomi": [
+      "いしのとびら"
+     ]
+    }
+   ]
+  },
+  "JEWELLED-KNIFE": {
+   "adjs": [
+    "JEWELLED",
+    "CROWN"
+   ],
+   "desc": "jewelled knife",
+   "ja": [
+    "宝石のナイフ",
+    "ほうせきのないふ",
+    "ナイフ",
+    "ないふ",
+    "短剣",
+    "たんけん"
+   ],
+   "nouns": [
+    "KNIFE",
+    "JEWELS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "宝石のナイフ",
+     "yomi": [
+      "ほうせきのないふ"
+     ]
+    },
+    {
+     "form": "ナイフ",
+     "yomi": [
+      "ないふ"
+     ]
+    },
+    {
+     "form": "短剣",
+     "yomi": [
+      "たんけん"
+     ]
+    }
+   ]
+  },
+  "KEY": {
+   "adjs": [
+    "STRANGE",
+    "RUSTY",
+    "LONG",
+    "SHORT",
+    "HEAVY",
+    "THIN",
+    "SHARP",
+    "POINTED"
+   ],
+   "desc": "strange key",
+   "ja": [
+    "奇妙な鍵",
+    "きみょうなかぎ",
+    "鍵",
+    "かぎ"
+   ],
+   "nouns": [
+    "KEY"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "奇妙な鍵",
+     "yomi": [
+      "きみょうなかぎ"
+     ]
+    },
+    {
+     "form": "鍵",
+     "yomi": [
+      "かぎ"
+     ]
+    }
+   ]
+  },
+  "LADDER": {
+   "adjs": [
+    "RICKETY",
+    "WOODEN",
+    "NARROW"
+   ],
+   "desc": "wooden ladder",
+   "ja": [
+    "木の梯子",
+    "きのはしご"
+   ],
+   "nouns": [
+    "LADDER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の梯子",
+     "yomi": [
+      "きのはしご"
+     ]
+    }
+   ]
+  },
+  "LAKE": {
+   "adjs": [],
+   "desc": "lake",
+   "ja": [
+    "湖",
+    "みずうみ",
+    "水面",
+    "すいめん"
+   ],
+   "nouns": [
+    "LAKE",
+    "WATER",
+    "SURFACE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "湖",
+     "yomi": [
+      "みずうみ"
+     ]
+    },
+    {
+     "form": "水面",
+     "yomi": [
+      "すいめん"
+     ]
+    }
+   ]
+  },
+  "LAMP": {
+   "adjs": [
+    "BRASS"
+   ],
+   "desc": "lamp",
+   "ja": [
+    "真鍮のランタン",
+    "しんちゅうのらんたん",
+    "ランタン",
+    "らんたん",
+    "明かり",
+    "あかり",
+    "ライト"
+   ],
+   "nouns": [
+    "LAMP",
+    "LANTERN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "真鍮のランタン",
+     "yomi": [
+      "しんちゅうのらんたん"
+     ]
+    },
+    {
+     "form": "ランタン",
+     "yomi": [
+      "らんたん"
+     ]
+    },
+    {
+     "form": "明かり",
+     "yomi": [
+      "あかり"
+     ]
+    },
+    {
+     "form": "ライト",
+     "yomi": []
+    }
+   ]
+  },
+  "LEDGE": {
+   "adjs": [
+    "WIDE"
+   ],
+   "desc": "ledge",
+   "ja": [
+    "岩棚",
+    "いわだな"
+   ],
+   "nouns": [
+    "LEDGE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "岩棚",
+     "yomi": [
+      "いわだな"
+     ]
+    }
+   ]
+  },
+  "LOCKED-DOOR": {
+   "adjs": [
+    "LOCKED",
+    "WOOD",
+    "WOODEN",
+    "CELL"
+   ],
+   "desc": "cell door",
+   "ja": [
+    "独房の扉",
+    "どくぼうのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "独房の扉",
+     "yomi": [
+      "どくぼうのとびら"
+     ]
+    }
+   ]
+  },
+  "LONG-POLE": {
+   "adjs": [
+    "CENTER",
+    "LONG"
+   ],
+   "desc": "long pole",
+   "ja": [
+    "長い棒",
+    "ながいぼう"
+   ],
+   "nouns": [
+    "POLE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "長い棒",
+     "yomi": [
+      "ながいぼう"
+     ]
+    }
+   ]
+  },
+  "LORE-BOOK": {
+   "adjs": [
+    "LORE",
+    "OLD",
+    "STRANGE"
+   ],
+   "desc": "very ancient book",
+   "ja": [
+    "太古の書物",
+    "たいこのしょもつ",
+    "書物",
+    "しょもつ",
+    "本",
+    "ほん"
+   ],
+   "nouns": [
+    "BOOK",
+    "LORE",
+    "TEXT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "太古の書物",
+     "yomi": [
+      "たいこのしょもつ"
+     ]
+    },
+    {
+     "form": "書物",
+     "yomi": [
+      "しょもつ"
+     ]
+    },
+    {
+     "form": "本",
+     "yomi": [
+      "ほん"
+     ]
+    }
+   ]
+  },
+  "LUNGS": {
+   "adjs": [],
+   "desc": "blast of air",
+   "ja": [
+    "空気",
+    "くうき"
+   ],
+   "nouns": [
+    "LUNGS",
+    "AIR",
+    "MOUTH",
+    "BREATH"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "空気",
+     "yomi": [
+      "くうき"
+     ]
+    }
+   ]
+  },
+  "MAHOGANY-PANEL": {
+   "adjs": [
+    "MAHOGANY"
+   ],
+   "desc": "mahogany panel",
+   "ja": [
+    "マホガニーのパネル",
+    "まほがにーのぱねる",
+    "マホガニーの壁",
+    "まほがにーのかべ"
+   ],
+   "nouns": [
+    "WALL",
+    "PANEL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "マホガニーのパネル",
+     "yomi": [
+      "まほがにーのぱねる"
+     ]
+    },
+    {
+     "form": "マホガニーの壁",
+     "yomi": [
+      "まほがにーのかべ"
+     ]
+    }
+   ]
+  },
+  "MAN": {
+   "adjs": [],
+   "desc": "man",
+   "ja": [
+    "男",
+    "おとこ",
+    "友人",
+    "ゆうじん"
+   ],
+   "nouns": [
+    "MAN",
+    "FRIEND"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "男",
+     "yomi": [
+      "おとこ"
+     ]
+    },
+    {
+     "form": "友人",
+     "yomi": [
+      "ゆうじん"
+     ]
+    }
+   ]
+  },
+  "MASTER": {
+   "adjs": [
+    "DUNGEON"
+   ],
+   "desc": "dungeon master",
+   "ja": [
+    "ダンジョン・マスター",
+    "だんじょんますたー",
+    "マスター",
+    "ますたー"
+   ],
+   "nouns": [
+    "MASTER",
+    "MAN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ダンジョン・マスター",
+     "yomi": [
+      "だんじょんますたー"
+     ]
+    },
+    {
+     "form": "マスター",
+     "yomi": [
+      "ますたー"
+     ]
+    }
+   ]
+  },
+  "ME": {
+   "adjs": [],
+   "desc": "you",
+   "ja": [
+    "自分",
+    "じぶん"
+   ],
+   "nouns": [
+    "ME",
+    "MYSELF",
+    "SELF",
+    "CRETIN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "自分",
+     "yomi": [
+      "じぶん"
+     ]
+    }
+   ]
+  },
+  "MIRROR": {
+   "adjs": [],
+   "desc": "mirror",
+   "ja": [
+    "鏡",
+    "かがみ",
+    "構造物",
+    "こうぞうぶつ"
+   ],
+   "nouns": [
+    "MIRROR",
+    "STRUCTURE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "鏡",
+     "yomi": [
+      "かがみ"
+     ]
+    },
+    {
+     "form": "構造物",
+     "yomi": [
+      "こうぞうぶつ"
+     ]
+    }
+   ]
+  },
+  "MOSS": {
+   "adjs": [],
+   "desc": "moss and lichen",
+   "ja": [
+    "苔と地衣",
+    "こけとちい",
+    "苔",
+    "こけ",
+    "地衣",
+    "ちい"
+   ],
+   "nouns": [
+    "MOSS",
+    "LICHEN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "苔と地衣",
+     "yomi": [
+      "こけとちい"
+     ]
+    },
+    {
+     "form": "苔",
+     "yomi": [
+      "こけ"
+     ]
+    },
+    {
+     "form": "地衣",
+     "yomi": [
+      "ちい"
+     ]
+    }
+   ]
+  },
+  "NORTH-WALL": {
+   "adjs": [
+    "NORTHE",
+    "NORTH"
+   ],
+   "desc": "northern wall",
+   "ja": [
+    "北側の壁",
+    "きたがわのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "北側の壁",
+     "yomi": [
+      "きたがわのかべ"
+     ]
+    }
+   ]
+  },
+  "OCEAN": {
+   "adjs": [
+    "FLATHEAD"
+   ],
+   "desc": "Flathead Ocean",
+   "ja": [
+    "フラットヘッド海",
+    "ふらっとへっどかい",
+    "海",
+    "うみ"
+   ],
+   "nouns": [
+    "OCEAN",
+    "WATER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "フラットヘッド海",
+     "yomi": [
+      "ふらっとへっどかい"
+     ]
+    },
+    {
+     "form": "海",
+     "yomi": [
+      "うみ"
+     ]
+    }
+   ]
+  },
+  "OLD-MAN": {
+   "adjs": [
+    "OLD"
+   ],
+   "desc": "old man",
+   "ja": [
+    "老人",
+    "ろうじん"
+   ],
+   "nouns": [
+    "MAN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "老人",
+     "yomi": [
+      "ろうじん"
+     ]
+    }
+   ]
+  },
+  "PANEL": {
+   "adjs": [],
+   "desc": "panel",
+   "ja": [
+    "パネル",
+    "ぱねる"
+   ],
+   "nouns": [
+    "PANEL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "パネル",
+     "yomi": [
+      "ぱねる"
+     ]
+    }
+   ]
+  },
+  "PARAPET-OBJ": {
+   "adjs": [],
+   "desc": "parapet",
+   "ja": [
+    "胸壁",
+    "きょうへき"
+   ],
+   "nouns": [
+    "PARAPET"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "胸壁",
+     "yomi": [
+      "きょうへき"
+     ]
+    }
+   ]
+  },
+  "PATHOBJ": {
+   "adjs": [
+    "FOREST",
+    "NARROW",
+    "LONG",
+    "WINDING"
+   ],
+   "desc": "passage",
+   "ja": [
+    "通路",
+    "つうろ"
+   ],
+   "nouns": [
+    "TRAIL",
+    "PATH"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "通路",
+     "yomi": [
+      "つうろ"
+     ]
+    }
+   ]
+  },
+  "PEDESTAL": {
+   "adjs": [],
+   "desc": "pedestal",
+   "ja": [
+    "台座",
+    "だいざ"
+   ],
+   "nouns": [
+    "PEDESTAL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "台座",
+     "yomi": [
+      "だいざ"
+     ]
+    }
+   ]
+  },
+  "PINE-PANEL": {
+   "adjs": [
+    "PINE"
+   ],
+   "desc": "pine panel",
+   "ja": [
+    "松のパネル",
+    "まつのぱねる",
+    "松の壁",
+    "まつのかべ"
+   ],
+   "nouns": [
+    "PANEL",
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "松のパネル",
+     "yomi": [
+      "まつのぱねる"
+     ]
+    },
+    {
+     "form": "松の壁",
+     "yomi": [
+      "まつのかべ"
+     ]
+    }
+   ]
+  },
+  "PLAQUE": {
+   "adjs": [
+    "BRONZE"
+   ],
+   "desc": "bronze plaque",
+   "ja": [
+    "青銅の銘板",
+    "せいどうのめいばん",
+    "銘板",
+    "めいばん"
+   ],
+   "nouns": [
+    "PLAQUE",
+    "TEXT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "青銅の銘板",
+     "yomi": [
+      "せいどうのめいばん"
+     ]
+    },
+    {
+     "form": "銘板",
+     "yomi": [
+      "めいばん"
+     ]
+    }
+   ]
+  },
+  "POTION": {
+   "adjs": [
+    "HEAVY",
+    "SWEET",
+    "INVISIBLE",
+    "SMELLING"
+   ],
+   "desc": "heavy but invisible liquid",
+   "ja": [
+    "重いが目に見えない液体",
+    "おもいがめにみえないえきたい",
+    "液体",
+    "えきたい",
+    "薬",
+    "くすり",
+    "中身",
+    "なかみ"
+   ],
+   "nouns": [
+    "POTION",
+    "LIQUID",
+    "CONTENTS",
+    "FLUID"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "重いが目に見えない液体",
+     "yomi": [
+      "おもいがめにみえないえきたい"
+     ]
+    },
+    {
+     "form": "液体",
+     "yomi": [
+      "えきたい"
+     ]
+    },
+    {
+     "form": "薬",
+     "yomi": [
+      "くすり"
+     ]
+    },
+    {
+     "form": "中身",
+     "yomi": [
+      "なかみ"
+     ]
+    }
+   ]
+  },
+  "PRESSURIZER": {
+   "adjs": [
+    "WASHING",
+    "GRAY",
+    "GREY"
+   ],
+   "desc": "grey machine",
+   "ja": [
+    "灰色の機械",
+    "はいいろのきかい",
+    "加圧機",
+    "かあつき",
+    "乾燥機",
+    "かんそうき",
+    "衣類乾燥機",
+    "いるいかんそうき"
+   ],
+   "nouns": [
+    "DRYER",
+    "MACHINE",
+    "PRESSURIZER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "灰色の機械",
+     "yomi": [
+      "はいいろのきかい"
+     ]
+    },
+    {
+     "form": "加圧機",
+     "yomi": [
+      "かあつき"
+     ]
+    },
+    {
+     "form": "乾燥機",
+     "yomi": [
+      "かんそうき"
+     ]
+    },
+    {
+     "form": "衣類乾燥機",
+     "yomi": [
+      "いるいかんそうき"
+     ]
+    }
+   ]
+  },
+  "RED-BUTTON": {
+   "adjs": [
+    "RED"
+   ],
+   "desc": "red button",
+   "ja": [
+    "赤いボタン",
+    "あかいぼたん"
+   ],
+   "nouns": [
+    "BUTTON"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "赤いボタン",
+     "yomi": [
+      "あかいぼたん"
+     ]
+    }
+   ]
+  },
+  "RED-PANEL": {
+   "adjs": [
+    "RED"
+   ],
+   "desc": "red panel",
+   "ja": [
+    "赤いパネル",
+    "あかいぱねる",
+    "赤い壁",
+    "あかいかべ"
+   ],
+   "nouns": [
+    "PANEL",
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "赤いパネル",
+     "yomi": [
+      "あかいぱねる"
+     ]
+    },
+    {
+     "form": "赤い壁",
+     "yomi": [
+      "あかいかべ"
+     ]
+    }
+   ]
+  },
+  "REEDS": {
+   "adjs": [
+    "SICKLY"
+   ],
+   "desc": "reeds",
+   "ja": [
+    "葦",
+    "あし"
+   ],
+   "nouns": [
+    "REEDS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "葦",
+     "yomi": [
+      "あし"
+     ]
+    }
+   ]
+  },
+  "REPELLENT": {
+   "adjs": [
+    "GRUE",
+    "MAGIC"
+   ],
+   "desc": "Frobozz Magic Grue Repellent",
+   "ja": [
+    "グルー除け",
+    "ぐるーよけ",
+    "魔法のグルー除け",
+    "まほうのぐるーよけ",
+    "缶",
+    "かん"
+   ],
+   "nouns": [
+    "REPELLENT",
+    "CAN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "グルー除け",
+     "yomi": [
+      "ぐるーよけ"
+     ]
+    },
+    {
+     "form": "魔法のグルー除け",
+     "yomi": [
+      "まほうのぐるーよけ"
+     ]
+    },
+    {
+     "form": "缶",
+     "yomi": [
+      "かん"
+     ]
+    }
+   ]
+  },
+  "RING": {
+   "adjs": [
+    "GOLDEN",
+    "CROWN"
+   ],
+   "desc": "golden ring",
+   "ja": [
+    "金の指輪",
+    "きんのゆびわ",
+    "指輪",
+    "ゆびわ"
+   ],
+   "nouns": [
+    "RING",
+    "JEWELS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "金の指輪",
+     "yomi": [
+      "きんのゆびわ"
+     ]
+    },
+    {
+     "form": "指輪",
+     "yomi": [
+      "ゆびわ"
+     ]
+    }
+   ]
+  },
+  "ROBOT": {
+   "adjs": [],
+   "desc": "robot",
+   "ja": [
+    "ロボット",
+    "ろぼっと",
+    "装置",
+    "そうち"
+   ],
+   "nouns": [
+    "ROBOT",
+    "DEVICE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ロボット",
+     "yomi": [
+      "ろぼっと"
+     ]
+    },
+    {
+     "form": "装置",
+     "yomi": [
+      "そうち"
+     ]
+    }
+   ]
+  },
+  "ROPE": {
+   "adjs": [
+    "LONG"
+   ],
+   "desc": "rope",
+   "ja": [
+    "ロープ",
+    "ろーぷ",
+    "縄",
+    "なわ"
+   ],
+   "nouns": [
+    "ROPE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ロープ",
+     "yomi": [
+      "ろーぷ"
+     ]
+    },
+    {
+     "form": "縄",
+     "yomi": [
+      "なわ"
+     ]
+    }
+   ]
+  },
+  "ROSE": {
+   "adjs": [
+    "COMPASS"
+   ],
+   "desc": "compass rose",
+   "ja": [
+    "方位図",
+    "ほういず"
+   ],
+   "nouns": [
+    "ROSE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "方位図",
+     "yomi": [
+      "ほういず"
+     ]
+    }
+   ]
+  },
+  "ROYAL-SEAL": {
+   "adjs": [
+    "LARGE",
+    "ROYAL"
+   ],
+   "desc": "Royal Seal of Dimwit Flathead",
+   "ja": [
+    "ディムウィット・フラットヘッドの王璽",
+    "でぃむうぃっとふらっとへっどのおうじ",
+    "王璽",
+    "おうじ",
+    "紋章",
+    "もんしょう"
+   ],
+   "nouns": [
+    "SEAL",
+    "CARVIN",
+    "RENDER"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ディムウィット・フラットヘッドの王璽",
+     "yomi": [
+      "でぃむうぃっとふらっとへっどのおうじ"
+     ]
+    },
+    {
+     "form": "王璽",
+     "yomi": [
+      "おうじ"
+     ]
+    },
+    {
+     "form": "紋章",
+     "yomi": [
+      "もんしょう"
+     ]
+    }
+   ]
+  },
+  "RUBBLE": {
+   "adjs": [],
+   "desc": "rubble",
+   "ja": [
+    "瓦礫",
+    "がれき"
+   ],
+   "nouns": [
+    "ROCK",
+    "ROCKS",
+    "BOULDER",
+    "RUBBLE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "瓦礫",
+     "yomi": [
+      "がれき"
+     ]
+    }
+   ]
+  },
+  "RUNES": {
+   "adjs": [
+    "CARVED"
+   ],
+   "desc": "runes",
+   "ja": [
+    "ルーン文字",
+    "るーんもじ",
+    "ルーン",
+    "るーん",
+    "彫刻",
+    "ちょうこく"
+   ],
+   "nouns": [
+    "ENGRAV",
+    "TEXT",
+    "WALL",
+    "RUNES"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ルーン文字",
+     "yomi": [
+      "るーんもじ"
+     ]
+    },
+    {
+     "form": "ルーン",
+     "yomi": [
+      "るーん"
+     ]
+    },
+    {
+     "form": "彫刻",
+     "yomi": [
+      "ちょうこく"
+     ]
+    }
+   ]
+  },
+  "SAILOR": {
+   "adjs": [],
+   "desc": "sailor",
+   "ja": [
+    "船乗り",
+    "ふなのり"
+   ],
+   "nouns": [
+    "SAILOR",
+    "FOOTPAD",
+    "AVIATOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "船乗り",
+     "yomi": [
+      "ふなのり"
+     ]
+    },
+    {
+     "form": "船乗り",
+     "yomi": [
+      "ふなのり"
+     ]
+    }
+   ]
+  },
+  "SAND": {
+   "adjs": [],
+   "desc": "sand",
+   "ja": [
+    "砂",
+    "すな",
+    "湖底",
+    "こてい"
+   ],
+   "nouns": [
+    "SAND",
+    "FLOOR",
+    "BOTTOM"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "砂",
+     "yomi": [
+      "すな"
+     ]
+    },
+    {
+     "form": "湖底",
+     "yomi": [
+      "こてい"
+     ]
+    }
+   ]
+  },
+  "SCEPTRE": {
+   "adjs": [
+    "CROWN"
+   ],
+   "desc": "sceptre",
+   "ja": [
+    "王笏",
+    "おうしゃく"
+   ],
+   "nouns": [
+    "SCEPTRE",
+    "JEWELS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "王笏",
+     "yomi": [
+      "おうしゃく"
+     ]
+    }
+   ]
+  },
+  "SECRET-DOOR": {
+   "adjs": [
+    "SECRET"
+   ],
+   "desc": "secret door",
+   "ja": [
+    "秘密の扉",
+    "ひみつのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "秘密の扉",
+     "yomi": [
+      "ひみつのとびら"
+     ]
+    }
+   ]
+  },
+  "SHADOW": {
+   "adjs": [
+    "HOODED",
+    "CLOAKED"
+   ],
+   "desc": "hooded figure",
+   "ja": [
+    "頭巾の人影",
+    "ずきんのひとかげ",
+    "人影",
+    "ひとかげ",
+    "影",
+    "かげ"
+   ],
+   "nouns": [
+    "SHADOW",
+    "FIGURE",
+    "MAN",
+    "WOMAN"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "頭巾の人影",
+     "yomi": [
+      "ずきんのひとかげ"
+     ]
+    },
+    {
+     "form": "人影",
+     "yomi": [
+      "ひとかげ"
+     ]
+    },
+    {
+     "form": "影",
+     "yomi": [
+      "かげ"
+     ]
+    }
+   ]
+  },
+  "SHINY-OBJECT": {
+   "adjs": [
+    "SHINY"
+   ],
+   "desc": "shiny object",
+   "ja": [
+    "光る物",
+    "ひかるもの"
+   ],
+   "nouns": [
+    "OBJECT",
+    "AMULET"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "光る物",
+     "yomi": [
+      "ひかるもの"
+     ]
+    }
+   ]
+  },
+  "SHORT-POLE": {
+   "adjs": [
+    "SHORT",
+    "SMALL",
+    "HAND"
+   ],
+   "desc": "short pole",
+   "ja": [
+    "短い棒",
+    "みじかいぼう",
+    "握り",
+    "にぎり"
+   ],
+   "nouns": [
+    "POLE",
+    "POST",
+    "HANDGRIP",
+    "GRIP"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "短い棒",
+     "yomi": [
+      "みじかいぼう"
+     ]
+    },
+    {
+     "form": "握り",
+     "yomi": [
+      "にぎり"
+     ]
+    }
+   ]
+  },
+  "SOUTH-WALL": {
+   "adjs": [
+    "SOUTHE",
+    "SOUTH"
+   ],
+   "desc": "southern wall",
+   "ja": [
+    "南側の壁",
+    "みなみがわのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "南側の壁",
+     "yomi": [
+      "みなみがわのかべ"
+     ]
+    }
+   ]
+  },
+  "SPINNER": {
+   "adjs": [
+    "BLACK"
+   ],
+   "desc": "black machine",
+   "ja": [
+    "黒い機械",
+    "くろいきかい"
+   ],
+   "nouns": [
+    "PIPES",
+    "MACHINE",
+    "WIRES",
+    "MOTORS"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "黒い機械",
+     "yomi": [
+      "くろいきかい"
+     ]
+    }
+   ]
+  },
+  "STAFF": {
+   "adjs": [
+    "WOODEN"
+   ],
+   "desc": "wooden staff",
+   "ja": [
+    "木の杖",
+    "きのつえ",
+    "杖",
+    "つえ"
+   ],
+   "nouns": [
+    "STAFF"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の杖",
+     "yomi": [
+      "きのつえ"
+     ]
+    },
+    {
+     "form": "杖",
+     "yomi": [
+      "つえ"
+     ]
+    }
+   ]
+  },
+  "STAIRS": {
+   "adjs": [
+    "STONE",
+    "DARK",
+    "MARBLE",
+    "FORBIDDING",
+    "STEEP"
+   ],
+   "desc": "stairs",
+   "ja": [
+    "階段",
+    "かいだん",
+    "大理石の階段",
+    "だいりせきのかいだん"
+   ],
+   "nouns": [
+    "STAIRS",
+    "STEPS",
+    "STAIRCASE",
+    "STAIRWAY"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "階段",
+     "yomi": [
+      "かいだん"
+     ]
+    },
+    {
+     "form": "大理石の階段",
+     "yomi": [
+      "だいりせきのかいだん"
+     ]
+    }
+   ]
+  },
+  "STONE": {
+   "adjs": [
+    "GREAT"
+   ],
+   "desc": "great rock",
+   "ja": [
+    "大岩",
+    "おおいわ",
+    "岩",
+    "いわ",
+    "石",
+    "いし"
+   ],
+   "nouns": [
+    "ROCK",
+    "STONE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "大岩",
+     "yomi": [
+      "おおいわ"
+     ]
+    },
+    {
+     "form": "岩",
+     "yomi": [
+      "いわ"
+     ]
+    },
+    {
+     "form": "石",
+     "yomi": [
+      "いし"
+     ]
+    }
+   ]
+  },
+  "STONE-WALL": {
+   "adjs": [
+    "MASSIVE",
+    "STONE"
+   ],
+   "desc": "stone wall",
+   "ja": [
+    "石の壁",
+    "いしのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "石の壁",
+     "yomi": [
+      "いしのかべ"
+     ]
+    }
+   ]
+  },
+  "SUNDIAL": {
+   "adjs": [
+    "INDICATOR",
+    "SUN"
+   ],
+   "desc": "sundial",
+   "ja": [
+    "日時計",
+    "ひどけい",
+    "ダイヤル",
+    "だいやる",
+    "文字盤",
+    "もじばん"
+   ],
+   "nouns": [
+    "SUNDIAL",
+    "DIAL",
+    "INDICATOR",
+    "ARROW"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "日時計",
+     "yomi": [
+      "ひどけい"
+     ]
+    },
+    {
+     "form": "ダイヤル",
+     "yomi": [
+      "だいやる"
+     ]
+    },
+    {
+     "form": "文字盤",
+     "yomi": [
+      "もじばん"
+     ]
+    }
+   ]
+  },
+  "SWORD": {
+   "adjs": [
+    "ELVISH",
+    "OLD",
+    "ANTIQUE"
+   ],
+   "desc": "sword",
+   "ja": [
+    "剣",
+    "けん",
+    "エルフの剣",
+    "えるふのけん",
+    "刃",
+    "やいば",
+    "剣先",
+    "けんさき"
+   ],
+   "nouns": [
+    "SWORD",
+    "ORCRIST",
+    "GLAMDRING",
+    "BLADE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "剣",
+     "yomi": [
+      "けん"
+     ]
+    },
+    {
+     "form": "エルフの剣",
+     "yomi": [
+      "えるふのけん"
+     ]
+    },
+    {
+     "form": "刃",
+     "yomi": [
+      "やいば"
+     ]
+    },
+    {
+     "form": "剣先",
+     "yomi": [
+      "けんさき"
+     ]
+    }
+   ]
+  },
+  "T-BAR": {
+   "adjs": [],
+   "desc": "T-bar",
+   "ja": [
+    "T 字の横木",
+    "てぃーじのよこぎ",
+    "横木",
+    "よこぎ"
+   ],
+   "nouns": [
+    "T-BAR",
+    "BAR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "T 字の横木",
+     "yomi": [
+      "てぃーじのよこぎ"
+     ]
+    },
+    {
+     "form": "横木",
+     "yomi": [
+      "よこぎ"
+     ]
+    }
+   ]
+  },
+  "TECH-PLAQUE": {
+   "adjs": [],
+   "desc": "plaque",
+   "ja": [
+    "銘板",
+    "めいばん"
+   ],
+   "nouns": [
+    "PLAQUE",
+    "TEXT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "銘板",
+     "yomi": [
+      "めいばん"
+     ]
+    }
+   ]
+  },
+  "TIMBERS": {
+   "adjs": [
+    "WOODEN",
+    "BROKEN"
+   ],
+   "desc": "broken timber",
+   "ja": [
+    "折れた坑木",
+    "おれたこうぼく",
+    "坑木",
+    "こうぼく"
+   ],
+   "nouns": [
+    "TIMBERS",
+    "PILE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "折れた坑木",
+     "yomi": [
+      "おれたこうぼく"
+     ]
+    },
+    {
+     "form": "坑木",
+     "yomi": [
+      "こうぼく"
+     ]
+    }
+   ]
+  },
+  "TIME-MACHINE": {
+   "adjs": [
+    "GOLDEN",
+    "TIME",
+    "GOLD"
+   ],
+   "desc": "gold machine",
+   "ja": [
+    "金色の機械",
+    "きんいろのきかい",
+    "機械",
+    "きかい",
+    "時間移動機",
+    "じかんいどうき",
+    "タイムマシン",
+    "たいむましん"
+   ],
+   "nouns": [
+    "TEMPORIZER",
+    "MACHINE"
+   ],
+   "vehicle": true,
+   "words": [
+    {
+     "form": "金色の機械",
+     "yomi": [
+      "きんいろのきかい"
+     ]
+    },
+    {
+     "form": "機械",
+     "yomi": [
+      "きかい"
+     ]
+    },
+    {
+     "form": "時間移動機",
+     "yomi": [
+      "じかんいどうき"
+     ]
+    },
+    {
+     "form": "タイムマシン",
+     "yomi": [
+      "たいむましん"
+     ]
+    }
+   ]
+  },
+  "TM-BUTTON": {
+   "adjs": [],
+   "desc": "button",
+   "ja": [
+    "ボタン",
+    "ぼたん"
+   ],
+   "nouns": [
+    "BUTTON"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ボタン",
+     "yomi": [
+      "ぼたん"
+     ]
+    }
+   ]
+  },
+  "TM-DIAL": {
+   "adjs": [],
+   "desc": "dial",
+   "ja": [
+    "ダイヤル",
+    "だいやる",
+    "操作盤",
+    "そうさばん"
+   ],
+   "nouns": [
+    "CONSOLE",
+    "DIAL",
+    "DISPLAY"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ダイヤル",
+     "yomi": [
+      "だいやる"
+     ]
+    },
+    {
+     "form": "操作盤",
+     "yomi": [
+      "そうさばん"
+     ]
+    }
+   ]
+  },
+  "TM-HOLLOW": {
+   "adjs": [
+    "SMALL",
+    "HOLLOW"
+   ],
+   "desc": "seat",
+   "ja": [
+    "空洞",
+    "くうどう",
+    "窪み",
+    "くぼみ"
+   ],
+   "nouns": [
+    "AREA"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "空洞",
+     "yomi": [
+      "くうどう"
+     ]
+    },
+    {
+     "form": "窪み",
+     "yomi": [
+      "くぼみ"
+     ]
+    }
+   ]
+  },
+  "TM-SEAT": {
+   "adjs": [],
+   "desc": "seat",
+   "ja": [
+    "座席",
+    "ざせき",
+    "椅子",
+    "いす"
+   ],
+   "nouns": [
+    "SEAT",
+    "CHAIR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "座席",
+     "yomi": [
+      "ざせき"
+     ]
+    },
+    {
+     "form": "椅子",
+     "yomi": [
+      "いす"
+     ]
+    }
+   ]
+  },
+  "TORCH": {
+   "adjs": [],
+   "desc": "torch",
+   "ja": [
+    "松明",
+    "たいまつ",
+    "トーチ",
+    "とーち"
+   ],
+   "nouns": [
+    "TORCH"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "松明",
+     "yomi": [
+      "たいまつ"
+     ]
+    },
+    {
+     "form": "トーチ",
+     "yomi": [
+      "とーち"
+     ]
+    }
+   ]
+  },
+  "TREE": {
+   "adjs": [
+    "LARGE",
+    "TALL"
+   ],
+   "desc": "tree",
+   "ja": [
+    "木",
+    "き",
+    "枝",
+    "えだ",
+    "大きな木",
+    "おおきなき",
+    "木々",
+    "きぎ",
+    "大木",
+    "たいぼく",
+    "巨木",
+    "きょぼく"
+   ],
+   "nouns": [
+    "TREE",
+    "TREES"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木",
+     "yomi": [
+      "き"
+     ]
+    },
+    {
+     "form": "枝",
+     "yomi": [
+      "えだ"
+     ]
+    },
+    {
+     "form": "大きな木",
+     "yomi": [
+      "おおきなき"
+     ]
+    },
+    {
+     "form": "木々",
+     "yomi": [
+      "きぎ"
+     ]
+    },
+    {
+     "form": "大木",
+     "yomi": [
+      "たいぼく"
+     ]
+    },
+    {
+     "form": "巨木",
+     "yomi": [
+      "きょぼく"
+     ]
+    }
+   ]
+  },
+  "TUNNEL": {
+   "adjs": [
+    "DARK",
+    "SMOKY"
+   ],
+   "desc": "tunnel",
+   "ja": [
+    "トンネル",
+    "とんねる"
+   ],
+   "nouns": [
+    "PASSAGE",
+    "CRAWLWAY"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "トンネル",
+     "yomi": [
+      "とんねる"
+     ]
+    }
+   ]
+  },
+  "VALUABLES": {
+   "adjs": [
+    "ASSORTED"
+   ],
+   "desc": "pile of assorted valuables",
+   "ja": [
+    "雑多な宝の山",
+    "ざったなたからのやま",
+    "宝の山",
+    "たからのやま",
+    "宝",
+    "たから",
+    "財宝",
+    "ざいほう"
+   ],
+   "nouns": [
+    "VALUABLES",
+    "TREASURE",
+    "PILE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "雑多な宝の山",
+     "yomi": [
+      "ざったなたからのやま"
+     ]
+    },
+    {
+     "form": "宝の山",
+     "yomi": [
+      "たからのやま"
+     ]
+    },
+    {
+     "form": "宝",
+     "yomi": [
+      "たから"
+     ]
+    },
+    {
+     "form": "財宝",
+     "yomi": [
+      "ざいほう"
+     ]
+    }
+   ]
+  },
+  "VIAL": {
+   "adjs": [],
+   "desc": "vial",
+   "ja": [
+    "小瓶",
+    "こびん",
+    "瓶",
+    "びん"
+   ],
+   "nouns": [
+    "VIAL",
+    "ODOR",
+    "GIFT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "小瓶",
+     "yomi": [
+      "こびん"
+     ]
+    },
+    {
+     "form": "瓶",
+     "yomi": [
+      "びん"
+     ]
+    }
+   ]
+  },
+  "VIEW-INDICATOR": {
+   "adjs": [],
+   "desc": "indicator",
+   "ja": [
+    "表示",
+    "ひょうじ"
+   ],
+   "nouns": [
+    "INDICATOR",
+    "DIAL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "表示",
+     "yomi": [
+      "ひょうじ"
+     ]
+    }
+   ]
+  },
+  "VIEWING-TABLE": {
+   "adjs": [
+    "VIEWING"
+   ],
+   "desc": "viewing table",
+   "ja": [
+    "遠見の卓",
+    "とおみのたく",
+    "卓",
+    "たく",
+    "テーブル",
+    "てーぶる"
+   ],
+   "nouns": [
+    "TABLE",
+    "SURFACE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "遠見の卓",
+     "yomi": [
+      "とおみのたく"
+     ]
+    },
+    {
+     "form": "卓",
+     "yomi": [
+      "たく"
+     ]
+    },
+    {
+     "form": "テーブル",
+     "yomi": [
+      "てーぶる"
+     ]
+    }
+   ]
+  },
+  "VIKING-SHIP": {
+   "adjs": [
+    "VIKING"
+   ],
+   "desc": "Viking Ship",
+   "ja": [
+    "ヴァイキング船(ゔぁいきんぐせん)",
+    "バイキング船",
+    "ばいきんぐせん",
+    "船",
+    "ふね"
+   ],
+   "nouns": [
+    "BOAT",
+    "SHIP",
+    "CRAFT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ヴァイキング船(ゔぁいきんぐせん)",
+     "yomi": []
+    },
+    {
+     "form": "バイキング船",
+     "yomi": [
+      "ばいきんぐせん"
+     ]
+    },
+    {
+     "form": "船",
+     "yomi": [
+      "ふね"
+     ]
+    }
+   ]
+  },
+  "VOICES": {
+   "adjs": [
+    "ARMED"
+   ],
+   "desc": "voices",
+   "ja": [
+    "声",
+    "こえ",
+    "衛兵",
+    "えいへい"
+   ],
+   "nouns": [
+    "VOICE",
+    "VOICES",
+    "GUARDS",
+    "OFFICI"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "声",
+     "yomi": [
+      "こえ"
+     ]
+    },
+    {
+     "form": "衛兵",
+     "yomi": [
+      "えいへい"
+     ]
+    }
+   ]
+  },
+  "WARNING-NOTE": {
+   "adjs": [
+    "WARNING",
+    "SMALL"
+   ],
+   "desc": "warning note",
+   "ja": [
+    "警告の書き付け",
+    "けいこくのかきつけ",
+    "書き付け",
+    "かきつけ",
+    "メモ",
+    "めも"
+   ],
+   "nouns": [
+    "NOTE",
+    "WARNING",
+    "TEXT"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "警告の書き付け",
+     "yomi": [
+      "けいこくのかきつけ"
+     ]
+    },
+    {
+     "form": "書き付け",
+     "yomi": [
+      "かきつけ"
+     ]
+    },
+    {
+     "form": "メモ",
+     "yomi": [
+      "めも"
+     ]
+    }
+   ]
+  },
+  "WATER": {
+   "adjs": [],
+   "desc": "quantity of water",
+   "ja": [
+    "いくらかの水",
+    "いくらかのみず"
+   ],
+   "nouns": [
+    "H2O",
+    "WATER",
+    "QUANTITY",
+    "LIQUID"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "いくらかの水",
+     "yomi": [
+      "いくらかのみず"
+     ]
+    }
+   ]
+  },
+  "WATER-CHANNEL": {
+   "adjs": [
+    "WATER"
+   ],
+   "desc": "channel",
+   "ja": [
+    "水路",
+    "すいろ"
+   ],
+   "nouns": [
+    "CHANNEL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "水路",
+     "yomi": [
+      "すいろ"
+     ]
+    }
+   ]
+  },
+  "WAYBREAD": {
+   "adjs": [
+    "WAY",
+    "FRESH"
+   ],
+   "desc": "piece of waybread",
+   "ja": [
+    "旅の糧食",
+    "たびのりょうしょく",
+    "糧食",
+    "りょうしょく",
+    "パン",
+    "ぱん"
+   ],
+   "nouns": [
+    "BREAD",
+    "WAYBREAD",
+    "PIECE"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "旅の糧食",
+     "yomi": [
+      "たびのりょうしょく"
+     ]
+    },
+    {
+     "form": "糧食",
+     "yomi": [
+      "りょうしょく"
+     ]
+    },
+    {
+     "form": "パン",
+     "yomi": [
+      "ぱん"
+     ]
+    }
+   ]
+  },
+  "WEST-WALL": {
+   "adjs": [
+    "WEST",
+    "WESTERN"
+   ],
+   "desc": "western wall",
+   "ja": [
+    "西側の壁",
+    "にしがわのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "西側の壁",
+     "yomi": [
+      "にしがわのかべ"
+     ]
+    }
+   ]
+  },
+  "WHITE-PANEL": {
+   "adjs": [
+    "WHITE"
+   ],
+   "desc": "white panel",
+   "ja": [
+    "白いパネル",
+    "しろいぱねる",
+    "白い壁",
+    "しろいかべ"
+   ],
+   "nouns": [
+    "PANEL",
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "白いパネル",
+     "yomi": [
+      "しろいぱねる"
+     ]
+    },
+    {
+     "form": "白い壁",
+     "yomi": [
+      "しろいかべ"
+     ]
+    }
+   ]
+  },
+  "WOODEN-BAR": {
+   "adjs": [
+    "WOOD",
+    "WOODEN"
+   ],
+   "desc": "wooden bar",
+   "ja": [
+    "木の横木",
+    "きのよこぎ"
+   ],
+   "nouns": [
+    "BAR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の横木",
+     "yomi": [
+      "きのよこぎ"
+     ]
+    }
+   ]
+  },
+  "WOODEN-DOOR": {
+   "adjs": [
+    "NORTH",
+    "WOODEN",
+    "WOOD"
+   ],
+   "desc": "wooden door",
+   "ja": [
+    "木の扉",
+    "きのとびら"
+   ],
+   "nouns": [
+    "DOOR"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の扉",
+     "yomi": [
+      "きのとびら"
+     ]
+    }
+   ]
+  },
+  "WOODEN-WALL": {
+   "adjs": [
+    "WOODEN",
+    "WOOD"
+   ],
+   "desc": "wooden wall",
+   "ja": [
+    "木の壁",
+    "きのかべ"
+   ],
+   "nouns": [
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "木の壁",
+     "yomi": [
+      "きのかべ"
+     ]
+    }
+   ]
+  },
+  "YELLOW-PANEL": {
+   "adjs": [
+    "YELLOW"
+   ],
+   "desc": "yellow panel",
+   "ja": [
+    "黄色いパネル",
+    "きいろいぱねる",
+    "黄色い壁",
+    "きいろいかべ"
+   ],
+   "nouns": [
+    "PANEL",
+    "WALL"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "黄色いパネル",
+     "yomi": [
+      "きいろいぱねる"
+     ]
+    },
+    {
+     "form": "黄色い壁",
+     "yomi": [
+      "きいろいかべ"
+     ]
+    }
+   ]
+  },
+  "ZORKMID": {
+   "adjs": [],
+   "desc": "zorkmid",
+   "ja": [
+    "ゾークミッド",
+    "ぞーくみっど"
+   ],
+   "nouns": [
+    "ZORKMID"
+   ],
+   "vehicle": false,
+   "words": [
+    {
+     "form": "ゾークミッド",
+     "yomi": [
+      "ぞーくみっど"
+     ]
+    }
+   ]
+  }
+ },
+ "preps": {
+  "ABOUT": [
+   "について"
+  ],
+  "ACROSS": [
+   "を渡って"
+  ],
+  "AROUND": [
+   "のまわりを"
+  ],
+  "AT": [
+   "に",
+   "を"
+  ],
+  "AWAY": [
+   "遠くへ"
+  ],
+  "BEHIND": [
+   "の後ろ",
+   "の裏"
+  ],
+  "DOWN": [
+   "下へ",
+   "下に"
+  ],
+  "FOR": [
+   "を求めて"
+  ],
+  "FROM": [
+   "から"
+  ],
+  "IN": [
+   "の中に",
+   "に入れて"
+  ],
+  "OFF": [
+   "を外して",
+   "オフ"
+  ],
+  "ON": [
+   "の上に",
+   "オン"
+  ],
+  "OUT": [
+   "外へ",
+   "外に"
+  ],
+  "OVER": [
+   "を越えて"
+  ],
+  "TO": [
+   "に",
+   "へ"
+  ],
+  "UNDER": [
+   "の下"
+  ],
+  "UP": [
+   "上へ",
+   "上に"
+  ],
+  "WITH": [
+   "で",
+   "を使って"
+  ]
+ },
+ "spells": [
+  {
+   "alts": [
+    "フロッツオズモー",
+    "ふろっつおずもー",
+    "ふろっつ・おずもー"
+   ],
+   "en": "FROTZ OZMOO",
+   "form": "フロッツ・オズモー",
+   "word": "frotz ozmoo"
+  }
+ ],
+ "verbs": {
+  "ACTIVATE": {
+   "ja": [
+    "作動させる",
+    "さどうさせる",
+    "起動する",
+    "きどうする"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "作動させる",
+     "yomi": [
+      "さどうさせる"
+     ]
+    },
+    {
+     "form": "起動する",
+     "yomi": [
+      "きどうする"
+     ]
+    }
+   ]
+  },
+  "ANSWER": {
+   "ja": [
+    "答える",
+    "こたえる"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "答える",
+     "yomi": [
+      "こたえる"
+     ]
+    }
+   ]
+  },
+  "APPLY": {
+   "ja": [
+    "当てる",
+    "あてる",
+    "塗る",
+    "ぬる"
+   ],
+   "shapes": [
+    "OBJ TO OBJ"
+   ],
+   "words": [
+    {
+     "form": "当てる",
+     "yomi": [
+      "あてる"
+     ]
+    },
+    {
+     "form": "塗る",
+     "yomi": [
+      "ぬる"
+     ]
+    }
+   ]
+  },
+  "ATTACK": {
+   "ja": [
+    "攻撃する",
+    "こうげきする",
+    "襲う",
+    "おそう",
+    "斬る",
+    "きる",
+    "打ちかかる",
+    "うちかかる",
+    "戦う",
+    "たたかう"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "攻撃する",
+     "yomi": [
+      "こうげきする"
+     ]
+    },
+    {
+     "form": "襲う",
+     "yomi": [
+      "おそう"
+     ]
+    },
+    {
+     "form": "斬る",
+     "yomi": [
+      "きる"
+     ]
+    },
+    {
+     "form": "打ちかかる",
+     "yomi": [
+      "うちかかる"
+     ]
+    },
+    {
+     "form": "戦う",
+     "yomi": [
+      "たたかう"
+     ]
+    }
+   ]
+  },
+  "BACK": {
+   "ja": [
+    "戻る",
+    "もどる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "戻る",
+     "yomi": [
+      "もどる"
+     ]
+    }
+   ]
+  },
+  "BLAST": {
+   "ja": [
+    "爆破する",
+    "ばくはする"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "爆破する",
+     "yomi": [
+      "ばくはする"
+     ]
+    }
+   ]
+  },
+  "BLOW": {
+   "ja": [
+    "吹く",
+    "ふく"
+   ],
+   "shapes": [
+    "OUT OBJ",
+    "UP OBJ WITH OBJ",
+    "UP OBJ",
+    "IN OBJ"
+   ],
+   "words": [
+    {
+     "form": "吹く",
+     "yomi": [
+      "ふく"
+     ]
+    }
+   ]
+  },
+  "BOARD": {
+   "ja": [
+    "乗る",
+    "のる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "乗る",
+     "yomi": [
+      "のる"
+     ]
+    }
+   ]
+  },
+  "BRIEF": {
+   "ja": [
+    "簡潔に",
+    "かんけつに"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "簡潔に",
+     "yomi": [
+      "かんけつに"
+     ]
+    }
+   ]
+  },
+  "BRUSH": {
+   "ja": [
+    "磨く",
+    "みがく",
+    "掃除する",
+    "そうじする",
+    "きれいにする"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "磨く",
+     "yomi": [
+      "みがく"
+     ]
+    },
+    {
+     "form": "掃除する",
+     "yomi": [
+      "そうじする"
+     ]
+    },
+    {
+     "form": "きれいにする",
+     "yomi": []
+    }
+   ]
+  },
+  "BURN": {
+   "ja": [
+    "燃やす",
+    "もやす"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "DOWN OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "燃やす",
+     "yomi": [
+      "もやす"
+     ]
+    }
+   ]
+  },
+  "CHOMP": {
+   "ja": [
+    "かじる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "かじる",
+     "yomi": []
+    }
+   ]
+  },
+  "CLIMB": {
+   "ja": [
+    "登る",
+    "のぼる",
+    "上る",
+    "よじ登る",
+    "よじのぼる"
+   ],
+   "shapes": [
+    "UP OBJ",
+    "DOWN OBJ",
+    "OBJ",
+    "IN OBJ",
+    "ON OBJ",
+    "WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "登る",
+     "yomi": [
+      "のぼる"
+     ]
+    },
+    {
+     "form": "上る",
+     "yomi": [
+      "のぼる"
+     ]
+    },
+    {
+     "form": "よじ登る",
+     "yomi": [
+      "よじのぼる"
+     ]
+    }
+   ]
+  },
+  "CLOSE": {
+   "ja": [
+    "閉める",
+    "しめる",
+    "閉じる",
+    "とじる",
+    "塞ぐ",
+    "ふさぐ"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "閉める",
+     "yomi": [
+      "しめる"
+     ]
+    },
+    {
+     "form": "閉じる",
+     "yomi": [
+      "とじる"
+     ]
+    },
+    {
+     "form": "塞ぐ",
+     "yomi": [
+      "ふさぐ"
+     ]
+    }
+   ]
+  },
+  "COMMAND": {
+   "ja": [
+    "命じる",
+    "めいじる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "命じる",
+     "yomi": [
+      "めいじる"
+     ]
+    }
+   ]
+  },
+  "COUNT": {
+   "ja": [
+    "数える",
+    "かぞえる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "数える",
+     "yomi": [
+      "かぞえる"
+     ]
+    }
+   ]
+  },
+  "CROSS": {
+   "ja": [
+    "渡る",
+    "わたる",
+    "横切る",
+    "よこぎる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "渡る",
+     "yomi": [
+      "わたる"
+     ]
+    },
+    {
+     "form": "横切る",
+     "yomi": [
+      "よこぎる"
+     ]
+    }
+   ]
+  },
+  "CURSE": {
+   "ja": [
+    "罵る",
+    "ののしる",
+    "悪態をつく",
+    "あくたいをつく"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "罵る",
+     "yomi": [
+      "ののしる"
+     ]
+    },
+    {
+     "form": "悪態をつく",
+     "yomi": [
+      "あくたいをつく"
+     ]
+    }
+   ]
+  },
+  "CUT": {
+   "ja": [
+    "切る",
+    "きる"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "切る",
+     "yomi": [
+      "きる"
+     ]
+    }
+   ]
+  },
+  "DEFLATE": {
+   "ja": [
+    "しぼませる",
+    "空気を抜く",
+    "くうきをぬく"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "しぼませる",
+     "yomi": []
+    },
+    {
+     "form": "空気を抜く",
+     "yomi": [
+      "くうきをぬく"
+     ]
+    }
+   ]
+  },
+  "DESTROY": {
+   "ja": [
+    "壊す",
+    "こわす",
+    "破壊する",
+    "はかいする"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "DOWN OBJ WITH OBJ",
+    "IN OBJ"
+   ],
+   "words": [
+    {
+     "form": "壊す",
+     "yomi": [
+      "こわす"
+     ]
+    },
+    {
+     "form": "破壊する",
+     "yomi": [
+      "はかいする"
+     ]
+    }
+   ]
+  },
+  "DIAGNOSE": {
+   "ja": [
+    "診断",
+    "しんだん",
+    "容体",
+    "ようだい",
+    "体調",
+    "たいちょう",
+    "怪我",
+    "けが",
+    "具合",
+    "ぐあい"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "診断",
+     "yomi": [
+      "しんだん"
+     ]
+    },
+    {
+     "form": "容体",
+     "yomi": [
+      "ようだい"
+     ]
+    },
+    {
+     "form": "体調",
+     "yomi": [
+      "たいちょう"
+     ]
+    },
+    {
+     "form": "怪我",
+     "yomi": [
+      "けが"
+     ]
+    },
+    {
+     "form": "具合",
+     "yomi": [
+      "ぐあい"
+     ]
+    }
+   ]
+  },
+  "DIG": {
+   "ja": [
+    "掘る",
+    "ほる",
+    "掘り返す",
+    "ほりかえす",
+    "穴を掘る",
+    "あなをほる"
+   ],
+   "shapes": [
+    "IN OBJ",
+    "IN OBJ WITH OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "掘る",
+     "yomi": [
+      "ほる"
+     ]
+    },
+    {
+     "form": "掘り返す",
+     "yomi": [
+      "ほりかえす"
+     ]
+    },
+    {
+     "form": "穴を掘る",
+     "yomi": [
+      "あなをほる"
+     ]
+    }
+   ]
+  },
+  "DISEMBARK": {
+   "ja": [
+    "降りる",
+    "おりる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "降りる",
+     "yomi": [
+      "おりる"
+     ]
+    }
+   ]
+  },
+  "DISENCHANT": {
+   "ja": [
+    "魔法を解く",
+    "まほうをとく"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "魔法を解く",
+     "yomi": [
+      "まほうをとく"
+     ]
+    }
+   ]
+  },
+  "DRINK": {
+   "ja": [
+    "飲む",
+    "のむ"
+   ],
+   "shapes": [
+    "OBJ",
+    "FROM OBJ"
+   ],
+   "words": [
+    {
+     "form": "飲む",
+     "yomi": [
+      "のむ"
+     ]
+    }
+   ]
+  },
+  "DROP": {
+   "ja": [
+    "置く",
+    "おく",
+    "落とす",
+    "おとす",
+    "捨てる",
+    "すてる",
+    "手放す",
+    "てばなす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ DOWN OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ"
+   ],
+   "words": [
+    {
+     "form": "置く",
+     "yomi": [
+      "おく"
+     ]
+    },
+    {
+     "form": "落とす",
+     "yomi": [
+      "おとす"
+     ]
+    },
+    {
+     "form": "捨てる",
+     "yomi": [
+      "すてる"
+     ]
+    },
+    {
+     "form": "手放す",
+     "yomi": [
+      "てばなす"
+     ]
+    }
+   ]
+  },
+  "EAT": {
+   "ja": [
+    "食べる",
+    "たべる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "食べる",
+     "yomi": [
+      "たべる"
+     ]
+    }
+   ]
+  },
+  "ECHO": {
+   "ja": [
+    "エコー",
+    "こだま",
+    "反響",
+    "はんきょう",
+    "山彦",
+    "やまびこ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "エコー",
+     "yomi": []
+    },
+    {
+     "form": "こだま",
+     "yomi": []
+    },
+    {
+     "form": "反響",
+     "yomi": [
+      "はんきょう"
+     ]
+    },
+    {
+     "form": "山彦",
+     "yomi": [
+      "やまびこ"
+     ]
+    }
+   ]
+  },
+  "ENCHANT": {
+   "ja": [
+    "魔法をかける",
+    "まほうをかける"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "魔法をかける",
+     "yomi": [
+      "まほうをかける"
+     ]
+    }
+   ]
+  },
+  "ENTER": {
+   "ja": [
+    "入る",
+    "はいる",
+    "くぐる",
+    "入り込む",
+    "はいりこむ"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "入る",
+     "yomi": [
+      "はいる",
+      "くぐる"
+     ]
+    },
+    {
+     "form": "入り込む",
+     "yomi": [
+      "はいりこむ"
+     ]
+    }
+   ]
+  },
+  "EXAMINE": {
+   "ja": [
+    "調べる",
+    "しらべる",
+    "よく見る",
+    "よくみる",
+    "観察する",
+    "かんさつする",
+    "見てみる",
+    "みてみる",
+    "確かめる",
+    "たしかめる"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "ON OBJ"
+   ],
+   "words": [
+    {
+     "form": "調べる",
+     "yomi": [
+      "しらべる"
+     ]
+    },
+    {
+     "form": "よく見る",
+     "yomi": [
+      "よくみる"
+     ]
+    },
+    {
+     "form": "観察する",
+     "yomi": [
+      "かんさつする"
+     ]
+    },
+    {
+     "form": "見てみる",
+     "yomi": [
+      "みてみる"
+     ]
+    },
+    {
+     "form": "確かめる",
+     "yomi": [
+      "たしかめる"
+     ]
+    }
+   ]
+  },
+  "EXIT": {
+   "ja": [
+    "出る",
+    "でる",
+    "抜ける",
+    "ぬける"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "出る",
+     "yomi": [
+      "でる"
+     ]
+    },
+    {
+     "form": "抜ける",
+     "yomi": [
+      "ぬける"
+     ]
+    }
+   ]
+  },
+  "EXORCISE": {
+   "ja": [
+    "祓う",
+    "はらう",
+    "退治する",
+    "たいじする"
+   ],
+   "shapes": [
+    "OBJ",
+    "OUT OBJ",
+    "AWAY OBJ"
+   ],
+   "words": [
+    {
+     "form": "祓う",
+     "yomi": [
+      "はらう"
+     ]
+    },
+    {
+     "form": "退治する",
+     "yomi": [
+      "たいじする"
+     ]
+    }
+   ]
+  },
+  "EXTINGUISH": {
+   "ja": [
+    "消す",
+    "けす",
+    "吹き消す",
+    "ふきけす"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "消す",
+     "yomi": [
+      "けす"
+     ]
+    },
+    {
+     "form": "吹き消す",
+     "yomi": [
+      "ふきけす"
+     ]
+    }
+   ]
+  },
+  "FILL": {
+   "ja": [
+    "満たす",
+    "みたす",
+    "汲む",
+    "くむ"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "満たす",
+     "yomi": [
+      "みたす"
+     ]
+    },
+    {
+     "form": "汲む",
+     "yomi": [
+      "くむ"
+     ]
+    }
+   ]
+  },
+  "FIND": {
+   "ja": [
+    "見つける",
+    "みつける",
+    "どこ"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "見つける",
+     "yomi": [
+      "みつける"
+     ]
+    },
+    {
+     "form": "どこ",
+     "yomi": []
+    }
+   ]
+  },
+  "FOLLOW": {
+   "ja": [
+    "追う",
+    "おう",
+    "ついてくる",
+    "ついて来る",
+    "ついてこい",
+    "ついていく",
+    "従う",
+    "したがう"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "追う",
+     "yomi": [
+      "おう"
+     ]
+    },
+    {
+     "form": "ついてくる",
+     "yomi": []
+    },
+    {
+     "form": "ついて来る",
+     "yomi": [
+      "ついてくる"
+     ]
+    },
+    {
+     "form": "ついてこい",
+     "yomi": []
+    },
+    {
+     "form": "ついていく",
+     "yomi": []
+    },
+    {
+     "form": "従う",
+     "yomi": [
+      "したがう"
+     ]
+    }
+   ]
+  },
+  "FROBOZZ": {
+   "ja": [
+    "フロボズ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "フロボズ",
+     "yomi": []
+    }
+   ]
+  },
+  "GIVE": {
+   "ja": [
+    "渡す",
+    "わたす",
+    "与える",
+    "あたえる",
+    "差し出す",
+    "さしだす"
+   ],
+   "shapes": [
+    "OBJ TO OBJ",
+    "OBJ OBJ"
+   ],
+   "words": [
+    {
+     "form": "渡す",
+     "yomi": [
+      "わたす"
+     ]
+    },
+    {
+     "form": "与える",
+     "yomi": [
+      "あたえる"
+     ]
+    },
+    {
+     "form": "差し出す",
+     "yomi": [
+      "さしだす"
+     ]
+    }
+   ]
+  },
+  "HATCH": {
+   "ja": [
+    "孵す",
+    "かえす"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "孵す",
+     "yomi": [
+      "かえす"
+     ]
+    }
+   ]
+  },
+  "HELLO": {
+   "ja": [
+    "こんにちは",
+    "やあ",
+    "もしもし"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "こんにちは",
+     "yomi": []
+    },
+    {
+     "form": "やあ",
+     "yomi": []
+    },
+    {
+     "form": "もしもし",
+     "yomi": []
+    }
+   ]
+  },
+  "INCANT": {
+   "ja": [
+    "呪文を唱える",
+    "じゅもんをとなえる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "呪文を唱える",
+     "yomi": [
+      "じゅもんをとなえる"
+     ]
+    }
+   ]
+  },
+  "INFLAT": {
+   "ja": [
+    "膨らませる",
+    "ふくらませる",
+    "空気を入れる",
+    "くうきをいれる"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "膨らませる",
+     "yomi": [
+      "ふくらませる"
+     ]
+    },
+    {
+     "form": "空気を入れる",
+     "yomi": [
+      "くうきをいれる"
+     ]
+    }
+   ]
+  },
+  "INVENTORY": {
+   "ja": [
+    "持ち物",
+    "もちもの",
+    "持ち物を見る",
+    "もちものをみる",
+    "所持品",
+    "しょじひん",
+    "荷物",
+    "にもつ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "持ち物",
+     "yomi": [
+      "もちもの"
+     ]
+    },
+    {
+     "form": "持ち物を見る",
+     "yomi": [
+      "もちものをみる"
+     ]
+    },
+    {
+     "form": "所持品",
+     "yomi": [
+      "しょじひん"
+     ]
+    },
+    {
+     "form": "荷物",
+     "yomi": [
+      "にもつ"
+     ]
+    }
+   ]
+  },
+  "JUMP": {
+   "ja": [
+    "跳ぶ",
+    "とぶ",
+    "飛ぶ",
+    "飛び込む",
+    "とびこむ"
+   ],
+   "shapes": [
+    "",
+    "OVER OBJ",
+    "ACROSS OBJ",
+    "IN OBJ",
+    "FROM OBJ",
+    "OFF OBJ"
+   ],
+   "words": [
+    {
+     "form": "跳ぶ",
+     "yomi": [
+      "とぶ"
+     ]
+    },
+    {
+     "form": "飛ぶ",
+     "yomi": [
+      "とぶ"
+     ]
+    },
+    {
+     "form": "飛び込む",
+     "yomi": [
+      "とびこむ"
+     ]
+    }
+   ]
+  },
+  "KICK": {
+   "ja": [
+    "蹴る",
+    "ける"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "蹴る",
+     "yomi": [
+      "ける"
+     ]
+    }
+   ]
+  },
+  "KILL": {
+   "ja": [
+    "殺す",
+    "ころす",
+    "倒す",
+    "たおす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "殺す",
+     "yomi": [
+      "ころす"
+     ]
+    },
+    {
+     "form": "倒す",
+     "yomi": [
+      "たおす"
+     ]
+    }
+   ]
+  },
+  "KISS": {
+   "ja": [
+    "キスする",
+    "口づけする",
+    "くちづけする"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "キスする",
+     "yomi": []
+    },
+    {
+     "form": "口づけする",
+     "yomi": [
+      "くちづけする"
+     ]
+    }
+   ]
+  },
+  "KNOCK": {
+   "ja": [
+    "叩く",
+    "たたく",
+    "ノックする"
+   ],
+   "shapes": [
+    "AT OBJ",
+    "ON OBJ",
+    "DOWN OBJ"
+   ],
+   "words": [
+    {
+     "form": "叩く",
+     "yomi": [
+      "たたく"
+     ]
+    },
+    {
+     "form": "ノックする",
+     "yomi": []
+    }
+   ]
+  },
+  "LAUNCH": {
+   "ja": [
+    "漕ぎ出す",
+    "こぎだす",
+    "出す",
+    "だす",
+    "進水させる",
+    "しんすいさせる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "漕ぎ出す",
+     "yomi": [
+      "こぎだす"
+     ]
+    },
+    {
+     "form": "出す",
+     "yomi": [
+      "だす"
+     ]
+    },
+    {
+     "form": "進水させる",
+     "yomi": [
+      "しんすいさせる"
+     ]
+    }
+   ]
+  },
+  "LEAN": {
+   "ja": [
+    "もたれる",
+    "寄りかかる",
+    "よりかかる"
+   ],
+   "shapes": [
+    "ON OBJ"
+   ],
+   "words": [
+    {
+     "form": "もたれる",
+     "yomi": []
+    },
+    {
+     "form": "寄りかかる",
+     "yomi": [
+      "よりかかる"
+     ]
+    }
+   ]
+  },
+  "LEAVE": {
+   "ja": [
+    "去る",
+    "さる"
+   ],
+   "shapes": [
+    "",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "去る",
+     "yomi": [
+      "さる"
+     ]
+    }
+   ]
+  },
+  "LIGHT": {
+   "ja": [
+    "点ける",
+    "つける",
+    "灯す",
+    "ともす",
+    "火を点ける",
+    "ひをつける"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "点ける",
+     "yomi": [
+      "つける"
+     ]
+    },
+    {
+     "form": "灯す",
+     "yomi": [
+      "ともす"
+     ]
+    },
+    {
+     "form": "火を点ける",
+     "yomi": [
+      "ひをつける"
+     ]
+    }
+   ]
+  },
+  "LISTEN": {
+   "ja": [
+    "聞く",
+    "きく",
+    "耳を澄ます",
+    "みみをすます"
+   ],
+   "shapes": [
+    "TO OBJ",
+    "FOR OBJ"
+   ],
+   "words": [
+    {
+     "form": "聞く",
+     "yomi": [
+      "きく"
+     ]
+    },
+    {
+     "form": "耳を澄ます",
+     "yomi": [
+      "みみをすます"
+     ]
+    }
+   ]
+  },
+  "LOCK": {
+   "ja": [
+    "鍵をかける",
+    "かぎをかける",
+    "錠をかける",
+    "じょうをかける",
+    "施錠する",
+    "せじょうする"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "鍵をかける",
+     "yomi": [
+      "かぎをかける"
+     ]
+    },
+    {
+     "form": "錠をかける",
+     "yomi": [
+      "じょうをかける"
+     ]
+    },
+    {
+     "form": "施錠する",
+     "yomi": [
+      "せじょうする"
+     ]
+    }
+   ]
+  },
+  "LOOK": {
+   "ja": [
+    "見る",
+    "みる",
+    "見回す",
+    "みまわす",
+    "あたりを見る",
+    "あたりをみる",
+    "眺める",
+    "ながめる",
+    "覗く",
+    "のぞく",
+    "中を見る",
+    "なかをみる"
+   ],
+   "shapes": [
+    "",
+    "AROUND OBJ",
+    "UP OBJ",
+    "DOWN OBJ",
+    "AT OBJ",
+    "ON OBJ",
+    "WITH OBJ",
+    "UNDER OBJ",
+    "BEHIND OBJ",
+    "IN OBJ",
+    "AT OBJ WITH OBJ",
+    "FOR OBJ"
+   ],
+   "words": [
+    {
+     "form": "見る",
+     "yomi": [
+      "みる"
+     ]
+    },
+    {
+     "form": "見回す",
+     "yomi": [
+      "みまわす"
+     ]
+    },
+    {
+     "form": "あたりを見る",
+     "yomi": [
+      "あたりをみる"
+     ]
+    },
+    {
+     "form": "眺める",
+     "yomi": [
+      "ながめる"
+     ]
+    },
+    {
+     "form": "覗く",
+     "yomi": [
+      "のぞく"
+     ]
+    },
+    {
+     "form": "中を見る",
+     "yomi": [
+      "なかをみる"
+     ]
+    }
+   ]
+  },
+  "LOWER": {
+   "ja": [
+    "下げる",
+    "さげる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "下げる",
+     "yomi": [
+      "さげる"
+     ]
+    }
+   ]
+  },
+  "LUBRICATE": {
+   "ja": [
+    "油を差す",
+    "あぶらをさす",
+    "塗る",
+    "ぬる"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "油を差す",
+     "yomi": [
+      "あぶらをさす"
+     ]
+    },
+    {
+     "form": "塗る",
+     "yomi": [
+      "ぬる"
+     ]
+    }
+   ]
+  },
+  "MAKE": {
+   "ja": [
+    "作る",
+    "つくる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "作る",
+     "yomi": [
+      "つくる"
+     ]
+    }
+   ]
+  },
+  "MELT": {
+   "ja": [
+    "溶かす",
+    "とかす"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "溶かす",
+     "yomi": [
+      "とかす"
+     ]
+    }
+   ]
+  },
+  "MOVE": {
+   "ja": [
+    "動かす",
+    "どかす",
+    "うごかす",
+    "ずらす",
+    "めくる",
+    "どける",
+    "寄せる",
+    "よせる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ OBJ",
+    "OBJ TO OBJ",
+    "OBJ IN OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "動かす",
+     "yomi": [
+      "どかす",
+      "うごかす"
+     ]
+    },
+    {
+     "form": "ずらす",
+     "yomi": []
+    },
+    {
+     "form": "めくる",
+     "yomi": []
+    },
+    {
+     "form": "どける",
+     "yomi": []
+    },
+    {
+     "form": "寄せる",
+     "yomi": [
+      "よせる"
+     ]
+    }
+   ]
+  },
+  "MUMBLE": {
+   "ja": [
+    "つぶやく",
+    "ぶつぶつ言う",
+    "ぶつぶついう"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "つぶやく",
+     "yomi": []
+    },
+    {
+     "form": "ぶつぶつ言う",
+     "yomi": [
+      "ぶつぶついう"
+     ]
+    }
+   ]
+  },
+  "ODYSSEUS": {
+   "ja": [
+    "オデュッセウス",
+    "ユリシーズ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "オデュッセウス",
+     "yomi": []
+    },
+    {
+     "form": "ユリシーズ",
+     "yomi": []
+    }
+   ]
+  },
+  "OPEN": {
+   "ja": [
+    "開ける",
+    "あける",
+    "開く",
+    "ひらく"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "開ける",
+     "yomi": [
+      "あける"
+     ]
+    },
+    {
+     "form": "開く",
+     "yomi": [
+      "ひらく"
+     ]
+    }
+   ]
+  },
+  "PICK": {
+   "ja": [
+    "こじ開ける",
+    "こじあける",
+    "開錠する",
+    "かいじょうする",
+    "摘む",
+    "つむ"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "こじ開ける",
+     "yomi": [
+      "こじあける"
+     ]
+    },
+    {
+     "form": "開錠する",
+     "yomi": [
+      "かいじょうする"
+     ]
+    },
+    {
+     "form": "摘む",
+     "yomi": [
+      "つむ"
+     ]
+    }
+   ]
+  },
+  "PLAY": {
+   "ja": [
+    "演奏する",
+    "えんそうする",
+    "遊ぶ",
+    "あそぶ"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "演奏する",
+     "yomi": [
+      "えんそうする"
+     ]
+    },
+    {
+     "form": "遊ぶ",
+     "yomi": [
+      "あそぶ"
+     ]
+    }
+   ]
+  },
+  "PLUG": {
+   "ja": [
+    "塞ぐ",
+    "ふさぐ",
+    "詰める",
+    "つめる"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "塞ぐ",
+     "yomi": [
+      "ふさぐ"
+     ]
+    },
+    {
+     "form": "詰める",
+     "yomi": [
+      "つめる"
+     ]
+    }
+   ]
+  },
+  "PLUGH": {
+   "ja": [
+    "プラグ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "プラグ",
+     "yomi": []
+    }
+   ]
+  },
+  "POKE": {
+   "ja": [
+    "突く",
+    "つく"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "突く",
+     "yomi": [
+      "つく"
+     ]
+    }
+   ]
+  },
+  "POUR": {
+   "ja": [
+    "注ぐ",
+    "そそぐ"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "OBJ FROM OBJ"
+   ],
+   "words": [
+    {
+     "form": "注ぐ",
+     "yomi": [
+      "そそぐ"
+     ]
+    }
+   ]
+  },
+  "PRAY": {
+   "ja": [
+    "祈る",
+    "いのる",
+    "祈りを捧げる",
+    "いのりをささげる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "祈る",
+     "yomi": [
+      "いのる"
+     ]
+    },
+    {
+     "form": "祈りを捧げる",
+     "yomi": [
+      "いのりをささげる"
+     ]
+    }
+   ]
+  },
+  "PULL": {
+   "ja": [
+    "引く",
+    "ひく",
+    "引っ張る",
+    "ひっぱる",
+    "たぐる"
+   ],
+   "shapes": [
+    "OBJ",
+    "ON OBJ",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "引く",
+     "yomi": [
+      "ひく"
+     ]
+    },
+    {
+     "form": "引っ張る",
+     "yomi": [
+      "ひっぱる"
+     ]
+    },
+    {
+     "form": "たぐる",
+     "yomi": []
+    }
+   ]
+  },
+  "PUMP": {
+   "ja": [
+    "空気を送る",
+    "くうきをおくる",
+    "ポンプで膨らませる",
+    "ぽんぷでふくらませる"
+   ],
+   "shapes": [
+    "UP OBJ",
+    "UP OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "空気を送る",
+     "yomi": [
+      "くうきをおくる"
+     ]
+    },
+    {
+     "form": "ポンプで膨らませる",
+     "yomi": [
+      "ぽんぷでふくらませる"
+     ]
+    }
+   ]
+  },
+  "PUNCTURE": {
+   "ja": [
+    "穴を開ける",
+    "あなをあける",
+    "突き刺す",
+    "つきさす"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "穴を開ける",
+     "yomi": [
+      "あなをあける"
+     ]
+    },
+    {
+     "form": "突き刺す",
+     "yomi": [
+      "つきさす"
+     ]
+    }
+   ]
+  },
+  "PUSH": {
+   "ja": [
+    "押す",
+    "おす"
+   ],
+   "shapes": [
+    "OBJ OBJ",
+    "OBJ TO OBJ",
+    "OBJ",
+    "ON OBJ",
+    "OBJ WITH OBJ",
+    "OBJ UNDER OBJ"
+   ],
+   "words": [
+    {
+     "form": "押す",
+     "yomi": [
+      "おす"
+     ]
+    }
+   ]
+  },
+  "PUT": {
+   "ja": [
+    "入れる",
+    "いれる",
+    "置く",
+    "おく",
+    "しまう",
+    "収める",
+    "おさめる",
+    "隠す",
+    "かくす"
+   ],
+   "shapes": [
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "DOWN OBJ",
+    "OBJ UNDER OBJ",
+    "OUT OBJ",
+    "ON OBJ",
+    "OBJ BEHIND OBJ"
+   ],
+   "words": [
+    {
+     "form": "入れる",
+     "yomi": [
+      "いれる"
+     ]
+    },
+    {
+     "form": "置く",
+     "yomi": [
+      "おく"
+     ]
+    },
+    {
+     "form": "しまう",
+     "yomi": []
+    },
+    {
+     "form": "収める",
+     "yomi": [
+      "おさめる"
+     ]
+    },
+    {
+     "form": "隠す",
+     "yomi": [
+      "かくす"
+     ]
+    }
+   ]
+  },
+  "QUIT": {
+   "ja": [
+    "やめる",
+    "終わる",
+    "おわる",
+    "終了",
+    "しゅうりょう",
+    "終了する",
+    "しゅうりょうする",
+    "終わりにする",
+    "おわりにする",
+    "ゲームをやめる",
+    "げーむをやめる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "やめる",
+     "yomi": []
+    },
+    {
+     "form": "終わる",
+     "yomi": [
+      "おわる"
+     ]
+    },
+    {
+     "form": "終了",
+     "yomi": [
+      "しゅうりょう"
+     ]
+    },
+    {
+     "form": "終了する",
+     "yomi": [
+      "しゅうりょうする"
+     ]
+    },
+    {
+     "form": "終わりにする",
+     "yomi": [
+      "おわりにする"
+     ]
+    },
+    {
+     "form": "ゲームをやめる",
+     "yomi": [
+      "げーむをやめる"
+     ]
+    }
+   ]
+  },
+  "RAISE": {
+   "ja": [
+    "持ち上げる",
+    "もちあげる"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "持ち上げる",
+     "yomi": [
+      "もちあげる"
+     ]
+    }
+   ]
+  },
+  "READ": {
+   "ja": [
+    "読む",
+    "よむ",
+    "目を通す",
+    "めをとおす"
+   ],
+   "shapes": [
+    "OBJ",
+    "FROM OBJ",
+    "OBJ WITH OBJ",
+    "OBJ OBJ"
+   ],
+   "words": [
+    {
+     "form": "読む",
+     "yomi": [
+      "よむ"
+     ]
+    },
+    {
+     "form": "目を通す",
+     "yomi": [
+      "めをとおす"
+     ]
+    }
+   ]
+  },
+  "REPENT": {
+   "ja": [
+    "悔い改める",
+    "くいあらためる",
+    "悔いる",
+    "くいる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "悔い改める",
+     "yomi": [
+      "くいあらためる"
+     ]
+    },
+    {
+     "form": "悔いる",
+     "yomi": [
+      "くいる"
+     ]
+    }
+   ]
+  },
+  "RESTART": {
+   "ja": [
+    "やり直す",
+    "やりなおす",
+    "最初から",
+    "さいしょから",
+    "最初からやる",
+    "さいしょからやる",
+    "リスタート"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "やり直す",
+     "yomi": [
+      "やりなおす"
+     ]
+    },
+    {
+     "form": "最初から",
+     "yomi": [
+      "さいしょから"
+     ]
+    },
+    {
+     "form": "最初からやる",
+     "yomi": [
+      "さいしょからやる"
+     ]
+    },
+    {
+     "form": "リスタート",
+     "yomi": []
+    }
+   ]
+  },
+  "RESTORE": {
+   "ja": [
+    "再開する",
+    "さいかいする",
+    "読み込む",
+    "よみこむ",
+    "復帰する",
+    "ふっきする",
+    "ロード"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "再開する",
+     "yomi": [
+      "さいかいする"
+     ]
+    },
+    {
+     "form": "読み込む",
+     "yomi": [
+      "よみこむ"
+     ]
+    },
+    {
+     "form": "復帰する",
+     "yomi": [
+      "ふっきする"
+     ]
+    },
+    {
+     "form": "ロード",
+     "yomi": []
+    }
+   ]
+  },
+  "RING": {
+   "ja": [
+    "鳴らす",
+    "ならす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "鳴らす",
+     "yomi": [
+      "ならす"
+     ]
+    }
+   ]
+  },
+  "ROLL": {
+   "ja": [
+    "転がす",
+    "ころがす",
+    "巻く",
+    "まく"
+   ],
+   "shapes": [
+    "UP OBJ",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "転がす",
+     "yomi": [
+      "ころがす"
+     ]
+    },
+    {
+     "form": "巻く",
+     "yomi": [
+      "まく"
+     ]
+    }
+   ]
+  },
+  "RUB": {
+   "ja": [
+    "触る",
+    "さわる",
+    "触れる",
+    "ふれる",
+    "撫でる",
+    "なでる",
+    "こする"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "触る",
+     "yomi": [
+      "さわる"
+     ]
+    },
+    {
+     "form": "触れる",
+     "yomi": [
+      "ふれる"
+     ]
+    },
+    {
+     "form": "撫でる",
+     "yomi": [
+      "なでる"
+     ]
+    },
+    {
+     "form": "こする",
+     "yomi": []
+    }
+   ]
+  },
+  "SAVE": {
+   "ja": [
+    "保存する",
+    "ほぞんする",
+    "記録する",
+    "きろくする",
+    "セーブ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "保存する",
+     "yomi": [
+      "ほぞんする"
+     ]
+    },
+    {
+     "form": "記録する",
+     "yomi": [
+      "きろくする"
+     ]
+    },
+    {
+     "form": "セーブ",
+     "yomi": []
+    }
+   ]
+  },
+  "SAY": {
+   "ja": [
+    "言う",
+    "いう"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "言う",
+     "yomi": [
+      "いう"
+     ]
+    }
+   ]
+  },
+  "SCORE": {
+   "ja": [
+    "得点",
+    "とくてん",
+    "点数",
+    "てんすう",
+    "成績",
+    "せいせき",
+    "スコア"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "得点",
+     "yomi": [
+      "とくてん"
+     ]
+    },
+    {
+     "form": "点数",
+     "yomi": [
+      "てんすう"
+     ]
+    },
+    {
+     "form": "成績",
+     "yomi": [
+      "せいせき"
+     ]
+    },
+    {
+     "form": "スコア",
+     "yomi": []
+    }
+   ]
+  },
+  "SEARCH": {
+   "ja": [
+    "探す",
+    "さがす",
+    "中を探る",
+    "なかをさぐる",
+    "漁る",
+    "あさる",
+    "調べ回る",
+    "しらべまわる"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "FOR OBJ"
+   ],
+   "words": [
+    {
+     "form": "探す",
+     "yomi": [
+      "さがす"
+     ]
+    },
+    {
+     "form": "中を探る",
+     "yomi": [
+      "なかをさぐる"
+     ]
+    },
+    {
+     "form": "漁る",
+     "yomi": [
+      "あさる"
+     ]
+    },
+    {
+     "form": "調べ回る",
+     "yomi": [
+      "しらべまわる"
+     ]
+    }
+   ]
+  },
+  "SEND": {
+   "ja": [
+    "呼ぶ",
+    "よぶ"
+   ],
+   "shapes": [
+    "FOR OBJ"
+   ],
+   "words": [
+    {
+     "form": "呼ぶ",
+     "yomi": [
+      "よぶ"
+     ]
+    }
+   ]
+  },
+  "SHAKE": {
+   "ja": [
+    "揺する",
+    "ゆする"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "揺する",
+     "yomi": [
+      "ゆする"
+     ]
+    }
+   ]
+  },
+  "SKIP": {
+   "ja": [
+    "スキップする"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "スキップする",
+     "yomi": []
+    }
+   ]
+  },
+  "SLIDE": {
+   "ja": [
+    "滑り降りる",
+    "すべりおりる",
+    "滑る",
+    "すべる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ UNDER OBJ",
+    "OBJ OBJ",
+    "OBJ TO OBJ"
+   ],
+   "words": [
+    {
+     "form": "滑り降りる",
+     "yomi": [
+      "すべりおりる"
+     ]
+    },
+    {
+     "form": "滑る",
+     "yomi": [
+      "すべる"
+     ]
+    }
+   ]
+  },
+  "SMELL": {
+   "ja": [
+    "嗅ぐ",
+    "かぐ",
+    "匂いを嗅ぐ",
+    "においをかぐ"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "嗅ぐ",
+     "yomi": [
+      "かぐ"
+     ]
+    },
+    {
+     "form": "匂いを嗅ぐ",
+     "yomi": [
+      "においをかぐ"
+     ]
+    }
+   ]
+  },
+  "SPIN": {
+   "ja": [
+    "回転させる",
+    "かいてんさせる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "回転させる",
+     "yomi": [
+      "かいてんさせる"
+     ]
+    }
+   ]
+  },
+  "SPRAY": {
+   "ja": [
+    "吹きかける",
+    "ふきかける",
+    "かける"
+   ],
+   "shapes": [
+    "OBJ ON OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "吹きかける",
+     "yomi": [
+      "ふきかける"
+     ]
+    },
+    {
+     "form": "かける",
+     "yomi": []
+    }
+   ]
+  },
+  "SQUEEZE": {
+   "ja": [
+    "握る",
+    "にぎる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ ON OBJ"
+   ],
+   "words": [
+    {
+     "form": "握る",
+     "yomi": [
+      "にぎる"
+     ]
+    }
+   ]
+  },
+  "STAB": {
+   "ja": [
+    "刺す",
+    "さす",
+    "突く",
+    "つく"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "刺す",
+     "yomi": [
+      "さす"
+     ]
+    },
+    {
+     "form": "突く",
+     "yomi": [
+      "つく"
+     ]
+    }
+   ]
+  },
+  "STAND": {
+   "ja": [
+    "立つ",
+    "たつ"
+   ],
+   "shapes": [
+    "",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "立つ",
+     "yomi": [
+      "たつ"
+     ]
+    }
+   ]
+  },
+  "STAY": {
+   "ja": [
+    "とどまる",
+    "止まる",
+    "とまる",
+    "残る",
+    "のこる",
+    "ここにいる"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "とどまる",
+     "yomi": []
+    },
+    {
+     "form": "止まる",
+     "yomi": [
+      "とまる"
+     ]
+    },
+    {
+     "form": "残る",
+     "yomi": [
+      "のこる"
+     ]
+    },
+    {
+     "form": "ここにいる",
+     "yomi": []
+    }
+   ]
+  },
+  "STRIKE": {
+   "ja": [
+    "打つ",
+    "うつ"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "打つ",
+     "yomi": [
+      "うつ"
+     ]
+    }
+   ]
+  },
+  "SUPER": {
+   "ja": [
+    "ごく簡潔に",
+    "ごくかんけつに",
+    "超簡潔",
+    "ちょうかんけつ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "ごく簡潔に",
+     "yomi": [
+      "ごくかんけつに"
+     ]
+    },
+    {
+     "form": "超簡潔",
+     "yomi": [
+      "ちょうかんけつ"
+     ]
+    }
+   ]
+  },
+  "SWIM": {
+   "ja": [
+    "泳ぐ",
+    "およぐ"
+   ],
+   "shapes": [
+    "",
+    "IN OBJ",
+    "ACROSS OBJ"
+   ],
+   "words": [
+    {
+     "form": "泳ぐ",
+     "yomi": [
+      "およぐ"
+     ]
+    }
+   ]
+  },
+  "SWING": {
+   "ja": [
+    "振る",
+    "ふる",
+    "振り回す",
+    "ふりまわす"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ AT OBJ"
+   ],
+   "words": [
+    {
+     "form": "振る",
+     "yomi": [
+      "ふる"
+     ]
+    },
+    {
+     "form": "振り回す",
+     "yomi": [
+      "ふりまわす"
+     ]
+    }
+   ]
+  },
+  "TAKE": {
+   "ja": [
+    "取る",
+    "とる",
+    "拾う",
+    "ひろう",
+    "持つ",
+    "もつ",
+    "手に取る",
+    "てにとる",
+    "手にする",
+    "てにする",
+    "掴む",
+    "つかむ",
+    "捕まえる",
+    "つかまえる",
+    "外す",
+    "はずす",
+    "取り外す",
+    "とりはずす"
+   ],
+   "shapes": [
+    "OBJ",
+    "IN OBJ",
+    "OUT OBJ",
+    "ON OBJ",
+    "UP OBJ",
+    "OBJ OUT OBJ",
+    "OBJ OFF OBJ",
+    "OBJ FROM OBJ"
+   ],
+   "words": [
+    {
+     "form": "取る",
+     "yomi": [
+      "とる"
+     ]
+    },
+    {
+     "form": "拾う",
+     "yomi": [
+      "ひろう"
+     ]
+    },
+    {
+     "form": "持つ",
+     "yomi": [
+      "もつ"
+     ]
+    },
+    {
+     "form": "手に取る",
+     "yomi": [
+      "てにとる"
+     ]
+    },
+    {
+     "form": "手にする",
+     "yomi": [
+      "てにする"
+     ]
+    },
+    {
+     "form": "掴む",
+     "yomi": [
+      "つかむ"
+     ]
+    },
+    {
+     "form": "捕まえる",
+     "yomi": [
+      "つかまえる"
+     ]
+    },
+    {
+     "form": "外す",
+     "yomi": [
+      "はずす"
+     ]
+    },
+    {
+     "form": "取り外す",
+     "yomi": [
+      "とりはずす"
+     ]
+    }
+   ]
+  },
+  "TALK": {
+   "ja": [
+    "話しかける",
+    "はなしかける",
+    "話す",
+    "はなす"
+   ],
+   "shapes": [
+    "TO OBJ"
+   ],
+   "words": [
+    {
+     "form": "話しかける",
+     "yomi": [
+      "はなしかける"
+     ]
+    },
+    {
+     "form": "話す",
+     "yomi": [
+      "はなす"
+     ]
+    }
+   ]
+  },
+  "TELL": {
+   "ja": [
+    "伝える",
+    "つたえる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ ABOUT OBJ"
+   ],
+   "words": [
+    {
+     "form": "伝える",
+     "yomi": [
+      "つたえる"
+     ]
+    }
+   ]
+  },
+  "THROW": {
+   "ja": [
+    "投げる",
+    "なげる",
+    "放る",
+    "ほうる"
+   ],
+   "shapes": [
+    "OBJ AT OBJ",
+    "OBJ WITH OBJ",
+    "OBJ OBJ",
+    "OBJ IN OBJ",
+    "OBJ ON OBJ",
+    "OBJ OFF OBJ",
+    "OBJ OVER OBJ"
+   ],
+   "words": [
+    {
+     "form": "投げる",
+     "yomi": [
+      "なげる"
+     ]
+    },
+    {
+     "form": "放る",
+     "yomi": [
+      "ほうる"
+     ]
+    }
+   ]
+  },
+  "TIE": {
+   "ja": [
+    "結ぶ",
+    "むすぶ",
+    "縛る",
+    "しばる",
+    "繋ぐ",
+    "つなぐ"
+   ],
+   "shapes": [
+    "OBJ TO OBJ",
+    "UP OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "結ぶ",
+     "yomi": [
+      "むすぶ"
+     ]
+    },
+    {
+     "form": "縛る",
+     "yomi": [
+      "しばる"
+     ]
+    },
+    {
+     "form": "繋ぐ",
+     "yomi": [
+      "つなぐ"
+     ]
+    }
+   ]
+  },
+  "TREASURE": {
+   "ja": [
+    "宝",
+    "たから"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "宝",
+     "yomi": [
+      "たから"
+     ]
+    }
+   ]
+  },
+  "TURN": {
+   "ja": [
+    "回す",
+    "まわす",
+    "捻る",
+    "ひねる",
+    "合わせる",
+    "あわせる"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ",
+    "ON OBJ",
+    "ON OBJ WITH OBJ",
+    "OFF OBJ",
+    "OBJ TO OBJ",
+    "OBJ FOR OBJ",
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "回す",
+     "yomi": [
+      "まわす"
+     ]
+    },
+    {
+     "form": "捻る",
+     "yomi": [
+      "ひねる"
+     ]
+    },
+    {
+     "form": "合わせる",
+     "yomi": [
+      "あわせる"
+     ]
+    }
+   ]
+  },
+  "UNLOCK": {
+   "ja": [
+    "鍵を開ける",
+    "かぎをあける",
+    "錠を開ける",
+    "じょうをあける",
+    "錠を外す",
+    "じょうをはずす",
+    "開錠する",
+    "かいじょうする"
+   ],
+   "shapes": [
+    "OBJ WITH OBJ"
+   ],
+   "words": [
+    {
+     "form": "鍵を開ける",
+     "yomi": [
+      "かぎをあける"
+     ]
+    },
+    {
+     "form": "錠を開ける",
+     "yomi": [
+      "じょうをあける"
+     ]
+    },
+    {
+     "form": "錠を外す",
+     "yomi": [
+      "じょうをはずす"
+     ]
+    },
+    {
+     "form": "開錠する",
+     "yomi": [
+      "かいじょうする"
+     ]
+    }
+   ]
+  },
+  "UNTIE": {
+   "ja": [
+    "解く",
+    "とく",
+    "解きほどく",
+    "ときほどく",
+    "ほどく"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ FROM OBJ"
+   ],
+   "words": [
+    {
+     "form": "解く",
+     "yomi": [
+      "とく"
+     ]
+    },
+    {
+     "form": "解きほどく",
+     "yomi": [
+      "ときほどく"
+     ]
+    },
+    {
+     "form": "ほどく",
+     "yomi": []
+    }
+   ]
+  },
+  "VERBOSE": {
+   "ja": [
+    "詳しく",
+    "くわしく"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "詳しく",
+     "yomi": [
+      "くわしく"
+     ]
+    }
+   ]
+  },
+  "VERSION": {
+   "ja": [
+    "バージョン",
+    "ばーじょん"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "バージョン",
+     "yomi": [
+      "ばーじょん"
+     ]
+    }
+   ]
+  },
+  "WAIT": {
+   "ja": [
+    "待つ",
+    "まつ",
+    "休む",
+    "やすむ",
+    "待機",
+    "たいき",
+    "やり過ごす",
+    "やりすごす",
+    "そのまま"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "待つ",
+     "yomi": [
+      "まつ"
+     ]
+    },
+    {
+     "form": "休む",
+     "yomi": [
+      "やすむ"
+     ]
+    },
+    {
+     "form": "待機",
+     "yomi": [
+      "たいき"
+     ]
+    },
+    {
+     "form": "やり過ごす",
+     "yomi": [
+      "やりすごす"
+     ]
+    },
+    {
+     "form": "そのまま",
+     "yomi": []
+    }
+   ]
+  },
+  "WAKE": {
+   "ja": [
+    "起こす",
+    "おこす"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "起こす",
+     "yomi": [
+      "おこす"
+     ]
+    }
+   ]
+  },
+  "WALK": {
+   "ja": [
+    "行く",
+    "いく",
+    "歩く",
+    "あるく",
+    "進む",
+    "すすむ"
+   ],
+   "shapes": [
+    "",
+    "OBJ",
+    "AWAY OBJ",
+    "IN OBJ",
+    "WITH OBJ",
+    "ON OBJ",
+    "OVER OBJ",
+    "TO OBJ",
+    "AROUND OBJ",
+    "UP OBJ",
+    "DOWN OBJ"
+   ],
+   "words": [
+    {
+     "form": "行く",
+     "yomi": [
+      "いく"
+     ]
+    },
+    {
+     "form": "歩く",
+     "yomi": [
+      "あるく"
+     ]
+    },
+    {
+     "form": "進む",
+     "yomi": [
+      "すすむ"
+     ]
+    }
+   ]
+  },
+  "WAVE": {
+   "ja": [
+    "振る",
+    "ふる"
+   ],
+   "shapes": [
+    "OBJ",
+    "OBJ AT OBJ",
+    "AT OBJ"
+   ],
+   "words": [
+    {
+     "form": "振る",
+     "yomi": [
+      "ふる"
+     ]
+    }
+   ]
+  },
+  "WEAR": {
+   "ja": [
+    "身に着ける",
+    "みにつける",
+    "着る",
+    "きる"
+   ],
+   "shapes": [
+    "OBJ"
+   ],
+   "words": [
+    {
+     "form": "身に着ける",
+     "yomi": [
+      "みにつける"
+     ]
+    },
+    {
+     "form": "着る",
+     "yomi": [
+      "きる"
+     ]
+    }
+   ]
+  },
+  "WIN": {
+   "ja": [
+    "勝つ",
+    "かつ"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "勝つ",
+     "yomi": [
+      "かつ"
+     ]
+    }
+   ]
+  },
+  "WIND": {
+   "ja": [
+    "巻く",
+    "まく",
+    "ねじを巻く",
+    "ねじをまく",
+    "ぜんまいを巻く",
+    "ぜんまいをまく"
+   ],
+   "shapes": [
+    "OBJ",
+    "UP OBJ"
+   ],
+   "words": [
+    {
+     "form": "巻く",
+     "yomi": [
+      "まく"
+     ]
+    },
+    {
+     "form": "ねじを巻く",
+     "yomi": [
+      "ねじをまく"
+     ]
+    },
+    {
+     "form": "ぜんまいを巻く",
+     "yomi": [
+      "ぜんまいをまく"
+     ]
+    }
+   ]
+  },
+  "WISH": {
+   "ja": [
+    "願う",
+    "ねがう"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "願う",
+     "yomi": [
+      "ねがう"
+     ]
+    }
+   ]
+  },
+  "YELL": {
+   "ja": [
+    "叫ぶ",
+    "さけぶ",
+    "わめく"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "叫ぶ",
+     "yomi": [
+      "さけぶ"
+     ]
+    },
+    {
+     "form": "わめく",
+     "yomi": []
+    }
+   ]
+  },
+  "ZORK": {
+   "ja": [
+    "ゾーク"
+   ],
+   "shapes": [
+    ""
+   ],
+   "words": [
+    {
+     "form": "ゾーク",
+     "yomi": []
+    }
+   ]
+  }
+ }
+}

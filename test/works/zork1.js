@@ -12,6 +12,9 @@ module.exports = {
   start: 'West of House',
   save: { cmds: ['open mailbox', 'save', 'north', 'north', 'restore', 'look'] },
   walkthrough: 'walkthrough.txt',
+  // ★通しの最後に着く場所（状態行の英語の部屋名）。手の列が途中で崩れたら赤になる（2026-11-15）
+  //   ★この作品の手の列は結末まで行かない（途中まで）。いまの終わりの場所を固定して、崩れたら気づけるようにした
+  walkthroughEnd: 'Canyon View',
   // ★1 字のコマンド不適語（滝）が載っている = run-swallow.js の「名指しできるか」の見張りが効く。
   //   無くなったら赤にする（見張りが素通りになるので）
   nocmdOneChar: true,

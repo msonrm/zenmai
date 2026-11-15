@@ -158,6 +158,9 @@
   /* ── 本文 ── */
   #screen { flex: 1 1 auto; overflow-y: auto; padding-top: 1.3em; padding-bottom: 2em; background: var(--bg) }
   #screen p { margin: 0 0 .9em; white-space: pre-wrap }
+  /* 形を保って出す行（等幅の図）。日本語の字は幅 2ch の箱に入れて列をそろえる */
+  #screen p .fixed { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre }
+  #screen p .fixed .w2 { display: inline-block; width: 2ch; text-align: center }
   /* ★場所名の行。原作は改行だけで区切る（1980 年の端末の書式）が、
      ここは HTML なので段落の頭だと分かるようにする。
      ★色は**本文と同じ**にする —— 場所名は情景描写の側であって、

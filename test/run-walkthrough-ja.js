@@ -40,6 +40,7 @@ const NOT_HERE = /can't see any .* here!/i      // 別案を順に試す（手�
 
 let n = 0
 let place = ''
+let lastRoom = ''               // ★状態行の英語の部屋名（結末の見張り）
 let rawSince = ''
 let cur = null                 // いまの手 { ja, r, en, raw[] }
 let trial = null               // 別案を順に試している最中
@@ -54,7 +55,7 @@ const Glk = createGlk({
   cols: 64,
   rows: 24,
   write(text) { rawSince += text; tr.feed(text) },
-  status(line) { place = tr.word((line.match(/^(.*?)\s{2,}/) || [0, line])[1]) },
+  status(line) { lastRoom = ((line.match(/^(.*?)\s{2,}/) || [0, line])[1]).trim(); place = tr.word(lastRoom) },
   update() {
     tr.flush()
     for (const s of tr.stats.missed) if (!seenMiss.has(s)) { seenMiss.set(s, true); note('未訳', s) }
@@ -131,6 +132,10 @@ function finish() {
   if (process.env.VERBOSE) console.log('\n' + log.join('\n') + '\n')
   const byKind = {}
   for (const p of problems) (byKind[p.kind] = byKind[p.kind] || []).push(p)
+  // ★**最後に着いた場所**（2026-11-15）。「どの◯◯のことか」は状態による返事なので問題に数えないが、それで 1 手ずれると
+  //   問題 0 件のまま結末に着かない（Zork III の木の扉で踏んだ）。`ZENMAI_END`（英語の部屋名）を渡されたら、違えば問題にする
+  console.log(`★最後の場所: ${lastRoom}`)
+  if (process.env.ZENMAI_END && lastRoom !== process.env.ZENMAI_END) { n = steps.length; cur = null; note('結末に着かなかった', `最後の場所 ${lastRoom}（期待: ${process.env.ZENMAI_END}）`) }
   console.log(`★問題 ${problems.length} 件`)
   for (const [k, ps] of Object.entries(byKind)) {
     console.log(`\n[${k}] ${ps.length} 件`)

@@ -13,8 +13,8 @@ await mkdir(OUT, { recursive: true })
 
 // 1 階層に畳む（配布に要るものだけ）
 for (const d of ['src', 'assets']) await cp(path.join(ROOT, d), path.join(OUT, d), { recursive: true })
-// ★公開する作品は ZENMAI_WORKS（既定 zork1,zork2。2026-10-06 に zork2 を足した）。作りかけの作品の訳・語彙（assets/zork2-*.json など）は配らない
-const WORKS = (process.env.ZENMAI_WORKS || 'zork1,zork2').split(',').map((s) => s.trim()).filter(Boolean)
+// ★公開する作品は ZENMAI_WORKS（既定 zork1,zork2,zork3。2026-10-06 に zork2、2026-11-15 に zork3 を足した）。作りかけの作品の訳・語彙は配らない
+const WORKS = (process.env.ZENMAI_WORKS || 'zork1,zork2,zork3').split(',').map((s) => s.trim()).filter(Boolean)
 for (const f of await readdir(path.join(OUT, 'assets'))) {
   const m = /^(zork\d)-/.exec(f)
   if (m && !WORKS.includes(m[1])) await rm(path.join(OUT, 'assets', f))

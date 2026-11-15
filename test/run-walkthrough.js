@@ -21,14 +21,16 @@ const cmds = fs.readFileSync(process.argv[2], 'utf8').split('\n').map((s) => s.t
 let n = 0
 let place = ''
 const seen = new Map()          // 未訳の行 → 初めて出た手数
+let lastRoom = ''               // ★状態行の英語の部屋名（最後にどこへ着いたか = 結末の見張り）
+const shown = []                // 訳したあとの出力（英字の残りを数える）
 
 const Glk = createGlk({
   cols: 64,
   rows: 24,
-  write(text) { tr.feed(text) },                       // 画面には出さない（ログだけ取る）
-  status(line) { place = tr.word((line.match(/^(.*?)\s{2,}/) || [0, line])[1]) },
+  write(text) { shown.push(tr.feed(text)) },           // 画面には出さない（ログだけ取る。訳したあとの字は英字の見張りに使う）
+  status(line) { lastRoom = ((line.match(/^(.*?)\s{2,}/) || [0, line])[1]).trim(); place = tr.word(lastRoom) },
   update() {
-    tr.flush()
+    shown.push(tr.flush() || '')
     for (const s of tr.stats.missed) if (!seen.has(s)) seen.set(s, `${n} 手目 / ${place}`)
     if (Glk.waitingFor() === 'char') return setImmediate(() => Glk.submitChar(32))
     if (Glk.waitingFor() !== 'line') return
@@ -73,6 +75,25 @@ function finish() {
   // ★スロットに英語が残ったもの。**行としては引けている**ので未訳には出ない
   //   （実プレイで `a clove of garlic, and a lunch` が英語のまま出た）
   console.log(`★スロットに英語が残った語: ${m.rawWords.size} 種\n`)
+  // ★**英字が残った行**（2026-11-15）。1 行のうち後ろの文だけ訳せたとき（貪欲な照合）や、「訳さない行」の部分一致に
+  //   引っかかったとき、**英語のまま画面に出るのに未訳 0 行と数えられる**（Zork III の石の扉・胸壁の説明で踏んだ）。
+  //   訳したあとの字から、英字の語が 2 つ以上並ぶ行を拾う。「訳さない」と決めた行（版権表示など）は**完全一致のときだけ**除く
+  const nz = (x) => x.replace(/\s+/g, ' ').trim()
+  const keep = new Set()
+  for (const en of tr.notrans) keep.add(nz(en))
+  //   ★除くもの: ① 起動時の版権表示と版の行（訳さない・作品ごとに年が違うので形で見る）
+  //   ② **打った語の復唱**（`You can't see any blue sphere here!` の blue sphere は原作が入力をそのまま印字する。
+  //      この検査は英語の手で流すので英語になる。日本語で打てば日本語）—— 手の列に出てくる語を消してから数える
+  const BANNER = /^(Copyright\b|Release \d+ \/ Serial number )/
+  const typed = new Set(cmds.join(' ').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean))
+  const untyped = (l) => l.replace(/[A-Za-z][A-Za-z0-9'-]*/g, (w) => (typed.has(w.toLowerCase()) ? '' : w))
+  const latin = [...new Set(shown.join('').split('\n').map(nz))]
+    .filter((l) => !keep.has(l) && !BANNER.test(l) && /[A-Za-z]{3,} +[A-Za-z]{2,}/.test(untyped(l)))
+  console.log(`★英字が残った ${latin.length} 行`)
+  // ★**最後に着いた場所**（2026-11-15）。手の列の途中で崩れると（聞き返しで 1 手ずれる・乱数がずれる）、未訳 0 行のまま
+  //   結末に着かない。`npm test` は作品の `walkthroughEnd`（英語の部屋名）と突き合わせる
+  console.log(`★最後の場所: ${lastRoom}`)
+  for (const l of latin) console.log(`[英字] ${l.slice(0, 160)}`)
   for (const [s, where] of seen) console.log(`[${where}] ${s}`)
   for (const w of m.rawWords) console.log(`[スロット] ${w}`)
   process.exit(0)

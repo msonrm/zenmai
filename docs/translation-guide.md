@@ -107,6 +107,8 @@ Zork I は暗黙にこうなっていた（地の文 80 行中 79 行が句点�
 |---|---|---|
 | 未訳の英語が実機で出る（`The grating is closed!`） | 文字列が `ROUTINE` の中・`1dungeon.zil` の中にもあった | `PROP` と `TELL` の両方を**全 .zil から**走査 |
 | 階段・地面・自分・空気の名前が引けない | **どの部屋にもある物**は `gglobals.zil` にある | 名前・入力語彙の抽出で `gglobals.zil` も読む |
+| 状態行の部屋名（`Junction`）や 1 語の物（`chest`・`rope`）が英語のまま・入力語彙にも無い（Zork III・2026-11-15） | Zork III は部屋と物の半分以上（117 個）が **`3actions.zil` の側**にある。物として読むのは `<作品>dungeon.zil` と `gglobals.zil` だけだった（2 語以上の名前は文字列の走査が拾うので、**1 語の名前だけが落ちる** = 気づきにくい） | 名前・入力語彙の抽出で `<作品>actions.zil` も読む。★ZIL の全 `DESC` と原簿を突き合わせて漏れを数える（30 個あった） |
+| 断片に付けた「→ 完成行」の印が `refresh` で消える | 文ごとに割った完成行は、断片の英文を**部分文字列として含まない**ので、道具が結び付けられない | 断片の ID を `<作品>-covered.txt` に書く（Zork II と同じ） |
 | 画面に出ない英語を数えてしまう | `"AUX"`（ルーチン引数宣言）・コンパイル時の `PRINC`・トレース用ラベル・内部用オブジェクトの DESC | 除外集合を持つ。★**`;<…>` でコメントアウトされた節はデッドコード**（`gparser.zil:855` の `through`） |
 | 環境変数を忘れて ruby と words が空になる | `--src` と `ZORK_SRC` の**二系統が両方要る** | `ZORK_SRC=… python3 zork1_asset.py build --src …`（2026-08-18 に踏んだ） |
 
@@ -242,7 +244,7 @@ Zork I は暗黙にこうなっていた（地の文 80 行中 79 行が句点�
 - ★**トップページ（`/`）は作品を選ぶメニューだけ**（2026-10-06・msonrm の判断）。`?work=` が無い・知らない作品のときはゲームも訳も story も読まず（`works.json` だけ）、作品の札（題・一行紹介・β の注記）を並べ、下の「日本語でプレイ」「English（原典）でプレイ」で言語と作品を `localStorage`（`zenmai-body-lang` / `zenmai-work`）に覚えて **作品の URL（`/?work=zork2`）へ移る**。作品の URL は**案内なしですぐ始まる**（言語は始める前に決まっている。訳したあとの文は英語に戻せないので、後から変える道は無い）。ヘッダの題を押すと確かめてからメニューへ戻る（遊びは保存しないと失われる）。メニューの「ライセンスと出典」は `?work=…&about=1`（作品の URL を開いて手引きを出す）。`web/main.js` は作品の URL では訳・語彙・story をその作品のものに差し替えるだけで、層は同じ。
   ★**かつては**入口が**ゲームの上に重なるダイアログ**で、背景を押すと言語も作品も選ばないまま始まった・作品の切替が説明の下にあった・作品を選ぶたびにページが開き直った（2026-10-06 に msonrm の指摘で全部やめた）。
 - ★**`web/works.json`**: 作品ごとの題・一行紹介・`beta`（札に「β」と注記）・`examples`（入力欄の例 = **ひらがな / 漢字まじり / 英語**の 3 つ。★「ひらがなで打つ」と書いていたのは実態と違った —— どの形でも通る）を持つ。
-  `build.mjs` が**公開する作品**（`ZENMAI_WORKS`・**既定 `zork1,zork2`**）に絞って `works.json` を書き、assets・story・LICENSE も同じ作品だけ配る。作りかけの作品は配らない（`ZENMAI_WORKS=zork1 node build.mjs` で Zork I だけ）。
+  `build.mjs` が**公開する作品**（`ZENMAI_WORKS`・**既定 `zork1,zork2,zork3`**・2026-11-15 に zork3 を足した）に絞って `works.json` を書き、assets・story・LICENSE も同じ作品だけ配る。作りかけの作品は配らない（`ZENMAI_WORKS=zork1 node build.mjs` で Zork I だけ）。
 - ★**セーブ枠は作品ごと**（Zork I は従来の `zenmai-save` のまま = 公開済みの利用者のセーブを失わない・ほかは `zenmai-save-<作品>`）。作品が違う story のセーブを読むと壊れるため。`glk-shim.js` の `slot`。
 - ★**ライセンス全文は作品ごとの `vendor/<作品>/LICENSE`** を読む（設定の手引きの「ライセンスと出典」）。
 - 検査: `ZENMAI_WORK=zork2 node test/run-web-dom.js`（作品の URL がすぐ始まる・ライセンス 3 本）／`ZENMAI_MENU=1 node test/run-web-dom.js`（トップページ = 作品を選ぶメニュー。ゲームは読まず、「はじめる」で `?work=` へ移る）／`ZENMAI_ROOT=dist …`（畳んだ形）／`WORK=zork2 node test/run-save.js`（枠が作品ごと）／`WORK=zork2 node test/run-full-ja.js …`。

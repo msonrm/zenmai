@@ -226,7 +226,15 @@
       if (p._raw && !p._raw.endsWith('\n')) p._raw += '\n'
       p._raw += t
       // ★英語のまま出す行（未訳・種明かし）にふりがなは要らない
-      p.innerHTML = cls === 'raw' || cls === 'sent' ? rb.esc(p._raw) : ruby(p._raw)
+      // ★形を保って出す行（等幅の図・Zork III の王家の難題）は、**その行だけ等幅で描く**（2026-11-15）。
+      //   本文は明朝体（幅が字ごとに違う）なので、そのままでは図の列がずれる。日本語の字は等幅の書体でも
+      //   半角 2 つ分とは限らないので、1 字を幅 2ch の箱に入れる。★図の行が無い段落は今までどおり（描き方を変えない）
+      const lines = p._raw.split('\n')
+      if (!cls && tr.fixed && lines.some((l) => tr.fixed.has(l.replace(/\s+$/, '')))) {
+        p.innerHTML = lines.map((l) => (tr.fixed.has(l.replace(/\s+$/, ''))
+          ? `<span class="fixed">${rb.esc(l).replace(/[^\x00-\x7f]/g, (c) => `<span class="w2">${c}</span>`)}</span>`
+          : ruby(l))).join('\n')
+      } else p.innerHTML = cls === 'raw' || cls === 'sent' ? rb.esc(p._raw) : ruby(p._raw)
       if (cls) para = null
     }
     screen.scrollTop = screen.scrollHeight

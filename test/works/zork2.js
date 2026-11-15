@@ -8,6 +8,10 @@ module.exports = {
   start: 'Inside the Barrow',
   save: { cmds: ['take lamp', 'save', 's', 's', 'restore', 'look'] },
   walkthrough: 'walkthrough-zork2.txt',
+  // ★通しの最後に着く場所（状態行の英語の部屋名）。手の列が途中で崩れたら赤になる（2026-11-15）
+  //   ★この作品の手の列は結末まで行かない（途中まで）。いまの終わりの場所を固定して、崩れたら気づけるようにした
+  walkthroughEnd: 'Great Cavern',
+  walkthroughJaEnd: 'Room of Blue Mist',
   walkthroughJa: 'walkthrough-zork2-ja.txt',
   // ★1 字のコマンド不適語は無い（run-swallow.js のカナリアは鳴らさない）
   nocmdOneChar: false,
