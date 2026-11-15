@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
-"""コマンド変換の等価性検証コーパスを作る(固定表 + 系統的な組み合わせ)。"""
+"""コマンド変換の等価性検証コーパスを作る(固定表 + 系統的な組み合わせ)。
+
+    python3 native/make_corpus.py        (WORK=zork2 で作品を替える。既定 zork1)
+"""
 import json
+import os
 import random
 import re
 from pathlib import Path
 
 HERE = Path(__file__).parent
-asset = json.loads((HERE.parent / 'assets' / 'zork1-cmd.json').read_text())
+WORK = os.environ.get('WORK', 'zork1')
+asset = json.loads((HERE.parent / 'assets' / f'{WORK}-cmd.json').read_text())
 
 cases = []
 
-# 固定表(run-cmd.js)の入力を吸い上げる
-src = (HERE.parent / 'test' / 'run-cmd.js').read_text()
+# 固定表(test/works/<作品>.js = run-cmd.js が流す表)の入力を吸い上げる。★字面から拾うので、表は「行頭の ['…',」の形
+spec = HERE.parent / 'test' / 'works' / f'{WORK}.js'
+src = spec.read_text() if spec.exists() else ''
 for m in re.finditer(r"^\s*\['([^']+)',", src, re.M):
     cases.append(m.group(1))
 
@@ -63,4 +69,4 @@ for _ in range(150):
 seen = set()
 out = [c for c in cases if not (c in seen or seen.add(c))]
 (HERE / 'corpus.txt').write_text('\n'.join(out) + '\n')
-print(f'corpus.txt: {len(out)} 件')
+print(f'corpus.txt ({WORK}): {len(out)} 件')

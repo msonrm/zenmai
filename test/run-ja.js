@@ -6,23 +6,23 @@
  *   glk_put_jstring(text)              本文
  *   glk_put_jstring_stream(str, text)  ステータス行など、ストリーム指定つき
  *
- * 使い方: node test/run-ja.js [コマンド...]
+ * 使い方: node test/run-ja.js [コマンド...]   （WORK=zork2 で作品を替える。既定 zork1）
  *   例: node test/run-ja.js "open mailbox" "read leaflet"
  */
 const fs = require('fs')
-const path = require('path')
 const GlkOte = require('glkote-term')
 const ZVM = require('ifvms/src/zvm.js')
 const { Translator } = require('../src/translate.js')
 
-const STORY = path.join(__dirname, '..', 'vendor', 'zork1', 'zork1.z3')
-const ASSET = path.join(__dirname, '..', 'assets', 'zork1-ja.json')
+const work = require('./work.js')
+
+const STORY = work.storyPath
 if (!fs.existsSync(STORY)) {
-  console.error('story file がない: ' + STORY + '\n（historicalsource/zork1 から取得するか ZILF でビルドする）')
+  console.error('story file がない: ' + STORY + `\n（historicalsource/${work.WORK} から取得するか ZILF でビルドする）`)
   process.exit(2)
 }
 
-const tr = new Translator(JSON.parse(fs.readFileSync(ASSET, 'utf8')))
+const tr = new Translator(work.jaAsset())
 const Glk = GlkOte.Glk
 
 // --- 印字の横取り（ここが翻訳の注ぎ口）---

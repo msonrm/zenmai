@@ -27,12 +27,11 @@
  */
 const fs = require('fs')
 const path = require('path')
-const { createCommander } = require('../src/command.js')
 
 const A = (f) => path.join(__dirname, '..', 'assets', f)
 const WORK = process.env.WORK || 'zork1'
 const cmdAsset = JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8'))
-const cm = createCommander(cmdAsset)
+const cm = require('./work.js').commander(cmdAsset)
 const ruby = JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8')).ruby
 
 const forms = new Set()

@@ -13,13 +13,12 @@ const path = require('path')
 const ZVM = require('ifvms/src/zvm.js')
 const { createGlk } = require('../src/glk-shim.js')
 const { Translator } = require('../src/translate.js')
-const { createCommander } = require('../src/command.js')
 
 const A = (f) => path.join(__dirname, '..', 'assets', f)
 // ★作品は環境変数 WORK（既定 zork1）。例: WORK=zork2 node test/run-full-ja.js "こおりつけ"
 const WORK = process.env.WORK || 'zork1'
 const tr = new Translator(JSON.parse(fs.readFileSync(A(`${WORK}-ja.json`), 'utf8')))
-const cm = createCommander(JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8')))
+const cm = require('./work.js').commander(JSON.parse(fs.readFileSync(A(`${WORK}-cmd.json`), 'utf8')))
 const inputs = process.argv.slice(2)
 let n = 0
 let place = ''

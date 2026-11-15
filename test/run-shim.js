@@ -3,16 +3,15 @@
  * 自前 Glk シムの検証。glkote-term を使わず、`src/glk-shim.js` だけで走らせる。
  * これが通れば、ブラウザ側は「シムに DOM を繋ぐだけ」になる。
  *
- * 使い方: node test/run-shim.js "open mailbox" "north" ...
+ * 使い方: node test/run-shim.js "open mailbox" "north" ...   （WORK=zork2 で作品を替える。既定 zork1）
  */
-const fs = require('fs')
-const path = require('path')
 const ZVM = require('ifvms/src/zvm.js')
 const { createGlk } = require('../src/glk-shim.js')
 const { Translator } = require('../src/translate.js')
 
-const STORY = path.join(__dirname, '..', 'vendor', 'zork1', 'zork1.z3')
-const tr = new Translator(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets', 'zork1-ja.json'), 'utf8')))
+const work = require('./work.js')
+
+const tr = new Translator(work.jaAsset())
 const cmds = process.argv.slice(2)
 let n = 0
 let statusLine = ''
@@ -43,5 +42,5 @@ const Glk = createGlk({
 })
 
 const vm = new ZVM()
-vm.prepare(fs.readFileSync(STORY), { vm, Glk, GlkOte: null, Dialog: null })
+vm.prepare(work.story(), { vm, Glk, GlkOte: null, Dialog: null })
 Glk.init({ vm })

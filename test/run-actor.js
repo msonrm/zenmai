@@ -1,17 +1,27 @@
 'use strict'
 /**
  * 登場人物への呼びかけ（Zork II のロボット）: 「呼び名、命令」→ `robot, <命令>`。
- * 中の命令は普通の道（語彙は Zork I のものを借りる）。命令形（とれ・あけろ・いけ）も受ける。
- *   node test/run-actor.js
+ * 中の命令は普通の道。命令形（とれ・あけろ・いけ）も受ける。
+ *   node test/run-actor.js            （WORK=zork2 で作品を替える。既定 zork1）
+ *
+ * ★相手と呪文は**作品の語彙にあればそれを使う**（Zork II = 本物のロボット）。無い作品（Zork I）は
+ *   仕組みだけを見るために、ここで 1 人と 1 つを書き足す。
+ * ★命令の中の物は作品の語彙なので、物を伴う命令は `test/works/<作品>.js` の `actorOrders`
  */
-const fs = require('fs')
-const path = require('path')
-const { createCommander } = require('../src/command.js')
+const work = require('./work.js')
 
-const asset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets', 'zork1-cmd.json'), 'utf8'))
-asset.actors = [{ en: 'ROBOT', word: 'robot', form: 'ロボット', yomi: ['ろぼっと'], alts: ['ロボ', 'ろぼ'] }]
-asset.spells = [{ en: 'FREEZE', word: 'freeze', form: 'こおりつけ', alts: [] }]
-const c = createCommander(asset)
+const asset = work.cmdAsset()
+if (!(asset.actors || []).some((a) => a.word === 'robot')) {
+  asset.actors = [...(asset.actors || []), { en: 'ROBOT', word: 'robot', form: 'ロボット', yomi: ['ろぼっと'], alts: ['ロボ', 'ろぼ'] }]
+}
+if (!(asset.spells || []).some((s) => s.form === 'こおりつけ')) {
+  asset.spells = [...(asset.spells || []), { en: 'FREEZE', word: 'freeze', form: 'こおりつけ', alts: [] }]
+}
+const c = work.commander(asset)
+const orders = work.spec().actorOrders || [
+  ['ろぼっと、ランタンをとれ', 'robot, take lamp'],
+  ['ろぼっと、ふくろをあけろ', 'robot, open bag'],
+]
 
 const cases = [
   ['ろぼっと、きたへいけ', 'robot, north'],
@@ -20,8 +30,7 @@ const cases = [
   ['ろぼっとよ、にしへいけ', 'robot, west'],
   ['ろぼ、ひがしへいけ', 'robot, east'],
   ['ろぼっと，みなみへいけ', 'robot, south'],         // 全角のコンマ
-  ['ろぼっと、ランタンをとれ', 'robot, take lamp'],
-  ['ろぼっと、ふくろをあけろ', 'robot, open bag'],
+  ...orders,
 ]
 let bad = 0
 const ok = (cond, label) => { if (!cond) bad++; console.log(`${cond ? '✓' : '✗'} ${label}`) }
@@ -42,6 +51,6 @@ r = c.toCommand('ろぼっと、ほげほげをとれ')
 ok(r.command === null || !/^robot, /.test(r.command || ''), `未知語は黙って送らない（${r.command} / ${r.trace}）`)
 // エコーは「呼び名、命令」
 r = c.toCommand('ろぼっと、きたへいけ')
-ok(/^ロボット、/.test(r.echo), `エコー: ${r.echo}`)
-console.log(`\n--- ${cases.length + 5} 件 / 食い違い ${bad} 件 ---`)
+ok(r.echo === 'ロボット、きたへ行く', `エコー: ${r.echo}（★命令形の「いけ」を物の「池」と読まない・2026-11-14）`)
+console.log(`\n--- ${work.WORK}: ${cases.length + 5} 件 / 食い違い ${bad} 件 ---`)
 process.exit(bad ? 1 : 0)

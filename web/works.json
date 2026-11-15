@@ -12,6 +12,13 @@
    "beta": true,
    "examples": ["けんをとる", "剣を取る", "take sword"],
    "intro": "1981年の <i>Zork II</i>（Infocom）。ウィザードの住む地下を探る。呪文は日本語の言葉で唱える。"
+  },
+  {
+   "id": "zork3",
+   "title": "Zork III",
+   "beta": true,
+   "examples": ["ランタンをとる", "ランタンを取る", "take lamp"],
+   "intro": "1982年の <i>Zork III</i>（Infocom）。果てしない階段の下から、ダンジョン・マスターの待つ最深部へ。"
   }
  ]
 }

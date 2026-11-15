@@ -1,150 +1,24 @@
 'use strict'
 /**
- * 入力側（日本語 → 英語コマンド）の固定表。**実プレイで出た取りこぼしをここに足す。**
+ * 入力側（日本語 → 英語コマンド）の固定表を流す。
  *
- * ★この表は「正しい英語コマンド」ではなく「**原作が受け付ける形**」を書く。
- *   原作の文法は有限の表なので、期待値は推測ではなく `zork1-cmd.json` の shapes から決まる。
+ * ★表は作品ごと = `test/works/<作品>.js` の `cmd`（**実プレイで出た取りこぼしはそこに足す**）。
+ *   ここにあるのは作品によらない検査（語の途中で切らない・問い返しが打った言い方を映す）と、表の流し方だけ。
  *
- * 使い方: node test/run-cmd.js
+ * 使い方: node test/run-cmd.js            （WORK=zork2 で作品を替える。既定 zork1）
  */
-const fs = require('fs')
-const path = require('path')
-const { createCommander } = require('../src/command.js')
+const { Translator } = require('../src/translate.js')
+const work = require('./work.js')
 
-const asset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets', 'zork1-cmd.json'), 'utf8'))
-const cm = createCommander(asset)
-
-const CASES = [
-  // --- 基本 ---
-  ['ゆうびんばこをあける', 'open mailbox'],
-  ['てがみをよむ', 'read advertisement'],   // 原作は代表の名詞を受ける（leaflet も同義語）
-  ['けんをとる', 'take sword'],
-  // ★送る名詞は DESC の呼び名に寄せる。SYNONYM の第一語は**辞書の代表語**であって
-  //   原作が画面に出す呼び名ではないので、食い違うと復唱が割れる
-  //   （`nasty knife` を `the nasty knives` と聞き返された。2026-08-21 の実プレイ）。
-  //   ★寄せるのは同じ語の単複だけ —— `いたをはずす` が `take boards` のままなのは、
-  //   原作自身が `The boards are securely fastened.` と複数形で答えるから（下にある）
-  ['ないふをとる', 'take nasty knife'],
-  ['さびたないふをとる', 'take rusty knife'],
-  ['けんをつかむ', 'take sword'],          // 同じ英単語に寄せる（動詞の言い方は複数）
-  ['じゅうたんをめくる', 'move rug'],
-  // ★「扉」「窓」は**わざと曖昧なまま渡す**（2026-08-14）。どの扉かは部屋が決めるので
-  //   原作に判断を返す（`open door` → 「木の扉と揚げ戸の、どちらのことか。」）。
-  //   日本語で一意な言い方（木の扉 / 揚げ戸）は形容詞を添えて聞き返しを省く
-  ['あげど', 'trap door'],
-  ['いしのとびらをあける', 'open huge door'],
-  // --- 連体修飾（AのB）は B が目的語（2026-08-14 実プレイ）---
-  ['いえのとびらをあける', 'open door'],
-  ['いえのどあをあける', 'open door'],
-  ['きのどあをあける', 'open wooden door'],   // 語彙に載っている複合語は最長一致が先に取る
-  // ★「〜に投げる」は `at`。「に」は TO で受けるが、原作の構文に TO を持たない動詞では
-  //   **同じ「に」が指しうる役**から選び直す —— `throw bag in troll` だと原作は
-  //   「場所がない。」と断って手が止まる（2026-08-24 の実プレイ）。
-  //   ★AT と IN を両方持つのは THROW と LOOK だけで、どちらも AT が正しい
-  ['ふくろをトロルになげる', 'throw bag at troll'],
-  ['トロルにけんをわたす', 'give sword to troll'],   // TO を持つ動詞は変わらない
-  ['たまごをケースにいれる', 'put egg in case'],     // IN を持つ動詞も変わらない
-  // --- 助詞が役を決める ---
-  // ★ランタン = 上位語（共有シノニム LAMP）。形容詞を先回りで足さず**語を渡すだけ** ——
-  //   どのランタンかは原作のスコープが決める（「その場に無い物を名指しして外れる」の是正）
-  ['ランタンでとびらをあける', 'open door with lamp'],
-  ['じゅうたんのしたをみる', 'look under rug'],
-  ['きにのぼる', 'climb tree'],             // 「に」は CLIMB に無い形 → 裸で渡す
-  // --- 方角 ---
-  ['きたへいく', 'north'],
-  ['したへいく', 'down'],
-  ['したへおりる', 'down'],                 // 物を伴わない DISEMBARK は方角
-  ['うえへのぼる', 'up'],
-  ['はしごをおりる', 'climb down ladder'],  // 乗り物でなければ climb down
-  ['きをおりる', 'climb down tree'],        // 実プレイ: disembark tree は「乗っていない」
-  ['ふねをおりる', 'disembark boat'],       // 乗り物（VEHBIT）なら disembark
-  // ★「〜から出る／降りる／去る」の「から」は起点 = 離れる物そのもの（原作の `exit boat` / `disembark boat` / `leave boat`）。
-  //   以前は「原作にない言い方」で断っていた（2026-10-05・Zork II の桶と気球で判明）
-  // ★キュクロプスに効く言葉（原作は動詞 `odysseus` / `ulysses`）。日本語は**表記がゆれる**ので、よくある書き方を全部受ける
-  ['オデュッセウス', 'odysseus'], ['オデュセウス', 'odysseus'], ['オデッセウス', 'odysseus'], ['オディッセウス', 'odysseus'],
-  ['オデュッセイア', 'odysseus'], ['オデッセイ', 'odysseus'], ['オデッセイア', 'odysseus'], ['オデュセイ', 'odysseus'],
-  ['ユリシーズ', 'odysseus'], ['ユリシス', 'odysseus'],
-  ['ふねからおりる', 'disembark boat'],
-  ['ふねからでる', 'exit boat'],
-  ['ふねからさる', 'leave boat'],
-  ['きからおりる', 'climb down tree'],     // 乗り物でなければ climb down（「から」でも同じ）
-  ['なかにはいる', 'enter'],
-  // --- 実プレイで出た取りこぼし（2026-08-13）---
-  ['いたをはずす', 'take boards'],          // BOARD が動詞と物で衝突していた
-  ['どあをあける', 'open door'],           // ドア／戸 が語彙に無かった
-  ['ドアをあける', 'open door'],           // カタカナでも当たる
-  // --- 動詞が取れない関係は黙って落とさない（2026-08-14 実プレイ）---
-  ['いえのうしろにいく', null],             // `walk house` になっていた
-  ['いえのうらにいく', null],
-  ['きにのぼる', 'climb tree'],             // 「に・へ」だけは例外（ただ目的語を指す）
-  // --- 同じ日本語が別の英単語の物を指す（2026-08-14 実プレイ）---
-  //   原作は 1 語しか受けないので候補を順に試す。第一候補だけ固定表で見る
-  ['とろふぃーけーすをみる', 'look at case'],   // 名前をずらしたので一発で当たる
-  ['ゆうびんばこをあける', 'open mailbox'],
-  // --- 目的語が要る動詞は、原作に聞き返させずこちらで訊く（2026-08-14 実プレイ）---
-  //   原作の聞き返しの最中に完全な文を送るとパーサが混ぜて壊す（eat advertisement → 「eat advert」）
-  ['おりる', 'disembark'],                  // needsObject が立つ（下の別検査で見る）
-  // --- 原作にない言い方には案内を返す（2026-08-14 実プレイ）---
-  ['けんをつかう', null],                  // 「使う」に当たる動詞は原作にない
-  ['ほんをよむ', 'read book'],             // 「本」が語彙に無かった
-  ['ふたをあける', 'open machine'],        // 蓋 = 機械の蓋 / 揚げ戸の蓋（原作の COVER）。外れたら順に試す
-  // --- はい／いいえ（終わるか・最初からやるかの質問。原作は Y/N で受ける）---
-  ['はい', 'y'], ['いいえ', 'n'], ['やめる', 'quit'],
-  ['しゅうりょう', 'quit'], ['もういちど', 'again'],   // again はパーサが直接受ける語（動詞表に無い）
-  // --- 複数対象（ALL / EXCEPT / AND）---
-  //   ★捌くのは原作の仕事。z3 の辞書に `all` / `but` / `except` / `and` が入っている
-  //   （684 語を直接読んで確認した）ので、こちらは語を渡すだけでよい
-  ['ぜんぶとる', 'take all'],
-  ['すべてとる', 'take all'],
-  ['ぜんぶおく', 'drop all'],
-  ['ぜんぶ', 'all'],                                    // 「何を取る？」への答えにもなる
-  // ★「ぜんぶとる」の「と」は助詞ではなく**動詞の頭**。助詞を当てた先が行き止まりなら当てない
-  //   （直す前は「と」が AND に食われ、「る」だけ残って「知らない言葉」になっていた）
-  ['ぜんぶとじる', 'close all'],
-  ['らんたんいがいをぜんぶとる', 'take all except lamp'],
-  ['らんたんいがいをとる', 'take all except lamp'],  // 除くものだけ言われたら残り全部を指す
-  ['はことけんいがいをぜんぶとる', 'take all except mailbox and sword'],  // (箱と剣) 以外に分配。★箱の第一候補は上位語の宣言順（原簿の対象順）
-  // ★「と」で並べた物を捨てると**片方が黙って消える**（`take bag` になっていた）
-  ['びんとふくろをとる', 'take bottle and bag'],
-  ['けんとらんたんをとる', 'take sword and lamp'],
-  // --- しまう / 収める = PUT（2026-08-18 実プレイ）---
-  //   ★行き先なしの PUT は原作が聞き返す（「何の中に〜入れる？」）ので、送ってよい
-  ['たまごをしまう', 'put egg'],
-  ['たまごをおさめる', 'put egg'],
-  // --- 読み通りに打てるか（2026-08-17 実プレイ）---
-  //   ★ダムで `たまをとる` が「『たま』は知らない言葉」で弾かれた。ふりがなは**表示名にしか
-  //   振られない**ので、訳文の中の「球」は読みが二択（たま／きゅう）になる。両方受ける。
-  //   ★この穴を `zork1_yomi_check.py` は緑にしていた（漢字だけの形は `_align` の
-  //   `(.+?)` がどんなかな形とも噛み合う ＝「球」を「みどりのたま」で読めていると判定）
-  ['たまをとる', 'take bubble'],
-  ['きゅうをとる', 'take bubble'],
-  ['たまごをとる', 'take egg'],            // 最長一致で「たま」に食われない
-  // --- 訳文に出る語は打てなければならない（2026-08-27 実プレイ）---
-  //   ★ダムの下で `べんをあける` が「『べん』は知らない言葉」で弾かれた。原作の VALVE は
-  //   ビニールの塊（INFLATABLE-BOAT）の同義語 ＝ **原作では打てる語**。訳文に「弁」と出して
-  //   おきながら日本語の呼び名に入れておらず、ふりがなも無かった（読めない ＝ 打てない）。
-  ['べんをあける', 'open plastic boat'],
-  ['べんとうをたべる', 'eat food'],        // 2 モーラの「べん」が「べんとう」を食わない
-  //   ★同じ型を機械で洗い直して出た 2 件（2026-08-27）。原作の同義語のうち日本語が
-  //   足りない物を絞る検査（zork1_typable_check.py）→ 実際に打つ、で見つけた
-  ['ちょうこくをみる', 'look at old wall'],   // 「壁には古い彫刻がある。」と出るのに打てなかった
-  ['さふぁいあをとる', 'take bracelet'],      // 「サファイアをちりばめた腕輪」の SAPPHIRE
-  // --- 色の言い方は「〜い」「〜の」の両方（2026-09-28 実プレイ）---
-  //   ★ダムの制御室で `きいろいぼたんをおす` が通らなかった。「き」が木に食いつき、残った
-  //   「いろい」は助詞が付かないので黙って落ち、`push button` になっていた（原作が「どのボタンか」と訊く）。
-  //   `あおのぼたん` は「おの」が斧に食いつく。★語彙に載っていれば最長一致が先に取る
-  ['きいろいぼたんをおす', 'push yellow button'],
-  ['きいろのぼたんをおす', 'push yellow button'],
-  ['あおのぼたんをおす', 'push blue button'],
-  ['あかのぼたんをおす', 'push red button'],
-  ['ちゃいろいぼたんをおす', 'push brown button'],
-  // --- 知らない言葉は黙って捨てない ---
-  ['ぶんぶんをあける', null],               // 「を」が付く未知語 = 物のつもり → 止める
-  ['そっととびらをあける', 'open door'], // 助詞の付かない未知語は落としてよい
-  ['とびらをあけない', null],               // 否定は扱えない
-]
+const asset = work.cmdAsset()
+const cm = work.commander(asset)
+const T = work.spec().cmd || {}
+const CASES = T.cases || []
 
 let ng = 0
+let count = 0
+const check = (ok, line) => { count++; if (!ok) ng++; console.log(`${ok ? '✓' : '✗'} ${line}`) }
+
 // ★語彙は**語の途中で切ってはいけない**。日本語の語は小書きかな・長音では始まらないので、
 //   一致の直後がそれなら、その一致は語の途中を食っている。
 //   実プレイ: 「きゅうをとる」で「き」（木）が食い、残った「ゅう」が
@@ -157,144 +31,62 @@ let ng = 0
   for (const p of probes) {
     for (const w of cm.toCommand(p).unknown || []) if (SMALL.test(w)) bad.push(`${p} → 「${w}」`)
   }
-  const ok = bad.length === 0
-  if (!ok) ng++
-  console.log(`${ok ? '✓' : '✗'} ★語の途中で切らない（${probes.length} 通り）${ok ? '' : ' ★' + bad.join(' / ')}`)
+  check(bad.length === 0, `★語の途中で切らない（${probes.length} 通り）${bad.length ? ' ★' + bad.join(' / ') : ''}`)
 }
 // ★総称は**候補が揃っていること**を見る（第一候補は順位付けの都合で動く）
-{
-  const r = cm.toCommand('はこをみる')
+for (const { say, label, want } of T.candidates || []) {
+  const r = cm.toCommand(say)
   const got = [r.command, ...(r.alts || [])].sort().join(' / ')
-  const want = ['look at case', 'look at chest', 'look at mailbox', 'look at trunk'].join(' / ')
-  const ok = got === want
-  if (!ok) ng++
-  console.log(`${ok ? '✓' : '✗'} はこをみる（候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
-}
-// ★行き先の位置にも候補が要る（2026-08-18 実プレイ）——「たまごをはこにいれる」の箱が
-//   郵便箱で外れたとき、ケース／トランクを試さずに止まっていた
-{
-  const r = cm.toCommand('たまごをはこにいれる')
-  const got = [r.command, ...(r.alts || [])].sort().join(' / ')
-  const want = ['put egg in case', 'put egg in chest', 'put egg in mailbox', 'put egg in trunk'].join(' / ')
-  const ok = got === want
-  if (!ok) ng++
-  console.log(`${ok ? '✓' : '✗'} たまごをはこにいれる（行き先の候補）  → ${got}${ok ? '' : ` ★期待: ${want}`}`)
-}
-{
-  const a = cm.toCommand('おりる')
-  const b = cm.toCommand('き', { verb: a.verbKey })
-  const ok = a.needsObject && a.ask === '何を降りる？' && b.command === 'climb down tree'
-  if (!ok) ng++
-  console.log(`${ok ? '✓' : '✗'} おりる → 訊く → き　→ ${a.ask} / ${b.command}`)
+  const ok = got === [...want].sort().join(' / ')
+  check(ok, `${say}（${label}）  → ${got}${ok ? '' : ` ★期待: ${[...want].sort().join(' / ')}`}`)
 }
 for (const [ja, want] of CASES) {
   const r = cm.toCommand(ja)
   const ok = r.command === want
-  if (!ok) ng++
-  console.log(`${ok ? '✓' : '✗'} ${ja.padEnd(14, '　')} → ${String(r.command).padEnd(24)}${ok ? '' : ` ★期待: ${want}`}`)
+  check(ok, `${ja.padEnd(14, '　')} → ${String(r.command).padEnd(24)}${ok ? '' : ` ★期待: ${want}`}`)
 }
-// ★轟音の部屋の反響 —— 原作は**プレイヤーが打った語**を返す（`P-INBUF` から切り出す）ので、
-//   訳語ではなく打った呼び名が返らなければならない。
-//   walkthrough はこの部屋を通らないので、ここで押さえる
-{
-  const { Translator } = require('../src/translate.js')
-  const tr = new Translator(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'assets', 'zork1-ja.json'), 'utf8')))
-  // ★英語モード＝**訳すのをやめる**。原文がそのまま返る（行の貯め込みや
-  //   プロンプト剥がしはそのまま使いたいので、訳を引くところだけを止めている）
-  {
-    const raw = 'West of House'
+// ★復唱（画面に出す「こう読んだ」）。送る英語が合っていても、復唱が別の物を言っていたら打った人は戸惑う。[打つ, 送る英語, 復唱]
+for (const [ja, want, shown] of T.shown || []) {
+  const r = cm.toCommand(ja)
+  const ok = r.command === want && r.echo === shown
+  check(ok, `復唱 ${ja.padEnd(12, '　')} → ${r.command} / ${r.echo}${ok ? '' : ` ★期待: ${want} / ${shown}`}`)
+}
+// --- 訳の側（原作の 1 行 → 日本語）。打った語が訳にどう映るかは入力と対なので、ここで見る ---
+if (T.passthrough || T.lines || T.echo || T.said || T.noSaid) {
+  const tr = new Translator(work.jaAsset())
+  if (T.passthrough) {
+    const raw = T.passthrough.en
     const ja = tr.line(raw)
     tr.setPassthrough(true)
     const en = tr.line(raw)
     tr.setPassthrough(false)
-    const ok = ja === '家の西' && en === raw
-    if (!ok) ng++
-    console.log(`${ok ? '✓' : '✗'} 英語モードは訳さず原文  → 日本語「${ja}」/ 英語「${en}」`)
+    check(ja === T.passthrough.ja && en === raw, `英語モードは訳さず原文  → 日本語「${ja}」/ 英語「${en}」`)
   }
-  // ★複数対象になると、原作は対象ごとに `<名前>: <文>` の形で 1 行を出す。
-  //   行単位で引く設計なので、名前が頭に付いた瞬間に在庫から外れる（`Dropped.` は持っているのに
-  //   `brown sack: Dropped.` が引けなかった）。剥がして両方引いて組み直せているか。
-  //   ★在庫に `{OBJ}: Taken.` を 1 本だけ持っていたのはやめて、この規則に一本化した
-  {
-    const MULTI = [
-      ['glass bottle: Taken.', 'ガラス瓶：取った。'],
-      ['brown sack: Dropped.', '茶色の袋：置いた。'],
-      ['brown sack: You already have that!', '茶色の袋：それはもう持っている。'],
-      ['small mailbox: It is securely anchored.', '小さな郵便箱：しっかりと固定されている。'],
-      // ★引用符の中でも `{VERB}` は**打った語ではない**（こちらが送った英語）ので訳す。
-      //   「ぜんぶあける」と打った人の画面に `「open」に…` と出ていた
-      ['You can\'t use multiple direct objects with "open".', '「開ける」に複数の目的語は使えない。'],
-      // ★逆に `{WORD}` は打った語そのもの。訳してはいけない
-      ['I don\'t know the word "bunbun".', '「bunbun」という言葉は知らない。'],
-      // ★名前と本文の**両方**が引けたときだけ組む。片方でも欠けたら未訳のまま出す
-      //   （`:` を含むだけの行を、それらしい顔にして隠さない）
-      ['xyzzy plugh: Taken.', null],
-      ['glass bottle: Xyzzy plugh.', null],
-    ]
-    for (const [en, want] of MULTI) {
+  for (const [label, rows] of Object.entries(T.lines || {})) {
+    for (const [en, want] of rows) {
       const got = tr.line(en)
-      const ok = got === want
-      if (!ok) ng++
-      console.log(`${ok ? '✓' : '✗'} 複数対象 ${en.padEnd(42)} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+      check(got === want, `${label} ${en.padEnd(42)} → ${got}${got === want ? '' : ` ★期待: ${want}`}`)
     }
   }
-  // ★スロットが**空白だけ**で隣り合う骨格（`{VERB} the {OBJ} {PREP}?`）。区切りが空白では
-  //   位置が決まらないので、左のスロットを最長に採らないと 1 語で止まって残りが右へ流れ込む。
-  //   実プレイ（2026-08-21）で「しまう」→「ないふ」が `何knives innastyを入れる？` になった。
-  //   ★walkthrough は聞き返し（orphan）を踏まないので、ここで押さえる。
-  //   ★目的語が 1 語のもの（剣・トロル）は元から通っていた —— **壊れるのは 2 語以上のとき**
-  {
-    const ORPHAN = [
-      ['What do you want to put the nasty knives in?', '何の中に嫌な感じのナイフを入れる？'],
-      ['What do you want to put the jewel-encrusted egg in?', '何の中に宝石をちりばめた卵を入れる？'],
-      ['What do you want to put the sword in?', '何の中に剣を入れる？'],
-      ['What do you want to attack the troll with?', '何でトロルを攻撃する？'],
-      ['What do you want to tie the rope to?', '何に縄を結ぶ？'],
-    ]
-    for (const [en, want] of ORPHAN) {
-      const got = tr.line(en)
-      const ok = got === want
-      if (!ok) ng++
-      console.log(`${ok ? '✓' : '✗'} 聞き返し ${en.padEnd(46)} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
-    }
-  }
-  for (const [ja, want] of [['のべぼうをとる', 'のべぼう のべぼう ……'], ['はんきょう', 'はんきょう はんきょう ……']]) {
+  for (const [ja, want] of T.echo || []) {
     const r = cm.toCommand(ja)
     tr.setEcho(r.echoWord || ja)
     tr.setSaid(r.said || '')
     const last = String(r.command).split(' ').pop()
     const got = tr.line(`${last} ${last} ...`)
-    const ok = got === want
-    if (!ok) ng++
-    console.log(`${ok ? '✓' : '✗'} 反響 ${ja.padEnd(10, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+    check(got === want, `反響 ${ja.padEnd(10, '　')} → ${got}${got === want ? '' : ` ★期待: ${want}`}`)
   }
-  // ★「見当たらない」と目的語の聞き返しは、原作が**入力バッファをそのまま印字**している行
-  //   （`NOT-HERE-PRINT` / `THING-PRINT` → `BUFFER-PRINT`）。訳語辞書で引くと、
-  //   **語を共有する物**では別の物の名前が出る（実プレイ 2026-08-27: 「ビニールの塊」を
-  //   指したのに「穴の空いた舟など、ここには見当たらない」と返った）。
-  //   ★原作にも一意な指し方は無い —— 3 つの舟が plastic / boat / pile を共有していて、
-  //   **同時に 1 つしか存在しない**ことで解決している。送る英語を変えても直らない
-  for (const [ja, en, want] of [
-    ['べんをあける', "You can't see any plastic boat here!", '弁など、ここには見当たらない。'],
-    ['びにーるのかたまりをあける', "You can't see any plastic boat here!", 'ビニールの塊など、ここには見当たらない。'],
-    ['くうきいれでべんをふくらませる', 'What do you want to inflat the plastic boat with?', '何で弁を膨らませる？'],
-  ]) {
+  for (const [ja, en, want] of T.said || []) {
     const r = cm.toCommand(ja)
     tr.setEcho(r.echoWord || ja)
     tr.setSaid(r.said || '')
     const got = tr.line(en)
-    const ok = got === want
-    if (!ok) ng++
-    console.log(`${ok ? '✓' : '✗'} 打った語 ${ja.padEnd(16, '　')} → ${got}${ok ? '' : ` ★期待: ${want}`}`)
+    check(got === want, `打った語 ${ja.padEnd(16, '　')} → ${got}${got === want ? '' : ` ★期待: ${want}`}`)
   }
-  // ★打った語が無いときは訳語辞書へ落とす（ホストが setSaid を呼ばない器でも壊れない）
-  {
+  if (T.noSaid) {
     tr.setSaid('')
-    const want = '穴の空いた舟など、ここには見当たらない。'
-    const got = tr.line("You can't see any plastic boat here!")
-    const ok = got === want
-    if (!ok) ng++
-    console.log(`${ok ? '✓' : '✗'} 打った語なし（辞書へ落とす） → ${got}`)
+    const got = tr.line(T.noSaid.en)
+    check(got === T.noSaid.ja, `打った語なし（辞書へ落とす） → ${got}${got === T.noSaid.ja ? '' : ` ★期待: ${T.noSaid.ja}`}`)
   }
 }
 // ★問い返しは**打った言い方を映す**こと。
@@ -304,7 +96,7 @@ for (const [ja, want] of CASES) {
 //   ★1 件ではなく**類**なので、言い方を全部なめて固定する（増えても勝手に検査される）
 {
   let n = 0
-  let miss = 0
+  const miss = []
   for (const v of Object.values(asset.verbs)) {
     for (const ja of v.ja || []) {
       const cut = ja.indexOf('を')
@@ -313,22 +105,18 @@ for (const [ja, want] of CASES) {
       if (!r || !r.needsObject) continue
       n++
       // 埋まっていた名詞が問い返しに残っているか
-      if (!String(r.ask).includes(ja.slice(0, cut))) { miss++; ng++; console.log(`✗ 問い返しが名詞を落とす ${ja} → 「${r.ask}」`) }
+      if (!String(r.ask).includes(ja.slice(0, cut))) miss.push(`${ja} → 「${r.ask}」`)
     }
   }
-  console.log(`${miss ? '✗' : '✓'} 問い返しが打った言い方を映す（${n} 通り / 落ち ${miss}）`)
-  // ★実プレイの流れがつながること
-  for (const [say, answer, want] of [
-    ['ぜんまいをまく', 'かなりあ', 'wind canary'],
-    ['じょうをあける', 'とびら', 'unlock door'],
-  ]) {
-    const r1 = cm.toCommand(say)
-    const r2 = cm.toCommand(answer, { verb: r1.verbKey })
-    const ok = r2 && r2.command === want
-    if (!ok) ng++
-    console.log(`${ok ? '✓' : '✗'} ${say} → 「${r1.ask}」 → ${answer} → ${r2 && r2.command}${ok ? '' : ` ★期待: ${want}`}`)
-  }
+  check(miss.length === 0, `問い返しが打った言い方を映す（${n} 通り / 落ち ${miss.length}）${miss.length ? ' ★' + miss.join(' / ') : ''}`)
+}
+// ★実プレイの流れがつながること（問い返し → 答え）
+for (const [say, answer, want, ask] of T.flows || []) {
+  const r1 = cm.toCommand(say)
+  const r2 = cm.toCommand(answer, { verb: r1.verbKey })
+  const ok = r1.needsObject && (!ask || r1.ask === ask) && r2 && r2.command === want
+  check(ok, `${say} → 「${r1.ask}」 → ${answer} → ${r2 && r2.command}${ok ? '' : ` ★期待: ${ask ? `「${ask}」 → ` : ''}${want}`}`)
 }
 
-console.log(`\n--- ${CASES.length} 件 / 食い違い ${ng} 件 ---`)
+console.log(`\n--- ${work.WORK}: ${count} 項目（固定表 ${CASES.length} 件）/ 食い違い ${ng} 件 ---`)
 process.exit(ng ? 1 : 0)

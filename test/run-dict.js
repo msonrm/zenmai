@@ -51,7 +51,9 @@ for (const h of cmd.hypernyms || []) if (h.noun) want(h.noun, `上位語 ${h.for
 for (const a of cmd.actors || []) want(a.word, `呼びかけ ${a.en}`)
 for (const s of cmd.spells || []) want(s.word, `呪文 ${s.en}`)
 for (const s of cmd.speech || []) want(s.word, `口に出す語 ${s.en}`)
-for (const d of ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'up', 'down', 'in', 'out', 'land', 'all', 'except', 'again', 'oops']) want(d, `方角・パーサの語 ${d}`)
+// ★作品が受ける方角（land など）は作品の語彙から見る —— ここに書くと、その語を持たない作品（Zork III に land は無い）が偽の赤になる（2026-11-15）
+for (const d of cmd.dirs || []) want(d.word, `方角 ${d.en}`)
+for (const d of ['north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'up', 'down', 'in', 'out', 'all', 'except', 'again', 'oops']) want(d, `方角・パーサの語 ${d}`)
 
 const miss = [...need].filter(([w]) => !inDict(w))
 console.log(`辞書 ${words.size} 語 / 調べた語 ${need.size}`)

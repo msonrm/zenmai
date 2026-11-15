@@ -1,0 +1,22 @@
+# 訳・語彙（JS・Web）の検査 = `npm test`（全作品・10 秒ほど）。
+# ★native の照合（cmd_ref.js ↔ cmd_test_host）と PC-98 / SDL の検査は流さない ——
+#   native は節目でまとめて追う約束で、そのあいだ食い違っていてよい（CLAUDE.md の「守ること」）。
+name: test
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  npm-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test

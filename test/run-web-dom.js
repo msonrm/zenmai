@@ -98,10 +98,12 @@ document.handlers = {}
 document.addEventListener = (ev, fn) => { (document.handlers[ev] = document.handlers[ev] || []).push(fn) }
 global.window = window
 global.document = document
-// ★作品は ZENMAI_WORK（既定 zork1）。本番の `?work=zork2` と同じ道を通す
+// ★作品は WORK（既定 zork1。昔の名前 ZENMAI_WORK も受ける = `test/work.js`）。本番の `?work=zork2` と同じ道を通す
+const { WORK, info } = require('./work.js')
+const TITLE = info().title   // ★ヘッダに出るはずの題は web/works.json から（検査に作品名を書かない）
 // ★作品の URL（`?work=`）はゲーム、無ければトップページ（メニュー）。既定は zork1 のゲーム。
 //   メニューを試すときは ZENMAI_MENU=1
-global.location = { search: process.env.ZENMAI_MENU ? '' : `?work=${process.env.ZENMAI_WORK || 'zork1'}`, href: '' }
+global.location = { search: process.env.ZENMAI_MENU ? '' : `?work=${WORK}`, href: '' }
 const fetched = []
 global.fetch = async (url) => {
   fetched.push(url)
@@ -447,11 +449,15 @@ const finish = async () => {
   //   ここが「画面に出した語は、打てなければならない」の機械化。
   //   手引きに言葉を書き写すと必ずずれるので、器のほうで塞ぐ
   let cmdAsset = null
-  for (const p of [`../assets/${process.env.ZENMAI_WORK || 'zork1'}-cmd.json`, `assets/${process.env.ZENMAI_WORK || 'zork1'}-cmd.json`]) {
+  for (const p of [`../assets/${WORK}-cmd.json`, `assets/${WORK}-cmd.json`]) {
     // ★器は無いパスにも index.html を返す（本番と同じ意地悪）ので、中身で見分ける
     try { const j = await (await fetch(p)).json(); if (j && j.verbs) { cmdAsset = j; break } } catch (e) { /* 次 */ }
   }
-  const cm2 = cmdAsset ? window.ZenmaiCommand.createCommander(cmdAsset) : null
+  let jaCommon = null
+  for (const p of ['../assets/japanese.json', 'assets/japanese.json']) {
+    try { const j = await (await fetch(p)).json(); if (j && j.particles) { jaCommon = j; break } } catch (e) { /* 次 */ }
+  }
+  const cm2 = cmdAsset && jaCommon ? window.ZenmaiCommand.createCommander(cmdAsset, jaCommon) : null
   const cannot = cm2 ? words.filter((w) => !cm2.toCommand(w).command) : ['(アセットが読めない)']
   // ★かなだけで書かれているか（漢字の形を案内しても打てない）
   const notKana = words.filter((w) => !/^[ぁ-んァ-ヶーa-z]+$/.test(w))
@@ -483,7 +489,7 @@ const finish = async () => {
   const pchecks = [
     ['★題を押しても、確かめて「いいえ」ならメニューへ戻らない', titleStay],
     ['★題を押して「はい」ならメニュー（./）へ戻る', titleBack],
-    ['★ヘッダに遊んでいる作品が出る', els['title-tag'].textContent.includes(process.env.ZENMAI_WORK === 'zork2' ? 'Zork II' : 'Zork I')],
+    ['★ヘッダに遊んでいる作品が出る', els['title-tag'].textContent.includes(TITLE)],
     ['歯車で開く', opened],
     ['Escape で閉じる', closed],
     ['システムの言葉が並ぶ', rows.length >= 10],
@@ -548,7 +554,7 @@ setTimeout(async () => {
   introGate = els.intro.hidden === true && els.screen.children.length > 0
   {
     let ex = []
-    for (const p of ['works.json', '../web/works.json']) { try { const j = await (await fetch(p)).json(); const w = (j.works || []).find((x) => x.id === (process.env.ZENMAI_WORK || 'zork1')); if (w) { ex = w.examples || []; break } } catch (e) { /* 次 */ } }
+    for (const p of ['works.json', '../web/works.json']) { try { const j = await (await fetch(p)).json(); const w = (j.works || []).find((x) => x.id === (WORK)); if (w) { ex = w.examples || []; break } } catch (e) { /* 次 */ } }
     exampleOk = ex.length === 3 && ex.every((e) => els.input.placeholder.includes(e))
   }
   setTimeout(tick, 100)

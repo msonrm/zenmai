@@ -11,67 +11,16 @@
  * 英語は語順で役を決めるが、日本語は助詞が教えてくれるので語順が自由でも正規化できる。
  */
 
-// 方角は原作が単語で受ける（`north` だけで動く）
-// ★読みも要る。無いと「きたへいく」の「き」が木に食いつく（最長一致は
-//   両方に読みがあって初めて守れる）
-const DIRS = {
-  北東: 'northeast', ほくとう: 'northeast', 北西: 'northwest', ほくせい: 'northwest',
-  南東: 'southeast', なんとう: 'southeast', 南西: 'southwest', なんせい: 'southwest',
-  北: 'north', きた: 'north', 南: 'south', みなみ: 'south',
-  東: 'east', ひがし: 'east', 西: 'west', にし: 'west',
-  上: 'up', うえ: 'up', 下: 'down', した: 'down', 中: 'in', なか: 'in', 外: 'out', そと: 'out',
-  // ★`land` も原作の**方角の語**（`<DIRECTIONS … LAND>`・Zork I の舟 / Zork II の気球で「着陸・上陸」）。
-  //   以前は日本語から届く道が無かった（「じょうりくする」が知らない言葉・2026-10-05 に判明）
-  着陸: 'land', ちゃくりく: 'land', 着陸する: 'land', ちゃくりくする: 'land',
-  上陸: 'land', じょうりく: 'land', 上陸する: 'land', じょうりくする: 'land',
-  着岸: 'land', ちゃくがん: 'land', 着岸する: 'land', ちゃくがんする: 'land',
-  // ★「岸に着く」も言う。無いと `し` を読みの外に残し、`き`（木）が食って `poke tree` になっていた
-  岸に着く: 'land', きしにつく: 'land', 岸につく: 'land',
-}
-// ★「ぜんぶ」= 原作の `all`。物ではなく**パーサが直接受ける語**（z3 の辞書に
-//   `all` / `but` / `except` / `and` が入っている）。複数対象を捌くのは原作の仕事なので、
-//   こちらは語を渡すだけでよい。★代表形は「ぜんぶ」ひとつ（漢字に寄せる利得が無い）
-const ALL_WORDS = ['ぜんぶ', 'すべて', 'のこらず', '全部', '全て', '残らず']
-
-// 助詞 → 役。長いものから当てる
-const PARTICLES = [
-  // ★「〜以外」= `except`。**助詞ではなく名詞**だが、この表は「役を決める接尾辞」なので同じ扱いでよい。
-  //   ★「を」より前に置くこと（後ろだと「いがい」が未知語の側に飲まれる）
-  ['以外を', 'EXCEPT'], ['いがいを', 'EXCEPT'], ['以外', 'EXCEPT'], ['いがい', 'EXCEPT'],
-  ['の中に', 'IN'], ['のなかに', 'IN'], ['の中へ', 'IN'], ['のなかへ', 'IN'],
-  ['の下', 'UNDER'], ['のした', 'UNDER'], ['の後ろ', 'BEHIND'], ['のうしろ', 'BEHIND'],
-  ['の裏', 'BEHIND'], ['のうら', 'BEHIND'],
-  ['の上に', 'ON'], ['のうえに', 'ON'], ['の上', 'ON'], ['のうえ', 'ON'],
-  ['を使って', 'WITH'], ['をつかって', 'WITH'], ['によって', 'WITH'],
-  // ★「には」は入れない —— 「なかにはいる」の「はいる」の頭を食う
-  ['から', 'FROM'], ['へ', 'TO'], ['に', 'TO'], ['で', 'WITH'],
-  ['を', 'O'], ['は', 'O'], ['が', 'O'], ['と', 'AND'],
-  // ★連体修飾の「の」（家の扉 / 家のドア）。**上の の〜 より必ず後ろに置く**
-  //   —— 先に来ると「絨毯の下」の「のした」を食う
-  ['の', 'MOD'],
-]
+// ★語の表のうち**日本語共通**のもの（方角・「ぜんぶ」・助詞と役・「もういちど」・「はい／いいえ」・否定と命令形の語尾・
+//   「唱える／答える」の言い回し）は `assets/japanese.json` にある（2026-11-14 に、ここの定数から移した）。
+//   `createCommander(asset, common)` の 2 つ目の引数で受ける。★ここに既定値は持たない —— 持つと置き場所が 2 つに戻る
+//   （`native/gen_cmd.py` も同じ JSON を読む）。なぜその順か・なぜ入れないかの注記も JSON の側にある。
+//   ★作品ごとの語は `asset`（`assets/<作品>-cmd.json`）。作品が受ける方角の語（`land`）もそちら（`asset.dirs`）
 
 // 空間の関係を表す役（捨てると意味が変わる）
 const SPATIAL = new Set(['IN', 'ON', 'UNDER', 'BEHIND', 'FROM'])
-const ROLE_JA = { IN: 'の中', ON: 'の上', UNDER: 'の下', BEHIND: 'の後ろ', FROM: 'から', WITH: 'で' }
 
 const strip = (s) => s.replace(/[。、．，！？\s]+/g, '')
-
-// ★パーサが直接受ける語（SYNTAX の動詞ではないので動詞表に載らない）。
-//   `again` は直前のコマンドの繰り返し、`oops` は打ち間違いの訂正
-const PARSER_WORDS = {
-  もういちど: 'again', もう一度: 'again', くりかえす: 'again', 繰り返す: 'again',
-  またやる: 'again', リピート: 'again', りぴーと: 'again',
-  // ★「おなじ」は入れない —— 物を指す「同じ」と紛れる（`おなじものをとる` の頭を食う）
-}
-
-// ★はい／いいえの質問は**原作の 2 か所だけ**（`V-QUIT` / `V-RESTART` の
-//   `Do you wish to leave the game? (Y is affirmative):`）。しかも原作の `YES?` は
-//   **Y / YES 以外をすべて否定**として読むので、否定側は何を打っても通る。
-//   だから受けるのは「はい」「いいえ」だけでよい —— ★**この 2 語以外は
-//   ふつうの命令として解釈されるべき**で、`そう` や `いや` を予約すると
-//   ゲーム中の語を食う（`そうさする` の頭など）。英字（y/n）はかな入力では打たない
-const YESNO = { はい: 'y', いいえ: 'n' }
 
 /**
  * ★照合はすべて「かな」に正規化してから行う。
@@ -84,10 +33,25 @@ const kana = (s) => String(s)
   .replace(/[ー－—]/g, 'ー')
   .toLowerCase()
 
-// 否定を捨てると逆の命令になる。★黙って間違うより止める
-const NEGATIVE = /(ない|ないで|ぬ|ません|なかった)$/
+// 語の列 → 「どれかで終わる」の正規表現（JSON には語だけ置き、式はここで組む）
+const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const endsWith = (words, head) => new RegExp((head || '') + '(?:' + words.map(esc).join('|') + ')$')
 
-function createCommander(asset) {
+function createCommander(asset, common) {
+  if (!common || !common.particles || !common.dirs) {
+    throw new Error('createCommander(asset, common): 日本語共通の表（assets/japanese.json）を 2 つ目の引数に渡すこと')
+  }
+  const ALL_WORDS = common.all
+  const PARTICLES = common.particles
+  const ROLE_JA = common.roleJa
+  const PARSER_WORDS = common.parserWords
+  const YESNO = common.yesno
+  // ★方角 = 共通（東西南北・上下・中外）+ 作品が受ける語（`land` = 着陸・上陸。原作の `<DIRECTIONS … LAND>`）。
+  //   積む順は共通 → 作品（同じ長さの語の優先がこの順で決まる）
+  const DIRS = { ...common.dirs }
+  for (const d of asset.dirs || []) for (const ja of d.ja) DIRS[ja] = d.word
+  // 否定を捨てると逆の命令になる。★黙って間違うより止める
+  const NEGATIVE = endsWith(common.negative)
   // ★原作に無い言い方への案内（`zork1-guide.md`）。「知らない言葉」で突き放さない
   const guide = asset.guide || {}
   // ★呪文（Zork II の杖）。**語彙の表（lex）には載せない** —— 呪文は動詞と目的語に分けず、
@@ -99,7 +63,7 @@ function createCommander(asset) {
     for (const ja of [sp.form, ...(sp.alts || [])]) spells.set(kana(ja), sp)
   }
   // 「…と唱える」「…と言う」の言い回しと、括弧・感嘆符を落として、句だけにする
-  const CAST = /(?:と)?(?:となえる|唱える|いう|言う|さけぶ|叫ぶ|つぶやく|ささやく|よむ|詠む|詠じる)$/
+  const CAST = endsWith(common.cast, '(?:と)?')
   const spellOf = (raw) => {
     if (!spells.size) return null
     let t = kana(raw).replace(/[「」『』“”"']/g, '')
@@ -114,7 +78,8 @@ function createCommander(asset) {
   for (const sp of asset.speech || []) {
     for (const ja of [sp.form, ...(sp.yomi || []), ...(sp.alts || [])]) speech.set(kana(ja), sp)
   }
-  const ANSWER = /(?:と)?(?:こたえる|答える|こたえよ|答えよ|こたえた|答えた|へんじする|返事する)$/
+  const ANSWER = endsWith(common.answer, '(?:と)?')
+  const ASSERT = endsWith(common.assert)
   const speechOf = (input) => {
     if (!speech.size) return null
     const quoted = /[「『“"]/.test(input)
@@ -124,7 +89,7 @@ function createCommander(asset) {
     if (m) { t = t.slice(0, m.index); verb = 'answer' }
     else if (CAST.test(t)) { for (let i = 0; i < 2; i++) t = t.replace(CAST, ''); verb = 'say' }
     // 「井戸だ」「井戸です」は答えの言い切りなので、カギカッコも「答える」も要らない（物を指す言い方ではない）
-    if (!quoted && !verb && !/(だ|です)$/.test(t)) return null
+    if (!quoted && !verb && !ASSERT.test(t)) return null
     const sp = speech.get(t)
     return sp ? { sp, verb: verb || 'say' } : null
   }
@@ -141,11 +106,7 @@ function createCommander(asset) {
         .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')よ?[、,]')
     : null
   // 命令形 → 終止形（語彙は終止形だけを持つ。呼びかけの中は「とれ」「あけろ」「いけ」と打つのが自然）
-  const IMPERATIVE = [
-    [/しろ$/, ['する']], [/せよ$/, ['する']], [/ろ$/, ['る']], [/れ$/, ['る']],
-    [/け$/, ['く', 'ける']], [/せ$/, ['す', 'せる']], [/め$/, ['む', 'める']],
-    [/べ$/, ['ぶ', 'べる']], [/げ$/, ['ぐ', 'げる']], [/ね$/, ['ぬ']], [/よ$/, ['る']],
-  ]
+  const IMPERATIVE = common.imperative.map(([end, to]) => [endsWith([end]), to])
   // 語彙をひとつの表に畳んで、長いものから当てる（逐次入力の配列エンジンと同じ最長一致）
   const lex = []
   for (const [key, v] of Object.entries(asset.verbs || {})) {
@@ -160,7 +121,9 @@ function createCommander(asset) {
   //   日本語で一意なら（「揚げ戸」）形容詞を添えて聞き返しを省く。
   const owners = {}
   for (const [key, o] of Object.entries(asset.objects || {})) {
-    for (const ja of o.ja) (owners[kana(ja)] = owners[kana(ja)] || []).push(key)
+    // ★同じ物を 2 度数えない（2026-11-15）。カタカナだけの名前は**表記と読みが同じかな**になる（マホガニーのパネル / まほがにーのぱねる）。
+    //   2 度積むと「2 つの物が名乗る言い方」に見え、形容詞を落として `push wall` を送っていた（Zork III の鏡の箱）
+    for (const ja of o.ja) { const k = kana(ja); (owners[k] = owners[k] || []); if (!owners[k].includes(key)) owners[k].push(key) }
   }
   const objOf = asset.objects || {}
   // ★英語の名詞を複数の物が共有するときだけ形容詞を添える。
@@ -169,6 +132,11 @@ function createCommander(asset) {
   for (const o of Object.values(objOf)) {
     const n = (o.nouns[0] || '').toLowerCase()
     nounUse[n] = (nounUse[n] || 0) + 1
+  }
+  // 名乗る物すべてが持つ形容詞（最初の物の形容詞の順で、最初に共通するもの）
+  const commonAdj = (own) => {
+    const lists = own.map((x) => (objOf[x].adjs || []).map((a) => a.toLowerCase()))
+    return (lists[0] || []).find((a) => lists.every((l) => l.includes(a))) || ''
   }
   const seen = new Set()
   // ★英語が割れる言い方（箱 = mailbox / case / chest / trunk）の見せ方。
@@ -226,7 +194,11 @@ function createCommander(asset) {
         // ★同じ言い方を複数の物が名乗るとき、**その物にとってどれだけ中心的な名前か**で順を決める
         //   （`ランタン` は真鍮のランタンでは 2 番目・壊れたランタンでは 3 番目 → 真鍮を先に試す）
         rank,
-        word: shared || !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
+        // ★共有された言い方でも、**名乗る物どうしに共通の形容詞**があり、その名詞をほかの物も使うなら添える（2026-11-15）。
+        //   「木の扉」= ダンジョンの入口の扉と博物館の扉（どちらも WOODEN）。裸の `door` を送ると、その場の石の扉・鉄の扉まで
+        //   候補に入って「どの扉のことか」と聞き返された。`wooden door` なら日本語が指す範囲と同じになる
+        word: shared ? (commonAdj(own) && nounUse[noun] > own.length ? commonAdj(own) + ' ' + noun : noun)
+          : !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
         // ★共有された言い方（舟 = ビニールの塊 / 魔法の舟 / 穴の空いた舟）は、
         //   **どれかが乗り物なら乗り物として扱う**。どれを指すかは場が決める
         vehicle: shared ? own.some((x) => objOf[x].vehicle) : !!o.vehicle,
@@ -258,7 +230,9 @@ function createCommander(asset) {
   //   （以前は各物の ja 内の位置から逆算していて、順序が編集のたびに揺れた）
   for (const h of asset.hypernyms || []) {
     const targets = (h.targets || []).filter((t) => objOf[t])
-    if (!targets.length) continue
+    // ★対象を持たない上位語 = 原作の**部屋付きの仮の物**（PSEUDO。滝・霧・流砂・岸）の名詞（2026-11-15・Zork III）。
+    //   物の表には居ないが原作は語を知っているので、語だけ渡す（どこで通じるかは原作が決める）。名詞も無いものは積まない
+    if (!targets.length && !h.noun) continue
     const vehicle = targets.some((t) => !!objOf[t].vehicle)
     const wordOf = (t) => {
       const o = objOf[t]
@@ -293,6 +267,19 @@ function createCommander(asset) {
   const SMALL = /[ぁぃぅぇぉっゃゅょゎゕゖー]/
   const wordAt = (s, at) => lex.find((e) => s.startsWith(e.kana, at) && !SMALL.test(s[at + e.kana.length] || ''))
 
+  // 入力の末尾が語彙の語で終わっているか（否定の語尾に見えるものが、語の一部かを見分ける）
+  const endsWithWord = (s) => lex.some((e) => s.endsWith(e.kana))
+  // ★数字はそのまま原作へ渡す（2026-11-15・Zork III の「ダイヤルを 4 に合わせる」= `turn dial to 4`、時間移動機の 776）。
+  //   語彙には載せない（数は無限にある）。半角・全角の数字の並びを 1 語の「物」として読む。漢数字は受けない
+  //   （「一」「二」は物の名前の中にも出るので、黙って数に読むと別の命令になる）
+  const numAt = (s, at) => {
+    const m = /^[0-9０-９]+/.exec(s.slice(at))
+    if (!m) return null
+    const n = m[0].replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    return { ja: n, form: n, disp: n, kana: m[0], kind: 'obj', key: '*NUM*', word: n, rank: 0, others: [], vehicle: false }
+  }
+  const tokenAt = (s, at) => numAt(s, at) || wordAt(s, at)
+
   /**
    * @param {string} input 日本語
    * @param {{verb?: string}} [opts] ★原作が「何を◯◯？」と聞き返している最中は、
@@ -300,6 +287,19 @@ function createCommander(asset) {
    *   （「おりる」→「き」が `disembark tree` になり「それには乗っていない」と出ていた）
    * @returns {{command:string|null, trace:string, unknown:string[]}}
    */
+  // 命令形 → 終止形に戻して、**きれいに通る**（送れる・余りが無い）ものを返す。無ければ null
+  //   ★`plain` = 戻した形をもう一度戻さない
+  const viaImperative = (t, opts) => {
+    for (const [re, ends] of IMPERATIVE) {
+      if (!re.test(t)) continue
+      for (const e of ends) {
+        const r2 = toCommand(t.replace(re, e), { ...opts, plain: true })
+        if (r2.command && !r2.unknown.length) return r2
+      }
+    }
+    return null
+  }
+
   function toCommand(input, opts) {
     const raw = strip(String(input || ''))
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
@@ -318,18 +318,12 @@ function createCommander(asset) {
       const a = actorNames.get(am[1])
       const rest = String(input).trim().slice(am[0].length)
       if (!strip(rest)) return { command: null, trace: '何をさせるか言っていない', unknown: [], echo: a.form + '、' }
+      // 命令形のままでは語彙に無い（「とれ」）。そのままで通らなかったら、終止形に戻して当たるものを採る。
+      // ★順番は「そのまま → 戻す」。逆（戻した形を先）は試して退けた（2026-11-14）—— 命令形らしい語尾の**物の名前**が動詞に化ける
+      //   （「紙切れ」→ `cut`・「空気入れ」→ `enter`・「おけ」→ `drop`・呪文の「こおりつけ」→ 氷 + 付ける）。
+      //   「きたへいけ」の「いけ」（Zork II の池）は、方角に余りがあるときの読み直し（下の「方角」の所）が拾う
       let r = toCommand(rest, opts)
-      if (!(r.command && !r.unknown.length)) {
-        // 命令形のままでは語彙に無い（「とれ」）。終止形に戻して当たるものを採る
-        const t = strip(rest)
-        outer: for (const [re, ends] of IMPERATIVE) {
-          if (!re.test(t)) continue
-          for (const e of ends) {
-            const r2 = toCommand(t.replace(re, e), opts)
-            if (r2.command && !r2.unknown.length) { r = r2; break outer }
-          }
-        }
-      }
+      if (!(r.command && !r.unknown.length)) r = viaImperative(strip(rest), opts) || r
       if (r.spell) return { command: null, trace: '呪文は呼びかけの中では唱えられない', unknown: [], echo: a.form + '、' + r.echo }
       const echo = a.form + '、' + r.echo
       if (!r.command) return { ...r, echo }
@@ -346,7 +340,9 @@ function createCommander(asset) {
     if (sp) {
       return { command: `say "${sp.word}"`, trace: '呪文', unknown: [], echo: `「${sp.form}」と唱える`, spell: sp.en }
     }
-    if (NEGATIVE.test(raw)) {
+    // ★ただし**語彙の語がその語尾を含んでいる**なら否定ではない（「いぬ」「あんない」。2026-11-13 ——
+    //   聞き返しへ名詞だけで答えると「打ち消しの言い方はまだ扱えない」になっていた）
+    if (NEGATIVE.test(raw) && !endsWithWord(kana(raw))) {
       // ★「扉を開けない」の「ない」を捨てると逆の命令になる。止める
       return { command: null, trace: '否定は扱えない', unknown: [], echo: raw }
     }
@@ -357,7 +353,7 @@ function createCommander(asset) {
     const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
     while (i < s.length) {
-      const hit = wordAt(s, i)
+      const hit = tokenAt(s, i)
       // ★コマンドにならない語に当たったら、そこで止めて「知らない」と言う。
       //   ★**黙って読み飛ばしてはいけない** —— 飛ばすと中の短い語が拾われ、
       //   `てんじょうをみる` が `look at grate`（錠）になる。打った本人には
@@ -379,7 +375,7 @@ function createCommander(asset) {
           //   ★続きは語彙とは限らない。助詞は 2 つ並ぶ（「じゅうたんのしたを」の「のした」+「を」）
           const next = i + p.length
           const goes = next >= s.length
-            || wordAt(s, next)
+            || tokenAt(s, next)
             || PARTICLES.some(([q]) => s.startsWith(kana(q), next))
           if (!goes) continue
           role = r; i = next; echo.push(p)
@@ -392,7 +388,7 @@ function createCommander(asset) {
       }
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
-      while (j < s.length && !wordAt(s, j)) j++
+      while (j < s.length && !tokenAt(s, j)) j++
       let word = s.slice(i, j)
       // ★未知語が格助詞を背負っていたら、それは「物のつもり」だ。捨ててはいけない。
       //   動詞だけ送るとゲームが**別の物を勝手に補う**ことがあり、たまたま正しく
@@ -432,6 +428,13 @@ function createCommander(asset) {
     //   物を伴わずに方角だけが立っているときに限って方角へ寄せる
     const MOVE_DIR = ['CLIMB', 'DISEMBARK']
     if (dirs.length && (!verb || verb.key === 'WALK' || (MOVE_DIR.includes(verb.key) && !objs.length))) {
+      // ★方角だけを送るのに**余り**（使わない物・知らない言葉）があるなら、命令形かもしれない（「きたへいけ」）。
+      //   終止形に戻してきれいに通るなら、そちらを採る —— 余りの「いけ」が池として復唱に出ていた（Zork II・2026-11-14）。
+      //   Zork I では「いけ」が知らない言葉として余っていた（送るのは同じ `north`）
+      if ((objs.length || unknown.length) && !(opts && opts.plain)) {
+        const r2 = viaImperative(raw, opts)
+        if (r2) return r2
+      }
       return { command: dirs[0].word, trace: '方角', unknown, echo: echo.join('') }
     }
     // 「中に入る」「外に出る」の中／外は方角ではなく動詞のほうに含まれている
@@ -579,6 +582,10 @@ function createCommander(asset) {
       out.push(dest.word)
     }
     if (!prso && !tool && !dest && bareDirs.length) out.push(bareDirs[0].word)
+    // ★物を方角へ動かす（「機械を南へ押す」= `push machine south`）。原作の `PUSH OBJECT OBJECT`（2 つ目が方角）の形。
+    //   動詞がその形（`OBJ OBJ`）を持つときだけ方角を後ろに付ける —— 黙って落とすと `push machine` になり、
+    //   原作は「どの方向へ押すのか」と聞き返す（Zork III の時間移動機・2026-11-15）
+    else if (prso && !tool && !dest && bareDirs.length && shapes.includes('OBJ OBJ')) out.push(bareDirs[0].word)
     // ★除くものは目的語の並びの最後に付く（`take all except lamp` / `… except a and b`）
     if (excepts.length) {
       out.push('except')
@@ -591,7 +598,8 @@ function createCommander(asset) {
     const at = prsoAt >= 0 && prso.others && prso.others.length ? [prsoAt, prso.others, prso]
       : toolAt >= 0 && tool.others && tool.others.length ? [toolAt, tool.others, tool]
       : destAt >= 0 && dest.others && dest.others.length ? [destAt, dest.others, dest] : null
-    const alts = at ? at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')) : []
+    // ★同じ英語になる候補は 1 つにする（2026-11-15。表記と読みの両方から同じ物が挙がると、同じ命令を 2 度試すことになる）
+    const alts = at ? [...new Set(at[1].map((w) => out.map((x, i) => (i === at[0] ? w : x)).join(' ')))].filter((c) => c !== out.join(' ')) : []
     // ★候補が全部外れたとき、**打った言葉**で断るために覚えておく
     const objDisp = at ? at[2].disp : ''
     // ★目的語を取らないと成り立たない動詞なのに目的語が無いなら、**送らない**。
@@ -645,9 +653,8 @@ function createCommander(asset) {
 }
 
 {
-  // ★PARSER_WORDS / YESNO も出す —— 手引きの画面が**同じ表を見て**言い方を並べるため。
-  //   画面側に書き写すと、ここを直したとき手引きだけ古くなる（打てない語を案内する）
-  const api = { createCommander, DIRS, PARTICLES, PARSER_WORDS, YESNO }
+  // ★語の表（PARSER_WORDS ほか）はここから出さない —— 手引きの画面も `assets/japanese.json` を直に見る
+  const api = { createCommander }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   if (typeof window !== 'undefined') window.ZenmaiCommand = api
 }

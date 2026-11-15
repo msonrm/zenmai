@@ -4,7 +4,6 @@
  * 呪文表の本物は原簿（非公開）の `## 呪文`。ここでは仕組みだけを小さな表で確かめる。
  *   node test/run-spell.js
  */
-const { createCommander } = require('../src/command.js')
 
 const asset = {
   spells: [
@@ -16,7 +15,7 @@ const asset = {
   // 口に出す語（Zork II のなぞなぞ）。裸の語は物の名前なので、カギカッコか「答える・言う」が要る
   speech: [{ en: 'WELL', word: 'well', form: '井戸', yomi: ['いど'], alts: ['井戸だ', 'いどだ', '井戸です', 'ウェル'] }],
 }
-const c = createCommander(asset)
+const c = require('./work.js').commander(asset)   // 日本語共通の表は本物（assets/japanese.json）・語彙は上の小さな表
 const cases = [
   ['こおりつけ', 'say "freeze"'],
   ['こおれ', 'say "freeze"'],

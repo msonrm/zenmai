@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""zork1-cmd.json → cmd_data.c/h(入力側の語彙)。
+"""<作品>-cmd.json + japanese.json(日本語共通の語の表) → cmd_data.c/h(入力側の語彙)。
 
 createCommander(src/command.js)の語彙構築(lex・owners・ambigDisp・sharedDisp・
 others・hypernyms・DIRS・ソート)をビルド時に再現する。挙動の正典は JS。
@@ -16,36 +16,20 @@ from ctab import Struct, Table, emit, sec_path, work_name
 HERE = Path(__file__).parent
 asset = json.loads((HERE.parent / 'assets' / f'{work_name()}-cmd.json').read_text())
 
-# ---- command.js の定数 ----
-DIRS = {
-    '北東': 'northeast', 'ほくとう': 'northeast', '北西': 'northwest', 'ほくせい': 'northwest',
-    '南東': 'southeast', 'なんとう': 'southeast', '南西': 'southwest', 'なんせい': 'southwest',
-    '北': 'north', 'きた': 'north', '南': 'south', 'みなみ': 'south',
-    '東': 'east', 'ひがし': 'east', '西': 'west', 'にし': 'west',
-    '上': 'up', 'うえ': 'up', '下': 'down', 'した': 'down', '中': 'in', 'なか': 'in', '外': 'out', 'そと': 'out',
-    '着陸': 'land', 'ちゃくりく': 'land', '着陸する': 'land', 'ちゃくりくする': 'land',
-    '上陸': 'land', 'じょうりく': 'land', '上陸する': 'land', 'じょうりくする': 'land',
-    '着岸': 'land', 'ちゃくがん': 'land', '着岸する': 'land', 'ちゃくがんする': 'land',
-    '岸に着く': 'land', 'きしにつく': 'land', '岸につく': 'land',
-}
-ALL_WORDS = ['ぜんぶ', 'すべて', 'のこらず', '全部', '全て', '残らず']
-PARTICLES = [
-    ['以外を', 'EXCEPT'], ['いがいを', 'EXCEPT'], ['以外', 'EXCEPT'], ['いがい', 'EXCEPT'],
-    ['の中に', 'IN'], ['のなかに', 'IN'], ['の中へ', 'IN'], ['のなかへ', 'IN'],
-    ['の下', 'UNDER'], ['のした', 'UNDER'], ['の後ろ', 'BEHIND'], ['のうしろ', 'BEHIND'],
-    ['の裏', 'BEHIND'], ['のうら', 'BEHIND'],
-    ['の上に', 'ON'], ['のうえに', 'ON'], ['の上', 'ON'], ['のうえ', 'ON'],
-    ['を使って', 'WITH'], ['をつかって', 'WITH'], ['によって', 'WITH'],
-    ['から', 'FROM'], ['へ', 'TO'], ['に', 'TO'], ['で', 'WITH'],
-    ['を', 'O'], ['は', 'O'], ['が', 'O'], ['と', 'AND'],
-    ['の', 'MOD'],
-]
-PARSER_WORDS = {
-    'もういちど': 'again', 'もう一度': 'again', 'くりかえす': 'again', '繰り返す': 'again',
-    'またやる': 'again', 'リピート': 'again', 'りぴーと': 'again',
-}
-YESNO = {'はい': 'y', 'いいえ': 'n'}
-ROLE_JA = {'IN': 'の中', 'ON': 'の上', 'UNDER': 'の下', 'BEHIND': 'の後ろ', 'FROM': 'から', 'WITH': 'で'}
+# ---- 日本語共通の語の表 ----
+# ★出どころは `assets/japanese.json` の 1 つだけ（`src/command.js` も同じファイルを読む。2026-11-14 に、ここにあった写しをやめた）。
+#   名前はそのまま残す —— `gen_data.py`・`gen_ui.py` が `gen_cmd.DIRS` などを import している
+common = json.loads((HERE.parent / 'assets' / 'japanese.json').read_text())
+# 方角 = 共通（東西南北・上下・中外）+ 作品が受ける語（`land`。`<作品>-cmd.json` の `dirs`）。積む順は共通 → 作品（command.js と同じ）
+DIRS = dict(common['dirs'])
+for d in asset.get('dirs', []):
+    for ja in d['ja']:
+        DIRS[ja] = d['word']
+ALL_WORDS = common['all']
+PARTICLES = common['particles']
+PARSER_WORDS = common['parserWords']
+YESNO = common['yesno']
+ROLE_JA = common['roleJa']
 
 # UI 断片(cmd.c が合成に使う。gen_data がグリフ収集のため import する)
 UI_FRAGS = ['「', '」を「', '」では受けられない', ' —— 移動は方角で言う: 北・東・上・下',
