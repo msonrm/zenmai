@@ -136,7 +136,7 @@ Zork I は暗黙にこうなっていた（地の文 80 行中 79 行が句点�
 | `node test/run-swallow.js` | repo | **語の食い合い**（ベースライン化） |
 | `WORK=zork2 node test/run-visible.js` | repo | ★**画面に出た複合語（ふりがな語）を読みのまま打てるか**。語彙の語を含むのに断られるものを挙げる（歩道橋型）。baseline = `test/visible-known-<作品>.txt`（文の断片だけ） |
 | `node test/run-walkthrough.js test/walkthrough.txt` | repo | 全経路を流して**未訳ログ**（Zork I は 211 手・未訳 0 行を 3 回連続） |
-| `native/cmd_ref.js` ↔ `cmd_test_host`・`test_translate.c` | native | JS と C の照合（4,031 件・trace 込み） |
+| `native/cmd_ref.js` ↔ `cmd_test_host`・`test_translate.c` | native | JS と C の照合（Zork I 4,127 件・trace 込み。2026-11-27 に差 0 件） |
 | `native/test-pc98.sh` | native | PC-98 の台本（ホストと QuuBee の記録の突き合わせ） |
 
 ★**walkthrough は IF Archive の攻略（`zorkI.step1/step2`）から抽出**した。散文が混ざる（末尾 62 行は記事の本文だった）ので 1 手ずつ目で確かめる。
