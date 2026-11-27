@@ -96,6 +96,10 @@ _blk = _web[_web.index('const SYS = ['):]
 _blk = _blk[:_blk.index('\n  ]')]
 SYS = _re.findall(r"\['([^']+)', '([^']+)'\]", _blk)
 assert SYS, '★web/main.js の SYS を読めなかった（形が変わった？）'
+# ★Web だけの言葉は native の手引きに出さない。「レシートに印字」（SCRIPT / UNSCRIPT）は WebUSB / Web Bluetooth で
+#   感熱プリンタへ送る Web の機能で、native には印字先が無い（2026-11-27）
+WEB_ONLY = {'SCRIPT', 'UNSCRIPT'}
+SYS = [(l, k) for (l, k) in SYS if k not in WEB_ONLY]
 
 # ★役目名は web 版（`SYS`）の言い方をそのまま出す。**言い換えは持たない**。
 #   以前は「描写」の「写」が同梱フォントに無くて「部屋の説明を長く」等に言い換えて

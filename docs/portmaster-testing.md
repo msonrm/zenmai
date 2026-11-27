@@ -11,6 +11,9 @@
 
 ## 0. 事前に済んでいること（2026-09-05 時点）
 
+★**2026-11-27 に zip を焼き直した**（9 月以降の訳・語彙の直しと、Zork I に効く入力の挙動を C へ移した分。詳細は `TODO.md` の「PortMaster 版を更新した」）。
+実機の記録は、この zip で取り直す。
+
 | | |
 |---|---|
 | `port.json` / `.sh` / `gameinfo.xml` / `README.md` / `licenses/` | 揃っている |
@@ -193,6 +196,14 @@ ssh <user>@<ip> 'cd /<roms>/ports/zenmai && mv zenmai-zork.new zenmai-zork.aarch
 ★★**ソフト側で吸収しようとしないこと。** 起動時に中心を測って引く回避策を書いたが、
 **原因が電池だと分かった時点で害しか残らなかった**（電池が減った状態で起動すると
 沈んだ中心を覚える）ので落とした。**回避策を書く前に原因を確かめる。**
+
+### ★機体の構成が変わった（2026-11-27・R36H / dArkOSen・ホスト名 `dArkOSen-r36`）
+
+- ★**カードが 1 枚になった**。`/roms2` は無く、ポートは **`/roms/ports`**（exfat）。下の「`/roms2/ports`」は 9 月の 2 枚構成の記録
+- ★PortMaster は **`/opt/system/Tools/PortMaster`**（`/roms/tools/PortMaster` と同じ場所）。取り込み口は **`/opt/system/Tools/PortMaster/autoinstall/`**
+  （`/roms/ports/autoinstall` は中身の違う別のフォルダなので、そこに置かない）
+- 送り方: `ssh ark@<IP> 'cat > …/autoinstall/zenmai.zip.part' < portmaster/zenmai.zip` → md5 の一致を見て `mv` → `sync`。
+  そのあと**機体で Tools → PortMaster を起動**すると取り込まれ、ES を再起動すると Ports 一覧に出る
 
 ### ★機体に置いたあとで踏んだもの 3 つ（2026-09-08・R36H / dArkOSen）
 

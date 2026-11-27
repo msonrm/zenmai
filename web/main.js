@@ -370,6 +370,9 @@
   function send(text) {
     if (ended) { location.reload(); return }
     if (Glk.waitingFor() === 'char') { $('input').value = ''; Glk.submitChar(32); return }
+    // ★原作が行を待っていない（立ち上がる途中・ファイルを開く問い合わせの最中）なら**受け付けない**。打った言葉は欄に残す
+    //   （以前は送ったつもりで黙って消えていた。CI の遅い機械で、続きから立ち上がる前の「やめる」が落ちて見つかった・2026-11-27）
+    if (Glk.waitingFor() !== 'line') return
     // ★空は送らない。R🕹↓ を握っていると送信が連発し、空コマンドが並んでいた
     if (!String(text).trim()) { $('input').value = ''; return }
     $('input').value = ''
