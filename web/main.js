@@ -451,9 +451,12 @@
     const el = $('receipt-status')
     if (el) { el.textContent = msg; el.className = `note ${cls || ''}` }
   }
+  // ★字の濃さ（0 ふつう / 1 太字 / 2 もっと濃く）はこの端末に覚える。既定は太字（実機で「かすれ気味」だった・2026-11-27）
+  const receiptWeight = () => { const v = Number(store.get('zenmai-receipt-weight')); return store.get('zenmai-receipt-weight') == null || Number.isNaN(v) ? 1 : v }
   const receipt = window.ZenmaiReceipt.createReceipt({
     qrcode: window.qrcode || (typeof qrcode !== 'undefined' ? qrcode : null),   // eslint-disable-line no-undef
     onStatus: receiptStatus,
+    weight: receiptWeight,
   })
   window.zenmaiReceipt = receipt     // ★検査（run-web-dom.js）が印字に積んだものを見る口
   {
@@ -461,6 +464,22 @@
     const b = $('receipt-ble')
     if (u) { u.hidden = !receipt.usb; u.addEventListener('click', () => receipt.connect('usb')) }
     if (b) { b.hidden = !receipt.ble; b.addEventListener('click', () => receipt.connect('ble')) }
+    const wsel = $('receipt-weight')
+    if (wsel) {
+      wsel.value = String(receiptWeight())
+      wsel.addEventListener('change', () => store.set('zenmai-receipt-weight', wsel.value))
+    }
+    // ★試し刷り = 濃さを詰めるための短い見本（画数の多い字・かな・英数字）。遊びの記録には入らない
+    const tb = $('receipt-test')
+    if (tb) {
+      tb.hidden = !receipt.usb && !receipt.ble
+      tb.addEventListener('click', () => {
+        if (!receipt.connected()) { receiptStatus('先にプリンタにつなぐ。', 'err'); return }
+        const names = ['ふつう', '太字', 'もっと濃く']
+        receipt.print({ text: `試し刷り（字の濃さ: ${names[receiptWeight()] || receiptWeight()}）\n鬱蒼とした森。轟音の部屋。\n郵便箱を開けると、ちらしが出てきた。\nABCabc 0123 ＞ ゆうびんばこをあける` })
+        receipt.print({ feed: 3 })
+      })
+    }
     if (!receipt.usb && !receipt.ble) {
       receiptStatus('このブラウザからは印字できない（Android・ChromeOS・PC の Chrome / Edge で使える。iPhone / iPad の Safari は非対応）。', 'err')
     }

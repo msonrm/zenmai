@@ -200,25 +200,46 @@ function newCanvas(w, h) {
   return { c, ctx }
 }
 
-/** canvas を二値にして帯へ。★プレビューを持たないので、ここで一度だけ */
-function bandsOf(cv) {
+/**
+ * 字の濃さ（2026-11-27・実機で「かすれ気味」）。細いゴシックの画数の多い字は、縁のぼかし（灰色）を
+ * しきい値 128 で白に落とすと線が削れる。★濃くするほど、灰色を黒に寄せ（しきい値を上げ）、字を太くする。
+ *   0 = ふつう（へちま言語ラボの /qr/ と同じ）/ 1 = 太字（既定）/ 2 = もっと濃く（太字を 1 ドットずらして重ね描き）
+ */
+const WEIGHTS = [
+  { bold: false, over: 0, cut: 128 },
+  { bold: true, over: 0, cut: 160 },
+  { bold: true, over: 1, cut: 176 },
+]
+const weightOf = (w) => WEIGHTS[Math.max(0, Math.min(WEIGHTS.length - 1, Number(w) || 0))]
+
+/** 字を描く（「もっと濃く」は横に 1 ドットずらして重ねる） */
+function drawText(ctx, text, x, y, wt) {
+  ctx.fillText(text, x, y)
+  for (let d = 1; d <= wt.over; d++) ctx.fillText(text, x + d, y)
+}
+
+/** canvas を二値にして帯へ。`cut` より暗い画素を黒にする */
+function bandsOf(cv, cut) {
   const img = cv.ctx.getImageData(0, 0, cv.c.width, cv.c.height)
   const p = img.data
+  const th = cut || 128
   for (let i = 0; i < p.length; i += 4) {
-    const v = p[i] * 0.299 + p[i + 1] * 0.587 + p[i + 2] * 0.114 < 128 ? 0 : 255
+    const v = p[i] * 0.299 + p[i + 1] * 0.587 + p[i + 2] * 0.114 < th ? 0 : 255
     p[i] = p[i + 1] = p[i + 2] = v
   }
   return bandsFromRgba(p, cv.c.width, cv.c.height)
 }
 
 /** 本文を描いた帯の列。★長くても canvas の高さの上限に当たらないよう、2,400 ドットごとに描く */
-function textBands(text, size, bold) {
-  const font = `${bold ? 'bold ' : ''}${size}px ${FONT}`
+function textBands(text, size, weight) {
+  const wt = weightOf(weight)
+  const font = `${wt.bold ? 'bold ' : ''}${size}px ${FONT}`
   const m = newCanvas(8, 8)
   if (!m) return []
   m.ctx.font = font
   const t = normalize(text)
-  const lines = t === '' ? [] : wrapLines(t, WIDTH, (s) => m.ctx.measureText(s).width)
+  // ★重ね描きでずらす分だけ幅を詰めて割る（右端が 384 ドットの外へ出ないように）
+  const lines = t === '' ? [] : wrapLines(t, WIDTH - wt.over, (s) => m.ctx.measureText(s).width)
   const lh = Math.round(size * 1.35)
   const step = Math.max(1, Math.floor(2400 / lh))
   const out = []
@@ -227,8 +248,8 @@ function textBands(text, size, bold) {
     const cv = newCanvas(WIDTH, n * lh)
     cv.ctx.font = font
     const pad = Math.round((lh - size) / 2)
-    for (let i = 0; i < n; i++) cv.ctx.fillText(lines[from + i], 0, i * lh + pad)
-    out.push(...bandsOf(cv))
+    for (let i = 0; i < n; i++) drawText(cv.ctx, lines[from + i], 0, i * lh + pad, wt)
+    out.push(...bandsOf(cv, wt.cut))
   }
   return out
 }
@@ -237,7 +258,9 @@ function textBands(text, size, bold) {
  * 頭書き: 名前・ひとこと・QR を 2 つ横に並べ、下に URL。`qrs` = [{ url, label }]。
  * ★QR の 1 模様は 4 ドット（≒ 0.5mm）。スマホのカメラで読める大きさで、2 つ並べても 384 に収まる
  */
-function headerBands(qrcode, head) {
+function headerBands(qrcode, head, weight) {
+  const wt = weightOf(weight)
+  const b = wt.bold ? 'bold ' : ''
   const cell = 4
   const quiet = 4
   const mats = (head.qrs || []).map((q) => qrMatrix(qrcode, q.url))
@@ -252,8 +275,8 @@ function headerBands(qrcode, head) {
   ctx.textAlign = 'center'
   ctx.font = `bold 44px ${FONT}`
   ctx.fillText(head.title, WIDTH / 2, 4)
-  ctx.font = `20px ${FONT}`
-  subLines.forEach((l, i) => ctx.fillText(l, WIDTH / 2, titleH + i * lineH))
+  ctx.font = `${b}20px ${FONT}`
+  subLines.forEach((l, i) => drawText(ctx, l, WIDTH / 2, titleH + i * lineH, wt))
   const top = titleH + subLines.length * lineH + 12
   const slot = WIDTH / Math.max(1, mats.length)
   mats.forEach((m, k) => {
@@ -262,10 +285,10 @@ function headerBands(qrcode, head) {
     for (let r = 0; r < m.length; r++) {
       for (let c = 0; c < m.length; c++) if (m[r][c]) ctx.fillRect(x0 + c * cell, y0 + r * cell, cell, cell)
     }
-    ctx.font = `18px ${FONT}`
-    ctx.fillText(head.qrs[k].label, Math.round(slot * k + slot / 2), top + side + 2)
+    ctx.font = `${b}18px ${FONT}`
+    drawText(ctx, head.qrs[k].label, Math.round(slot * k + slot / 2), top + side + 2, wt)
   })
-  return bandsOf(cv)
+  return bandsOf(cv, wt.cut)
 }
 
 /**
@@ -279,6 +302,8 @@ function createReceipt(opts) {
   const qrcode = o.qrcode || (typeof globalThis !== 'undefined' ? globalThis.qrcode : null)
   const onStatus = o.onStatus || (() => {})
   const size = o.size || 24
+  // ★字の濃さは**印字するときに**引く（設定を変えたら次の 1 手から効く）
+  const weight = typeof o.weight === 'function' ? o.weight : () => (o.weight == null ? 1 : o.weight)
   let link = null
   const queue = []
   let running = false
@@ -303,9 +328,9 @@ function createReceipt(opts) {
   }
 
   function bandsFor(item) {
-    if (item.header) return qrcode ? headerBands(qrcode, item.header) : textBands([item.header.title, ...(item.header.lines || []), ...(item.header.qrs || []).map((q) => q.url)].join('\n'), size, false)
+    if (item.header) return qrcode ? headerBands(qrcode, item.header, weight()) : textBands([item.header.title, ...(item.header.lines || []), ...(item.header.qrs || []).map((q) => q.url)].join('\n'), size, weight())
     if (item.feed) return [feed(item.feed)]
-    return textBands(item.text || '', size, false)
+    return textBands(item.text || '', size, weight())
   }
 
   async function pump() {
@@ -350,7 +375,7 @@ function createReceipt(opts) {
 }
 
 {
-  const api = { WIDTH, BAND, INIT, feed, normalize, wrapLines, bandsFromRgba, qrMatrix, turnText, createReceipt }
+  const api = { WIDTH, BAND, INIT, WEIGHTS, feed, normalize, wrapLines, bandsFromRgba, qrMatrix, turnText, createReceipt }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   if (typeof window !== 'undefined') window.ZenmaiReceipt = api
 }
