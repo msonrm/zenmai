@@ -141,6 +141,8 @@
   #panel label { display: block; cursor: pointer }
   #panel label input { margin-right: .5em }
   #panel .note, #pad-help .note { color: var(--dim); font-size: .8rem; line-height: 1.7 }
+  #panel .receipt-btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 }
+  #panel .receipt-btns button { font: inherit; font-size: .85rem; padding: 4px 10px }
   /* ★言い方の表。左が「何をするか」、右が**打つ言葉**（かなで出す。打鍵はかなだから） */
   #sys-list { width: 100%; border-collapse: collapse; font-size: .9em }
   #sys-list td { padding: .1em 0; vertical-align: baseline }
@@ -433,6 +435,15 @@
       <label><input type="checkbox" id="debug-chk"> 英語コマンドを表示</label>
       <p class="note">打った日本語を原作へ渡すとき、実際に送った英語コマンドを本文の下に薄く並べる。</p>
 
+      <!-- ★レシートに印字（2026-11-27）。「印字する」（原作の SCRIPT）から 1 手ごとに出す。経路は WebUSB / Web Bluetooth（Chrome 系だけ）。
+           本体は src/receipt.js（へちま言語ラボの /qr/ の印字から写した） -->
+      <h3>レシートに印字</h3>
+      <p class="note">58mm の感熱プリンタにつないで「<b>いんじする</b>」と打つと、頭書き（QR つき）のあと、遊んだ記録が 1 手ごとに出てくる。
+        「<b>いんじをやめる</b>」で締めて、切り取れる所まで紙を送る。</p>
+      <p class="receipt-btns"><button id="receipt-usb" type="button">USB でつなぐ</button>
+        <button id="receipt-ble" type="button">Bluetooth でつなぐ</button></p>
+      <p class="note" id="receipt-status">まだつないでいない。</p>
+
       <h3>訳の成績</h3>
       <p id="stat"></p>
       <p class="note" id="stat-note"></p>
@@ -443,11 +454,11 @@
       <p class="note">★進みは打つたびにこのブラウザが覚えている。閉じても、次に開くと<b>前回の続きから</b>始まる。
         「保存する」は、あとで戻りたい地点を 1 つ残しておくためのもの（「続きから」でそこへ戻る）。</p>
 
-      <!-- ★3 つの MIT の上に立っている。MIT が求めているのは「複製物に含めること」で、
+      <!-- ★4 つの MIT の上に立っている（2026-11-27 にレシートの QR = qrcode-generator を足した）。MIT が求めているのは「複製物に含めること」で、
            画面に出すことではない（配布物にファイルを置くのが本体）。ここはその**道**——
            URL を知っている人しか辿れない状態を、押せば読める状態にする -->
       <h3>ライセンスと出典</h3>
-      <p class="note">この企画は 3 つの MIT ライセンスの上に立っている。見出しを押すと全文が開く。</p>
+      <p class="note">この企画は 4 つの MIT ライセンスの上に立っている（4 つ目はレシートの QR を作る部品）。見出しを押すと全文が開く。</p>
       <div id="license"></div>
     </div>
   </div>
@@ -564,6 +575,8 @@
   <script src="../src/translate.js"></script>
   <script src="../src/command.js"></script>
   <script src="../src/glk-shim.js"></script>
+  <script src="../vendor/qrcode.js"></script>
+  <script src="../src/receipt.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@ for (const w of WORKS) await mkdir(path.join(OUT, 'vendor', w), { recursive: tru
   j.works = j.works.filter((w) => WORKS.includes(w.id))
   await writeFile(path.join(OUT, 'works.json'), JSON.stringify(j, null, 1) + '\n')
 }
-for (const f of ['zvm.min.js', 'gamepad-engine.js', 'flick-engine.js', 'LICENSE.ifvms']) {
+for (const f of ['zvm.min.js', 'gamepad-engine.js', 'flick-engine.js', 'LICENSE.ifvms', 'qrcode.js', 'LICENSE.qrcode-generator']) {
   await cp(path.join(ROOT, 'vendor', f), path.join(OUT, 'vendor', f))
 }
 for (const w of WORKS) {

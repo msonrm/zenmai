@@ -143,7 +143,7 @@ for (const rel of srcs) {
 }
 // ★UMD は `globalThis` に登録する。ブラウザでは window と同じものだが、
 //   この器では window を別に作っているので、載せ替えてやる必要がある
-for (const name of ['FlickEngine', 'GamepadEngine', 'ZenmaiRuby', 'ZenmaiTranslate', 'ZenmaiCommand', 'GlkShim']) {
+for (const name of ['FlickEngine', 'GamepadEngine', 'ZenmaiRuby', 'ZenmaiTranslate', 'ZenmaiCommand', 'GlkShim', 'ZenmaiReceipt', 'qrcode']) {
   if (!window[name] && globalThis[name]) window[name] = globalThis[name]
 }
 // ★フリックは**本物の resolver** を使う（flickmap の中身ごと確かめられる）。
@@ -154,6 +154,17 @@ store['zenmai-flick'] = 'on'
 const pad = {}
 // node 22 の navigator は getter だけなので上書きする
 Object.defineProperty(global, 'navigator', { value: { getGamepads: () => [] }, configurable: true })
+// ★`ZENMAI_RECEIPT=1` = 偽の USB レシートプリンタを差し込む（run-receipt.js）。送られたバイト列を数える
+const usbSent = []
+if (process.env.ZENMAI_RECEIPT) {
+  const dev = {
+    productName: '偽のプリンタ',
+    configuration: { interfaces: [{ interfaceNumber: 0, alternates: [{ endpoints: [{ endpointNumber: 1, direction: 'out', type: 'bulk' }] }] }] },
+    async open() {}, async close() {}, async selectConfiguration() {}, async claimInterface() {},
+    async transferOut(ep, data) { usbSent.push(Array.from(data)); return { status: 'ok' } },
+  }
+  global.navigator.usb = { requestDevice: async () => dev, addEventListener() {}, removeEventListener() {} }
+}
 // ★**本物のエンジンを土台にして**、rAF を回す start と DOM を作る mount だけ差し替える。
 //   丸ごと偽物にすると、入力表のような「本物にしかないもの」が器から消えて、
 //   **器だけが落ちる**（v1.8.0 で表が公開されたときに実際に落ちた）
@@ -204,6 +215,12 @@ const finish = async () => {
   const rooms = els.screen.children.filter((p) => p.className === 'room')
   console.log('--- 場所名の段落: ' + rooms.length + ' 件　' + rooms.map((p) => p.textContent).join(' / '))
   if (cmds.length && !rooms.length) { console.error('★場所名が切り出されていない'); process.exit(1) }
+  // ★印字の試し（run-receipt.js）: 印字に積んだもの（文字のまま）と、送ったバイト列の数を出して終える
+  if (process.env.ZENMAI_RECEIPT) {
+    console.log('--- receipt-log: ' + JSON.stringify(window.zenmaiReceipt ? window.zenmaiReceipt.log : null))
+    console.log('--- receipt-sent: ' + JSON.stringify(usbSent.map((b) => b.length)))
+    process.exit(0)
+  }
   // ★持ち越しの試し（run-resume.js）は手を流したところで終える。この先の打鍵の試しも自動保存に入り、続きの場所が変わるので
   if (process.env.ZENMAI_STORE) process.exit(0)
   // ★ゲームパッドの配線（実機が無くても op から先は同じ道を通る）
@@ -475,7 +492,8 @@ const finish = async () => {
   await new Promise((r) => setTimeout(r, 50))
   const lic = els.license.children
   const licTexts = lic.map((d) => (d.children[1] || {}).textContent || '')
-  const licOk = lic.length === 3
+  // ★4 者 = 自作・ZVM・作品のソース・レシートの QR（qrcode-generator・2026-11-27 に足した）
+  const licOk = lic.length === 4
     && licTexts.every((t) => /Permission is hereby granted/.test(t) && !/<!doctype/i.test(t))
   const licWho = licTexts.map((t) => (t.match(/Copyright \(c\) [^\n]*/i) || [''])[0])
   // ふりがなの入切
@@ -507,8 +525,8 @@ const finish = async () => {
     ['案内はかなの形だけ', words.length >= 12 && notKana.length === 0],
     ['ふりがなを切れる', rubyOff],
     ['ふりがなを戻せる', rubyOn],
-    ['★ライセンス全文が 3 本とも本物（HTML ではない）', licOk],
-    ['★3 者ぶんが別々に読まれている', new Set(licWho).size === 3 && licWho.every(Boolean)],
+    ['★ライセンス全文が 4 本とも本物（HTML ではない）', licOk],
+    ['★4 者ぶんが別々に読まれている', new Set(licWho).size === 4 && licWho.every(Boolean)],
     ['成績が出ている', /引けた \d+ 行/.test(els.stat.textContent)],
   ]
   for (const [name, ok] of pchecks) console.log(`--- 手引き ${ok ? '✓' : '✗'} ${name}`)
@@ -565,6 +583,8 @@ setTimeout(async () => {
     for (const p of ['works.json', '../web/works.json']) { try { const j = await (await fetch(p)).json(); const w = (j.works || []).find((x) => x.id === (WORK)); if (w) { ex = w.examples || []; break } } catch (e) { /* 次 */ } }
     exampleOk = ex.length === 3 && ex.every((e) => els.input.placeholder.includes(e))
   }
+  // ★印字の試しは、先に設定の「USB でつなぐ」を押しておく（本番と同じ道 = ボタンの click）
+  if (process.env.ZENMAI_RECEIPT && process.env.ZENMAI_RECEIPT !== 'idle' && els['receipt-usb']) els['receipt-usb'].dispatch('click')
   setTimeout(tick, 100)
 }, 150)
 }

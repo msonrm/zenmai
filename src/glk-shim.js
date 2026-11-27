@@ -47,6 +47,8 @@ class RefStruct {
 //   ★作品が違う story のセーブを読ませると壊れるので、枠の名前は作品で分ける（ホストが `slot` で渡す。
 //   渡さなければ従来の `zenmai-save` = Zork I の枠のまま。公開済みの利用者のセーブを失わないため）
 const SLOT = 'zenmai-save'
+const fileusage_Transcript = 0x02
+const fileusage_InputRecord = 0x03
 const filemode_Write = 0x01
 const filemode_WriteAppend = 0x05
 
@@ -158,6 +160,15 @@ function createGlk(host) {
     //   `glk_blocking_call` を立てて止まり、こちらが `vm.resume(fref)` を呼ぶまで動かない。
     //   ここで null を返して放置していたので `save` が固まっていた（実プレイで判明）
     glk_fileref_create_by_prompt(usage, mode) {
+      // ★記録（`script`・usage 0x102）と打鍵の記録（0x103）は**保存の枠に触らない空の流れ**にする（2026-11-27）。
+      //   以前は保存の枠の名前で開いていた（書く道が無かったので壊れはしなかった）。
+      //   原作の記録は英語なので捨てる —— 日本語の記録は画面の側（web/main.js）が取る。
+      //   ★null を返すと ZVM は見出しの旗（0x11 の bit 0）を下ろし、記録が始まったことにならない
+      if ((usage & 0xff) === fileusage_Transcript || (usage & 0xff) === fileusage_InputRecord) {
+        const fref = { name: null, mode, transcript: true }
+        setTimeout(() => { if (vm) vm.resume(fref) }, 0)
+        return fref
+      }
       const write = mode === filemode_Write || mode === filemode_WriteAppend
       const data = write ? null : files.read(slot)
       const fref = (write || data) ? { name: slot, mode, data } : null   // 読めるものが無ければ失敗
@@ -167,11 +178,12 @@ function createGlk(host) {
     glk_fileref_destroy() {},
     glk_stream_open_file(fref, mode) {
       if (!fref) return null
+      if (fref.transcript) return { file: null, transcript: true, mode, out: [], data: new Uint8Array(0), pos: 0 }
       return { file: fref.name, mode, out: [], data: fref.data || new Uint8Array(0), pos: 0 }
     },
     glk_stream_open_file_uni(fref, mode) { return this.glk_stream_open_file(fref, mode) },
     glk_stream_close(str) {
-      if (str && str.file && str.out.length) files.write(str.file, Uint8Array.from(str.out))
+      if (str && str.file && str.out.length) files.write(str.file, Uint8Array.from(str.out))   // 記録の流れは file が無い = 書かない
     },
     glk_stream_iterate() { return null },
     glk_get_buffer_stream(str, buf) {
@@ -214,7 +226,9 @@ function createGlk(host) {
       return true
     },
     /** いま何を待っているか */
-    waitingFor() { return lineReq ? 'line' : charReq ? 'char' : null },
+    // ★**ZVM が止まって待っている間（ファイルを開く問い合わせ = glk_select がまだ）は何も待っていない**（2026-11-27）。
+    //   `script` の直後に「行を待っている」と答えていたので、次の入力が受け取られずに落ち、返事が一手遅れて出ていた
+    waitingFor() { if (!pending) return null; return lineReq ? 'line' : charReq ? 'char' : null },
     /** 原作が終わったか（glk_exit が来た） */
     exited() { return exited },
 
