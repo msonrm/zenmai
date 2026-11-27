@@ -72,6 +72,9 @@ const els = Object.fromEntries(ids.map((id) => [id, new El('div')]))
 // ★`hidden` 付きで始まる要素は器でも隠しておく —— 器のほうが「開いた状態」で始まっていると、
 //   開閉のトグルが本番と逆に動き、**器だけ通る**（本番より優しい器は本番でだけ壊れる）
 for (const m of html.matchAll(/<div id="([^"]+)"[^>]*\shidden\b/g)) if (els[m[1]]) els[m[1]].hidden = true
+// ★`disabled` 付きで始まる要素も同じ（入力欄は原作が行を待つまで使えない。器が使える状態で始まると、
+//   立ち上がる前に打った手が落ちる —— CI の遅い機械でだけ「やめる」が消えた・2026-11-27）
+for (const m of html.matchAll(/<input id="([^"]+)"[^>]*\sdisabled\b/g)) if (els[m[1]]) els[m[1]].disabled = true
 const document = { getElementById: (id) => els[id], createElement: (t) => new El(t) }
 const window = { innerWidth: 1024, addEventListener() {} }
 // ふりがなの入切は body の class と localStorage を使う
