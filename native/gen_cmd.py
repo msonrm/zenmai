@@ -30,6 +30,8 @@ PARTICLES = common['particles']
 PARSER_WORDS = common['parserWords']
 YESNO = common['yesno']
 ROLE_JA = common['roleJa']
+# ★命令形の語尾 → 終止形（「いけ」→「いく」）。方角に余りがあるときの読み直しに使う（command.js の viaImperative・2026-11-14）
+IMPERATIVE = common['imperative']
 
 # UI 断片(cmd.c が合成に使う。gen_data がグリフ収集のため import する)
 UI_FRAGS = ['「', '」を「', '」では受けられない', ' —— 移動は方角で言う: 北・東・上・下',
@@ -68,11 +70,30 @@ if __name__ == '__main__':
     owners = {}
     for key, o in objOf.items():
         for ja in o['ja']:
-            owners.setdefault(kana(ja), []).append(key)
+            # ★同じ物を 2 度数えない（command.js と同じ・2026-11-15）。カタカナだけの名前は表記と読みが同じかなになり、
+            #   2 度積むと「2 つの物が名乗る言い方」に見えて形容詞が落ちる
+            lst = owners.setdefault(kana(ja), [])
+            if key not in lst:
+                lst.append(key)
     nounUse = {}
     for o in objOf.values():
         n = (o['nouns'][0] if o['nouns'] else '').lower()
         nounUse[n] = nounUse.get(n, 0) + 1
+    # ★別名まで数えた使用数（command.js の nounAny・2026-11-27）。使うのは**修飾語の付いた名前**を打ったときだけ
+    #   （黒い書物 → `large book`。案内書が `book` を別名に持つ）。短い呼び名は裸のまま（Zork III の湖の「光る物」）
+    nounAny = {}
+    for o in objOf.values():
+        for n in {x.lower() for x in o['nouns']}:
+            nounAny[n] = nounAny.get(n, 0) + 1
+    MODIFIED = re.compile(r'[いのなた](?=[一-龥ァ-ヶ])')
+
+    def common_adj(own):
+        """名乗る物すべてが持つ形容詞（最初の物の形容詞の順で、最初に共通するもの）。command.js の commonAdj"""
+        lists = [[a.lower() for a in objOf[x].get('adjs', [])] for x in own]
+        for a in (lists[0] if lists else []):
+            if all(a in l for l in lists):
+                return a
+        return ''
     seen = set()
     ambigDisp = {}
     for key, o in objOf.items():
@@ -128,7 +149,13 @@ if __name__ == '__main__':
                 disp = ambigDisp.get('|'.join(sorted(own)), ja)
             else:
                 disp = o['ja'][0]
-            word = noun if (shared or not (nounUse.get(noun, 0) > 1 and adj)) else adj + ' ' + noun
+            if shared:
+                # ★共有された言い方でも、名乗る物どうしに共通の形容詞があり、その名詞をほかの物も使うなら添える（`wood door`・2026-11-15）
+                ca = common_adj(own)
+                word = ca + ' ' + noun if ca and nounUse.get(noun, 0) > len(own) else noun
+            else:
+                use = nounAny if MODIFIED.search(formOf.get(ja, ja)) else nounUse
+                word = adj + ' ' + noun if use.get(noun, 0) > 1 and adj else noun
             vehicle = any(objOf[x].get('vehicle') for x in own) if shared else bool(o.get('vehicle'))
             others = [word_of(x) for x in own
                       if x != key and (objOf[x]['nouns'][0] if objOf[x]['nouns'] else '').lower() != noun]
@@ -142,7 +169,8 @@ if __name__ == '__main__':
 
     for h in asset.get('hypernyms', []):
         targets = [t for t in h.get('targets', []) if t in objOf]
-        if not targets:
+        # ★対象を持たない上位語 = 原作の部屋付きの仮の物（PSEUDO。鎖・滝・霧）の名詞。語だけ渡す（command.js と同じ・2026-11-15）
+        if not targets and not h.get('noun'):
             continue
         vehicle = any(objOf[t].get('vehicle') for t in targets)
         word = h['noun'].lower() if h.get('noun') else word_of(targets[0])
@@ -243,6 +271,13 @@ if __name__ == '__main__':
         grows.append((ko, kl, vo, vl))
 
     frows = [jput(s) for s in UI_FRAGS]
+    # 命令形の表: 語尾と戻す形の組を**試す順**に平らに並べる（同じ語尾が続く）
+    irows = []
+    for end, tos in IMPERATIVE:
+        for to in tos:
+            eo, el = jput(end)
+            to_, tl = jput(to)
+            irows.append((eo, el, to_, tl))
     role_ja_rows = [jput(ROLE_JA.get(r, '')) for r in ROLES]
 
     CmLex = Struct('CmLex', [
@@ -257,6 +292,7 @@ if __name__ == '__main__':
                                ('unsigned char', 'role')])
     CmMap = Struct('CmMap', [('unsigned int', 'ko'), ('unsigned short', 'kl'), ('unsigned int', 'vo'), ('unsigned short', 'vl')])
     CmStr = Struct('CmStr', [('unsigned int', 'off'), ('unsigned short', 'len')])
+    CmImp = Struct('CmImp', [('unsigned int', 'eo'), ('unsigned short', 'el'), ('unsigned int', 'to'), ('unsigned short', 'tl')])
     # ★作品に依る定数（語彙の表の中の番号）。昔は enum で焼き込んでいた —— パックへ出すので表 cm_k に入れ、
     #   昔の名前はマクロで cm_k を指す（cmd.c は変わらない）
     all_idx = next(i for i, e in enumerate(lex) if e.get('key') == '*ALL*' and e['ja'] == ALL_WORDS[0])
@@ -272,7 +308,7 @@ if __name__ == '__main__':
     # 並び: kn,knl,dp,dpl,jo,jl,fo,fl,wo,wl,kind,vehicle,is_all,ooff,on_,vidx
     lex_rows = [(r[0], r[1], r[2], r[3], r[4], r[5], r[14], r[15], r[6], r[7], r[8], r[10], r[13],
                  r[11], r[12], r[9]) for r in lrows]
-    emit('cmd', 'CM', 'gen_cmd.py', [CmLex, CmVerb, CmPart, CmMap, CmStr], [
+    emit('cmd', 'CM', 'gen_cmd.py', [CmLex, CmVerb, CmPart, CmMap, CmStr, CmImp], [
         Table('cm_jpool', 'unsigned short', jpool),
         Table('cm_apool', 'char', apool),
         Table('cm_k', 'short', [v for _, v in consts], doc='作品に依る定数: ' + ' / '.join(k for k, _ in consts)),
@@ -285,6 +321,7 @@ if __name__ == '__main__':
         Table('cm_frags', CmStr, frows, 'CM_FRAG_N'),
         Table('cm_others', CmStr, others_pool),
         Table('cm_role_ja', CmStr, role_ja_rows, 'CM_ROLE_N'),
+        Table('cm_imper', CmImp, irows, 'CM_IMP_N'),
     ], head_extra=head,
        # ★本体が番号で指すもの（UI の文言・役割の並び・定数の名前）も要約値に入れる —— 変われば古いパックを断る
        schema_extra=repr((UI_FRAGS, ROLES, [k for k, _ in consts])),

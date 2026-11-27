@@ -17,6 +17,8 @@ const TRACE = {
   '否定は扱えない': 'NEG', '知らない言葉': 'UNKNOWN', '名詞のみ': 'NOUN',
   '動詞が見つからない': 'NOVERB', '原作にない言い方': 'NOSHAPE', '方角': 'DIR',
   '動詞+役': 'OK', 'コマンド不適語': 'NOCMD',
+  // ★語の途中を食った読みの断り（2026-11-27）。画面の文言は「知らない言葉」と同じなので、C は UNKNOWN で返す
+  '語の途中': 'UNKNOWN',
 }
 
 const lines = fs.readFileSync(process.argv[2], 'utf8').split('\n').filter((l) => l.length)

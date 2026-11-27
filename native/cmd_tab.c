@@ -14,6 +14,7 @@ const CmMap *cm_guide; unsigned cm_guide_n;
 const CmStr *cm_frags; unsigned cm_frags_n;
 const CmStr *cm_others; unsigned cm_others_n;
 const CmStr *cm_role_ja; unsigned cm_role_ja_n;
+const CmImp *cm_imper; unsigned cm_imper_n;
 const TlTab cmd_tabs[] = {
   {"cm_jpool", (const void **)&cm_jpool, &cm_jpool_n, sizeof(unsigned short), 1, {{0,2}}},
   {"cm_apool", (const void **)&cm_apool, &cm_apool_n, sizeof(char), 1, {{0,1}}},
@@ -27,6 +28,7 @@ const TlTab cmd_tabs[] = {
   {"cm_frags", (const void **)&cm_frags, &cm_frags_n, sizeof(CmStr), 2, {{offsetof(CmStr,off),4},{offsetof(CmStr,len),2}}},
   {"cm_others", (const void **)&cm_others, &cm_others_n, sizeof(CmStr), 2, {{offsetof(CmStr,off),4},{offsetof(CmStr,len),2}}},
   {"cm_role_ja", (const void **)&cm_role_ja, &cm_role_ja_n, sizeof(CmStr), 2, {{offsetof(CmStr,off),4},{offsetof(CmStr,len),2}}},
+  {"cm_imper", (const void **)&cm_imper, &cm_imper_n, sizeof(CmImp), 4, {{offsetof(CmImp,eo),4},{offsetof(CmImp,el),2},{offsetof(CmImp,to),4},{offsetof(CmImp,tl),2}}},
 };
-const int cmd_tabs_n = 12;
+const int cmd_tabs_n = 13;
 const unsigned long cmd_schema = CM_SCHEMA;

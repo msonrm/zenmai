@@ -156,7 +156,22 @@ static void note_guide(CmdRes *r)
     }
 }
 
-void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
+/* ★語の途中を食った切れ端（command.js の `mid`・2026-11-27）。走査の中で覚え、送るものが決まったあとで止める。
+   入れ子の呼び出し（命令形の読み直し）は自分の分を持つ（入口の run が控えて戻す） */
+static u16 mid_buf[32];
+static int mid_len;
+
+static void run(const u16 *in, int inlen, int pending_verb, CmdRes *r, int plain);
+
+/* 次が助詞で始まるか（「らんぷ」+「をつけろ」は語の途中ではない = 助詞の先が読めなかっただけ） */
+static int starts_particle(const u16 *s, int n, int at)
+{
+    for (int q = 0; q < CM_PART_N; q++)
+        if (u16_starts(s, n, at, cm_jpool + cm_parts[q].po, cm_parts[q].pl)) return 1;
+    return 0;
+}
+
+static void run_core(const u16 *in, int inlen, int pending_verb, CmdRes *r, int plain)
 {
     static const u16 NEG1[] = {0x306A, 0x3044};                          /* ない */
     static const u16 NEG2[] = {0x306A, 0x3044, 0x3067};                  /* ないで */
@@ -255,6 +270,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     int nf = 0;
     int hard_stop = 0;
     int i = 0;
+    int prev_start = -1, prev_end = -1, prev_role = CMR_NONE;   /* 直前に当たった語（語の途中を食ったかを見る） */
     while (i < n) {
         const CmLex *hit = word_at(s, n, i);
         /* ★コマンドにならない語（原簿の「コマンド不適語」）。ここで止めて「知らない」と言う。
@@ -271,7 +287,9 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
             return;
         }
         if (hit) {
+            prev_start = i;
             i += hit->knl;
+            prev_end = i;
             put_pool(r->echo, &r->echo_len, 96, hit->dp, hit->dpl);
             int role = CMR_NONE;
             for (int p = 0; p < CM_PART_N; p++) {
@@ -285,6 +303,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                 if (!goes)
                     continue;
                 role = pt->role;
+                prev_role = role;
                 i = next;
                 put_pool(r->echo, &r->echo_len, 96, pt->dp, pt->dpl);
                 if (is_spatial(role) && i < n && (s[i] == 0x306B || s[i] == 0x3078)) {
@@ -293,6 +312,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                 }
                 break;
             }
+            if (role == CMR_NONE) prev_role = CMR_NONE;
             if (nf < 24) {
                 Tok *t = &found[nf++];
                 t->e = hit;
@@ -310,6 +330,14 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         }
         int j = i + 1;
         while (j < n && !word_at(s, n, j)) j++;
+        /* ★**語の直後に、助詞をはさまず知らない切れ端が続く** = その語は打った語の途中を食っている（プレイ日記・2026-11-27）。
+           「きりかえをまわす」→ 木 + 絵画 で `turn painting`、「したろす」→ 方角の「下」で `down`。ここでは覚えるだけ（入口の run が止める）。
+           食われた語はひと続きで見せる。右へは、続けて当たる 1 モーラの語（巣・絵・木）も含める */
+        if (!mid_len && prev_end == i && prev_role == CMR_NONE && !starts_particle(s, n, i)) {
+            int k = j;
+            for (const CmLex *h = word_at(s, n, k); h && h->knl == 1; h = word_at(s, n, k)) k += h->knl;
+            for (int t = prev_start; t < k && mid_len < 32; t++) mid_buf[mid_len++] = s[t];
+        }
         /* 未知語。を/は/が を背負っていたら「物のつもり」= 送らない */
         int cut = -1;
         for (int t = i; t < j && cut < 0; t++)
@@ -322,6 +350,7 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
         }
         put_j(r->echo, &r->echo_len, 96, s + i, j - i);
         i = j;
+        prev_end = -1;
     }
 
     if (hard_stop) {
@@ -361,6 +390,21 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     /* 方角だけ(WALK / 物なしの CLIMB・DISEMBARK も) */
     if (nd && (!verb || vidx == VK_WALK ||
                ((vidx == VK_CLIMB || vidx == VK_DISEMBARK) && !no))) {
+        /* ★方角だけを送るのに余り（使わない物・知らない言葉）があるなら、命令形かもしれない（「きたへいけ」）。
+           終止形に戻してきれいに通るなら、そちらを採る（command.js の viaImperative・2026-11-14）。★戻した形は 2 度戻さない */
+        if ((no || r->unknown_n) && !plain) {
+            for (int q = 0; q < (int)CM_IMP_N; q++) {
+                const CmImp *im = &cm_imper[q];
+                if (im->el > rn || !u16_starts(raw, rn, rn - im->el, cm_jpool + im->eo, im->el)) continue;
+                u16 raw2[IN_MAX];
+                int n2 = rn - im->el;
+                for (int t = 0; t < n2; t++) raw2[t] = raw[t];
+                for (int t = 0; t < im->tl && n2 < IN_MAX; t++) raw2[n2++] = cm_jpool[im->to + t];
+                static CmdRes tmp;          /* ★大きいので静的に（戻した形は 2 度戻さないので入れ子は 1 段だけ） */
+                run(raw2, n2, pending_verb, &tmp, 1);
+                if (tmp.has_command && !tmp.unknown_n) { *r = tmp; return; }
+            }
+        }
         for (int t = 0; t < dirs[0]->wl && r->command_len < 159; t++)
             r->command[r->command_len++] = cm_apool[dirs[0]->wo + t];
         r->command[r->command_len] = 0;
@@ -596,6 +640,13 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     else if (tool_at >= 0 && tool && tool->on) { alt_src = tool; alt_at = tool_at; }
     else if (dest_at >= 0 && dest && dest->on) { alt_src = dest; alt_at = dest_at; }
     if (alt_src) {
+        /* ★同じ英語になる候補は 1 つにし、送る命令と同じものは外す（command.js・2026-11-15） */
+        char cur[160];
+        int cl = 0;
+        for (int t = 0; t < now_; t++) {
+            if (t && cl < 159) cur[cl++] = ' ';
+            for (int q = 0; q < owl[t] && cl < 159; q++) cur[cl++] = ow[t][q];
+        }
         for (int a = 0; a < alt_src->on && r->alts_n < 4; a++) {
             const CmStr *w = &cm_others[alt_src->ooff + a];
             int o = 0;
@@ -609,6 +660,13 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
                         r->alts[r->alts_n][o++] = ow[t][q];
                 }
             }
+            int dup = o == cl;
+            for (int q = 0; dup && q < o; q++) dup = r->alts[r->alts_n][q] == cur[q];
+            for (int b = 0; !dup && b < r->alts_n; b++) {
+                dup = r->alts_lens[b] == o;
+                for (int q = 0; dup && q < o; q++) dup = r->alts[b][q] == r->alts[r->alts_n][q];
+            }
+            if (dup) continue;
             r->alts_lens[r->alts_n] = o;
             r->alts_n++;
         }
@@ -681,4 +739,33 @@ void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
     if (prso && prso->fl)
         put_pool(r->said, &r->said_len, 24, prso->fo, prso->fl);
     r->verb_idx = vidx;
+}
+
+/* 入口。★語の途中を食った切れ端を抱えたまま命令が決まったら、送らずに食われた語を「知らない言葉」と言う（command.js の toCommand と同じ形） */
+static void run(const u16 *in, int inlen, int pending_verb, CmdRes *r, int plain)
+{
+    u16 saved[32];
+    int saved_len = mid_len;
+    for (int t = 0; t < saved_len; t++) saved[t] = mid_buf[t];
+    mid_len = 0;
+    run_core(in, inlen, pending_verb, r, plain);
+    if (mid_len && r->has_command && r->unknown_n) {
+        int el = r->echo_len;
+        u16 echo[96];
+        for (int t = 0; t < el; t++) echo[t] = r->echo[t];
+        for (int t = 0; t < (int)sizeof(*r) / 4; t++) ((int *)r)[t] = 0;
+        for (int t = 0; t < el; t++) r->echo[t] = echo[t];
+        r->echo_len = el;
+        r->verb_idx = -1;
+        unknown_push(r, mid_buf, mid_len);
+        note_guide(r);
+        r->trace = CMD_TR_UNKNOWN;
+    }
+    mid_len = saved_len;
+    for (int t = 0; t < saved_len; t++) mid_buf[t] = saved[t];
+}
+
+void cmd_run(const u16 *in, int inlen, int pending_verb, CmdRes *r)
+{
+    run(in, inlen, pending_verb, r, 0);
 }
