@@ -738,12 +738,12 @@
   {
    "en": "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is open.",
    "id": "Z-1",
-   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記された切替がある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは開いている。"
+   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記されたスイッチがある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは開いている。"
   },
   {
    "en": "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is closed.",
    "id": "Z-2",
-   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記された切替がある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは閉じている。"
+   "ja": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記されたスイッチがある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは閉じている。"
   },
   {
    "en": "You evidently frightened the robber, though you didn't hit him. He flees, but the contents of his bag fall on the floor.",
@@ -1565,7 +1565,7 @@
   "This is a large room with a prominent doorway leading to a down staircase. Above you is a large dome. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room sits a white marble pedestal.": "広い部屋で、下り階段へ続く目立つ戸口がある。頭上には大きな円蓋がある。円蓋の縁のあたり（六メートルほど上）に木の手すりが巡っている。部屋の中央には白い大理石の台座が据えられている。",
   "This is a large room, in the middle of which is a small shaft descending through the floor into darkness below. To the west and the north are exits from this room. Constructed over the top of the shaft is a metal framework to which a heavy iron chain is attached.": "広い部屋で、中央に小さな縦坑が床を抜けて下の暗闇へ落ちている。西と北にこの部屋からの出口がある。縦坑の上には金属の枠が組まれ、重い鉄の鎖が取り付けられている。",
   "This is a large room, whose east wall is solid granite. A number of discarded bags, which crumble at your touch, are scattered about on the floor. There is an exit down a staircase.": "広い部屋で、東の壁は花崗岩の一枚岩だ。触れると崩れる捨てられた袋がいくつも、床に散らばっている。階段を下る出口がある。",
-  "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記された切替がある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは",
+  "This is a large, cold room whose sole exit is to the north. In one corner there is a machine which is reminiscent of a clothes dryer. On its face is a switch which is labelled \"START\". The switch does not appear to be manipulable by any human hand (unless the fingers are about 1/16 by 1/4 inch). On the front of the machine is a large lid, which is": "広く冷たい部屋で、出口は北だけだ。隅に、衣類乾燥機を思わせる機械が置かれている。前面には「START」と記されたスイッチがある。人の指で扱えるようには見えない（指の太さが一・五ミリ×六ミリほどなら別だが）。機械の正面には大きな蓋があり、それは",
   "This is a long and narrow corridor where a long north-south passageway briefly narrows even further.": "長く狭い廊下だ。長い南北の通路が、ここで少しのあいださらに狭まる。",
   "This is a long and narrow passage, which is cluttered with broken timbers. A wide passage comes from the east and turns at the west end of the room into a very narrow passageway. From the west comes a strong draft.": "長く狭い通路で、折れた坑木が散らばっている。広い通路が東から来て、部屋の西端でごく狭い通路に変わる。西から強い隙間風が吹いてくる。",
   "This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large opening in it (about cyclops sized).": "長い通路だ。西に入口が一つある。東には古い木の扉があり、大きな穴が開いている（ちょうどサイクロプスほどの大きさだ）。",
@@ -5565,6 +5565,12 @@
     "どうくつ"
    ]
   ],
+  "浮標": [
+   [
+    "浮標",
+    "ふひょう"
+   ]
+  ],
   "湿": [
    [
     "湿",
@@ -7106,6 +7112,20 @@
     "書物",
     "しょもつ"
    ]
+  ],
+  "黒い本": [
+   [
+    "黒",
+    "くろ"
+   ],
+   [
+    "い",
+    null
+   ],
+   [
+    "本",
+    "ほん"
+   ]
   ]
  },
  "templates": [
@@ -8514,7 +8534,7 @@
   "surrounding wall": "周囲の壁",
   "suspicious": "盗賊",
   "swim": "泳ぐ",
-  "swing": "振る",
+  "swing": "振り回す",
   "switch": "スイッチ",
   "sword": "剣",
   "table": "食卓",

@@ -62,6 +62,7 @@ function createGlk(host) {
   let pending = null          // glk_select が待っている RefStruct
   let lineReq = null          // { win, buf }
   let charReq = null
+  let exited = false
   const windows = []
 
   const newWindow = (type) => {
@@ -99,9 +100,10 @@ function createGlk(host) {
     fatal_error(e) { host.write('\n[エラー] ' + (e && e.message ? e.message : e) + '\n'); host.update() },
 
     // --- 窓 ---
-    glk_window_open(parent, method, size, wintype) {
+    glk_window_open(parent, method, size, wintype, rock) {
       const w = newWindow(wintype)
       w.parent = parent || null
+      w.rock = rock || 0          // ★ZVM は復帰のとき rock（201 = 本文・202 = 状態行）で窓を探し直す
       return w
     },
     glk_window_close(win) {
@@ -121,7 +123,12 @@ function createGlk(host) {
     },
     glk_window_move_cursor(win, x, y) { if (win) { win.cx = x; win.cy = y } },
     glk_window_set_arrangement() {},
-    glk_window_iterate() { return null },
+    // ★自動保存からの復帰で ZVM が窓を探し直す（`do_autorestore`）。rock を返し、行の器（linebuf）を渡す
+    glk_window_iterate(win, rockbox) {
+      const w = windows[win ? windows.indexOf(win) + 1 : 0] || null
+      if (w && rockbox && rockbox.set_value) rockbox.set_value(w.rock || 0)
+      return w
+    },
     glk_set_window(win) { curwin = win },
 
     // --- 出力 ---
@@ -142,6 +149,9 @@ function createGlk(host) {
     glk_request_line_event_uni(win, buf) { lineReq = { win, buf } },
     glk_request_char_event_uni(win) { charReq = { win } },
     glk_select(ev) { pending = ev },
+    // ★原作が終わった（「やめる」→「はい」）。ZVM は `e.quit=1; Glk.glk_exit()` を呼ぶ。
+    //   この口が無いと TypeError になり、`fatal_error` が「[エラー] … is not a function」を出していた（プレイ日記・2026-11-27）
+    glk_exit() { exited = true; lineReq = null; charReq = null; if (host.exit) host.exit() },   // 描くのは ZVM が続けて呼ぶ update
 
     // --- セーブ／復帰 ---
     // ★ZVM は `glk_fileref_create_by_prompt` を**返り値で待たない**。
@@ -205,6 +215,39 @@ function createGlk(host) {
     },
     /** いま何を待っているか */
     waitingFor() { return lineReq ? 'line' : charReq ? 'char' : null },
+    /** 原作が終わったか（glk_exit が来た） */
+    exited() { return exited },
+
+    // --- 自動保存（ZVM の `do_autosave` / `do_autorestore` が呼ぶ）---
+    // ★覚えるのは窓の形（種類・rock・親・状態行の字）と、**どの窓が行の入力を待っているか**だけ。
+    //   本文の窓は画面（ホスト）の側が持つので、ここには無い。行の器は ZVM の `read_data.buffer` と
+    //   **同じ配列**でなければならない（`submitLine` が書き、ZVM が読む）ので、復帰で作り直して `linebuf` に掛ける
+    save_allstate() {
+      return {
+        windows: windows.map((w) => ({ type: w.type, rock: w.rock || 0, parent: windows.indexOf(w.parent), grid: w.grid.map((r) => r.join('')) })),
+        line: lineReq ? { win: windows.indexOf(lineReq.win), len: (lineReq.buf && lineReq.buf.length) || 0 } : null,
+      }
+    },
+    restore_allstate(st) {
+      windows.length = 0
+      for (const d of st.windows || []) {
+        const w = newWindow(d.type)
+        w.rock = d.rock
+        w.grid = (d.grid || []).map((r) => Array.from(r))
+      }
+      ;(st.windows || []).forEach((d, i) => { windows[i].parent = d.parent >= 0 ? windows[d.parent] : null })
+      charReq = null
+      lineReq = null
+      if (st.line && windows[st.line.win]) {
+        const win = windows[st.line.win]
+        win.linebuf = new Array(st.line.len).fill(0)
+        lineReq = { win, buf: win.linebuf }
+      }
+      // ★出力先の窓も選び直す。ZVM は復帰のあと `glk_set_window` を呼ばないので、放っておくと本文が捨てられる
+      curwin = windows.find((w) => w.rock === 201) || windows.find((w) => w.type === wintype_TextBuffer) || null
+      const grid = windows.find((w) => w.type === wintype_TextGrid)
+      if (grid) host.status((grid.grid[0] || []).join('').replace(/\s+$/, ''))
+    },
   }
   return Glk
 }

@@ -133,6 +133,17 @@ function createCommander(asset, common) {
     const n = (o.nouns[0] || '').toLowerCase()
     nounUse[n] = (nounUse[n] || 0) + 1
   }
+  // ★**別名まで数えた**使用数（2026-11-27）。案内書（GUIDE）は `book` を別名に持つので、第一名詞だけで数えると
+  //   黒い書物の `book` が「共有していない」に見え、裸の `take book` を送って「案内書と黒い書物、どちらのことか」と
+  //   聞き返された（プレイ日記）。★ただし使うのは**修飾語の付いた名前**を打ったときだけ（下の `modified`）——
+  //   原作がわざと別名を貸している物がある（Zork III の湖の「光る物」は `amulet` と呼べる。「ごふをとる」に
+  //   `take gold amulet` を送ると、まだ無い本物の護符だけを指して拾えなくなった = 日本語の通しが止まった）
+  const nounAny = {}
+  for (const o of Object.values(objOf)) {
+    for (const n of new Set((o.nouns || []).map((x) => x.toLowerCase()))) nounAny[n] = (nounAny[n] || 0) + 1
+  }
+  // 修飾語の付いた名前 = 「〜い」「〜の」「〜な」「〜た」のあとに名詞（漢字・カタカナ）が続く形（黒い書物・金の護符・燃え尽きたランタン）
+  const modified = (form) => /[いのなた](?=[一-龥ァ-ヶ])/.test(form)
   // 名乗る物すべてが持つ形容詞（最初の物の形容詞の順で、最初に共通するもの）
   const commonAdj = (own) => {
     const lists = own.map((x) => (objOf[x].adjs || []).map((a) => a.toLowerCase()))
@@ -198,7 +209,7 @@ function createCommander(asset, common) {
         //   「木の扉」= ダンジョンの入口の扉と博物館の扉（どちらも WOODEN）。裸の `door` を送ると、その場の石の扉・鉄の扉まで
         //   候補に入って「どの扉のことか」と聞き返された。`wooden door` なら日本語が指す範囲と同じになる
         word: shared ? (commonAdj(own) && nounUse[noun] > own.length ? commonAdj(own) + ' ' + noun : noun)
-          : !(nounUse[noun] > 1 && adj) ? noun : adj + ' ' + noun,
+          : !(((modified(formOf[ja] || ja) ? nounAny : nounUse)[noun] > 1) && adj) ? noun : adj + ' ' + noun,
         // ★共有された言い方（舟 = ビニールの塊 / 魔法の舟 / 穴の空いた舟）は、
         //   **どれかが乗り物なら乗り物として扱う**。どれを指すかは場が決める
         vehicle: shared ? own.some((x) => objOf[x].vehicle) : !!o.vehicle,
@@ -300,7 +311,21 @@ function createCommander(asset, common) {
     return null
   }
 
+  // ★語の途中を食った切れ端（`parse` が走査の中で覚える）。入れ子の呼び出し（命令形の読み直し）は自分の分を持つ
+  let mid = null
   function toCommand(input, opts) {
+    const saved = mid
+    mid = null
+    let r = parse(input, opts)
+    // ★送る命令が決まっていて、しかも余りを抱えている = 食われた語の上に命令を組んだ。送らない
+    if (mid && r.command && r.unknown && r.unknown.length) {
+      r = { command: null, trace: '語の途中', note: guide[kana(mid)] || '', unknown: [mid], echo: r.echo }
+    }
+    mid = saved
+    return r
+  }
+
+  function parse(input, opts) {
     const raw = strip(String(input || ''))
     if (!raw) return { command: null, trace: '空', unknown: [], echo: '' }
     if (/^[\x20-\x7e]+$/.test(input.trim())) {
@@ -352,6 +377,7 @@ function createCommander(asset, common) {
     let hardStop = false      // ★未知語が目的語の位置に立っていたら送らない
     const echo = []           // ★打鍵がかなでも、画面には代表形（漢字）で見せる
     let i = 0
+    let prev = null           // 直前に当たった語 { start, end, role }（語の途中を食ったかを見る）
     while (i < s.length) {
       const hit = tokenAt(s, i)
       // ★コマンドにならない語に当たったら、そこで止めて「知らない」と言う。
@@ -363,7 +389,9 @@ function createCommander(asset, common) {
                  unknown: [hit.disp], echo: echo.join('') + hit.disp }
       }
       if (hit) {
+        const start = i
         i += hit.kana.length
+        prev = { start, end: i, role: null, echoAt: echo.length }
         echo.push(hit.disp)
         // 直後の助詞を読む（役を決める）
         let role = null
@@ -378,7 +406,7 @@ function createCommander(asset, common) {
             || tokenAt(s, next)
             || PARTICLES.some(([q]) => s.startsWith(kana(q), next))
           if (!goes) continue
-          role = r; i = next; echo.push(p)
+          role = r; i = next; echo.push(p); prev.role = r
           // ★「の後ろに」「の中へ」—— 空間の助詞は方向の「に・へ」を伴うことがある
           if (SPATIAL.has(r) && (s[i] === 'に' || s[i] === 'へ')) { echo.push(s[i]); i++ }
           break
@@ -389,6 +417,19 @@ function createCommander(asset, common) {
       // 語彙にない部分は読み飛ばす（何が落ちたかは残す）
       let j = i + 1
       while (j < s.length && !tokenAt(s, j)) j++
+      // ★**語の直後に、助詞をはさまず知らない切れ端が続く** = その語は打った語の途中を食っている（2026-11-27・プレイ日記）。
+      //   「きりかえをまわす」→ 木 + 「りか」+ 絵画 で `turn painting`、「カゴを下ろす」→ 方角の「下」で `down`（縦穴で死にかける）、
+      //   「ふくらます」→ 吹く + 巣 で `blow in nest`。どれも**送ると別の命令が実行される**（「たきをみる」が木を見た罠の続き）。
+      //   ここでは覚えるだけ。送るものが決まったあとで、切れ端を抱えたままなら止める（`toCommand` の入口）——
+      //   先に止めると、命令形の読み直し（「きたへいけ」）や知らない言葉の断りの道を塞ぐ。
+      //   食われた語は**ひと続きで**見せる。右へは、続けて当たる 1 モーラの語（巣・絵・木）も含める（「下ろ」ではなく「下ろす」）。
+      //   ★切れ端が助詞で始まるなら語の途中ではない（「らんぷ」+「をつけろ」= 助詞の先が読めなかっただけ）。
+      //   ★副詞は前に語が無いので当たらない（「しずかにあける」）
+      if (!mid && prev && prev.end === i && prev.role === null && !PARTICLES.some(([p]) => s.startsWith(kana(p), i))) {
+        let k = j
+        for (let h = tokenAt(s, k); h && h.kana.length === 1; h = tokenAt(s, k)) k += h.kana.length
+        mid = s.slice(prev.start, k)
+      }
       let word = s.slice(i, j)
       // ★未知語が格助詞を背負っていたら、それは「物のつもり」だ。捨ててはいけない。
       //   動詞だけ送るとゲームが**別の物を勝手に補う**ことがあり、たまたま正しく
@@ -408,6 +449,7 @@ function createCommander(asset, common) {
       }
       echo.push(s.slice(i, j))
       i = j
+      prev = null
     }
     if (hardStop) {
       const g = unknown.map((w) => guide[kana(w)]).find(Boolean)

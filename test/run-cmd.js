@@ -45,6 +45,12 @@ for (const [ja, want] of CASES) {
   const ok = r.command === want
   check(ok, `${ja.padEnd(14, '　')} → ${String(r.command).padEnd(24)}${ok ? '' : ` ★期待: ${want}`}`)
 }
+// ★「知らない言葉」と名指しする語。[打つ, 名指しする語の列]
+for (const [ja, want] of T.unknownShown || []) {
+  const r = cm.toCommand(ja)
+  const ok = !r.command && JSON.stringify(r.unknown) === JSON.stringify(want)
+  check(ok, `名指し ${ja.padEnd(12, '　')} → ${r.command} / ${JSON.stringify(r.unknown)}${ok ? '' : ` ★期待: 送らずに ${JSON.stringify(want)}`}`)
+}
 // ★復唱（画面に出す「こう読んだ」）。送る英語が合っていても、復唱が別の物を言っていたら打った人は戸惑う。[打つ, 送る英語, 復唱]
 for (const [ja, want, shown] of T.shown || []) {
   const r = cm.toCommand(ja)
