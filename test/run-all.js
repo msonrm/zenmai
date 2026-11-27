@@ -58,6 +58,7 @@ for (const WORK of works) {
   if (spec.save) step(`${WORK} セーブ`, 'run-save.js', { env })
   else console.log(`– ${WORK} セーブ: test/works/${WORK}.js に start・save が無いので流さない`)
   step(`${WORK} Web の配線`, 'run-web-dom.js', { env })
+  step(`${WORK} 前回の続き・やめる`, 'run-resume.js', { env })
   // 煙の検査（VM が立って 1 手打てる・未訳なし）
   step(`${WORK} Glk シム`, 'run-shim.js', { env, args: ['look'], expect: /★未訳 0 ---/ })
   step(`${WORK} 端末（glkote-term）`, 'run-ja.js', { env, args: ['look'], expect: /★引けなかった 0 行/ })

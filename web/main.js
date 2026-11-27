@@ -25,6 +25,7 @@
   const store = {
     get(k) { try { return localStorage.getItem(k) } catch (e) { return null } },
     set(k, v) { try { localStorage.setItem(k, v); return true } catch (e) { return false } },
+    del(k) { try { localStorage.removeItem(k) } catch (e) { /* 消せなくても遊べる */ } },
   }
   const screen = $('screen')
   const { Translator } = window.ZenmaiTranslate
@@ -282,6 +283,11 @@
       const out = tr.feed(text)
       if (out) sink(strip(out))
     },
+    // ★原作が終わった（「やめる」→「はい」）。黙って止まらず、終わったと言う。続きの記録も消す（次は最初から）
+    exit() {
+      store.del(AUTO)
+      ended = true
+    },
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
       const m = line.match(/^(.*?)\s{2,}(.*)$/)
@@ -335,6 +341,14 @@
           ? '未訳の行は英語のまま、左に罫を付けて出る。ここに出たものは埋められる。'
           : 'ここまでに出た行は、版権表示をのぞいてすべて日本語になっている。'
       }
+      if (ended) {
+        show('（ゲームを終えた。Enter で最初から遊ぶ）', 'raw')
+        $('input').disabled = false
+        $('input').placeholder = 'Enter で最初から'
+        return refocus()
+      }
+      // ★入力を待つたびに**続きを覚える**（前回の続きから・2026-11-27）。聞き返しの候補を試している最中は覚えない
+      if (Glk.waitingFor() === 'line' && !trial) autosave()
       $('input').disabled = Glk.waitingFor() !== 'line'
       $('input').placeholder = Glk.waitingFor() === 'char' ? '何かキーを（Enter で進む）' : hint()
       refocus()
@@ -348,6 +362,7 @@
 
   // ★1 行を送る道は 1 本にする（キーボードもゲームパッドもここを通る）
   function send(text) {
+    if (ended) { location.reload(); return }
     if (Glk.waitingFor() === 'char') { $('input').value = ''; Glk.submitChar(32); return }
     // ★空は送らない。R🕹↓ を握っていると送信が連発し、空コマンドが並んでいた
     if (!String(text).trim()) { $('input').value = ''; return }
@@ -384,6 +399,42 @@
     pendingVerb = null
     submit(r.command)
   }
+
+  // ★前回の続き（2026-11-27・プレイ日記で、保存し忘れて 2 度進みを失っていた）。枠は作品ごと、手動の「保存する」とは別
+  const AUTO = `zenmai-auto-${WORK}`
+  let theVm = null
+  let ended = false
+  function autosave() {
+    if (!theVm || ended) return
+    try { theVm.do_autosave() } catch (e) { /* 覚えられなくても遊べる */ }
+  }
+  // 画面の段落は**終わりの 60 個**だけ覚える（描いたままの HTML。ふりがなの入切は CSS なので、そのまま戻せる）
+  function snapScreen() {
+    return Array.from(screen.children).slice(-60).map((el) => ({ t: el.tagName, c: el.className, h: el.innerHTML }))
+  }
+  function restoreScreen(list) {
+    for (const d of list) {
+      const el = document.createElement(d.t === 'HR' ? 'hr' : 'p')
+      if (d.c) el.className = d.c
+      el.innerHTML = d.h
+      screen.appendChild(el)
+    }
+    show('（前回の続きから。最初からにするときは「やりなおす」と打つ）', 'raw')
+  }
+
+  // ★本文を写すとき、ふりがなを外す（プレイ日記に「潜もぐんでいた」と読みが混ざって写っていた・2026-11-27）
+  screen.addEventListener('copy', (e) => {
+    const sel = typeof getSelection === 'function' ? getSelection() : null
+    if (!sel || !sel.rangeCount || !e.clipboardData) return
+    const box = document.createElement('div')
+    for (let i = 0; i < sel.rangeCount; i++) box.appendChild(sel.getRangeAt(i).cloneContents())
+    for (const r of box.querySelectorAll('rt, rp')) r.remove()
+    // 段落の境目は改行にする（innerText は DOM に載っていない要素では使えないので、段落ごとに拾う）
+    const paras = box.querySelectorAll('p')
+    const text = paras.length ? Array.from(paras).map((p) => p.textContent).join('\n\n') : box.textContent
+    e.clipboardData.setData('text/plain', text)
+    e.preventDefault()
+  })
 
   function sent(cmd, note) {
     const p = document.createElement('p')
@@ -740,7 +791,7 @@
   // ★題はメニューへ戻る道。遊びの途中で押してしまうと失われるので、確かめてから戻る
   if ($('title')) {
     $('title').addEventListener('click', () => {
-      if (typeof confirm !== 'function' || confirm('作品の選択へ戻ります。いまの遊びは、先に「保存する」しておかないと失われます。戻りますか？')) location.href = './'
+      if (typeof confirm !== 'function' || confirm('作品の選択へ戻ります。いまの遊びは続きから始められるように覚えています。戻りますか？')) location.href = './'
     })
   }
 
@@ -775,7 +826,27 @@
     startGame._done = true
     applyBodyLang()          // 訳の素通しは 1 行目から効かせる
     const vm = new window.ZVM()
-    vm.prepare(story, { vm, Glk, GlkOte: null, Dialog: null })
+    theVm = vm
+    // ★前回の続き = ZVM 自身の自動保存（`do_autosave` / 起動時の `do_autorestore`）。Glk の側の形は glk-shim.js の
+    //   `save_allstate` / `restore_allstate`。★画面（本文の段落）は VM の外なので、ここで一緒に覚えて描き戻す
+    const Dialog = {
+      streaming: false,
+      autosave_read() {
+        const j = store.get(AUTO)
+        if (!j) return null
+        try {
+          const d = JSON.parse(j)
+          if (d.screen) restoreScreen(d.screen)
+          return d.vm
+        } catch (e) { store.del(AUTO); return null }
+      },
+      autosave_write(sig, data) {
+        if (!data) { store.del(AUTO); return }
+        // ★書けなくても遊べる（容量・保存を切ったブラウザ）。続きが残らないだけ
+        store.set(AUTO, JSON.stringify({ sig, vm: data, screen: snapScreen() }))
+      },
+    }
+    vm.prepare(story, { vm, Glk, GlkOte: null, Dialog, do_vm_autosave: true })
     Glk.init({ vm })
   }
 

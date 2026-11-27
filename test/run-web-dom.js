@@ -76,7 +76,13 @@ const document = { getElementById: (id) => els[id], createElement: (t) => new El
 const window = { innerWidth: 1024, addEventListener() {} }
 // ふりがなの入切は body の class と localStorage を使う
 const store = {}
-global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }
+global.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) }, removeItem: (k) => { delete store[k] } }
+// ★`ZENMAI_STORE=<ファイル>` = 保存先（localStorage）を走らせ直しへ持ち越す。「開き直すと前回の続きから」を試す（run-resume.js）
+if (process.env.ZENMAI_STORE) {
+  const f = process.env.ZENMAI_STORE
+  if (fs.existsSync(f)) Object.assign(store, JSON.parse(fs.readFileSync(f, 'utf8')))
+  process.on('exit', () => fs.writeFileSync(f, JSON.stringify(store)))
+}
 global.atob = (b64) => Buffer.from(b64, 'base64').toString('binary')
 global.btoa = (bin) => Buffer.from(bin, 'binary').toString('base64')
 document.body = {
@@ -198,6 +204,8 @@ const finish = async () => {
   const rooms = els.screen.children.filter((p) => p.className === 'room')
   console.log('--- 場所名の段落: ' + rooms.length + ' 件　' + rooms.map((p) => p.textContent).join(' / '))
   if (cmds.length && !rooms.length) { console.error('★場所名が切り出されていない'); process.exit(1) }
+  // ★持ち越しの試し（run-resume.js）は手を流したところで終える。この先の打鍵の試しも自動保存に入り、続きの場所が変わるので
+  if (process.env.ZENMAI_STORE) process.exit(0)
   // ★ゲームパッドの配線（実機が無くても op から先は同じ道を通る）
   if (pad.onOp) {
     const inp = els.input
