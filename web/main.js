@@ -114,6 +114,7 @@
     ['最初からやり直す', 'RESTART'], ['終わる', 'QUIT'], ['バージョン表示', 'VERSION'],
     ['体の具合を見る', 'DIAGNOSE'], ['描写を詳しく', 'VERBOSE'], ['描写を簡潔に', 'BRIEF'],
     ['描写をごく簡潔に', 'SUPER'], ['直前をもう一度', '@again'],
+    ['レシートに印字', 'SCRIPT'], ['印字をやめる', 'UNSCRIPT'],
     // ★「はい / いいえ」は入れない —— 問いを出すときに画面が
     //   「（はい / いいえ）」と明記するので、手引きに書くと**同じことを 2 度言う**
   ]
@@ -146,6 +147,7 @@
   const LICENSES = [
     ['この Zenmai（自作部分）', '../LICENSE'],
     ['Z-machine 実装 — ifvms.js (ZVM)', '../vendor/LICENSE.ifvms'],
+    ['レシートの QR — qrcode-generator', '../vendor/LICENSE.qrcode-generator'],
     [`作品のソース — historicalsource（2025 年公開・${WORK_CFG.title}）`, `../vendor/${WORK}/LICENSE`],
   ]
   async function renderLicense() {
@@ -287,6 +289,8 @@
     exit() {
       store.del(AUTO)
       ended = true
+      // ★印字の途中で終えたら締める（原作は記録の旗を下ろさずに終わる）
+      if (printing) { flushTurn(true) }
     },
     status(line) {
       // v3 のステータス行は「部屋名 ……… 得点/手数」。部屋名だけ引く
@@ -349,6 +353,8 @@
       }
       // ★入力を待つたびに**続きを覚える**（前回の続きから・2026-11-27）。聞き返しの候補を試している最中は覚えない
       if (Glk.waitingFor() === 'line' && !trial) autosave()
+      // ★1 手ぶんをレシートへ（印字する = 原作の SCRIPT のあいだだけ）
+      if (Glk.waitingFor() && !trial) flushTurn()
       $('input').disabled = Glk.waitingFor() !== 'line'
       $('input').placeholder = Glk.waitingFor() === 'char' ? '何かキーを（Enter で進む）' : hint()
       refocus()
@@ -435,6 +441,76 @@
     e.clipboardData.setData('text/plain', text)
     e.preventDefault()
   })
+
+  // ================= レシートに印字（2026-11-27）=================
+  // ★記録の始まりと終わりは**原作の見出しの旗**（0x11 の bit 0 = transcript）で見る。SCRIPT が立て、UNSCRIPT が下ろす。
+  //   原作の記録の流れ（英語）は glk-shim.js が捨てる —— 載せるのは**画面に出した日本語**（打った言葉と返事）
+  // ★頭書きは Zenmai を前に出す（ZORK の名前は前に出さない・CLAUDE.md）。作品の版権表示は、原作が SCRIPT の返事として
+  //   出す版の表示（`ZORK I: …` / `Copyright (c) …` / `Release …`）がそのまま最初の 1 手に載る
+  const receiptStatus = (msg, cls) => {
+    const el = $('receipt-status')
+    if (el) { el.textContent = msg; el.className = `note ${cls || ''}` }
+  }
+  const receipt = window.ZenmaiReceipt.createReceipt({
+    qrcode: window.qrcode || (typeof qrcode !== 'undefined' ? qrcode : null),   // eslint-disable-line no-undef
+    onStatus: receiptStatus,
+  })
+  window.zenmaiReceipt = receipt     // ★検査（run-web-dom.js）が印字に積んだものを見る口
+  {
+    const u = $('receipt-usb')
+    const b = $('receipt-ble')
+    if (u) { u.hidden = !receipt.usb; u.addEventListener('click', () => receipt.connect('usb')) }
+    if (b) { b.hidden = !receipt.ble; b.addEventListener('click', () => receipt.connect('ble')) }
+    if (!receipt.usb && !receipt.ble) {
+      receiptStatus('このブラウザからは印字できない（Android・ChromeOS・PC の Chrome / Edge で使える。iPhone / iPad の Safari は非対応）。', 'err')
+    }
+  }
+  let printing = false      // いま印字している（頭書きを出した）
+  let warnedNoPrinter = false
+  let turnFrom = 0          // 前の 1 手の終わり（screen の子の番号）
+  const scripting = () => {
+    try { return !!(theVm && theVm.m && (theVm.m.getUint8(0x11) & 1)) } catch (e) { return false }
+  }
+  const stamp = () => {
+    const d = new Date()
+    const z = (n) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`
+  }
+  function flushTurn(final) {
+    const kids = Array.from(screen.children)
+    const items = kids.slice(turnFrom).map((el) => ({
+      cls: el.tagName === 'HR' ? 'hr' : el.className,
+      text: el._raw != null ? el._raw : el.textContent,
+    }))
+    turnFrom = kids.length
+    const on = scripting() && !final
+    if (on && !printing) {
+      if (!receipt.connected()) {
+        // ★つないでいないなら 1 度だけ言う（旗は立ったまま。つないだ次の手から頭書きを出して印字を始める）
+        if (!warnedNoPrinter) {
+          warnedNoPrinter = true
+          show('（レシートプリンタにつないでいない。歯車の「設定と手引き」からつなぐと、次の手から印字する）', 'raw')
+          turnFrom = screen.children.length
+        }
+        return
+      }
+      printing = true
+      receipt.print({ header: {
+        title: 'Zenmai',
+        lines: ['Z-machine の物語を', '日本語で読み、日本語で打つ', `${stamp()}　${WORK_CFG.title}（同梱の見本）`],
+        qrs: [{ url: 'https://zenmai.pages.dev/', label: 'zenmai.pages.dev' }, { url: 'https://msonrm.works/', label: 'msonrm.works' }],
+      } })
+    }
+    if (!printing) return
+    const t = window.ZenmaiReceipt.turnText(items)
+    if (t) receipt.print({ text: t })
+    if (!on) {
+      printing = false
+      warnedNoPrinter = false
+      receipt.print({ text: `――――――――\n${stamp()}\nZenmai  https://zenmai.pages.dev/` })
+      receipt.print({ feed: 4 })
+    }
+  }
 
   function sent(cmd, note) {
     const p = document.createElement('p')

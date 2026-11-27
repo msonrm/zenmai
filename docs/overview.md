@@ -179,6 +179,8 @@ sh test-sdl.sh                                  # ★PS1 版と SDL 版が同じ
 シムが持つのは窓の形と行の器だけ（`save_allstate` / `restore_allstate`）、本文の段落は `web/main.js` が一緒に覚えて描き戻す。
 原作が終わったとき（「やめる」）は ZVM が `glk_exit` を呼ぶ —— シムに無いと「[エラー] … is not a function」が出る（2026-11-27 まで出ていた）。
 検査 = `test/run-resume.js`。
+★**レシートに印字**（2026-11-27）: 原作の SCRIPT のあいだ、画面に出した日本語を 1 手ごとに 58mm の感熱プリンタへ送る（`src/receipt.js`・WebUSB / Web Bluetooth）。
+始まりと終わりは見出しの旗（0x11 の bit 0）で見る。原作の英語の記録は、シムが空の流れで受けて捨てる。検査 = `test/run-receipt.js`。
 
 ### 動かす
 
