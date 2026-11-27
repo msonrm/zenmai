@@ -175,6 +175,10 @@ sh test-sdl.sh                                  # ★PS1 版と SDL 版が同じ
 差し込んでいるのは **Glk の 2 経路だけ**（`glk_put_jstring` / `glk_put_jstring_stream`）。
 描画は**自前の Glk シム**（`src/glk-shim.js`）—— GlkOte を使わないので、日本語の組み方・
 ふりがな・コントローラ入力を自分の手に置ける。
+★**前回の続き**は ZVM 自身の自動保存（`do_vm_autosave`。Web は入力を待つたびに `do_autosave` を呼び、`zenmai-auto-<作品>` に覚える）。
+シムが持つのは窓の形と行の器だけ（`save_allstate` / `restore_allstate`）、本文の段落は `web/main.js` が一緒に覚えて描き戻す。
+原作が終わったとき（「やめる」）は ZVM が `glk_exit` を呼ぶ —— シムに無いと「[エラー] … is not a function」が出る（2026-11-27 まで出ていた）。
+検査 = `test/run-resume.js`。
 
 ### 動かす
 
